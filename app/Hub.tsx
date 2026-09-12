@@ -225,6 +225,8 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
       <Sparkles /><div className="cursor-glow" ref={glowRef} aria-hidden />
       <Palette open={palette} onClose={() => setPalette(false)} lang={lang} />
 
+      <a href="#main" className="skiplink">{tr(lang, "skipContent")}</a>
+
       <div className={"topbar" + (stuck ? " stuck" : "")}>
         <div className="brand">
           <span className="mark" aria-hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 7l4-3 4 3 4-3 4 3v10l-4 3-4-3-4 3-4-3z" stroke="#06060c" strokeWidth="2" strokeLinejoin="round" /></svg></span>
@@ -240,7 +242,7 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
         </div>
       </div>
 
-      <div className="shell">
+      <main id="main" className="shell">
         <motion.header className="hero" style={{ y: heroY, opacity: heroFade }}>
           <motion.div className="eyebrow" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <span className="dot" /> {tr(lang, "eyebrow")}
@@ -263,16 +265,16 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
           <div className="searchbar">
             <span className="ico" aria-hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" /><path d="M20 20l-3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></span>
             <input ref={searchRef} value={q} onChange={(e) => setQ(e.target.value)} placeholder={tr(lang, "searchPh")} aria-label={tr(lang, "quick")} />
-            {q && <button className="clear" onClick={() => setQ("")} aria-label="✕">✕</button>}
+            {q && <button className="clear" onClick={() => setQ("")} aria-label={tr(lang, "clear")}>✕</button>}
           </div>
           <div className="chips">
             {CATEGORIES.map((c) => (
-              <button key={c} className={"chip" + (cat === c ? " on" : "")} onClick={() => setCat(c)}>{CAT_EMOJI[c]} {catLabel(lang, c)}</button>
+              <button key={c} className={"chip" + (cat === c ? " on" : "")} onClick={() => setCat(c)} aria-pressed={cat === c}>{CAT_EMOJI[c]} {catLabel(lang, c)}</button>
             ))}
           </div>
         </div>
 
-        <div className="count">
+        <div className="count" role="status" aria-live="polite">
           {results.length === 0 ? tr(lang, "countNone") : results.length === TOOLS.length ? tr(lang, "countAll", TOOLS.length) : tr(lang, "countSome", results.length)}
         </div>
 
@@ -281,12 +283,12 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
         ) : (
           <div className="grid">{results.map((t, i) => <Card key={t.slug} t={t} q={nq} i={i} lang={lang} />)}</div>
         )}
+      </main>
 
-        <footer className="foot">
-          <span className="made">{tr(lang, "footMade")}</span>
-          <span>outils.ch · {TOOLS.length} {tr(lang, "stTools")} · {tr(lang, "footRight")}</span>
-        </footer>
-      </div>
+      <footer className="foot">
+        <span className="made">{tr(lang, "footMade")}</span>
+        <span>outils.ch · {TOOLS.length} {tr(lang, "stTools")} · {tr(lang, "footRight")}</span>
+      </footer>
     </>
   );
 }

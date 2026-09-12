@@ -1,6 +1,19 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/react";
+
+const inter = localFont({
+  variable: "--font-inter",
+  display: "swap",
+  src: [
+    { path: "./fonts/inter-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/inter-500.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/inter-600.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/inter-700.woff2", weight: "700", style: "normal" },
+    { path: "./fonts/inter-800.woff2", weight: "800", style: "normal" },
+  ],
+});
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
@@ -67,7 +80,7 @@ const siteLd = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="fr">
+    <html lang="fr" className={inter.variable}>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteLd) }} />
         {children}

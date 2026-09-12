@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { TOOLS, bySlug, longDescription, CAT_EMOJI } from "@/lib/catalog";
+import { TOOLS, bySlug, longDescription, CAT_EMOJI, isPro } from "@/lib/catalog";
 
 export function generateStaticParams() {
   return TOOLS.map((t) => ({ slug: t.slug }));
@@ -48,10 +48,23 @@ export default function ToolPage({ params }: { params: { slug: string } }) {
     ],
   };
 
+  const pro = isPro(t.slug);
+  const faq = pro
+    ? [
+        { q: `${t.name} est-il conforme aux normes suisses ?`, a: `Oui. ${t.name} applique les règles suisses en vigueur (${t.tagline.toLowerCase()}) pour produire un résultat directement utilisable dans votre comptabilité et vos démarches.` },
+        { q: `Mes données sont-elles envoyées sur un serveur ?`, a: `Non. Tout est calculé dans votre navigateur — aucune donnée (montant, IBAN, numéro) n'est transmise ni stockée. Idéal pour des informations sensibles.` },
+        { q: `${t.name} est-il gratuit ?`, a: `Oui, ${t.name} est gratuit et sans inscription. Des fonctions Pro pour les indépendants et PME suisses arrivent sur outils.ch.` },
+      ]
+    : [];
+  const faqLd = pro
+    ? { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) }
+    : null;
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      {faqLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />}
       <div className="fx" aria-hidden>
         <div className="aurora a1" /><div className="aurora a2" /><div className="aurora a3" /><div className="aurora a4" />
       </div>
@@ -63,7 +76,7 @@ export default function ToolPage({ params }: { params: { slug: string } }) {
         <header className="tp-head">
           <div className="tp-logo" style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }}>{initials}</div>
           <div>
-            <div className="tp-cat">{t.ch && <span className="ch">🇨🇭</span>}{CAT_EMOJI[t.cat]} {t.cat}</div>
+            <div className="tp-cat">{t.ch && <span className="ch">🇨🇭</span>}{CAT_EMOJI[t.cat]} {t.cat}{pro && <span className="tp-pro">Pro · Suisse</span>}</div>
             <h1 className="tp-h1">{t.name}</h1>
             <p className="tp-tag">{t.tagline}</p>
           </div>
@@ -73,11 +86,30 @@ export default function ToolPage({ params }: { params: { slug: string } }) {
           Ouvrir {t.name} <span aria-hidden>→</span>
         </a>
 
+        {pro && (
+          <div className="tp-trust">
+            <span className="tp-trust-i" aria-hidden>🇨🇭</span>
+            <span>Outil métier aux <b>normes suisses</b> — résultat prêt pour votre comptabilité. <b>100 % dans votre navigateur</b>, aucune donnée envoyée.</span>
+          </div>
+        )}
+
         <p className="tp-long">{longDescription(t)}</p>
 
         <div className="tp-tags">
           {t.tags.map((tag) => <span key={tag} className="tp-tagchip">{tag}</span>)}
         </div>
+
+        {pro && faq.length > 0 && (
+          <section className="tp-faq">
+            <h2>Questions fréquentes</h2>
+            {faq.map((f) => (
+              <details key={f.q} className="tp-qa">
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </section>
+        )}
 
         {related.length > 0 && (
           <section className="tp-rel">

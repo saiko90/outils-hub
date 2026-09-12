@@ -234,6 +234,7 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
           <div className="langsw" role="navigation" aria-label="Langue">
             <a href="/" className={lang === "fr" ? "on" : ""} hrefLang="fr-CH">FR</a>
             <a href="/de" className={lang === "de" ? "on" : ""} hrefLang="de-CH">DE</a>
+            <a href="/en" className={lang === "en" ? "on" : ""} hrefLang="en">EN</a>
           </div>
           <button className="kbtn" onClick={() => setPalette(true)}>{tr(lang, "quick")} <kbd>⌘K</kbd></button>
         </div>

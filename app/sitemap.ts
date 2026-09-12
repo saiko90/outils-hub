@@ -7,10 +7,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const home: MetadataRoute.Sitemap = [
     { url: B, lastModified: now, changeFrequency: "daily", priority: 1 },
     { url: `${B}/de`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
+    { url: `${B}/en`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
   ];
   const cats: MetadataRoute.Sitemap = REAL_CATEGORIES.flatMap((c) => [
     { url: `${B}/c/${CAT_SLUG[c]}`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.7 },
     { url: `${B}/de/c/${CAT_SLUG[c]}`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.65 },
+    { url: `${B}/en/c/${CAT_SLUG[c]}`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.65 },
   ]);
   const pages: MetadataRoute.Sitemap = TOOLS.map((t) => ({
     url: `${B}/o/${t.slug}`, lastModified: now, changeFrequency: "weekly", priority: 0.8,

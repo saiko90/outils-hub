@@ -271,3 +271,25 @@ export function faqFor(lang: Lang, tool: Tool): { q: string; a: string }[] {
     { q: `${n} est-il gratuit ?`, a: `Oui, ${n} est gratuit et sans inscription. Des fonctions Pro pour les indépendants et PME suisses arrivent sur outils.ch.` },
   ];
 }
+
+/** FAQ générique (pour tous les outils non-pro) traduite. */
+export function faqGeneric(lang: Lang, tool: Tool): { q: string; a: string }[] {
+  const tag = toolTagline(lang, tool).toLowerCase();
+  const n = tool.name;
+  const cat = catLabel(lang, tool.cat).toLowerCase();
+  if (lang === "de") return [
+    { q: `Ist ${n} gratis?`, a: `Ja. ${n} ist komplett gratis und ohne Anmeldung — ${tag}. Keine versteckten Kosten, keine Kreditkarte.` },
+    { q: `Werden meine Daten an einen Server gesendet?`, a: `Nein. ${n} läuft zu 100 % in deinem Browser — alles wird lokal berechnet, nichts wird übertragen oder gespeichert. Deine Daten bleiben privat.` },
+    { q: `Muss ich mich registrieren oder etwas installieren?`, a: `Nein. Öffne ${n} und leg direkt los — kein Konto, keine Installation. Funktioniert auf Handy und Computer.` },
+  ];
+  if (lang === "en") return [
+    { q: `Is ${n} free?`, a: `Yes. ${n} is completely free with no sign-up — ${tag}. No hidden costs, no credit card.` },
+    { q: `Is my data sent to a server?`, a: `No. ${n} runs 100% in your browser — everything is computed locally, nothing is transmitted or stored. Your data stays private.` },
+    { q: `Do I need to register or install anything?`, a: `No. Open ${n} and start right away — no account, no install. Works on mobile and desktop.` },
+  ];
+  return [
+    { q: `${n} est-il gratuit ?`, a: `Oui. ${n} est entièrement gratuit et sans inscription — ${tag}. Aucun coût caché, aucune carte bancaire.` },
+    { q: `Mes données sont-elles envoyées sur un serveur ?`, a: `Non. ${n} fonctionne 100 % dans ton navigateur — tout est calculé en local, rien n'est transmis ni stocké. Tes données restent privées.` },
+    { q: `Faut-il s'inscrire ou installer quelque chose ?`, a: `Non. Ouvre ${n} et commence directement — aucun compte, aucune installation. Fonctionne sur mobile comme sur ordinateur (outil ${cat}).` },
+  ];
+}

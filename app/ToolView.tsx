@@ -4,7 +4,7 @@ import { TOOLS, bySlug, CAT_EMOJI, isPro } from "@/lib/catalog";
 import FacturamaPro from "./FacturamaPro";
 import FinanceLead from "./FinanceLead";
 import {
-  type Lang, langPrefix, catLabel, toolTagline, longDescriptionL, faqFor,
+  type Lang, langPrefix, catLabel, toolTagline, longDescriptionL, faqFor, faqGeneric,
   tpProBadge, tpOpenVerb, faqTitle, tpTrust, t,
 } from "@/lib/i18n";
 
@@ -16,7 +16,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
   const related = TOOLS.filter((x) => x.cat === tool.cat && x.slug !== tool.slug).slice(0, 4);
   const initials = tool.name.slice(0, 2).toUpperCase();
   const pro = isPro(tool.slug);
-  const faq = pro ? faqFor(lang, tool) : [];
+  const faq = pro ? faqFor(lang, tool) : faqGeneric(lang, tool);
   const tagline = toolTagline(lang, tool);
   const canon = `https://outils.ch${p}/o/${tool.slug}`;
 
@@ -34,7 +34,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
       { "@type": "ListItem", position: 2, name: tool.name, item: canon },
     ],
   };
-  const faqLd = pro ? {
+  const faqLd = faq.length > 0 ? {
     "@context": "https://schema.org", "@type": "FAQPage",
     mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
   } : null;
@@ -79,7 +79,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
           {tool.tags.map((tag) => <span key={tag} className="tp-tagchip">{tag}</span>)}
         </div>
 
-        {pro && faq.length > 0 && (
+        {faq.length > 0 && (
           <section className="tp-faq">
             <h2>{faqTitle[lang]}</h2>
             {faq.map((f) => (

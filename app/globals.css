@@ -259,3 +259,32 @@ main:focus { outline: none; }
 .langsw a:hover { color: var(--ink); }
 .langsw a.on { color: #06060c; background: var(--brand); }
 @media (max-width: 560px) { .langsw a { padding: 6px 9px; font-size: 11px; } .kbtn { display: none; } }
+
+/* ---------- facturama Pro (page phare) ---------- */
+.fpro { margin: 40px 0; padding: 32px; border-radius: 24px; border: 1px solid rgba(129,140,248,0.28);
+  background: linear-gradient(160deg, rgba(99,102,241,0.12), rgba(236,72,153,0.08)); position: relative; overflow: hidden; }
+.fpro-kicker { display: inline-block; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: #c7d2fe; background: rgba(129,140,248,0.16); border: 1px solid rgba(129,140,248,0.3); padding: 6px 14px; border-radius: 999px; }
+.fpro-title { font-size: clamp(1.4rem, 3.5vw, 2rem); font-weight: 800; margin: 16px 0 8px; line-height: 1.15; }
+.fpro-sub { color: var(--muted); max-width: 62ch; line-height: 1.6; margin: 0 0 24px; }
+.fpro-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 640px) { .fpro-grid { grid-template-columns: 1fr; } }
+.fpro-card { display: flex; gap: 12px; padding: 16px; border-radius: 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+.fpro-card b { display: block; margin-bottom: 4px; font-size: 0.98rem; }
+.fpro-card p { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
+.fpro-check { flex-shrink: 0; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-weight: 800;
+  color: #06060c; background: linear-gradient(135deg, #34d399, #10b981); }
+.fpro-free { margin: 18px 0 24px; font-size: 0.9rem; color: #a5b4fc; font-weight: 600; }
+.fpro-wait { padding: 24px; border-radius: 18px; background: rgba(10,10,16,0.55); border: 1px solid rgba(255,255,255,0.1); }
+.fpro-soon { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: #fbbf24; background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.3); padding: 5px 12px; border-radius: 999px; margin-bottom: 12px; }
+.fpro-wait h3 { margin: 0 0 6px; font-size: 1.1rem; font-weight: 700; }
+.fpro-wait p { margin: 0 0 16px; color: var(--muted); font-size: 0.92rem; line-height: 1.55; }
+.fpro-form { display: flex; gap: 10px; flex-wrap: wrap; }
+.fpro-form input { flex: 1; min-width: 220px; padding: 13px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.03); color: var(--ink); font-size: 0.95rem; opacity: 0.6; cursor: not-allowed; }
+.fpro-form button { padding: 13px 22px; border-radius: 12px; border: none; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+  color: #fff; background: linear-gradient(135deg, #6366f1, #ec4899); transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.fpro-form button:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(99,102,241,0.35); }
+.fpro-thanks { padding: 14px 18px; border-radius: 12px; background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.35);
+  color: #6ee7b7; font-weight: 600; font-size: 0.95rem; }

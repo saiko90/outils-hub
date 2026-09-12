@@ -69,6 +69,29 @@ export const CAT_EMOJI: Record<string, string> = {
 
 export const bySlug = (slug: string): Tool | undefined => TOOLS.find((t) => t.slug === slug);
 
+/** Catégories réelles (hors « Tous »), pour les pages de catégorie SEO. */
+export const REAL_CATEGORIES = CATEGORIES.filter((c) => c !== "Tous") as string[];
+
+/** Slug URL ASCII pour chaque catégorie (/c/<slug>). */
+export const CAT_SLUG: Record<string, string> = {
+  Suisse: "suisse", Dev: "dev", Design: "design", Texte: "texte", Temps: "temps",
+  Finance: "finance", Calcul: "calcul", Données: "donnees", Web: "web", Santé: "sante",
+};
+
+/** Reverse : slug URL -> nom de catégorie. */
+export const catBySlug = (slug: string): string | undefined =>
+  REAL_CATEGORIES.find((c) => CAT_SLUG[c] === slug);
+
+/** Tous les outils d'une catégorie. */
+export const toolsByCat = (cat: string): Tool[] => TOOLS.filter((t) => t.cat === cat);
+
+/** Phrase d'intro SEO unique par catégorie. */
+export function categoryIntro(cat: string): string {
+  const n = toolsByCat(cat).length;
+  const ch = cat === "Suisse" ? " spécialement pensés pour la Suisse (TVA, AVS, IBAN, immobilier…)" : "";
+  return `Découvre nos ${n} outils ${cat.toLowerCase()}${ch} : gratuits, sans inscription et 100 % dans ton navigateur. Aucune donnée n'est envoyée sur un serveur — rapides, sans publicité, et utilisables sur mobile comme sur ordinateur.`;
+}
+
 /** Description longue générée (unique par outil) pour la page SEO dédiée. */
 export function longDescription(t: Tool): string {
   const kw = t.tags.slice(0, 6).join(", ");

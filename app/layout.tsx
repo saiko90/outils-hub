@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -15,6 +15,15 @@ export const metadata: Metadata = {
   keywords: ["outils en ligne", "outils gratuits", "convertisseur", "générateur", "calculateur", "développeur", "suisse", "outils.ch"],
   applicationName: "outils.ch",
   authors: [{ name: "Swiss Digital Studio" }],
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "outils.ch", statusBarStyle: "black-translucent" },
+  icons: {
+    icon: [
+      { url: "/icon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   openGraph: {
     title: "outils.ch — la boîte à outils gratuite",
     description: "44 micro-outils rapides. Recherche instantanée, 100 % navigateur, aucune donnée envoyée.",
@@ -26,6 +35,11 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: "outils.ch — 44 outils gratuits", description: "La boîte à outils suisse : recherche instantanée, 100 % navigateur." },
   robots: { index: true, follow: true },
   alternates: { canonical: "/" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a0f",
+  colorScheme: "dark",
 };
 
 const siteLd = {

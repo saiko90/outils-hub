@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { TOOLS, bySlug, CAT_EMOJI, isPro } from "@/lib/catalog";
 import FacturamaPro from "./FacturamaPro";
+import FinanceLead from "./FinanceLead";
 import {
   type Lang, langPrefix, catLabel, toolTagline, longDescriptionL, faqFor,
   tpProBadge, tpOpenVerb, faqTitle, tpTrust, t,
@@ -70,6 +71,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
         )}
 
         {tool.slug === "facturama" && <FacturamaPro lang={lang} />}
+        {(tool.slug === "capimmo" || tool.slug === "ibano") && <FinanceLead slug={tool.slug} lang={lang} />}
 
         <p className="tp-long">{longDescriptionL(lang, tool)}</p>
 

@@ -288,3 +288,18 @@ main:focus { outline: none; }
 .fpro-form button:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(99,102,241,0.35); }
 .fpro-thanks { padding: 14px 18px; border-radius: 12px; background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.35);
   color: #6ee7b7; font-weight: 600; font-size: 0.95rem; }
+
+/* ---------- lead finance (CTA placeholder capimmo/ibano) ---------- */
+.flead { margin: 32px 0; padding: 26px 28px; border-radius: 20px; text-align: center;
+  border: 1px solid rgba(52,211,153,0.28); background: linear-gradient(160deg, rgba(16,185,129,0.10), rgba(14,165,233,0.06)); }
+.flead-soon { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+  color: #6ee7b7; background: rgba(52,211,153,0.14); border: 1px solid rgba(52,211,153,0.32); padding: 5px 13px; border-radius: 999px; }
+.flead-title { font-size: clamp(1.2rem, 3vw, 1.5rem); font-weight: 800; margin: 14px 0 8px; }
+.flead-text { color: var(--muted); max-width: 52ch; margin: 0 auto 20px; line-height: 1.55; }
+.flead-btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 26px; border-radius: 12px; border: none;
+  font-weight: 700; font-size: 0.98rem; cursor: pointer; color: #06060c; background: linear-gradient(135deg, #34d399, #10b981);
+  transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.flead-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(16,185,129,0.32); }
+.flead-note { margin: 12px 0 0; font-size: 0.8rem; color: var(--muted); }
+.flead-thanks { display: inline-block; padding: 14px 20px; border-radius: 12px; background: rgba(52,211,153,0.12);
+  border: 1px solid rgba(52,211,153,0.35); color: #6ee7b7; font-weight: 600; font-size: 0.95rem; }

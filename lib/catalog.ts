@@ -85,6 +85,14 @@ export const catBySlug = (slug: string): string | undefined =>
 /** Tous les outils d'une catégorie. */
 export const toolsByCat = (cat: string): Tool[] => TOOLS.filter((t) => t.cat === cat);
 
+/**
+ * Outils « pro » suisses : réglementés, à livrable officiel, défendables face à l'IA.
+ * Cœur de la stratégie de revenu (SaaS / leads B2B). Ordre = priorité, facturama en tête.
+ */
+export const PRO_SLUGS = ["facturama", "tvaflash", "ibano", "capimmo", "avso", "prorato", "teleco", "lettro"];
+export const proTools = (): Tool[] => PRO_SLUGS.map((s) => bySlug(s)).filter(Boolean) as Tool[];
+export const isPro = (slug: string): boolean => PRO_SLUGS.includes(slug);
+
 /** Phrase d'intro SEO unique par catégorie. */
 export function categoryIntro(cat: string): string {
   const n = toolsByCat(cat).length;

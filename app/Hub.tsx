@@ -3,7 +3,13 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { TOOLS, CATEGORIES, CAT_EMOJI, type Tool } from "@/lib/catalog";
+import { track } from "@vercel/analytics";
+import { TOOLS, CATEGORIES, CAT_EMOJI, isPro, type Tool } from "@/lib/catalog";
+
+/** Événement de conversion : quel outil est réellement ouvert (identifie les outils « héros »). */
+function trackOpen(t: Tool, from: string) {
+  try { track("tool_open", { slug: t.slug, cat: t.cat, ch: !!t.ch, pro: isPro(t.slug), from }); } catch { /* no-op */ }
+}
 
 const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
@@ -119,7 +125,7 @@ function Card({ t, q, i }: { t: Tool; q: string; i: number }) {
         </div>
       </div>
       <div className="tag"><Highlight text={t.tagline} q={q} /></div>
-      <a ref={btn} className="go" href={t.url} target="_blank" rel="noopener noreferrer" style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }}>
+      <a ref={btn} className="go" href={t.url} target="_blank" rel="noopener noreferrer" onClick={() => trackOpen(t, "card")} style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }}>
         <span className="sheen" />Utiliser <span aria-hidden>→</span>
       </a>
     </motion.div>
@@ -134,7 +140,7 @@ function Palette({ open, onClose }: { open: boolean; onClose: () => void }) {
   const res = useMemo(() => filterTools(norm(q.trim()), "Tous").slice(0, 8), [q]);
   useEffect(() => { if (open) { setQ(""); setSel(0); setTimeout(() => inp.current?.focus(), 30); } }, [open]);
   useEffect(() => { setSel(0); }, [q]);
-  const open2 = useCallback((t: Tool) => { window.open(t.url, "_blank", "noopener"); onClose(); }, [onClose]);
+  const open2 = useCallback((t: Tool) => { trackOpen(t, "palette"); window.open(t.url, "_blank", "noopener"); onClose(); }, [onClose]);
   function onKey(e: React.KeyboardEvent) {
     if (e.key === "ArrowDown") { e.preventDefault(); setSel((s) => Math.min(s + 1, res.length - 1)); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setSel((s) => Math.max(s - 1, 0)); }
@@ -155,7 +161,7 @@ function Palette({ open, onClose }: { open: boolean; onClose: () => void }) {
           {res.length === 0 ? <div className="pempty">Aucun outil pour « {q} »</div> :
             res.map((t, idx) => (
               <a key={t.slug} className={"pitem" + (idx === sel ? " sel" : "")} href={t.url} target="_blank" rel="noopener noreferrer"
-                onMouseEnter={() => setSel(idx)} onClick={onClose}>
+                onMouseEnter={() => setSel(idx)} onClick={() => { trackOpen(t, "palette"); onClose(); }}>
                 <span className="plogo" style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }}>{t.name.slice(0, 2).toUpperCase()}</span>
                 <span className="pmeta"><b>{t.name}</b><small>{t.tagline}</small></span>
               </a>

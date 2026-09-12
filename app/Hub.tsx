@@ -190,7 +190,7 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
     try { const u = new URL(window.location.href); const v = u.searchParams.get("q"); if (v) setQ(v); } catch { /* ignore */ }
   }, []);
 
-  useEffect(() => { try { document.documentElement.lang = lang === "de" ? "de" : "fr"; } catch { /* ignore */ } }, [lang]);
+  useEffect(() => { try { document.documentElement.lang = lang; } catch { /* ignore */ } }, [lang]);
 
   useEffect(() => {
     const onScroll = () => setStuck(window.scrollY > 40);

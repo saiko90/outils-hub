@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Hub from "./Hub";
 import { TOOLS, REAL_CATEGORIES, CAT_SLUG, CAT_EMOJI, toolsByCat, proTools } from "@/lib/catalog";
+import { altLanguages } from "@/lib/i18n";
 
-export const metadata: Metadata = { alternates: { canonical: "/" } };
+export const metadata: Metadata = { alternates: { canonical: "/", languages: altLanguages("/") } };
 
 const jsonLd = {
   "@context": "https://schema.org",

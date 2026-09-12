@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   REAL_CATEGORIES, CAT_SLUG, catBySlug, toolsByCat, categoryIntro, CAT_EMOJI,
 } from "@/lib/catalog";
+import { altLanguages } from "@/lib/i18n";
 
 export function generateStaticParams() {
   return REAL_CATEGORIES.map((c) => ({ slug: CAT_SLUG[c] }));
@@ -19,7 +20,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
     title,
     description,
     keywords: [`outils ${cat.toLowerCase()}`, "outils en ligne", "gratuit", "sans inscription", ...toolsByCat(cat).map((t) => t.name)],
-    alternates: { canonical: `/c/${params.slug}` },
+    alternates: { canonical: `/c/${params.slug}`, languages: altLanguages(`/c/${params.slug}`) },
     openGraph: { title, description, type: "website", url: `https://outils.ch/c/${params.slug}` },
   };
 }

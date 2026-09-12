@@ -239,3 +239,11 @@ canvas.sparkles { position: fixed; inset: 0; z-index: -2; pointer-events: none; 
 .tp-qa summary::after { content: "+"; color: var(--muted); font-size: 20px; font-weight: 400; flex-shrink: 0; }
 .tp-qa[open] summary::after { content: "−"; }
 .tp-qa p { margin: 0; padding: 0 16px 16px; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
+
+/* ---- Sélecteur de langue ---- */
+.topright { display: flex; align-items: center; gap: 12px; }
+.langsw { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.langsw a { padding: 6px 11px; font-size: 12px; font-weight: 700; color: var(--muted); text-decoration: none; letter-spacing: 0.03em; transition: color 0.15s ease, background 0.15s ease; }
+.langsw a:hover { color: var(--ink); }
+.langsw a.on { color: #06060c; background: var(--brand); }
+@media (max-width: 560px) { .langsw a { padding: 6px 9px; font-size: 11px; } .kbtn { display: none; } }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { track } from "@vercel/analytics";
 import { TOOLS, CATEGORIES, CAT_EMOJI, isPro, type Tool } from "@/lib/catalog";
+import { type Lang, t as tr, catLabel, toolTagline } from "@/lib/i18n";
 
 /** Événement de conversion : quel outil est réellement ouvert (identifie les outils « héros »). */
 function trackOpen(t: Tool, from: string) {
@@ -99,7 +100,7 @@ function CountUp({ to, dur = 1100 }: { to: number; dur?: number }) {
   return <>{n}</>;
 }
 
-function Card({ t, q, i }: { t: Tool; q: string; i: number }) {
+function Card({ t, q, i, lang }: { t: Tool; q: string; i: number; lang: Lang }) {
   const ref = useRef<HTMLDivElement>(null);
   const btn = useRef<HTMLAnchorElement>(null);
   function onMove(e: React.MouseEvent) {
@@ -118,22 +119,22 @@ function Card({ t, q, i }: { t: Tool; q: string; i: number }) {
       transition={{ duration: 0.5, delay: Math.min(i * 0.03, 0.4), ease: [0.22, 1, 0.36, 1] }}>
       <div className="halo" />
       <div className="top">
-        <Link href={`/o/${t.slug}`} className="logo" style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }} aria-label={`Détails ${t.name}`}>{initials}</Link>
+        <Link href={`/o/${t.slug}`} className="logo" style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }} aria-label={`${tr(lang, "details")} ${t.name}`}>{initials}</Link>
         <div>
           <div className="nm"><Link href={`/o/${t.slug}`} style={{ color: "inherit", textDecoration: "none" }}><Highlight text={t.name} q={q} /></Link></div>
-          <div className="cat">{t.ch && <span className="ch">🇨🇭</span>}{CAT_EMOJI[t.cat]} {t.cat}</div>
+          <div className="cat">{t.ch && <span className="ch">🇨🇭</span>}{CAT_EMOJI[t.cat]} {catLabel(lang, t.cat)}</div>
         </div>
       </div>
-      <div className="tag"><Highlight text={t.tagline} q={q} /></div>
+      <div className="tag"><Highlight text={toolTagline(lang, t)} q={q} /></div>
       <a ref={btn} className="go" href={t.url} target="_blank" rel="noopener noreferrer" onClick={() => trackOpen(t, "card")} style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }}>
-        <span className="sheen" />Utiliser <span aria-hidden>→</span>
+        <span className="sheen" />{tr(lang, "use")} <span aria-hidden>→</span>
       </a>
     </motion.div>
   );
 }
 
 /* palette de commande ⌘K */
-function Palette({ open, onClose }: { open: boolean; onClose: () => void }) {
+function Palette({ open, onClose, lang }: { open: boolean; onClose: () => void; lang: Lang }) {
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(0);
   const inp = useRef<HTMLInputElement>(null);
@@ -155,25 +156,25 @@ function Palette({ open, onClose }: { open: boolean; onClose: () => void }) {
           <span style={{ color: "var(--muted)" }} aria-hidden>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" /><path d="M20 20l-3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
           </span>
-          <input ref={inp} value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={onKey} placeholder="Aller à un outil…" aria-label="Recherche rapide" />
+          <input ref={inp} value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={onKey} placeholder={tr(lang, "palettePh")} aria-label={tr(lang, "quick")} />
         </div>
         <div className="plist">
-          {res.length === 0 ? <div className="pempty">Aucun outil pour « {q} »</div> :
+          {res.length === 0 ? <div className="pempty">{tr(lang, "pEmpty")} « {q} »</div> :
             res.map((t, idx) => (
               <a key={t.slug} className={"pitem" + (idx === sel ? " sel" : "")} href={t.url} target="_blank" rel="noopener noreferrer"
                 onMouseEnter={() => setSel(idx)} onClick={() => { trackOpen(t, "palette"); onClose(); }}>
                 <span className="plogo" style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }}>{t.name.slice(0, 2).toUpperCase()}</span>
-                <span className="pmeta"><b>{t.name}</b><small>{t.tagline}</small></span>
+                <span className="pmeta"><b>{t.name}</b><small>{toolTagline(lang, t)}</small></span>
               </a>
             ))}
         </div>
-        <div className="phint"><span><kbd>↑</kbd><kbd>↓</kbd> naviguer</span><span><kbd>↵</kbd> ouvrir</span><span><kbd>esc</kbd> fermer</span></div>
+        <div className="phint"><span><kbd>↑</kbd><kbd>↓</kbd> {tr(lang, "pNav")}</span><span><kbd>↵</kbd> {tr(lang, "pOpen")}</span><span><kbd>esc</kbd> {tr(lang, "pClose")}</span></div>
       </motion.div>
     </div>
   );
 }
 
-export default function Hub() {
+export default function Hub({ lang = "fr" }: { lang?: Lang }) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("Tous");
   const [stuck, setStuck] = useState(false);
@@ -188,6 +189,8 @@ export default function Hub() {
   useEffect(() => {
     try { const u = new URL(window.location.href); const v = u.searchParams.get("q"); if (v) setQ(v); } catch { /* ignore */ }
   }, []);
+
+  useEffect(() => { try { document.documentElement.lang = lang === "de" ? "de" : "fr"; } catch { /* ignore */ } }, [lang]);
 
   useEffect(() => {
     const onScroll = () => setStuck(window.scrollY > 40);
@@ -220,62 +223,67 @@ export default function Hub() {
       <div className="fx" aria-hidden><div className="aurora a1" /><div className="aurora a2" /><div className="aurora a3" /><div className="aurora a4" /></div>
       <div className="grid-fx" aria-hidden /><div className="noise" aria-hidden />
       <Sparkles /><div className="cursor-glow" ref={glowRef} aria-hidden />
-      <Palette open={palette} onClose={() => setPalette(false)} />
+      <Palette open={palette} onClose={() => setPalette(false)} lang={lang} />
 
       <div className={"topbar" + (stuck ? " stuck" : "")}>
         <div className="brand">
           <span className="mark" aria-hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 7l4-3 4 3 4-3 4 3v10l-4 3-4-3-4 3-4-3z" stroke="#06060c" strokeWidth="2" strokeLinejoin="round" /></svg></span>
           <span><b>outils</b><span className="tld">.ch</span></span>
         </div>
-        <button className="kbtn" onClick={() => setPalette(true)}>Recherche rapide <kbd>⌘K</kbd></button>
+        <div className="topright">
+          <div className="langsw" role="navigation" aria-label="Langue">
+            <a href="/" className={lang === "fr" ? "on" : ""} hrefLang="fr-CH">FR</a>
+            <a href="/de" className={lang === "de" ? "on" : ""} hrefLang="de-CH">DE</a>
+          </div>
+          <button className="kbtn" onClick={() => setPalette(true)}>{tr(lang, "quick")} <kbd>⌘K</kbd></button>
+        </div>
       </div>
 
       <div className="shell">
         <motion.header className="hero" style={{ y: heroY, opacity: heroFade }}>
           <motion.div className="eyebrow" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <span className="dot" /> Boîte à outils suisse — 100 % gratuit, 100 % navigateur
+            <span className="dot" /> {tr(lang, "eyebrow")}
           </motion.div>
           <motion.h1 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.05 }}>
             <span className="g">outils</span><span className="tld">.ch</span>
           </motion.h1>
           <motion.p className="lead" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.14 }}>
-            {TOOLS.length} micro-outils rapides pour les développeurs, les créatifs et les Suisses pressés.
-            Aucune inscription, aucune donnée envoyée.
+            {TOOLS.length} {tr(lang, "leadA")} {tr(lang, "leadB")}
           </motion.p>
           <motion.div className="stats" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.24 }}>
-            <div className="stat"><div className="n"><CountUp to={TOOLS.length} /></div><div className="l">outils</div></div>
-            <div className="stat"><div className="n"><CountUp to={catCount} /></div><div className="l">catégories</div></div>
-            <div className="stat"><div className="n">0.-</div><div className="l">gratuit</div></div>
-            <div className="stat"><div className="n">100%</div><div className="l">navigateur</div></div>
+            <div className="stat"><div className="n"><CountUp to={TOOLS.length} /></div><div className="l">{tr(lang, "stTools")}</div></div>
+            <div className="stat"><div className="n"><CountUp to={catCount} /></div><div className="l">{tr(lang, "stCats")}</div></div>
+            <div className="stat"><div className="n">0.-</div><div className="l">{tr(lang, "stFree")}</div></div>
+            <div className="stat"><div className="n">100%</div><div className="l">{tr(lang, "stBrowser")}</div></div>
           </motion.div>
         </motion.header>
 
         <div className="searchwrap">
           <div className="searchbar">
             <span className="ico" aria-hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" /><path d="M20 20l-3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></span>
-            <input ref={searchRef} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher un outil… (ex. couleur, iban, json, durée)  — appuie sur /" aria-label="Rechercher un outil" />
-            {q && <button className="clear" onClick={() => setQ("")} aria-label="Effacer">✕</button>}
+            <input ref={searchRef} value={q} onChange={(e) => setQ(e.target.value)} placeholder={tr(lang, "searchPh")} aria-label={tr(lang, "quick")} />
+            {q && <button className="clear" onClick={() => setQ("")} aria-label="✕">✕</button>}
           </div>
           <div className="chips">
             {CATEGORIES.map((c) => (
-              <button key={c} className={"chip" + (cat === c ? " on" : "")} onClick={() => setCat(c)}>{CAT_EMOJI[c]} {c}</button>
+              <button key={c} className={"chip" + (cat === c ? " on" : "")} onClick={() => setCat(c)}>{CAT_EMOJI[c]} {catLabel(lang, c)}</button>
             ))}
           </div>
         </div>
 
         <div className="count">
-          {results.length === 0 ? "Aucun outil trouvé" : results.length === TOOLS.length ? `Les ${TOOLS.length} outils` : `${results.length} outil${results.length > 1 ? "s" : ""} trouvé${results.length > 1 ? "s" : ""}`}
+          {results.length === 0 ? tr(lang, "countNone") : results.length === TOOLS.length ? tr(lang, "countAll", TOOLS.length) : tr(lang, "countSome", results.length)}
         </div>
 
         {results.length === 0 ? (
-          <div className="empty"><div className="big">🔍</div><div>Rien pour « {q} »{cat !== "Tous" ? ` dans ${cat}` : ""}.</div><button onClick={() => { setQ(""); setCat("Tous"); }}>Voir tous les outils</button></div>
+          <div className="empty"><div className="big">🔍</div><div>{tr(lang, "emptyTitle")} « {q} »{cat !== "Tous" ? ` ${tr(lang, "emptyIn")} ${catLabel(lang, cat)}` : ""}.</div><button onClick={() => { setQ(""); setCat("Tous"); }}>{tr(lang, "emptyBtn")}</button></div>
         ) : (
-          <div className="grid">{results.map((t, i) => <Card key={t.slug} t={t} q={nq} i={i} />)}</div>
+          <div className="grid">{results.map((t, i) => <Card key={t.slug} t={t} q={nq} i={i} lang={lang} />)}</div>
         )}
 
         <footer className="foot">
-          <span className="made">🇨🇭 Fait en Suisse — Swiss Digital Studio</span>
-          <span>outils.ch · {TOOLS.length} outils · aucune donnée envoyée</span>
+          <span className="made">{tr(lang, "footMade")}</span>
+          <span>outils.ch · {TOOLS.length} {tr(lang, "stTools")} · {tr(lang, "footRight")}</span>
         </footer>
       </div>
     </>

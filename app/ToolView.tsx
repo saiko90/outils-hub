@@ -1,0 +1,106 @@
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { TOOLS, bySlug, CAT_EMOJI, isPro } from "@/lib/catalog";
+import {
+  type Lang, langPrefix, catLabel, toolTagline, longDescriptionL, faqFor,
+  tpProBadge, tpOpenVerb, faqTitle, tpTrust, t,
+} from "@/lib/i18n";
+
+export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
+  const tool = bySlug(slug);
+  if (!tool) notFound();
+  const p = langPrefix(lang);
+  const home = p || "/";
+  const related = TOOLS.filter((x) => x.cat === tool.cat && x.slug !== tool.slug).slice(0, 4);
+  const initials = tool.name.slice(0, 2).toUpperCase();
+  const pro = isPro(tool.slug);
+  const faq = pro ? faqFor(lang, tool) : [];
+  const tagline = toolTagline(lang, tool);
+  const canon = `https://outils.ch${p}/o/${tool.slug}`;
+
+  const jsonLd = {
+    "@context": "https://schema.org", "@type": "SoftwareApplication",
+    name: tool.name, description: tagline, url: canon,
+    applicationCategory: "WebApplication", operatingSystem: "Web",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "CHF" },
+    inLanguage: lang, isAccessibleForFree: true,
+  };
+  const breadcrumb = {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "outils.ch", item: `https://outils.ch${p || ""}` || "https://outils.ch" },
+      { "@type": "ListItem", position: 2, name: tool.name, item: canon },
+    ],
+  };
+  const faqLd = pro ? {
+    "@context": "https://schema.org", "@type": "FAQPage",
+    mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  } : null;
+
+  return (
+    <>
+      {lang !== "fr" && <script dangerouslySetInnerHTML={{ __html: `document.documentElement.lang="${lang}"` }} />}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      {faqLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />}
+      <div className="fx" aria-hidden>
+        <div className="aurora a1" /><div className="aurora a2" /><div className="aurora a3" /><div className="aurora a4" />
+      </div>
+      <div className="grid-fx" aria-hidden />
+
+      <main className="toolpage">
+        <nav className="crumb"><Link href={home}>{t(lang, "backAll")}</Link></nav>
+
+        <header className="tp-head">
+          <div className="tp-logo" style={{ background: `linear-gradient(135deg, ${tool.from}, ${tool.to})` }}>{initials}</div>
+          <div>
+            <div className="tp-cat">{tool.ch && <span className="ch">🇨🇭</span>}{CAT_EMOJI[tool.cat]} {catLabel(lang, tool.cat)}{pro && <span className="tp-pro">{tpProBadge[lang]}</span>}</div>
+            <h1 className="tp-h1">{tool.name}</h1>
+            <p className="tp-tag">{tagline}</p>
+          </div>
+        </header>
+
+        <a className="tp-cta" href={tool.url} target="_blank" rel="noopener noreferrer" style={{ background: `linear-gradient(135deg, ${tool.from}, ${tool.to})` }}>
+          {tpOpenVerb[lang]} {tool.name} <span aria-hidden>→</span>
+        </a>
+
+        {pro && (
+          <div className="tp-trust"><span className="tp-trust-i" aria-hidden>🇨🇭</span><span>{tpTrust[lang]}</span></div>
+        )}
+
+        <p className="tp-long">{longDescriptionL(lang, tool)}</p>
+
+        <div className="tp-tags">
+          {tool.tags.map((tag) => <span key={tag} className="tp-tagchip">{tag}</span>)}
+        </div>
+
+        {pro && faq.length > 0 && (
+          <section className="tp-faq">
+            <h2>{faqTitle[lang]}</h2>
+            {faq.map((f) => (
+              <details key={f.q} className="tp-qa"><summary>{f.q}</summary><p>{f.a}</p></details>
+            ))}
+          </section>
+        )}
+
+        {related.length > 0 && (
+          <section className="tp-rel">
+            <h2>{t(lang, "sameCat")}</h2>
+            <div className="tp-relgrid">
+              {related.map((r) => (
+                <Link key={r.slug} href={`${p}/o/${r.slug}`} className="tp-relcard">
+                  <span className="tp-rellogo" style={{ background: `linear-gradient(135deg, ${r.from}, ${r.to})` }}>{r.name.slice(0, 2).toUpperCase()}</span>
+                  <span><b>{r.name}</b><small>{toolTagline(lang, r)}</small></span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <footer className="tp-foot">
+          <Link href={home}>outils.ch</Link> · {TOOLS.length} {t(lang, "freeTools")} · {t(lang, "madeCH")}
+        </footer>
+      </main>
+    </>
+  );
+}

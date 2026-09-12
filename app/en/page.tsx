@@ -45,7 +45,7 @@ export default function PageEn() {
           </div>
           <div className="pro-grid">
             {flagship && (
-              <Link href={`/o/${flagship.slug}`} className="pro-flag" style={{ ["--c1" as string]: flagship.from, ["--c2" as string]: flagship.to }}>
+              <Link href={`/en/o/${flagship.slug}`} className="pro-flag" style={{ ["--c1" as string]: flagship.from, ["--c2" as string]: flagship.to }}>
                 <span className="pro-badge">{t(lang, "proFlag")}</span>
                 <span className="pro-logo" style={{ background: `linear-gradient(135deg, ${flagship.from}, ${flagship.to})` }}>{flagship.name.slice(0, 2).toUpperCase()}</span>
                 <b className="pro-name">{flagship.name}</b>
@@ -55,7 +55,7 @@ export default function PageEn() {
             )}
             <div className="pro-list">
               {rest.map((tool) => (
-                <Link key={tool.slug} href={`/o/${tool.slug}`} className="pro-card">
+                <Link key={tool.slug} href={`/en/o/${tool.slug}`} className="pro-card">
                   <span className="pro-clogo" style={{ background: `linear-gradient(135deg, ${tool.from}, ${tool.to})` }}>{tool.name.slice(0, 2).toUpperCase()}</span>
                   <span className="pro-ctxt"><b>{tool.name}</b><small>{toolTagline(lang, tool)}</small></span>
                   <span className="pro-cgo" aria-hidden>→</span>

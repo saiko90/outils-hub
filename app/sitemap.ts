@@ -14,8 +14,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${B}/de/c/${CAT_SLUG[c]}`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.65 },
     { url: `${B}/en/c/${CAT_SLUG[c]}`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.65 },
   ]);
-  const pages: MetadataRoute.Sitemap = TOOLS.map((t) => ({
-    url: `${B}/o/${t.slug}`, lastModified: now, changeFrequency: "weekly", priority: 0.8,
-  }));
+  const pages: MetadataRoute.Sitemap = TOOLS.flatMap((t) => [
+    { url: `${B}/o/${t.slug}`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.8 },
+    { url: `${B}/de/o/${t.slug}`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.75 },
+    { url: `${B}/en/o/${t.slug}`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.75 },
+  ]);
   return [...home, ...cats, ...pages];
 }

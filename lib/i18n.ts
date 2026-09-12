@@ -224,3 +224,50 @@ export function altLanguages(pathNoPrefix: string): Record<string, string> {
     "x-default": fr,
   };
 }
+
+/* ---- Pages outil : helpers de traduction ---- */
+export const tpProBadge: Record<Lang, string> = { fr: "Pro · Suisse", de: "Pro · Schweiz", en: "Pro · Swiss" };
+export const tpOpenVerb: Record<Lang, string> = { fr: "Ouvrir", de: "Öffnen", en: "Open" };
+export const faqTitle: Record<Lang, string> = { fr: "Questions fréquentes", de: "Häufige Fragen", en: "FAQ" };
+export const tpTrust: Record<Lang, string> = {
+  fr: "Outil métier aux normes suisses — résultat prêt pour votre comptabilité. 100 % dans votre navigateur, aucune donnée envoyée.",
+  de: "Business-Tool nach Schweizer Norm — Ergebnis bereit für Ihre Buchhaltung. 100 % im Browser, keine Daten gesendet.",
+  en: "Business tool built to Swiss standards — result ready for your accounting. 100% in your browser, no data sent.",
+};
+
+/** Description longue traduite pour la page SEO. */
+export function longDescriptionL(lang: Lang, tool: Tool): string {
+  const kw = tool.tags.slice(0, 6).join(", ");
+  const tag = toolTagline(lang, tool).toLowerCase();
+  if (lang === "de") {
+    const ch = tool.ch ? " Für die Schweiz konzipiert." : "";
+    return `${tool.name} ist ein Online-${catLabel("de", tool.cat)}-Tool, gratis und ohne Anmeldung: ${tag}.${ch} Alles wird direkt in deinem Browser berechnet — keine Daten werden an einen Server gesendet, deine Informationen bleiben privat. Schnell, werbefrei, auf Handy und Computer nutzbar. Stichwörter: ${kw}.`;
+  }
+  if (lang === "en") {
+    const ch = tool.ch ? " Built for Switzerland." : "";
+    return `${tool.name} is a free, no-sign-up online ${catLabel("en", tool.cat).toLowerCase()} tool: ${tag}.${ch} Everything is computed right in your browser — no data is sent to a server, your information stays private. Fast, ad-free, works on mobile and desktop. Keywords: ${kw}.`;
+  }
+  const ch = tool.ch ? " Pensé pour la Suisse." : "";
+  return `${tool.name} est un outil ${tool.cat.toLowerCase()} en ligne, gratuit et sans inscription : ${tag}.${ch} Tout se calcule directement dans ton navigateur — aucune donnée n'est envoyée sur un serveur, tes informations restent privées. Rapide, sans publicité, utilisable sur mobile comme sur ordinateur. Mots-clés : ${kw}.`;
+}
+
+/** FAQ (pour les outils pro) traduite. */
+export function faqFor(lang: Lang, tool: Tool): { q: string; a: string }[] {
+  const tag = toolTagline(lang, tool).toLowerCase();
+  const n = tool.name;
+  if (lang === "de") return [
+    { q: `Ist ${n} normkonform (Schweiz)?`, a: `Ja. ${n} wendet die geltenden Schweizer Regeln an (${tag}), um ein Ergebnis zu liefern, das direkt in Ihrer Buchhaltung und für Ihre Behördengänge nutzbar ist.` },
+    { q: `Werden meine Daten an einen Server gesendet?`, a: `Nein. Alles wird in Ihrem Browser berechnet — keine Daten (Betrag, IBAN, Nummer) werden übertragen oder gespeichert. Ideal für sensible Informationen.` },
+    { q: `Ist ${n} gratis?`, a: `Ja, ${n} ist gratis und ohne Anmeldung. Pro-Funktionen für Schweizer Selbstständige und KMU kommen bald auf outils.ch.` },
+  ];
+  if (lang === "en") return [
+    { q: `Is ${n} compliant with Swiss standards?`, a: `Yes. ${n} applies the current Swiss rules (${tag}) to produce a result you can use directly in your accounting and paperwork.` },
+    { q: `Is my data sent to a server?`, a: `No. Everything is computed in your browser — no data (amount, IBAN, number) is transmitted or stored. Ideal for sensitive information.` },
+    { q: `Is ${n} free?`, a: `Yes, ${n} is free and requires no sign-up. Pro features for Swiss freelancers and SMEs are coming to outils.ch.` },
+  ];
+  return [
+    { q: `${n} est-il conforme aux normes suisses ?`, a: `Oui. ${n} applique les règles suisses en vigueur (${tag}) pour produire un résultat directement utilisable dans votre comptabilité et vos démarches.` },
+    { q: `Mes données sont-elles envoyées sur un serveur ?`, a: `Non. Tout est calculé dans votre navigateur — aucune donnée (montant, IBAN, numéro) n'est transmise ni stockée. Idéal pour des informations sensibles.` },
+    { q: `${n} est-il gratuit ?`, a: `Oui, ${n} est gratuit et sans inscription. Des fonctions Pro pour les indépendants et PME suisses arrivent sur outils.ch.` },
+  ];
+}

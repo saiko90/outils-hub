@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { track } from "@vercel/analytics";
 import { TOOLS, CATEGORIES, CAT_EMOJI, isPro, type Tool } from "@/lib/catalog";
-import { type Lang, t as tr, catLabel, toolTagline } from "@/lib/i18n";
+import { type Lang, t as tr, catLabel, toolTagline, langPrefix } from "@/lib/i18n";
 
 /** Événement de conversion : quel outil est réellement ouvert (identifie les outils « héros »). */
 function trackOpen(t: Tool, from: string) {
@@ -119,9 +119,9 @@ function Card({ t, q, i, lang }: { t: Tool; q: string; i: number; lang: Lang }) 
       transition={{ duration: 0.5, delay: Math.min(i * 0.03, 0.4), ease: [0.22, 1, 0.36, 1] }}>
       <div className="halo" />
       <div className="top">
-        <Link href={`/o/${t.slug}`} className="logo" style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }} aria-label={`${tr(lang, "details")} ${t.name}`}>{initials}</Link>
+        <Link href={`${langPrefix(lang)}/o/${t.slug}`} className="logo" style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }} aria-label={`${tr(lang, "details")} ${t.name}`}>{initials}</Link>
         <div>
-          <div className="nm"><Link href={`/o/${t.slug}`} style={{ color: "inherit", textDecoration: "none" }}><Highlight text={t.name} q={q} /></Link></div>
+          <div className="nm"><Link href={`${langPrefix(lang)}/o/${t.slug}`} style={{ color: "inherit", textDecoration: "none" }}><Highlight text={t.name} q={q} /></Link></div>
           <div className="cat">{t.ch && <span className="ch">🇨🇭</span>}{CAT_EMOJI[t.cat]} {catLabel(lang, t.cat)}</div>
         </div>
       </div>

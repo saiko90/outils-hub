@@ -79,7 +79,7 @@ export default function CategoryPageDe({ params }: { params: { slug: string } })
 
         <section className="cat-grid">
           {tools.map((x) => (
-            <Link key={x.slug} href={`/o/${x.slug}`} className="cat-card">
+            <Link key={x.slug} href={`/de/o/${x.slug}`} className="cat-card">
               <span className="cat-logo" style={{ background: `linear-gradient(135deg, ${x.from}, ${x.to})` }}>{x.name.slice(0, 2).toUpperCase()}</span>
               <span className="cat-txt"><b>{x.ch ? "🇨🇭 " : ""}{x.name}</b><small>{toolTagline(lang, x)}</small></span>
               <span className="cat-go" aria-hidden>→</span>

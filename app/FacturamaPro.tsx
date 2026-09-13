@@ -5,18 +5,27 @@ import { track } from "@vercel/analytics";
 import type { Lang } from "@/lib/i18n";
 
 /**
- * Section de positionnement « facturama Pro » (produit phare).
- * IMPORTANT (garde-fou) : AUCUNE collecte d'email réelle, AUCUN POST backend.
- * Le champ est désactivé ; le bouton n'enregistre qu'une intention (analytics)
- * et affiche un remerciement local. À activer seulement après validation de Michaël.
+ * Section « facturama Pro » (produit phare) avec collecte d'email de liste d'attente.
+ * Collecte activée (validée par Michaël). L'email est enregistré dans Supabase
+ * (table public.waitlist, RLS insert-only pour anon) via la clé PUBLISHABLE
+ * (publique par conception, protégée par RLS). Consentement affiché au point de collecte.
  */
 
-const C: Record<Lang, {
+const SB_URL = "https://srcvnqfgtazupuzwznrr.supabase.co";
+const SB_KEY = "sb_publishable_YUwom0kvnMbpn8Rpug1FaA_1H35zkY_";
+const ABOUT_PATH: Record<Lang, string> = { fr: "/a-propos", de: "/de/ueber-uns", en: "/en/about" };
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+type Copy = {
   kicker: string; title: string; sub: string;
   benefits: { t: string; d: string }[];
   freeNote: string;
-  waitTitle: string; waitSub: string; ph: string; btn: string; thanks: string; soon: string;
-}> = {
+  waitTitle: string; waitSub: string; ph: string; btn: string; sending: string;
+  thanks: string; soon: string; consent: string; consentLink: string;
+  errInvalid: string; errGeneric: string;
+};
+
+const C: Record<Lang, Copy> = {
   fr: {
     kicker: "Bientôt — version Pro",
     title: "facturama Pro : la QR-facture suisse, sans friction",
@@ -29,11 +38,16 @@ const C: Record<Lang, {
     ],
     freeNote: "L'outil gratuit reste gratuit — la version Pro s'ajoute par-dessus.",
     waitTitle: "Intéressé par la version Pro ?",
-    waitSub: "Les inscriptions ne sont pas encore ouvertes. Indique ton intérêt et tu seras prévenu au lancement.",
-    ph: "ton@email.ch (bientôt)",
+    waitSub: "Laisse ton email : tu seras prévenu en priorité au lancement.",
+    ph: "ton@email.ch",
     btn: "Me prévenir au lancement",
-    thanks: "Merci ! Ton intérêt est noté. On revient vers toi au lancement.",
-    soon: "Inscriptions bientôt ouvertes",
+    sending: "Envoi…",
+    thanks: "Merci ! Tu es sur la liste. On te préviendra en premier au lancement de facturama Pro.",
+    soon: "Inscriptions ouvertes",
+    consent: "En laissant ton email, tu acceptes d'être prévenu du lancement de facturama Pro. Aucune revente, désinscription à tout moment.",
+    consentLink: "En savoir plus",
+    errInvalid: "Merci d'entrer une adresse email valide.",
+    errGeneric: "Oups, un souci est survenu. Réessaie dans un instant.",
   },
   de: {
     kicker: "Bald — Pro-Version",
@@ -47,11 +61,16 @@ const C: Record<Lang, {
     ],
     freeNote: "Das Gratis-Tool bleibt gratis — die Pro-Version kommt obendrauf.",
     waitTitle: "Interesse an der Pro-Version?",
-    waitSub: "Die Anmeldung ist noch nicht offen. Zeig dein Interesse und wir informieren dich zum Start.",
-    ph: "deine@email.ch (bald)",
+    waitSub: "Hinterlasse deine E-Mail: Du wirst zum Start prioritär informiert.",
+    ph: "deine@email.ch",
     btn: "Zum Start benachrichtigen",
-    thanks: "Danke! Dein Interesse ist notiert. Wir melden uns zum Start.",
-    soon: "Anmeldung bald offen",
+    sending: "Senden…",
+    thanks: "Danke! Du bist auf der Liste. Wir informieren dich als Erste zum Start von facturama Pro.",
+    soon: "Anmeldung offen",
+    consent: "Mit deiner E-Mail erklärst du dich einverstanden, über den Start von facturama Pro informiert zu werden. Kein Weiterverkauf, jederzeit abmeldbar.",
+    consentLink: "Mehr erfahren",
+    errInvalid: "Bitte gib eine gültige E-Mail-Adresse ein.",
+    errGeneric: "Hoppla, etwas ist schiefgelaufen. Versuch es gleich nochmal.",
   },
   en: {
     kicker: "Coming soon — Pro version",
@@ -65,27 +84,56 @@ const C: Record<Lang, {
     ],
     freeNote: "The free tool stays free — Pro is added on top.",
     waitTitle: "Interested in the Pro version?",
-    waitSub: "Sign-ups aren't open yet. Register your interest and we'll notify you at launch.",
-    ph: "you@email.ch (soon)",
+    waitSub: "Leave your email: you'll be notified first at launch.",
+    ph: "you@email.ch",
     btn: "Notify me at launch",
-    thanks: "Thanks! Your interest is noted. We'll get back to you at launch.",
-    soon: "Sign-ups opening soon",
+    sending: "Sending…",
+    thanks: "Thanks! You're on the list. We'll notify you first when facturama Pro launches.",
+    soon: "Sign-ups open",
+    consent: "By leaving your email, you agree to be notified about the launch of facturama Pro. No resale, unsubscribe anytime.",
+    consentLink: "Learn more",
+    errInvalid: "Please enter a valid email address.",
+    errGeneric: "Oops, something went wrong. Try again in a moment.",
   },
 };
 
+type Status = "idle" | "sending" | "done" | "invalid" | "error";
+
 export default function FacturamaPro({ lang }: { lang: Lang }) {
   const c = C[lang];
-  const [done, setDone] = useState(false);
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<Status>("idle");
 
   useEffect(() => {
-    // Mesure d'intérêt pour la page phare (pas de donnée perso).
     track("pro_view", { tool: "facturama", lang });
   }, [lang]);
 
-  function onInterest() {
-    // Garde-fou : on n'enregistre QU'UNE intention anonyme, aucun email.
-    track("cta_click", { tool: "facturama", intent: "waitlist", lang });
-    setDone(true);
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const em = email.trim();
+    if (!EMAIL_RE.test(em) || em.length > 254) { setStatus("invalid"); return; }
+    setStatus("sending");
+    try {
+      const res = await fetch(`${SB_URL}/rest/v1/waitlist`, {
+        method: "POST",
+        headers: {
+          apikey: SB_KEY,
+          Authorization: `Bearer ${SB_KEY}`,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({ email: em, source: "facturama", lang }),
+      });
+      // 2xx = inscrit ; 409 = déjà inscrit (doublon) → succès côté UX.
+      if (res.ok || res.status === 409) {
+        try { track("cta_click", { tool: "facturama", intent: "waitlist", lang }); } catch { /* no-op */ }
+        setStatus("done");
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
   }
 
   return (
@@ -112,14 +160,35 @@ export default function FacturamaPro({ lang }: { lang: Lang }) {
         <div className="fpro-soon">{c.soon}</div>
         <h3>{c.waitTitle}</h3>
         <p>{c.waitSub}</p>
-        {done ? (
+        {status === "done" ? (
           <div className="fpro-thanks" role="status">{c.thanks}</div>
         ) : (
-          <div className="fpro-form">
-            {/* Champ désactivé : aucune collecte tant que non validé. */}
-            <input type="email" placeholder={c.ph} disabled aria-label={c.ph} />
-            <button type="button" onClick={onInterest}>{c.btn}</button>
-          </div>
+          <>
+            <form className="fpro-form" onSubmit={submit} noValidate>
+              <input
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => { setEmail(e.target.value); if (status === "invalid" || status === "error") setStatus("idle"); }}
+                placeholder={c.ph}
+                aria-label={c.ph}
+                aria-invalid={status === "invalid"}
+                disabled={status === "sending"}
+                required
+              />
+              <button type="submit" disabled={status === "sending"}>
+                {status === "sending" ? c.sending : c.btn}
+              </button>
+            </form>
+            {(status === "invalid" || status === "error") && (
+              <p className="fpro-err" role="alert">{status === "invalid" ? c.errInvalid : c.errGeneric}</p>
+            )}
+            <p className="fpro-consent">
+              {c.consent}{" "}
+              <a href={ABOUT_PATH[lang]}>{c.consentLink}</a>
+            </p>
+          </>
         )}
       </div>
     </section>

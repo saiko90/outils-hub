@@ -300,7 +300,12 @@ main:focus { outline: none; }
 .fpro-wait p { margin: 0 0 16px; color: var(--muted); font-size: 0.92rem; line-height: 1.55; }
 .fpro-form { display: flex; gap: 10px; flex-wrap: wrap; }
 .fpro-form input { flex: 1; min-width: 220px; padding: 13px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.03); color: var(--ink); font-size: 0.95rem; opacity: 0.6; cursor: not-allowed; }
+  background: rgba(255,255,255,0.05); color: var(--ink); font-size: 0.95rem; outline: none; transition: border-color 0.15s ease; }
+.fpro-form input:focus { border-color: rgba(129,140,248,0.6); }
+.fpro-form input:disabled { opacity: 0.6; cursor: progress; }
+.fpro-err { margin: 10px 0 0; font-size: 0.85rem; color: #fca5a5; }
+.fpro-consent { margin: 12px 0 0; font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+.fpro-consent a { color: #a5b4fc; }
 .fpro-form button { padding: 13px 22px; border-radius: 12px; border: none; font-weight: 700; font-size: 0.95rem; cursor: pointer;
   color: #fff; background: linear-gradient(135deg, #6366f1, #ec4899); transition: transform 0.15s ease, box-shadow 0.15s ease; }
 .fpro-form button:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(99,102,241,0.35); }

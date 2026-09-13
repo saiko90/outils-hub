@@ -356,3 +356,7 @@ main:focus { outline: none; }
   transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease, transform 0.15s ease; }
 .favstar:hover { color: #fbbf24; border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.1); transform: scale(1.08); }
 .favstar.on { color: #fbbf24; border-color: rgba(251,191,36,0.5); background: rgba(251,191,36,0.14); }
+
+/* ---------- état vide : suggestions ---------- */
+.empty-sugg { margin-top: 36px; width: 100%; }
+.empty-sugg-h { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }

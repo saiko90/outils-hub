@@ -6,6 +6,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { track } from "@vercel/analytics";
 import { TOOLS, CATEGORIES, CAT_EMOJI, CAT_SLUG, bySlug, isPro, type Tool } from "@/lib/catalog";
 import { type Lang, t as tr, catLabel, toolTagline, langPrefix } from "@/lib/i18n";
+import { norm, filterTools, suggestedTools } from "@/lib/search";
 
 /** Événement de conversion : quel outil est réellement ouvert (identifie les outils « héros »). */
 function trackOpen(t: Tool, from: string) {
@@ -21,25 +22,7 @@ function lsSet(key: string, arr: string[]) {
   try { localStorage.setItem(key, JSON.stringify(arr)); } catch { /* no-op */ }
 }
 
-const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-
-function scoreTool(t: Tool, q: string): number {
-  if (!q) return 1;
-  const n = norm(t.name), tag = norm(t.tagline), tags = t.tags.map(norm);
-  if (n.startsWith(q)) return 100;
-  if (n.includes(q)) return 80;
-  if (tags.some((x) => x.startsWith(q))) return 60;
-  if (tag.includes(q)) return 40;
-  if (tags.some((x) => x.includes(q))) return 30;
-  if (norm(t.cat).includes(q)) return 20;
-  return 0;
-}
-function filterTools(q: string, cat: string): Tool[] {
-  return TOOLS.map((t) => ({ t, s: scoreTool(t, q) }))
-    .filter((x) => x.s > 0 && (cat === "Tous" || x.t.cat === cat))
-    .sort((a, b) => b.s - a.s || a.t.name.localeCompare(b.t.name))
-    .map((x) => x.t);
-}
+// Recherche extraite dans lib/search.ts (synonymes + tolérance aux fautes, testable).
 
 function Highlight({ text, q }: { text: string; q: string }) {
   if (!q) return <>{text}</>;
@@ -325,7 +308,17 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
         </div>
 
         {results.length === 0 ? (
-          <div className="empty"><div className="big">🔍</div><div>{tr(lang, "emptyTitle")} « {q} »{cat !== "Tous" ? ` ${tr(lang, "emptyIn")} ${catLabel(lang, cat)}` : ""}.</div><button onClick={() => { setQ(""); setCat("Tous"); }}>{tr(lang, "emptyBtn")}</button></div>
+          <div className="empty">
+            <div className="big">🔍</div>
+            <div>{tr(lang, "emptyTitle")} « {q} »{cat !== "Tous" ? ` ${tr(lang, "emptyIn")} ${catLabel(lang, cat)}` : ""}.</div>
+            <button onClick={() => { setQ(""); setCat("Tous"); }}>{tr(lang, "emptyBtn")}</button>
+            <div className="empty-sugg">
+              <div className="empty-sugg-h">{tr(lang, "suggestTitle")}</div>
+              <div className="grid">
+                {suggestedTools().map((t, i) => <Card key={"s-" + t.slug} t={t} q="" i={i} lang={lang} fav={favs.includes(t.slug)} onFav={toggleFav} onOpen={registerOpen} />)}
+              </div>
+            </div>
+          </div>
         ) : (
           <div className="grid">{results.map((t, i) => <Card key={t.slug} t={t} q={nq} i={i} lang={lang} fav={favs.includes(t.slug)} onFav={toggleFav} onOpen={registerOpen} />)}</div>
         )}

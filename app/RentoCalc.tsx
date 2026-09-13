@@ -34,7 +34,7 @@ const L = {
     avance: "Réglages fiscaux (ajustables)", tauxImpotRente: "Impôt sur le revenu (rente)",
     tauxImpotCapital: "Impôt sur le retrait en capital", tauxFortune: "Impôt sur la fortune (par an)",
     partCapital: "Panachage : part prise en capital",
-    verdictTitre: "Ce qui semble le plus avantageux", ans: "ans", mois: "mois",
+    verdictTitre: "Ce qui semble le plus avantageux", ans: "ans", mois: "mois", parAn: "an",
     rente: "Prendre la RENTE", capital: "Prendre le CAPITAL", mixte: "Mixte",
     renteRevenu: "Revenu garanti à vie", renteImpot: "Impôt sur le revenu",
     renteSucc: "Laissé à la succession", aVie: "à vie, sans risque",
@@ -60,7 +60,7 @@ const L = {
     avance: "Steuer-Einstellungen (anpassbar)", tauxImpotRente: "Einkommenssteuer (Rente)",
     tauxImpotCapital: "Steuer auf Kapitalbezug", tauxFortune: "Vermögenssteuer (pro Jahr)",
     partCapital: "Mischung: Kapitalanteil",
-    verdictTitre: "Das scheint am günstigsten", ans: "J.", mois: "Mt.",
+    verdictTitre: "Das scheint am günstigsten", ans: "J.", mois: "Mt.", parAn: "Jahr",
     rente: "RENTE beziehen", capital: "KAPITAL beziehen", mixte: "Gemischt",
     renteRevenu: "Garantiertes Einkommen", renteImpot: "Einkommenssteuer",
     renteSucc: "Für den Nachlass", aVie: "lebenslang, ohne Risiko",
@@ -86,7 +86,7 @@ const L = {
     avance: "Tax settings (adjustable)", tauxImpotRente: "Income tax (pension)",
     tauxImpotCapital: "Lump-sum withdrawal tax", tauxFortune: "Wealth tax (per year)",
     partCapital: "Mix: share taken as capital",
-    verdictTitre: "What looks most advantageous", ans: "yrs", mois: "mo",
+    verdictTitre: "What looks most advantageous", ans: "yrs", mois: "mo", parAn: "yr",
     rente: "Take the PENSION", capital: "Take the CAPITAL", mixte: "Mixed",
     renteRevenu: "Guaranteed income for life", renteImpot: "Income tax",
     renteSucc: "Left to the estate", aVie: "for life, no risk",
@@ -207,7 +207,7 @@ export default function RentoCalc({ lang }: { lang: Lang }) {
               <div className="rc-ptitle" style={{ color: "#22d3ee" }}>{t.rente}</div>
               <Row label={t.renteRevenu} val={`${chf(rente.renteNetteAnnuelle / 12, lang)}/${t.mois}`} strong />
               <div className="rc-sub">{t.aVie}</div>
-              <Row label={t.renteImpot} val={`− ${chf(rente.impotRenteAnnuelCHF, lang)}/${t.ans}`} color="#fca5a5" />
+              <Row label={t.renteImpot} val={`− ${chf(rente.impotRenteAnnuelCHF, lang)}/${t.parAn}`} color="#fca5a5" />
               <Row label={t.renteSucc} val={chf(rente.successionEstimee, lang)} />
             </div>
 

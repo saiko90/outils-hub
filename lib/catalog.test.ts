@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { TOOLS, PRO_SLUGS, REAL_CATEGORIES, CAT_SLUG, bySlug, RELATED_PRO, relatedPro } from "./catalog";
 
 describe("catalogue outils.ch — intégrité", () => {
-  it("contient exactement 44 outils", () => {
-    expect(TOOLS.length).toBe(44);
+  it("contient au moins 40 outils", () => {
+    expect(TOOLS.length).toBeGreaterThanOrEqual(40);
   });
 
   it("a des slugs uniques", () => {

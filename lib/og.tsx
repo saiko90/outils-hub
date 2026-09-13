@@ -5,9 +5,9 @@ export const OG_SIZE = { width: 1200, height: 630 };
 export const OG_CONTENT_TYPE = "image/png";
 
 const BRAND = {
-  fr: { tools: "44 outils gratuits", browser: "100 % navigateur · aucune inscription", by: "Swiss Digital Studio" },
-  de: { tools: "44 gratis Tools", browser: "100 % im Browser · ohne Anmeldung", by: "Swiss Digital Studio" },
-  en: { tools: "44 free tools", browser: "100% in your browser · no sign-up", by: "Swiss Digital Studio" },
+  fr: { tools: "outils gratuits", browser: "100 % navigateur · aucune inscription", by: "Swiss Digital Studio" },
+  de: { tools: "gratis Tools", browser: "100 % im Browser · ohne Anmeldung", by: "Swiss Digital Studio" },
+  en: { tools: "free tools", browser: "100% in your browser · no sign-up", by: "Swiss Digital Studio" },
 } as const;
 
 type OgProps = {

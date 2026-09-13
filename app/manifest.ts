@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "outils.ch — la boîte à outils suisse",
     short_name: "outils.ch",
-    description: "44 micro-outils gratuits : convertisseurs, générateurs, calculateurs. 100 % navigateur, sans inscription.",
+    description: "Micro-outils gratuits : convertisseurs, générateurs, calculateurs. 100 % navigateur, sans inscription.",
     start_url: "/",
     scope: "/",
     display: "standalone",

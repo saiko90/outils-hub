@@ -4,7 +4,7 @@ import { TOOLS, bySlug, CAT_SLUG, CAT_EMOJI } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Page introuvable (404) — outils.ch",
-  description: "Cette page n'existe pas. Retourne à la boîte à outils suisse : 44 micro-outils gratuits.",
+  description: "Cette page n'existe pas. Retourne à la boîte à outils suisse : micro-outils gratuits.",
   robots: { index: false, follow: true },
 };
 

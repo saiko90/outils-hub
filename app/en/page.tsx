@@ -5,14 +5,14 @@ import { TOOLS, REAL_CATEGORIES, CAT_SLUG, CAT_EMOJI, toolsByCat, proTools } fro
 import { t, catLabel, toolTagline, altLanguages } from "@/lib/i18n";
 
 export const metadata: Metadata = {
-  title: "outils.ch — 44 free online tools (dev, design, Swiss)",
+  title: "outils.ch — free online tools (dev, design, Swiss)",
   description:
     "The directory of free online tools: converters, generators and calculators for developers, creatives and Switzerland. Instant search, 100% in your browser, no sign-up.",
   keywords: ["online tools", "free tools", "converter", "generator", "calculator", "switzerland", "outils.ch"],
   alternates: { canonical: "/en", languages: altLanguages("/") },
   openGraph: {
     title: "outils.ch — the free Swiss toolbox",
-    description: "44 fast mini-tools. Instant search, 100% in your browser, no data sent.",
+    description: "Fast mini-tools. Instant search, 100% in your browser, no data sent.",
     type: "website", locale: "en", siteName: "outils.ch", url: "https://outils.ch/en",
   },
 };

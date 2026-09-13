@@ -21,7 +21,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://outils.ch"),
   title: {
-    default: "outils.ch — 44 micro-outils gratuits (dev, design, Suisse)",
+    default: "outils.ch — micro-outils gratuits (dev, design, Suisse)",
     template: "%s",
   },
   description:
@@ -40,13 +40,13 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "outils.ch — la boîte à outils gratuite",
-    description: "44 micro-outils rapides. Recherche instantanée, 100 % navigateur, aucune donnée envoyée.",
+    description: "Des micro-outils rapides. Recherche instantanée, 100 % navigateur, aucune donnée envoyée.",
     type: "website",
     locale: "fr_CH",
     siteName: "outils.ch",
     url: "https://outils.ch",
   },
-  twitter: { card: "summary_large_image", title: "outils.ch — 44 outils gratuits", description: "La boîte à outils suisse : recherche instantanée, 100 % navigateur." },
+  twitter: { card: "summary_large_image", title: "outils.ch — outils gratuits", description: "La boîte à outils suisse : recherche instantanée, 100 % navigateur." },
   robots: { index: true, follow: true },
   alternates: { canonical: "/" },
 };
@@ -65,7 +65,7 @@ const siteLd = {
       name: "outils.ch",
       url: "https://outils.ch",
       inLanguage: ["fr", "de", "en"],
-      description: "44 micro-outils en ligne gratuits (convertisseurs, générateurs, calculateurs), 100 % navigateur, sans inscription — avec des outils métier conformes aux normes suisses.",
+      description: "Des micro-outils en ligne gratuits (convertisseurs, générateurs, calculateurs), 100 % navigateur, sans inscription — avec des outils métier conformes aux normes suisses.",
       publisher: { "@id": "https://www.swissdigitalstudio.ch/#org" },
       potentialAction: {
         "@type": "SearchAction",

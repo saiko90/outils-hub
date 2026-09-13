@@ -11,7 +11,7 @@ const lang: Lang = "de";
 export default function Image({ params }: { params: { slug: string } }) {
   const tool = bySlug(params.slug);
   if (!tool) {
-    return ogImage({ lang, title: "outils.ch", subtitle: "44 outils gratuits", badge: "outils.ch" });
+    return ogImage({ lang, title: "outils.ch", subtitle: "outils gratuits", badge: "outils.ch" });
   }
   return ogImage({
     lang,

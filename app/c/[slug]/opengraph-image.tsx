@@ -17,7 +17,7 @@ const SUB: Record<string, (n: number, c: string) => string> = {
 export default function Image({ params }: { params: { slug: string } }) {
   const cat = catBySlug(params.slug);
   if (!cat) {
-    return ogImage({ lang, title: "outils.ch", subtitle: "44 outils gratuits", badge: "outils.ch" });
+    return ogImage({ lang, title: "outils.ch", subtitle: "outils gratuits", badge: "outils.ch" });
   }
   const n = toolsByCat(cat).length;
   const label = catLabel(lang, cat);

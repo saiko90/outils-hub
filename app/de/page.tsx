@@ -5,14 +5,14 @@ import { TOOLS, REAL_CATEGORIES, CAT_SLUG, CAT_EMOJI, toolsByCat, proTools } fro
 import { t, catLabel, toolTagline, altLanguages } from "@/lib/i18n";
 
 export const metadata: Metadata = {
-  title: "outils.ch — 44 gratis Online-Tools (Dev, Design, Schweiz)",
+  title: "outils.ch — gratis Online-Tools (Dev, Design, Schweiz)",
   description:
     "Das Verzeichnis kostenloser Online-Tools: Konverter, Generatoren und Rechner für Entwickler, Kreative und die Schweiz. Sofortsuche, 100 % im Browser, keine Anmeldung.",
   keywords: ["online tools", "gratis tools", "konverter", "generator", "rechner", "schweiz", "outils.ch"],
   alternates: { canonical: "/de", languages: altLanguages("/") },
   openGraph: {
     title: "outils.ch — die kostenlose Schweizer Toolbox",
-    description: "44 schnelle Mini-Tools. Sofortsuche, 100 % im Browser, keine Daten gesendet.",
+    description: "Schnelle Mini-Tools. Sofortsuche, 100 % im Browser, keine Daten gesendet.",
     type: "website", locale: "de_CH", siteName: "outils.ch", url: "https://outils.ch/de",
   },
 };

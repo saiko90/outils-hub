@@ -107,6 +107,21 @@ export const RELATED_PRO: Record<string, string[]> = {
 export const relatedPro = (slug: string): Tool[] =>
   (RELATED_PRO[slug] || []).map((s) => bySlug(s)).filter(Boolean) as Tool[];
 
+// Passerelle outil gratuit fréquenté → outil métier pro suisse pertinent (canalise le trafic vers le revenu).
+// Uniquement des rapprochements honnêtes/thématiques ; affiché sur les pages NON-pro.
+export const PRO_BRIDGE: Record<string, string> = {
+  qrgen: "facturama",     // QR code → QR-facture suisse
+  pourcento: "tvaflash",  // pourcentages → décompte TVA
+  troiso: "tvaflash",     // règle de trois → HT/TTC & TVA
+  amortiz: "capimmo",     // amortissement de prêt → capacité d'achat immobilier
+  datecalc: "prorato",    // dates & délais → loyer au prorata (Suisse)
+};
+export const bridgePro = (slug: string): Tool | undefined => {
+  if (isPro(slug)) return undefined;
+  const target = PRO_BRIDGE[slug];
+  return target ? bySlug(target) : undefined;
+};
+
 /** Phrase d'intro SEO unique par catégorie. */
 export function categoryIntro(cat: string): string {
   const n = toolsByCat(cat).length;

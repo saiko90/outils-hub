@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { TOOLS, bySlug, CAT_EMOJI, CAT_SLUG, isPro, relatedPro } from "@/lib/catalog";
+import { TOOLS, bySlug, CAT_EMOJI, CAT_SLUG, isPro, relatedPro, bridgePro } from "@/lib/catalog";
 import FacturamaPro from "./FacturamaPro";
 import FinanceLead from "./FinanceLead";
 import {
@@ -18,6 +18,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
   const pro = isPro(tool.slug);
   const proText = pro ? proContent(lang, tool) : "";
   const swissLinked = pro ? relatedPro(tool.slug) : [];
+  const bridge = pro ? undefined : bridgePro(tool.slug);
   const faq = pro ? faqFor(lang, tool) : faqGeneric(lang, tool);
   const tagline = toolTagline(lang, tool);
   const canon = `https://outils.ch${p}/o/${tool.slug}`;
@@ -97,6 +98,18 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
                   <span><b>{r.name}</b><small>{toolTagline(lang, r)}</small></span>
                 </Link>
               ))}
+            </div>
+          </section>
+        )}
+
+        {bridge && (
+          <section className="tp-swiss">
+            <h2>🇨🇭 {t(lang, "goFurther")}</h2>
+            <div className="tp-relgrid">
+              <Link href={`${p}/o/${bridge.slug}`} className="tp-relcard">
+                <span className="tp-rellogo" style={{ background: `linear-gradient(135deg, ${bridge.from}, ${bridge.to})` }}>{bridge.name.slice(0, 2).toUpperCase()}</span>
+                <span><b>{bridge.name}</b><small>{toolTagline(lang, bridge)}</small></span>
+              </Link>
             </div>
           </section>
         )}

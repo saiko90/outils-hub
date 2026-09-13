@@ -61,9 +61,12 @@ const siteLd = {
   "@graph": [
     {
       "@type": "WebSite",
+      "@id": "https://outils.ch/#website",
       name: "outils.ch",
       url: "https://outils.ch",
-      inLanguage: "fr",
+      inLanguage: ["fr", "de", "en"],
+      description: "44 micro-outils en ligne gratuits (convertisseurs, générateurs, calculateurs), 100 % navigateur, sans inscription — avec des outils métier conformes aux normes suisses.",
+      publisher: { "@id": "https://www.swissdigitalstudio.ch/#org" },
       potentialAction: {
         "@type": "SearchAction",
         target: { "@type": "EntryPoint", urlTemplate: "https://outils.ch/?q={search_term_string}" },
@@ -72,9 +75,13 @@ const siteLd = {
     },
     {
       "@type": "Organization",
+      "@id": "https://www.swissdigitalstudio.ch/#org",
       name: "Swiss Digital Studio",
       url: "https://www.swissdigitalstudio.ch",
+      logo: "https://outils.ch/icon-192.png",
       brand: "outils.ch",
+      areaServed: "CH",
+      slogan: "Des outils suisses, simples, rapides et privés.",
     },
   ],
 };

@@ -6,6 +6,7 @@ import FinanceLead from "./FinanceLead";
 import RentoCalc from "./RentoCalc";
 import LegatoCalc from "./LegatoCalc";
 import BudgetoCalc from "./BudgetoCalc";
+import LamaloCalc from "./LamaloCalc";
 import {
   type Lang, langPrefix, catLabel, toolTagline, longDescriptionL, faqFor, faqGeneric, proContent,
   tpProBadge, tpOpenVerb, faqTitle, tpTrust, t,
@@ -78,7 +79,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
           </div>
         </header>
 
-        {(tool.slug === "rento" || tool.slug === "legato" || tool.slug === "budgeto") ? (
+        {(tool.slug === "rento" || tool.slug === "legato" || tool.slug === "budgeto" || tool.slug === "lamalo") ? (
           <a className="tp-cta" href={`#${tool.slug}`} style={{ background: `linear-gradient(135deg, ${tool.from}, ${tool.to})` }}>
             {tpOpenVerb[lang]} {tool.name} <span aria-hidden>↓</span>
           </a>
@@ -96,6 +97,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
         {tool.slug === "rento" && <RentoCalc lang={lang} />}
         {tool.slug === "legato" && <LegatoCalc lang={lang} />}
         {tool.slug === "budgeto" && <BudgetoCalc lang={lang} />}
+        {tool.slug === "lamalo" && <LamaloCalc lang={lang} />}
         {(tool.slug === "capimmo" || tool.slug === "ibano") && <FinanceLead slug={tool.slug} lang={lang} />}
 
         <p className="tp-long">{longDescriptionL(lang, tool)}</p>

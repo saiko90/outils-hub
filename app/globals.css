@@ -346,3 +346,13 @@ main:focus { outline: none; }
 .nf-logo { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; color: #fff; font-size: 0.95rem; }
 .nf-card-t { font-size: 0.88rem; }
 .nf-foot { margin-top: 44px; color: var(--muted); font-size: 0.85rem; }
+
+/* ---------- favoris & récents ---------- */
+.pinrow { margin: 8px 0 20px; }
+.pinrow-h { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
+.favstar { position: absolute; top: 12px; right: 12px; z-index: 3; width: 34px; height: 34px; border-radius: 10px;
+  display: grid; place-items: center; font-size: 18px; line-height: 1; cursor: pointer;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--line); color: var(--muted);
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease, transform 0.15s ease; }
+.favstar:hover { color: #fbbf24; border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.1); transform: scale(1.08); }
+.favstar.on { color: #fbbf24; border-color: rgba(251,191,36,0.5); background: rgba(251,191,36,0.14); }

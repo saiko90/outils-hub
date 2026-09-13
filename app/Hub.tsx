@@ -4,12 +4,21 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { track } from "@vercel/analytics";
-import { TOOLS, CATEGORIES, CAT_EMOJI, CAT_SLUG, isPro, type Tool } from "@/lib/catalog";
+import { TOOLS, CATEGORIES, CAT_EMOJI, CAT_SLUG, bySlug, isPro, type Tool } from "@/lib/catalog";
 import { type Lang, t as tr, catLabel, toolTagline, langPrefix } from "@/lib/i18n";
 
 /** Événement de conversion : quel outil est réellement ouvert (identifie les outils « héros »). */
 function trackOpen(t: Tool, from: string) {
   try { track("tool_open", { slug: t.slug, cat: t.cat, ch: !!t.ch, pro: isPro(t.slug), from }); } catch { /* no-op */ }
+}
+
+// Persistance locale (favoris & récents). Tout est try/catch (navigation privée peut throw).
+const LS_FAV = "oc_favs", LS_REC = "oc_recents";
+function lsGet(key: string): string[] {
+  try { const v = localStorage.getItem(key); const a = v ? JSON.parse(v) : []; return Array.isArray(a) ? a.filter((x) => typeof x === "string") : []; } catch { return []; }
+}
+function lsSet(key: string, arr: string[]) {
+  try { localStorage.setItem(key, JSON.stringify(arr)); } catch { /* no-op */ }
 }
 
 const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
@@ -100,7 +109,7 @@ function CountUp({ to, dur = 1100 }: { to: number; dur?: number }) {
   return <>{n}</>;
 }
 
-function Card({ t, q, i, lang }: { t: Tool; q: string; i: number; lang: Lang }) {
+function Card({ t, q, i, lang, fav, onFav, onOpen }: { t: Tool; q: string; i: number; lang: Lang; fav?: boolean; onFav?: (slug: string) => void; onOpen?: (slug: string) => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const btn = useRef<HTMLAnchorElement>(null);
   function onMove(e: React.MouseEvent) {
@@ -118,15 +127,21 @@ function Card({ t, q, i, lang }: { t: Tool; q: string; i: number; lang: Lang }) 
       initial={{ opacity: 0, y: 26 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: Math.min(i * 0.03, 0.4), ease: [0.22, 1, 0.36, 1] }}>
       <div className="halo" />
+      {onFav && (
+        <button className={"favstar" + (fav ? " on" : "")} aria-pressed={!!fav} aria-label={tr(lang, fav ? "unpin" : "pin")}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onFav(t.slug); }}>
+          {fav ? "★" : "☆"}
+        </button>
+      )}
       <div className="top">
-        <Link href={`${langPrefix(lang)}/o/${t.slug}`} className="logo" style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }} aria-label={`${tr(lang, "details")} ${t.name}`}>{initials}</Link>
+        <Link href={`${langPrefix(lang)}/o/${t.slug}`} className="logo" onClick={() => onOpen?.(t.slug)} style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }} aria-label={`${tr(lang, "details")} ${t.name}`}>{initials}</Link>
         <div>
-          <div className="nm"><Link href={`${langPrefix(lang)}/o/${t.slug}`} style={{ color: "inherit", textDecoration: "none" }}><Highlight text={t.name} q={q} /></Link></div>
+          <div className="nm"><Link href={`${langPrefix(lang)}/o/${t.slug}`} onClick={() => onOpen?.(t.slug)} style={{ color: "inherit", textDecoration: "none" }}><Highlight text={t.name} q={q} /></Link></div>
           <div className="cat">{t.ch && <span className="ch">🇨🇭</span>}{CAT_EMOJI[t.cat]} {catLabel(lang, t.cat)}</div>
         </div>
       </div>
       <div className="tag"><Highlight text={toolTagline(lang, t)} q={q} /></div>
-      <a ref={btn} className="go" href={t.url} target="_blank" rel="noopener noreferrer" onClick={() => trackOpen(t, "card")} style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }}>
+      <a ref={btn} className="go" href={t.url} target="_blank" rel="noopener noreferrer" onClick={() => { trackOpen(t, "card"); onOpen?.(t.slug); }} style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }}>
         <span className="sheen" />{tr(lang, "use")} <span aria-hidden>→</span>
       </a>
     </motion.div>
@@ -179,6 +194,8 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
   const [cat, setCat] = useState("Tous");
   const [stuck, setStuck] = useState(false);
   const [palette, setPalette] = useState(false);
+  const [favs, setFavs] = useState<string[]>([]);
+  const [recents, setRecents] = useState<string[]>([]);
   const glowRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const { scrollY, scrollYProgress } = useScroll();
@@ -189,6 +206,18 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
   useEffect(() => {
     try { const u = new URL(window.location.href); const v = u.searchParams.get("q"); if (v) setQ(v); } catch { /* ignore */ }
   }, []);
+
+  // Favoris & récents chargés côté client uniquement (après montage → pas de mismatch d'hydratation).
+  useEffect(() => { setFavs(lsGet(LS_FAV)); setRecents(lsGet(LS_REC)); }, []);
+  const toggleFav = useCallback((slug: string) => {
+    setFavs((prev) => { const next = prev.includes(slug) ? prev.filter((s) => s !== slug) : [slug, ...prev].slice(0, 24); lsSet(LS_FAV, next); return next; });
+  }, []);
+  const registerOpen = useCallback((slug: string) => {
+    setRecents((prev) => { const next = [slug, ...prev.filter((s) => s !== slug)].slice(0, 6); lsSet(LS_REC, next); return next; });
+  }, []);
+  const favTools = useMemo(() => favs.map((s) => bySlug(s)).filter(Boolean) as Tool[], [favs]);
+  const recentTools = useMemo(() => recents.map((s) => bySlug(s)).filter(Boolean) as Tool[], [recents]);
+  const showPins = !nq && cat === "Tous";
 
   useEffect(() => { try { document.documentElement.lang = lang; } catch { /* ignore */ } }, [lang]);
 
@@ -274,6 +303,23 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
           </div>
         </div>
 
+        {showPins && favTools.length > 0 && (
+          <section className="pinrow" aria-label={tr(lang, "favTitle")}>
+            <h2 className="pinrow-h">⭐ {tr(lang, "favTitle")}</h2>
+            <div className="grid">
+              {favTools.map((t, i) => <Card key={"f-" + t.slug} t={t} q="" i={i} lang={lang} fav onFav={toggleFav} onOpen={registerOpen} />)}
+            </div>
+          </section>
+        )}
+        {showPins && recentTools.length > 0 && (
+          <section className="pinrow" aria-label={tr(lang, "recentTitle")}>
+            <h2 className="pinrow-h">🕘 {tr(lang, "recentTitle")}</h2>
+            <div className="grid">
+              {recentTools.map((t, i) => <Card key={"r-" + t.slug} t={t} q="" i={i} lang={lang} fav={favs.includes(t.slug)} onFav={toggleFav} onOpen={registerOpen} />)}
+            </div>
+          </section>
+        )}
+
         <div className="count" role="status" aria-live="polite">
           {results.length === 0 ? tr(lang, "countNone") : results.length === TOOLS.length ? tr(lang, "countAll", TOOLS.length) : tr(lang, "countSome", results.length)}
         </div>
@@ -281,7 +327,7 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
         {results.length === 0 ? (
           <div className="empty"><div className="big">🔍</div><div>{tr(lang, "emptyTitle")} « {q} »{cat !== "Tous" ? ` ${tr(lang, "emptyIn")} ${catLabel(lang, cat)}` : ""}.</div><button onClick={() => { setQ(""); setCat("Tous"); }}>{tr(lang, "emptyBtn")}</button></div>
         ) : (
-          <div className="grid">{results.map((t, i) => <Card key={t.slug} t={t} q={nq} i={i} lang={lang} />)}</div>
+          <div className="grid">{results.map((t, i) => <Card key={t.slug} t={t} q={nq} i={i} lang={lang} fav={favs.includes(t.slug)} onFav={toggleFav} onOpen={registerOpen} />)}</div>
         )}
       </main>
 

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { REAL_CATEGORIES, CAT_SLUG, catBySlug, toolsByCat, CAT_EMOJI } from "@/lib/catalog";
 import { t, catLabel, toolTagline, categoryIntroL, altLanguages } from "@/lib/i18n";
+import CatProHighlight from "../../../CatProHighlight";
 
 const lang = "de" as const;
 
@@ -80,6 +81,8 @@ export default function CategoryPageDe({ params }: { params: { slug: string } })
         </header>
 
         <p className="tp-long">{categoryIntroL(lang, cat, tools.length)}</p>
+
+        <CatProHighlight cat={cat} lang="de" />
 
         <section className="cat-grid">
           {tools.map((x) => (

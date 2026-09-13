@@ -5,6 +5,7 @@ import {
   REAL_CATEGORIES, CAT_SLUG, catBySlug, toolsByCat, categoryIntro, CAT_EMOJI,
 } from "@/lib/catalog";
 import { altLanguages } from "@/lib/i18n";
+import CatProHighlight from "../../CatProHighlight";
 
 export function generateStaticParams() {
   return REAL_CATEGORIES.map((c) => ({ slug: CAT_SLUG[c] }));
@@ -83,6 +84,8 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
         </header>
 
         <p className="tp-long">{categoryIntro(cat)}</p>
+
+        <CatProHighlight cat={cat} lang="fr" />
 
         <section className="cat-grid">
           {tools.map((t) => (

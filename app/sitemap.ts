@@ -23,6 +23,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${B}/a-propos`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${B}/de/ueber-uns`, lastModified: now, changeFrequency: "monthly", priority: 0.45 },
     { url: `${B}/en/about`, lastModified: now, changeFrequency: "monthly", priority: 0.45 },
+    { url: `${B}/confidentialite`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${B}/de/datenschutz`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${B}/en/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
   ];
   return [...home, ...cats, ...pages, ...about];
 }

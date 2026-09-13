@@ -13,7 +13,7 @@ import type { Lang } from "@/lib/i18n";
 
 const SB_URL = "https://srcvnqfgtazupuzwznrr.supabase.co";
 const SB_KEY = "sb_publishable_YUwom0kvnMbpn8Rpug1FaA_1H35zkY_";
-const ABOUT_PATH: Record<Lang, string> = { fr: "/a-propos", de: "/de/ueber-uns", en: "/en/about" };
+const PRIVACY_PATH: Record<Lang, string> = { fr: "/confidentialite", de: "/de/datenschutz", en: "/en/privacy" };
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 type Copy = {
@@ -186,7 +186,7 @@ export default function FacturamaPro({ lang }: { lang: Lang }) {
             )}
             <p className="fpro-consent">
               {c.consent}{" "}
-              <a href={ABOUT_PATH[lang]}>{c.consentLink}</a>
+              <a href={PRIVACY_PATH[lang]}>{c.consentLink}</a>
             </p>
           </>
         )}

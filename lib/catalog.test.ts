@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { TOOLS, PRO_SLUGS, REAL_CATEGORIES, CAT_SLUG, bySlug } from "./catalog";
+import { TOOLS, PRO_SLUGS, REAL_CATEGORIES, CAT_SLUG, bySlug, RELATED_PRO, relatedPro } from "./catalog";
 
 describe("catalogue outils.ch — intégrité", () => {
   it("contient exactement 44 outils", () => {
@@ -60,5 +60,16 @@ describe("catalogue outils.ch — intégrité", () => {
   it("bySlug retrouve un outil connu et renvoie undefined sinon", () => {
     expect(bySlug("facturama")?.slug).toBe("facturama");
     expect(bySlug("outil-qui-nexiste-pas")).toBeUndefined();
+  });
+
+  it("RELATED_PRO : clés = outils pro, valeurs = slugs existants, pas d'auto-référence", () => {
+    for (const [slug, related] of Object.entries(RELATED_PRO)) {
+      expect(PRO_SLUGS, `clé non-pro: ${slug}`).toContain(slug);
+      for (const r of related) {
+        expect(bySlug(r), `slug lié introuvable: ${r} (depuis ${slug})`).toBeDefined();
+        expect(r, `auto-référence: ${slug}`).not.toBe(slug);
+      }
+    }
+    expect(relatedPro("facturama").length).toBeGreaterThan(0);
   });
 });

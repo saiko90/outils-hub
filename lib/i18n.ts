@@ -30,7 +30,7 @@ export const UI: Record<Lang, Record<string, string>> = {
     catsTitle: "Parcourir par catégorie",
     backAll: "← Tous les outils", sameCat: "Dans la même catégorie",
     otherCats: "Explorer les autres catégories", freeTools: "outils gratuits", madeCH: "🇨🇭 fait en Suisse", footTagline: "44 micro-outils gratuits, 100 % navigateur.", footBy: "Réalisé par", footCats: "Catégories", footLangs: "Langues",
-    toGrid: "Tous les outils", favTitle: "Favoris", recentTitle: "Récemment ouverts", pin: "Ajouter aux favoris", unpin: "Retirer des favoris", suggestTitle: "Suggestions", footAbout: "À propos",
+    toGrid: "Tous les outils", favTitle: "Favoris", recentTitle: "Récemment ouverts", pin: "Ajouter aux favoris", unpin: "Retirer des favoris", suggestTitle: "Suggestions", footAbout: "À propos", swissLinked: "Outils suisses complémentaires",
   },
   de: {
     eyebrow: "Schweizer Toolbox — 100 % gratis, 100 % im Browser",
@@ -51,7 +51,7 @@ export const UI: Record<Lang, Record<string, string>> = {
     catsTitle: "Nach Kategorie durchsuchen",
     backAll: "← Alle Tools", sameCat: "In derselben Kategorie",
     otherCats: "Weitere Kategorien entdecken", freeTools: "gratis Tools", madeCH: "🇨🇭 made in Switzerland", footTagline: "44 gratis Mikro-Tools, 100 % im Browser.", footBy: "Umgesetzt von", footCats: "Kategorien", footLangs: "Sprachen",
-    toGrid: "Alle Tools", favTitle: "Favoriten", recentTitle: "Zuletzt geöffnet", pin: "Zu Favoriten hinzufügen", unpin: "Aus Favoriten entfernen", suggestTitle: "Vorschläge", footAbout: "Über uns",
+    toGrid: "Alle Tools", favTitle: "Favoriten", recentTitle: "Zuletzt geöffnet", pin: "Zu Favoriten hinzufügen", unpin: "Aus Favoriten entfernen", suggestTitle: "Vorschläge", footAbout: "Über uns", swissLinked: "Ergänzende Schweizer Tools",
   },
   en: {
     eyebrow: "Swiss toolbox — 100% free, 100% in your browser",
@@ -72,7 +72,7 @@ export const UI: Record<Lang, Record<string, string>> = {
     catsTitle: "Browse by category",
     backAll: "← All tools", sameCat: "In the same category",
     otherCats: "Explore other categories", freeTools: "free tools", madeCH: "🇨🇭 made in Switzerland", footTagline: "44 free micro-tools, 100% in your browser.", footBy: "Built by", footCats: "Categories", footLangs: "Languages",
-    toGrid: "All tools", favTitle: "Favourites", recentTitle: "Recently opened", pin: "Add to favourites", unpin: "Remove from favourites", suggestTitle: "Suggestions", footAbout: "About",
+    toGrid: "All tools", favTitle: "Favourites", recentTitle: "Recently opened", pin: "Add to favourites", unpin: "Remove from favourites", suggestTitle: "Suggestions", footAbout: "About", swissLinked: "Related Swiss tools",
   },
 };
 
@@ -249,6 +249,53 @@ export function longDescriptionL(lang: Lang, tool: Tool): string {
   }
   const ch = tool.ch ? " Pensé pour la Suisse." : "";
   return `${tool.name} est un outil ${tool.cat.toLowerCase()} en ligne, gratuit et sans inscription : ${tag}.${ch} Tout se calcule directement dans ton navigateur — aucune donnée n'est envoyée sur un serveur, tes informations restent privées. Rapide, sans publicité, utilisable sur mobile comme sur ordinateur. Mots-clés : ${kw}.`;
+}
+
+/** Contenu SEO enrichi pour les outils pro (cas d'usage suisses concrets). */
+const PRO_CONTENT: Record<string, Record<Lang, string>> = {
+  facturama: {
+    fr: "Émettre une QR-facture suisse valide demande de respecter plusieurs règles : référence structurée (QRR), section de paiement scannable, IBAN (ou QR-IBAN) et montant au bon format. facturama produit une facture conforme à la norme ISO 20022 / SIX Swiss Payment Standards, lisible par toutes les applications bancaires suisses. Un outil pensé pour les indépendants, fiduciaires et PME qui facturent en francs et veulent être payés sans friction.",
+    de: "Eine gültige Schweizer QR-Rechnung folgt mehreren Regeln: strukturierte Referenz (QRR), scanbarer Zahlteil, IBAN (oder QR-IBAN) und Betrag im richtigen Format. facturama erstellt eine Rechnung nach ISO 20022 / SIX Swiss Payment Standards, lesbar von allen Schweizer Banking-Apps. Gedacht für Selbstständige, Treuhänder und KMU, die in Franken fakturieren.",
+    en: "Issuing a valid Swiss QR-invoice means following several rules: structured reference (QRR), scannable payment part, IBAN (or QR-IBAN) and correctly formatted amount. facturama produces an invoice compliant with ISO 20022 / SIX Swiss Payment Standards, readable by every Swiss banking app. Built for freelancers, fiduciaries and SMEs invoicing in francs.",
+  },
+  tvaflash: {
+    fr: "Le décompte TVA suisse impose de jongler avec trois taux : 8.1 % (normal), 2.6 % (réduit) et 3.8 % (hébergement). tvaflash calcule instantanément le HT, la TVA et le TTC pour chaque taux, sans erreur d'arrondi — pratique pour préparer un décompte trimestriel à l'AFC, vérifier une facture fournisseur ou fixer un prix TTC juste.",
+    de: "Die Schweizer MWST-Abrechnung jongliert mit drei Sätzen: 8.1 % (Normalsatz), 2.6 % (reduziert) und 3.8 % (Beherbergung). tvaflash berechnet sofort Netto, MWST und Brutto für jeden Satz, ohne Rundungsfehler — ideal für die Quartalsabrechnung bei der ESTV oder zur Prüfung einer Lieferantenrechnung.",
+    en: "Swiss VAT returns juggle three rates: 8.1% (standard), 2.6% (reduced) and 3.8% (accommodation). tvaflash instantly computes net, VAT and gross for each rate, with no rounding errors — handy for a quarterly FTA return or checking a supplier invoice.",
+  },
+  ibano: {
+    fr: "Un IBAN mal saisi bloque un paiement. ibano valide la structure (longueur par pays, clé de contrôle mod-97) et met en forme l'IBAN en groupes lisibles, y compris les QR-IBAN suisses (IID 30000–31999). Utile avant d'enregistrer un bénéficiaire, de préparer une QR-facture ou de contrôler des coordonnées bancaires.",
+    de: "Ein falsch erfasster IBAN blockiert eine Zahlung. ibano prüft die Struktur (Länge je Land, Mod-97-Prüfziffer) und formatiert den IBAN in lesbare Gruppen, inklusive Schweizer QR-IBAN (IID 30000–31999). Nützlich vor dem Erfassen eines Zahlungsempfängers oder dem Vorbereiten einer QR-Rechnung.",
+    en: "A mistyped IBAN blocks a payment. ibano validates the structure (per-country length, mod-97 check digits) and formats the IBAN into readable groups, including Swiss QR-IBANs (IID 30000–31999). Useful before saving a payee or preparing a QR-invoice.",
+  },
+  capimmo: {
+    fr: "En Suisse, deux règles décident d'un achat immobilier : 20 % de fonds propres minimum (dont 10 % hors 2e pilier) et des charges théoriques — intérêt calculatoire d'environ 5 %, entretien, amortissement — qui ne doivent pas dépasser un tiers du revenu brut. capimmo estime en quelques secondes le prix maximal que tu peux viser selon ton apport et ton revenu.",
+    de: "In der Schweiz entscheiden zwei Regeln über einen Immobilienkauf: mindestens 20 % Eigenkapital (davon 10 % ausserhalb der 2. Säule) und kalkulatorische Kosten — Zinssatz rund 5 %, Unterhalt, Amortisation — die einen Drittel des Bruttoeinkommens nicht übersteigen dürfen. capimmo schätzt in Sekunden den maximal tragbaren Kaufpreis.",
+    en: "In Switzerland, two rules decide a property purchase: at least 20% equity (10% outside the 2nd pillar) and theoretical costs — imputed interest around 5%, maintenance, amortisation — that must not exceed one third of gross income. capimmo estimates your maximum affordable price in seconds.",
+  },
+  avso: {
+    fr: "Le numéro AVS suisse (format 756.XXXX.XXXX.XX) intègre une clé de contrôle EAN-13. avso vérifie qu'un numéro est valide et bien formé — utile aux RH, fiduciaires et pour tout formulaire officiel avant de transmettre un dossier à une caisse de compensation ou à l'administration.",
+    de: "Die Schweizer AHV-Nummer (Format 756.XXXX.XXXX.XX) enthält eine EAN-13-Prüfziffer. avso prüft, ob eine Nummer gültig und korrekt formatiert ist — nützlich für HR, Treuhänder und jedes offizielle Formular vor der Übermittlung an eine Ausgleichskasse.",
+    en: "The Swiss AHV/AVS number (format 756.XXXX.XXXX.XX) embeds an EAN-13 check digit. avso verifies that a number is valid and well-formed — useful for HR, fiduciaries and any official form before submitting a file to a compensation fund.",
+  },
+  prorato: {
+    fr: "Un locataire qui entre ou sort en cours de mois ? En Suisse, le loyer au prorata se calcule selon la méthode des 30es : chaque mois compte 30 jours, quelle que soit sa durée réelle. prorato applique la règle et donne le montant exact à facturer, ce qui évite les litiges entre régie et locataire.",
+    de: "Ein Mieter zieht mitten im Monat ein oder aus? In der Schweiz wird der anteilige Mietzins nach der 30tel-Methode berechnet: jeder Monat zählt 30 Tage, unabhängig von der tatsächlichen Länge. prorato wendet die Regel an und liefert den exakten Betrag — das vermeidet Streit zwischen Verwaltung und Mieter.",
+    en: "A tenant moving in or out mid-month? In Switzerland, pro-rata rent uses the 30ths method: every month counts as 30 days regardless of its real length. prorato applies the rule and gives the exact amount to bill, avoiding disputes between agency and tenant.",
+  },
+  lettro: {
+    fr: "Sur un chèque, un contrat ou une facture, le montant doit souvent figurer en toutes lettres. lettro convertit un montant en CHF ou EUR en texte correct (accords, centimes, « francs »/« centimes »), ce qui sécurise les documents financiers et évite les fraudes par modification de chiffre.",
+    de: "Auf einem Check, Vertrag oder einer Rechnung muss der Betrag oft ausgeschrieben werden. lettro wandelt einen Betrag in CHF oder EUR in korrekten Text um (Franken/Rappen), was Finanzdokumente absichert und Betrug durch Ziffernänderung verhindert.",
+    en: "On a cheque, contract or invoice, the amount often has to be written out. lettro converts a CHF or EUR amount into correct text (francs/centimes), securing financial documents and preventing tampering with figures.",
+  },
+  teleco: {
+    fr: "Un numéro de téléphone suisse stocké dans un CRM devrait suivre le format international E.164 (+41 …). teleco valide et convertit un numéro suisse au format E.164, indispensable pour l'envoi de SMS, l'import dans un CRM ou une base de contacts propre.",
+    de: "Eine im CRM gespeicherte Schweizer Telefonnummer sollte dem internationalen Format E.164 (+41 …) folgen. teleco validiert und konvertiert eine Schweizer Nummer ins E.164-Format — unerlässlich für SMS-Versand oder den Import in ein CRM.",
+    en: "A Swiss phone number stored in a CRM should follow the international E.164 format (+41 …). teleco validates and converts a Swiss number to E.164, essential for sending SMS or importing into a clean CRM contact base.",
+  },
+};
+export function proContent(lang: Lang, tool: Tool): string {
+  return PRO_CONTENT[tool.slug]?.[lang] ?? "";
 }
 
 /** FAQ (pour les outils pro) traduite. */

@@ -93,6 +93,20 @@ export const PRO_SLUGS = ["facturama", "tvaflash", "ibano", "capimmo", "avso", "
 export const proTools = (): Tool[] => PRO_SLUGS.map((s) => bySlug(s)).filter(Boolean) as Tool[];
 export const isPro = (slug: string): boolean => PRO_SLUGS.includes(slug);
 
+// Outils suisses complémentaires (maillage interne du tunnel pro).
+export const RELATED_PRO: Record<string, string[]> = {
+  facturama: ["tvaflash", "ibano"],
+  tvaflash: ["facturama", "lettro"],
+  ibano: ["facturama", "teleco"],
+  capimmo: ["amortiz", "prorato"],
+  avso: ["teleco", "prorato"],
+  prorato: ["capimmo", "lettro"],
+  lettro: ["facturama", "tvaflash"],
+  teleco: ["avso", "ibano"],
+};
+export const relatedPro = (slug: string): Tool[] =>
+  (RELATED_PRO[slug] || []).map((s) => bySlug(s)).filter(Boolean) as Tool[];
+
 /** Phrase d'intro SEO unique par catégorie. */
 export function categoryIntro(cat: string): string {
   const n = toolsByCat(cat).length;

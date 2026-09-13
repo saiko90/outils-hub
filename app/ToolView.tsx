@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { TOOLS, bySlug, CAT_EMOJI, isPro } from "@/lib/catalog";
+import { TOOLS, bySlug, CAT_EMOJI, isPro, relatedPro } from "@/lib/catalog";
 import FacturamaPro from "./FacturamaPro";
 import FinanceLead from "./FinanceLead";
 import {
-  type Lang, langPrefix, catLabel, toolTagline, longDescriptionL, faqFor, faqGeneric,
+  type Lang, langPrefix, catLabel, toolTagline, longDescriptionL, faqFor, faqGeneric, proContent,
   tpProBadge, tpOpenVerb, faqTitle, tpTrust, t,
 } from "@/lib/i18n";
 
@@ -16,6 +16,8 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
   const related = TOOLS.filter((x) => x.cat === tool.cat && x.slug !== tool.slug).slice(0, 4);
   const initials = tool.name.slice(0, 2).toUpperCase();
   const pro = isPro(tool.slug);
+  const proText = pro ? proContent(lang, tool) : "";
+  const swissLinked = pro ? relatedPro(tool.slug) : [];
   const faq = pro ? faqFor(lang, tool) : faqGeneric(lang, tool);
   const tagline = toolTagline(lang, tool);
   const canon = `https://outils.ch${p}/o/${tool.slug}`;
@@ -74,6 +76,21 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
         {(tool.slug === "capimmo" || tool.slug === "ibano") && <FinanceLead slug={tool.slug} lang={lang} />}
 
         <p className="tp-long">{longDescriptionL(lang, tool)}</p>
+        {proText && <p className="tp-long tp-procontent">{proText}</p>}
+
+        {swissLinked.length > 0 && (
+          <section className="tp-swiss">
+            <h2>🇨🇭 {t(lang, "swissLinked")}</h2>
+            <div className="tp-relgrid">
+              {swissLinked.map((r) => (
+                <Link key={r.slug} href={`${p}/o/${r.slug}`} className="tp-relcard">
+                  <span className="tp-rellogo" style={{ background: `linear-gradient(135deg, ${r.from}, ${r.to})` }}>{r.name.slice(0, 2).toUpperCase()}</span>
+                  <span><b>{r.name}</b><small>{toolTagline(lang, r)}</small></span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         <div className="tp-tags">
           {tool.tags.map((tag) => <span key={tag} className="tp-tagchip">{tag}</span>)}

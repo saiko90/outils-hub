@@ -3,6 +3,7 @@ import Link from "next/link";
 import { TOOLS, bySlug, CAT_EMOJI, CAT_SLUG, isPro, relatedPro, bridgePro } from "@/lib/catalog";
 import FacturamaPro from "./FacturamaPro";
 import FinanceLead from "./FinanceLead";
+import RentoCalc from "./RentoCalc";
 import {
   type Lang, langPrefix, catLabel, toolTagline, longDescriptionL, faqFor, faqGeneric, proContent,
   tpProBadge, tpOpenVerb, faqTitle, tpTrust, t,
@@ -75,15 +76,22 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
           </div>
         </header>
 
-        <a className="tp-cta" href={tool.url} target="_blank" rel="noopener noreferrer" style={{ background: `linear-gradient(135deg, ${tool.from}, ${tool.to})` }}>
-          {tpOpenVerb[lang]} {tool.name} <span aria-hidden>→</span>
-        </a>
+        {tool.slug === "rento" ? (
+          <a className="tp-cta" href="#rento" style={{ background: `linear-gradient(135deg, ${tool.from}, ${tool.to})` }}>
+            {tpOpenVerb[lang]} {tool.name} <span aria-hidden>↓</span>
+          </a>
+        ) : (
+          <a className="tp-cta" href={tool.url} target="_blank" rel="noopener noreferrer" style={{ background: `linear-gradient(135deg, ${tool.from}, ${tool.to})` }}>
+            {tpOpenVerb[lang]} {tool.name} <span aria-hidden>→</span>
+          </a>
+        )}
 
         {pro && (
           <div className="tp-trust"><span className="tp-trust-i" aria-hidden>🇨🇭</span><span>{tpTrust[lang]}</span></div>
         )}
 
         {tool.slug === "facturama" && <FacturamaPro lang={lang} />}
+        {tool.slug === "rento" && <RentoCalc lang={lang} />}
         {(tool.slug === "capimmo" || tool.slug === "ibano") && <FinanceLead slug={tool.slug} lang={lang} />}
 
         <p className="tp-long">{longDescriptionL(lang, tool)}</p>

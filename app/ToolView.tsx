@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { TOOLS, bySlug, CAT_EMOJI, isPro, relatedPro } from "@/lib/catalog";
+import { TOOLS, bySlug, CAT_EMOJI, CAT_SLUG, isPro, relatedPro } from "@/lib/catalog";
 import FacturamaPro from "./FacturamaPro";
 import FinanceLead from "./FinanceLead";
 import {
@@ -29,11 +29,14 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
     offers: { "@type": "Offer", price: "0", priceCurrency: "CHF" },
     inLanguage: lang, isAccessibleForFree: true,
   };
+  const catSlug = CAT_SLUG[tool.cat];
+  const catUrl = `https://outils.ch${p}/c/${catSlug}`;
   const breadcrumb = {
     "@context": "https://schema.org", "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "outils.ch", item: `https://outils.ch${p || ""}` || "https://outils.ch" },
-      { "@type": "ListItem", position: 2, name: tool.name, item: canon },
+      { "@type": "ListItem", position: 2, name: catLabel(lang, tool.cat), item: catUrl },
+      { "@type": "ListItem", position: 3, name: tool.name, item: canon },
     ],
   };
   const faqLd = faq.length > 0 ? {
@@ -53,7 +56,13 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
       <div className="grid-fx" aria-hidden />
 
       <main className="toolpage">
-        <nav className="crumb"><Link href={home}>{t(lang, "backAll")}</Link></nav>
+        <nav className="crumb" aria-label="Breadcrumb">
+          <Link href={home}>outils.ch</Link>
+          <span className="crumb-sep" aria-hidden>›</span>
+          <Link href={`${p}/c/${catSlug}`}>{catLabel(lang, tool.cat)}</Link>
+          <span className="crumb-sep" aria-hidden>›</span>
+          <span aria-current="page" className="crumb-cur">{tool.name}</span>
+        </nav>
 
         <header className="tp-head">
           <div className="tp-logo" style={{ background: `linear-gradient(135deg, ${tool.from}, ${tool.to})` }}>{initials}</div>

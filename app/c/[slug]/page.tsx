@@ -68,7 +68,11 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       <div className="grid-fx" aria-hidden />
 
       <main className="toolpage">
-        <nav className="crumb"><Link href="/">← Tous les outils</Link></nav>
+        <nav className="crumb" aria-label="Breadcrumb">
+          <Link href="/">outils.ch</Link>
+          <span className="crumb-sep" aria-hidden>›</span>
+          <span aria-current="page" className="crumb-cur">Outils {cat}</span>
+        </nav>
 
         <header className="cat-head">
           <div className="cat-emoji" aria-hidden>{CAT_EMOJI[cat]}</div>

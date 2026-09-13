@@ -54,30 +54,43 @@ function Sparkles() {
   useEffect(() => {
     const cv = ref.current; if (!cv) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const ctx = cv.getContext("2d"); if (!ctx) return;
-    let raf = 0, w = 0, h = 0;
-    const N = Math.min(90, Math.floor(window.innerWidth / 16));
-    const cols = ["#a78bfa", "#22d3ee", "#f472b6", "#34d399", "#fbbf24"];
-    const ps = Array.from({ length: N }, () => ({
-      x: Math.random(), y: Math.random(), r: Math.random() * 1.6 + 0.4,
-      vx: (Math.random() - 0.5) * 0.0004, vy: (Math.random() - 0.5) * 0.0004 - 0.0002,
-      a: Math.random() * 0.5 + 0.2, tw: Math.random() * Math.PI * 2, c: cols[(Math.random() * cols.length) | 0],
-    }));
-    const resize = () => { w = cv.width = innerWidth * devicePixelRatio; h = cv.height = innerHeight * devicePixelRatio; cv.style.width = innerWidth + "px"; cv.style.height = innerHeight + "px"; };
-    resize(); addEventListener("resize", resize);
-    const draw = () => {
-      ctx.clearRect(0, 0, w, h);
-      for (const p of ps) {
-        p.x += p.vx; p.y += p.vy; p.tw += 0.02;
-        if (p.y < -0.02) p.y = 1.02; if (p.x < -0.02) p.x = 1.02; if (p.x > 1.02) p.x = -0.02;
-        const tw = (Math.sin(p.tw) + 1) / 2;
-        ctx.globalAlpha = p.a * (0.4 + tw * 0.6); ctx.fillStyle = p.c;
-        ctx.beginPath(); ctx.arc(p.x * w, p.y * h, p.r * devicePixelRatio * (0.7 + tw * 0.6), 0, Math.PI * 2); ctx.fill();
-      }
-      ctx.globalAlpha = 1; raf = requestAnimationFrame(draw);
+    let raf = 0;
+    let onResize: (() => void) | null = null;
+    // Décor purement esthétique : on l'initialise quand le navigateur est libre,
+    // pour ne pas retarder le premier rendu ni saturer le thread principal.
+    const start = () => {
+      const ctx = cv.getContext("2d"); if (!ctx) return;
+      let w = 0, h = 0;
+      const N = Math.min(90, Math.floor(window.innerWidth / 16));
+      const cols = ["#a78bfa", "#22d3ee", "#f472b6", "#34d399", "#fbbf24"];
+      const ps = Array.from({ length: N }, () => ({
+        x: Math.random(), y: Math.random(), r: Math.random() * 1.6 + 0.4,
+        vx: (Math.random() - 0.5) * 0.0004, vy: (Math.random() - 0.5) * 0.0004 - 0.0002,
+        a: Math.random() * 0.5 + 0.2, tw: Math.random() * Math.PI * 2, c: cols[(Math.random() * cols.length) | 0],
+      }));
+      const resize = () => { w = cv.width = innerWidth * devicePixelRatio; h = cv.height = innerHeight * devicePixelRatio; cv.style.width = innerWidth + "px"; cv.style.height = innerHeight + "px"; };
+      onResize = resize;
+      resize(); addEventListener("resize", resize);
+      const draw = () => {
+        ctx.clearRect(0, 0, w, h);
+        for (const p of ps) {
+          p.x += p.vx; p.y += p.vy; p.tw += 0.02;
+          if (p.y < -0.02) p.y = 1.02; if (p.x < -0.02) p.x = 1.02; if (p.x > 1.02) p.x = -0.02;
+          const tw = (Math.sin(p.tw) + 1) / 2;
+          ctx.globalAlpha = p.a * (0.4 + tw * 0.6); ctx.fillStyle = p.c;
+          ctx.beginPath(); ctx.arc(p.x * w, p.y * h, p.r * devicePixelRatio * (0.7 + tw * 0.6), 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.globalAlpha = 1; raf = requestAnimationFrame(draw);
+      };
+      draw();
     };
-    draw();
-    return () => { cancelAnimationFrame(raf); removeEventListener("resize", resize); };
+    const win = window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
+    const idleId = win.requestIdleCallback ? win.requestIdleCallback(start, { timeout: 1500 }) : (setTimeout(start, 400) as unknown as number);
+    return () => {
+      cancelAnimationFrame(raf);
+      if (onResize) removeEventListener("resize", onResize);
+      if (win.cancelIdleCallback && win.requestIdleCallback) win.cancelIdleCallback(idleId); else clearTimeout(idleId);
+    };
   }, []);
   return <canvas ref={ref} className="sparkles" aria-hidden />;
 }

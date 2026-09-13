@@ -51,6 +51,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       {faqLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />}
+      {tool.slug === "facturama" && <link rel="preconnect" href="https://srcvnqfgtazupuzwznrr.supabase.co" crossOrigin="anonymous" />}
       <div className="fx" aria-hidden>
         <div className="aurora a1" /><div className="aurora a2" /><div className="aurora a3" /><div className="aurora a4" />
       </div>

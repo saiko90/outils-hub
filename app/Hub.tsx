@@ -344,6 +344,7 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
             <a href="/" hrefLang="fr-CH">Français</a>
             <a href="/de" hrefLang="de-CH">Deutsch</a>
             <a href="/en" hrefLang="en">English</a>
+            <Link href={lang === "de" ? "/de/ueber-uns" : lang === "en" ? "/en/about" : "/a-propos"}>{tr(lang, "footAbout")}</Link>
           </nav>
         </div>
         <div className="foot-bottom">

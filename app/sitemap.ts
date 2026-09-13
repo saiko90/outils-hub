@@ -19,5 +19,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${B}/de/o/${t.slug}`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.75 },
     { url: `${B}/en/o/${t.slug}`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.75 },
   ]);
-  return [...home, ...cats, ...pages];
+  const about: MetadataRoute.Sitemap = [
+    { url: `${B}/a-propos`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${B}/de/ueber-uns`, lastModified: now, changeFrequency: "monthly", priority: 0.45 },
+    { url: `${B}/en/about`, lastModified: now, changeFrequency: "monthly", priority: 0.45 },
+  ];
+  return [...home, ...cats, ...pages, ...about];
 }

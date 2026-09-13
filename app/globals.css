@@ -116,8 +116,24 @@ main:focus { outline: none; }
 .empty button { margin-top: 14px; background: var(--brand); color: #06060c; border: none; border-radius: 11px; padding: 11px 18px; font-weight: 700; cursor: pointer; }
 
 /* footer */
-.foot { margin-top: 60px; padding-top: 28px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; color: var(--muted); font-size: 13.5px; }
-.foot .made { display: flex; align-items: center; gap: 8px; }
+.foot { margin-top: 60px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; padding: 40px 24px 48px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+.foot-main { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 32px; }
+@media (max-width: 680px) { .foot-main { grid-template-columns: 1fr 1fr; } .foot-brand { grid-column: 1 / -1; } }
+.foot-brand .foot-logo { font-weight: 850; font-size: 20px; letter-spacing: -0.02em; margin-bottom: 8px; }
+.foot-brand .foot-logo b { background: var(--brand); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.foot-brand .foot-logo .tld { color: var(--muted); }
+.foot-brand p { margin: 0 0 14px; max-width: 34ch; line-height: 1.55; }
+.foot-studio { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); text-decoration: none; font-weight: 600;
+  border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; transition: border-color 0.15s ease, background 0.15s ease; }
+.foot-studio:hover { border-color: rgba(129,140,248,0.5); background: rgba(129,140,248,0.08); }
+.foot-col h3 { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.foot-col { display: flex; flex-direction: column; gap: 9px; }
+.foot-col a { color: var(--ink); text-decoration: none; font-size: 0.92rem; transition: color 0.15s ease; }
+.foot-col a:hover { color: #a5b4fc; }
+.foot-bottom { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center;
+  margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--line); }
+.foot-bottom .made { display: flex; align-items: center; gap: 8px; }
+.tp-studio { display: inline-block; margin-top: 8px; font-size: 12.5px; font-weight: 600; }
 
 @media (max-width: 560px) {
   .stats { gap: 18px; }

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { track } from "@vercel/analytics";
-import { TOOLS, CATEGORIES, CAT_EMOJI, isPro, type Tool } from "@/lib/catalog";
+import { TOOLS, CATEGORIES, CAT_EMOJI, CAT_SLUG, isPro, type Tool } from "@/lib/catalog";
 import { type Lang, t as tr, catLabel, toolTagline, langPrefix } from "@/lib/i18n";
 
 /** Événement de conversion : quel outil est réellement ouvert (identifie les outils « héros »). */
@@ -286,8 +286,31 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
       </main>
 
       <footer className="foot">
-        <span className="made">{tr(lang, "footMade")}</span>
-        <span>outils.ch · {TOOLS.length} {tr(lang, "stTools")} · {tr(lang, "footRight")}</span>
+        <div className="foot-main">
+          <div className="foot-brand">
+            <div className="foot-logo"><b>outils</b><span className="tld">.ch</span></div>
+            <p>{tr(lang, "footTagline")}</p>
+            <a href="https://www.swissdigitalstudio.ch" target="_blank" rel="noopener noreferrer" className="foot-studio">
+              {tr(lang, "footBy")} <b>Swiss Digital Studio</b> <span aria-hidden>↗</span>
+            </a>
+          </div>
+          <nav className="foot-col" aria-label={tr(lang, "footCats")}>
+            <h3>{tr(lang, "footCats")}</h3>
+            {["Suisse", "Dev", "Données", "Finance"].filter((c) => CAT_SLUG[c]).map((c) => (
+              <Link key={c} href={`${langPrefix(lang)}/c/${CAT_SLUG[c]}`}>{CAT_EMOJI[c]} {catLabel(lang, c)}</Link>
+            ))}
+          </nav>
+          <nav className="foot-col" aria-label={tr(lang, "footLangs")}>
+            <h3>{tr(lang, "footLangs")}</h3>
+            <a href="/" hrefLang="fr-CH">Français</a>
+            <a href="/de" hrefLang="de-CH">Deutsch</a>
+            <a href="/en" hrefLang="en">English</a>
+          </nav>
+        </div>
+        <div className="foot-bottom">
+          <span className="made">© {new Date().getFullYear()} outils.ch · {tr(lang, "madeCH")}</span>
+          <span>{TOOLS.length} {tr(lang, "stTools")} · {tr(lang, "footRight")}</span>
+        </div>
       </footer>
     </>
   );

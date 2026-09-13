@@ -29,7 +29,7 @@ export const UI: Record<Lang, Record<string, string>> = {
     proFlag: "Produit phare", proDiscover: "Découvrir",
     catsTitle: "Parcourir par catégorie",
     backAll: "← Tous les outils", sameCat: "Dans la même catégorie",
-    otherCats: "Explorer les autres catégories", freeTools: "outils gratuits", madeCH: "🇨🇭 fait en Suisse",
+    otherCats: "Explorer les autres catégories", freeTools: "outils gratuits", madeCH: "🇨🇭 fait en Suisse", footTagline: "44 micro-outils gratuits, 100 % navigateur.", footBy: "Réalisé par", footCats: "Catégories", footLangs: "Langues",
     toGrid: "Tous les outils",
   },
   de: {
@@ -50,7 +50,7 @@ export const UI: Record<Lang, Record<string, string>> = {
     proFlag: "Vorzeigeprodukt", proDiscover: "Entdecken",
     catsTitle: "Nach Kategorie durchsuchen",
     backAll: "← Alle Tools", sameCat: "In derselben Kategorie",
-    otherCats: "Weitere Kategorien entdecken", freeTools: "gratis Tools", madeCH: "🇨🇭 made in Switzerland",
+    otherCats: "Weitere Kategorien entdecken", freeTools: "gratis Tools", madeCH: "🇨🇭 made in Switzerland", footTagline: "44 gratis Mikro-Tools, 100 % im Browser.", footBy: "Umgesetzt von", footCats: "Kategorien", footLangs: "Sprachen",
     toGrid: "Alle Tools",
   },
   en: {
@@ -71,7 +71,7 @@ export const UI: Record<Lang, Record<string, string>> = {
     proFlag: "Flagship", proDiscover: "Discover",
     catsTitle: "Browse by category",
     backAll: "← All tools", sameCat: "In the same category",
-    otherCats: "Explore other categories", freeTools: "free tools", madeCH: "🇨🇭 made in Switzerland",
+    otherCats: "Explore other categories", freeTools: "free tools", madeCH: "🇨🇭 made in Switzerland", footTagline: "44 free micro-tools, 100% in your browser.", footBy: "Built by", footCats: "Categories", footLangs: "Languages",
     toGrid: "All tools",
   },
 };

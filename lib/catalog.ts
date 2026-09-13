@@ -18,6 +18,7 @@ export const CATEGORIES = [
 export const TOOLS: Tool[] = [
   { slug: "facturama", name: "facturama", tagline: "QR-facture suisse conforme (ISO 20022 / SIX)", url: "https://facturama.ch", cat: "Suisse", tags: ["facture", "qr", "qr-bill", "paiement", "iban", "pme", "indépendant"], from: "#3b82f6", to: "#06b6d4", ch: true },
   { slug: "rento", name: "rento", tagline: "Retraite : 2e pilier en capital ou en rente ?", url: "https://outils.ch/o/rento", cat: "Suisse", tags: ["retraite", "2e pilier", "lpp", "rente", "capital", "prévoyance", "avs", "impôt fortune"], from: "#6366f1", to: "#22d3ee", ch: true },
+  { slug: "legato", name: "legato", tagline: "Succession suisse : parts, réserves & quotité disponible", url: "https://outils.ch/o/legato", cat: "Suisse", tags: ["succession", "héritage", "réserve héréditaire", "quotité disponible", "testament", "notaire", "hoirie"], from: "#8b5cf6", to: "#22d3ee", ch: true },
   { slug: "tvaflash", name: "tvaflash", tagline: "Décompte TVA suisse (8.1 / 2.6 / 3.8 %)", url: "https://tva-suisse.vercel.app", cat: "Suisse", tags: ["tva", "impôt", "décompte", "ht", "ttc", "comptabilité"], from: "#14b8a6", to: "#0ea5e9", ch: true },
   { slug: "csvzen", name: "csvzen", tagline: "Nettoyeur & dédoublonneur de CSV", url: "https://csvzen.outils.ch", cat: "Données", tags: ["csv", "doublons", "nettoyer", "tableur", "data"], from: "#10b981", to: "#22d3ee" },
   { slug: "dataflip", name: "dataflip", tagline: "Convertisseur JSON ⇄ CSV ⇄ Excel", url: "https://dataflip.outils.ch", cat: "Données", tags: ["json", "csv", "excel", "convertir", "data"], from: "#6366f1", to: "#a855f7" },
@@ -90,7 +91,7 @@ export const toolsByCat = (cat: string): Tool[] => TOOLS.filter((t) => t.cat ===
  * Outils « pro » suisses : réglementés, à livrable officiel, défendables face à l'IA.
  * Cœur de la stratégie de revenu (SaaS / leads B2B). Ordre = priorité, facturama en tête.
  */
-export const PRO_SLUGS = ["facturama", "rento", "tvaflash", "ibano", "capimmo", "avso", "prorato", "teleco", "lettro"];
+export const PRO_SLUGS = ["facturama", "rento", "legato", "tvaflash", "ibano", "capimmo", "avso", "prorato", "teleco", "lettro"];
 export const proTools = (): Tool[] => PRO_SLUGS.map((s) => bySlug(s)).filter(Boolean) as Tool[];
 export const isPro = (slug: string): boolean => PRO_SLUGS.includes(slug);
 

@@ -21,13 +21,14 @@ export async function POST(req: Request) {
     const ua = req.headers.get("user-agent") || "";
     if (BOT.test(ua)) return ok();
 
-    const body = (await req.json().catch(() => ({}))) as { p?: unknown };
+    const body = (await req.json().catch(() => ({}))) as { p?: unknown; ref?: unknown };
     let path = typeof body.p === "string" ? body.p : "/";
     if (!path.startsWith("/")) path = "/" + path;
     path = path.split("?")[0].split("#")[0].slice(0, 200) || "/";
     if (path.startsWith("/admin") || path.startsWith("/api")) return ok();
 
     const country = (req.headers.get("x-vercel-ip-country") || "XX").slice(0, 2);
+    const ref = (typeof body.ref === "string" ? body.ref : "").toLowerCase().slice(0, 100);
 
     await fetch(`${SB_URL}/rest/v1/rpc/track_view`, {
       method: "POST",
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
         apikey: SB_ANON,
         authorization: `Bearer ${SB_ANON}`,
       },
-      body: JSON.stringify({ p_path: path, p_country: country }),
+      body: JSON.stringify({ p_path: path, p_country: country, p_ref: ref }),
     }).catch(() => {});
 
     return ok();

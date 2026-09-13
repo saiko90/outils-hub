@@ -6,6 +6,7 @@ import { supabase, ADMIN_EMAIL } from "@/lib/supabase";
 
 type Row = { email: string; source: string; lang: string | null; created_at: string };
 type Stat = { day: string; path: string; country: string; views: number };
+type RefStat = { day: string; host: string; views: number };
 type Phase = "loading" | "anon" | "denied" | "admin";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -28,6 +29,7 @@ export default function AdminPage() {
   const [err, setErr] = useState("");
   const [rows, setRows] = useState<Row[] | null>(null);
   const [stats, setStats] = useState<Stat[] | null>(null);
+  const [refs, setRefs] = useState<RefStat[] | null>(null);
   const [loadErr, setLoadErr] = useState("");
 
   useEffect(() => {
@@ -53,6 +55,8 @@ export default function AdminPage() {
       .then(({ data, error }) => { if (error) setLoadErr(error.message); else setRows((data as Row[]) || []); });
     supabase().from("page_stats").select("day,path,country,views")
       .then(({ data }) => setStats((data as Stat[]) || []));
+    supabase().from("ref_stats").select("day,host,views")
+      .then(({ data }) => setRefs((data as RefStat[]) || []));
   }, [phase]);
 
   const sendLink = useCallback(async (e: React.FormEvent) => {
@@ -107,6 +111,7 @@ export default function AdminPage() {
     const cut = (n: number) => { const d = new Date(today); d.setUTCDate(d.getUTCDate() - n); return key(d); };
     const c7 = cut(6), c30 = cut(29);
     const sum = (arr: Stat[]) => arr.reduce((a, x) => a + (x.views || 0), 0);
+    const todayViews = sum(s.filter((x) => x.day === key(today)));
     const total7 = sum(s.filter((x) => x.day >= c7));
     const total30 = sum(s.filter((x) => x.day >= c30));
     const s30 = s.filter((x) => x.day >= c30);
@@ -116,8 +121,22 @@ export default function AdminPage() {
     const byCountry: Record<string, number> = {};
     s30.forEach((x) => { byCountry[x.country] = (byCountry[x.country] || 0) + (x.views || 0); });
     const topCountries = Object.entries(byCountry).sort((a, b) => b[1] - a[1]).slice(0, 4);
-    return { total7, total30, topPages, topCountries, has: s.length > 0 };
+    const byDay: Record<string, number> = {};
+    s.forEach((x) => { byDay[x.day] = (byDay[x.day] || 0) + (x.views || 0); });
+    const series: { d: string; v: number }[] = [];
+    for (let i = 13; i >= 0; i--) { const dt = new Date(today); dt.setUTCDate(dt.getUTCDate() - i); series.push({ d: dt.toLocaleDateString("fr-CH", { day: "numeric", month: "short" }), v: byDay[key(dt)] || 0 }); }
+    return { today: todayViews, total7, total30, topPages, topCountries, series, has: s.length > 0 };
   }, [stats]);
+
+  const rf = useMemo(() => {
+    const r = refs || [];
+    const t0 = new Date(); t0.setUTCHours(0, 0, 0, 0); t0.setUTCDate(t0.getUTCDate() - 29);
+    const cutK = t0.toISOString().slice(0, 10);
+    const by: Record<string, number> = {};
+    r.filter((x) => x.day >= cutK).forEach((x) => { by[x.host] = (by[x.host] || 0) + (x.views || 0); });
+    const top = Object.entries(by).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    return { top, has: top.length > 0 };
+  }, [refs]);
 
   return (
     <div className="adm">
@@ -246,13 +265,19 @@ export default function AdminPage() {
                     </div>
                     <div className="tr-sub">
                       {tr.has
-                        ? `${tr.total30} visites sur 30 j · first-party, sans cookie`
+                        ? `${tr.today} aujourd'hui · ${tr.total30} sur 30 j · first-party, sans cookie`
                         : "first-party, sans cookie · aucune donnée perso"}
                     </div>
                     {!tr.has ? (
-                      <p className="tr-wait">En attente des premières visites. Dès qu'un visiteur ouvre une page, les pages les plus vues s'afficheront ici en direct.</p>
+                      <p className="tr-wait">En attente des premières visites. Dès qu'un visiteur arrive, tu verras ici le trafic quotidien, les pages les plus vues, les pays et surtout d'où viennent les visiteurs (Google, réseaux sociaux, liens directs…).</p>
                     ) : (
                       <>
+                        <div className="tr-chart" role="img" aria-label="Visites par jour (14 derniers jours)">
+                          {(() => { const mx = Math.max(...tr.series.map((pt) => pt.v), 1); return tr.series.map((pt, i) => (
+                            <span key={i} className="tr-b" style={{ height: `${pt.v ? Math.max(6, (pt.v / mx) * 100) : 2}%` }} title={`${pt.d} : ${pt.v}`} />
+                          )); })()}
+                        </div>
+                        <div className="tr-lbl">14 derniers jours</div>
                         <div className="tr-pages">
                           {tr.topPages.map(([p, v]) => (
                             <div className="tr-bar" key={p}>
@@ -263,6 +288,12 @@ export default function AdminPage() {
                               <div className="tv">{v}</div>
                             </div>
                           ))}
+                        </div>
+                        <div className="tr-src">
+                          <div className="tr-srch">Sources · 30 j</div>
+                          {rf.has ? rf.top.map(([host, v]) => (
+                            <div className="tr-srcrow" key={host}><span className="tr-srcname" title={host}>{host}</span><span className="tr-srcv">{v}</span></div>
+                          )) : <div className="tr-srcempty">Aucune source externe encore — les visiteurs arrivent en direct/SEO. Les réseaux (linkedin.com, t.co…) apparaîtront ici.</div>}
                         </div>
                         {tr.topCountries.length > 0 && (
                           <div className="tr-geo">
@@ -471,6 +502,15 @@ const ADMIN_CSS = `
 .adm .tr-geo{display:flex;flex-wrap:wrap;gap:7px;margin-top:15px;padding-top:13px;border-top:1px solid var(--border);}
 .adm .tr-chip{font-size:11.5px;color:var(--muted);background:var(--surface-3);border-radius:99px;padding:3px 9px;}
 .adm .tr-chip b{color:var(--ink);font-weight:700;margin-left:2px;}
+.adm .tr-chart{display:flex;align-items:flex-end;gap:3px;height:46px;margin-top:14px;}
+.adm .tr-b{flex:1;min-width:0;background:linear-gradient(180deg,var(--accent-2),var(--accent));border-radius:3px 3px 0 0;opacity:.9;}
+.adm .tr-lbl{font-size:10px;color:var(--faint);text-align:right;margin-top:4px;}
+.adm .tr-src{margin-top:15px;padding-top:13px;border-top:1px solid var(--border);}
+.adm .tr-srch{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:9px;}
+.adm .tr-srcrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:3px 0;}
+.adm .tr-srcname{font-size:12px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.adm .tr-srcv{font-size:12px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;}
+.adm .tr-srcempty{font-size:11px;color:var(--faint);line-height:1.5;}
 .adm .sec-title{display:flex;align-items:baseline;gap:10px;margin:4px 2px -4px;}
 .adm .sec-title h2{font-size:15px;font-weight:700;}
 .adm .sec-title span{font-size:12px;color:var(--faint);}

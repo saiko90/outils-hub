@@ -11,7 +11,14 @@ export default function Hit() {
     try {
       const p = pathname || "/";
       if (p.startsWith("/admin")) return;
-      const body = JSON.stringify({ p });
+      let ref = "";
+      try {
+        if (document.referrer) {
+          const h = new URL(document.referrer).hostname.replace(/^www\./, "");
+          if (h && h !== "outils.ch" && !h.endsWith(".outils.ch")) ref = h;
+        }
+      } catch { /* no-op */ }
+      const body = JSON.stringify(ref ? { p, ref } : { p });
       if (typeof navigator !== "undefined" && navigator.sendBeacon) {
         navigator.sendBeacon("/api/hit", new Blob([body], { type: "application/json" }));
       } else {

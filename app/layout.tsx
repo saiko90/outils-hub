@@ -15,6 +15,7 @@ const inter = localFont({
   ],
 });
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import Hit from "./Hit";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -84,6 +85,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteLd) }} />
         {children}
+        <Hit />
         <Analytics />
         <SpeedInsights />
       </body>

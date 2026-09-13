@@ -5,6 +5,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase, ADMIN_EMAIL } from "@/lib/supabase";
 
 type Row = { email: string; source: string; lang: string | null; created_at: string };
+type Stat = { day: string; path: string; country: string; views: number };
 type Phase = "loading" | "anon" | "denied" | "admin";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -26,6 +27,7 @@ export default function AdminPage() {
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState("");
   const [rows, setRows] = useState<Row[] | null>(null);
+  const [stats, setStats] = useState<Stat[] | null>(null);
   const [loadErr, setLoadErr] = useState("");
 
   useEffect(() => {
@@ -49,6 +51,8 @@ export default function AdminPage() {
     supabase().from("waitlist").select("email,source,lang,created_at")
       .order("created_at", { ascending: false })
       .then(({ data, error }) => { if (error) setLoadErr(error.message); else setRows((data as Row[]) || []); });
+    supabase().from("page_stats").select("day,path,country,views")
+      .then(({ data }) => setStats((data as Stat[]) || []));
   }, [phase]);
 
   const sendLink = useCallback(async (e: React.FormEvent) => {
@@ -95,6 +99,25 @@ export default function AdminPage() {
     }
     return { total, w7, prev7, h24, byLang, topLang, topPct, series, labels };
   }, [rows]);
+
+  const tr = useMemo(() => {
+    const s = stats || [];
+    const today = new Date(); today.setUTCHours(0, 0, 0, 0);
+    const key = (d: Date) => d.toISOString().slice(0, 10);
+    const cut = (n: number) => { const d = new Date(today); d.setUTCDate(d.getUTCDate() - n); return key(d); };
+    const c7 = cut(6), c30 = cut(29);
+    const sum = (arr: Stat[]) => arr.reduce((a, x) => a + (x.views || 0), 0);
+    const total7 = sum(s.filter((x) => x.day >= c7));
+    const total30 = sum(s.filter((x) => x.day >= c30));
+    const s30 = s.filter((x) => x.day >= c30);
+    const byPath: Record<string, number> = {};
+    s30.forEach((x) => { byPath[x.path] = (byPath[x.path] || 0) + (x.views || 0); });
+    const topPages = Object.entries(byPath).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const byCountry: Record<string, number> = {};
+    s30.forEach((x) => { byCountry[x.country] = (byCountry[x.country] || 0) + (x.views || 0); });
+    const topCountries = Object.entries(byCountry).sort((a, b) => b[1] - a[1]).slice(0, 4);
+    return { total7, total30, topPages, topCountries, has: s.length > 0 };
+  }, [stats]);
 
   return (
     <div className="adm">
@@ -216,9 +239,40 @@ export default function AdminPage() {
                       );
                     })}
                   </div>
-                  <div className="soon-note">
-                    <b>Trafic & analytics — bientôt</b>
-                    <p>Visites et outils les plus ouverts : à connecter à Vercel Analytics (étape suivante).</p>
+                  <div className="traffic">
+                    <div className="tr-head">
+                      <b>Trafic — 7 derniers jours</b>
+                      <span className="tr-big">{tr.has ? tr.total7 : "—"}</span>
+                    </div>
+                    <div className="tr-sub">
+                      {tr.has
+                        ? `${tr.total30} visites sur 30 j · first-party, sans cookie`
+                        : "first-party, sans cookie · aucune donnée perso"}
+                    </div>
+                    {!tr.has ? (
+                      <p className="tr-wait">En attente des premières visites. Dès qu'un visiteur ouvre une page, les pages les plus vues s'afficheront ici en direct.</p>
+                    ) : (
+                      <>
+                        <div className="tr-pages">
+                          {tr.topPages.map(([p, v]) => (
+                            <div className="tr-bar" key={p}>
+                              <div className="tp">
+                                <b title={p}>{prettyPath(p)}</b>
+                                <div className="track"><div className="fill" style={{ width: `${(v / (tr.topPages[0][1] || 1)) * 100}%` }} /></div>
+                              </div>
+                              <div className="tv">{v}</div>
+                            </div>
+                          ))}
+                        </div>
+                        {tr.topCountries.length > 0 && (
+                          <div className="tr-geo">
+                            {tr.topCountries.map(([c, v]) => (
+                              <span className="tr-chip" key={c}>{flagEmoji(c)} {c === "XX" ? "?" : c} <b>{v}</b></span>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
               </section>
@@ -256,6 +310,15 @@ function trend(cur: number, prev: number): string {
   return (p >= 0 ? "▲ +" : "▼ ") + p + " %";
 }
 function initials(email: string) { return email.slice(0, 2).toUpperCase(); }
+function prettyPath(p: string): string {
+  if (p === "/") return "Accueil";
+  return p.length > 26 ? "…" + p.slice(-25) : p;
+}
+function flagEmoji(cc: string): string {
+  const c = (cc || "").toUpperCase();
+  if (c.length !== 2 || c === "XX") return "🌐";
+  return String.fromCodePoint(...[...c].map((ch) => 127397 + ch.charCodeAt(0)));
+}
 function grad(seed: string) {
   const pairs = [["#6366f1", "#22d3ee"], ["#34d399", "#0ea5e9"], ["#f472b6", "#a78bfa"], ["#f59e0b", "#ef4444"], ["#22d3ee", "#3b82f6"]];
   let h = 0; for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
@@ -392,9 +455,22 @@ const ADMIN_CSS = `
 .adm .bar .track{height:9px;background:var(--surface-3);border-radius:99px;overflow:hidden;}
 .adm .bar .fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-2));min-width:2px;}
 .adm .bar .bv{font-size:12.5px;font-weight:600;color:var(--muted);}
-.adm .soon-note{margin:4px 18px 18px;padding:14px;border-radius:12px;border:1px dashed var(--border-strong);background:var(--surface-2);}
-.adm .soon-note b{font-size:12.5px;}
-.adm .soon-note p{margin:5px 0 0;font-size:11.5px;color:var(--faint);line-height:1.5;}
+.adm .traffic{margin:4px 18px 18px;padding:16px;border-radius:12px;border:1px solid var(--border);background:var(--surface-2);}
+.adm .tr-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.adm .tr-head b{font-size:12.5px;color:var(--muted);}
+.adm .tr-big{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:27px;line-height:1;letter-spacing:-.02em;color:var(--accent-2);}
+.adm .tr-sub{font-size:11px;color:var(--faint);margin-top:3px;}
+.adm .tr-wait{font-size:11.5px;color:var(--faint);line-height:1.55;margin:13px 0 0;}
+.adm .tr-pages{display:flex;flex-direction:column;gap:11px;margin-top:15px;}
+.adm .tr-bar{display:grid;grid-template-columns:1fr 42px;align-items:center;gap:10px;}
+.adm .tr-bar .tp{min-width:0;}
+.adm .tr-bar .tp b{font-size:12px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.adm .tr-bar .track{height:6px;background:var(--surface-3);border-radius:99px;overflow:hidden;margin-top:5px;}
+.adm .tr-bar .fill{height:100%;background:linear-gradient(90deg,var(--accent-2),var(--accent));border-radius:99px;min-width:2px;}
+.adm .tr-bar .tv{font-size:12.5px;font-weight:700;color:var(--muted);text-align:right;}
+.adm .tr-geo{display:flex;flex-wrap:wrap;gap:7px;margin-top:15px;padding-top:13px;border-top:1px solid var(--border);}
+.adm .tr-chip{font-size:11.5px;color:var(--muted);background:var(--surface-3);border-radius:99px;padding:3px 9px;}
+.adm .tr-chip b{color:var(--ink);font-weight:700;margin-left:2px;}
 .adm .sec-title{display:flex;align-items:baseline;gap:10px;margin:4px 2px -4px;}
 .adm .sec-title h2{font-size:15px;font-weight:700;}
 .adm .sec-title span{font-size:12px;color:var(--faint);}

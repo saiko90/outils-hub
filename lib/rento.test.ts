@@ -20,7 +20,25 @@ describe("rento — conversion en rente", () => {
   });
   it("impôt unique réduit le capital net encaissé", () => {
     // part capital 100 %, impôt capital 7 % → 500000 × 0.93 = 465000
-    expect(simulate({ ...base0, tauxImpotCapital: 7 }, 100).capitalNet).toBe(465000);
+    const c = simulate({ ...base0, tauxImpotCapital: 7 }, 100);
+    expect(c.capitalNet).toBe(465000);
+    expect(c.impotCapitalCHF).toBe(35000); // 500000 × 7 %
+  });
+});
+
+describe("rento — détail des impôts", () => {
+  it("impôt annuel sur le revenu de la rente = brute − nette", () => {
+    const r = simulate({ ...base0, tauxImpotRente: 20 }, 0); // 100 % rente
+    expect(r.renteBruteAnnuelle).toBe(30000);
+    expect(r.renteNetteAnnuelle).toBe(24000);
+    expect(r.impotRenteAnnuelCHF).toBe(6000);
+  });
+  it("impôt sur la fortune cumulé : nul si taux 0, positif sinon", () => {
+    expect(simulate(base0, 100).impotFortuneTotalCHF).toBe(0);
+    expect(simulate({ ...base0, tauxFortune: 0.5, besoinsAnnuels: 10000 }, 100).impotFortuneTotalCHF).toBeGreaterThan(0);
+  });
+  it("aucun impôt capital quand on prend tout en rente", () => {
+    expect(simulate({ ...base0, tauxImpotCapital: 8 }, 0).impotCapitalCHF).toBe(0);
   });
 });
 

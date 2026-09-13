@@ -57,7 +57,11 @@ export type YearPoint = {
 export type ScenarioResult = {
   partCapital: number;
   capitalNet: number;        // capital net encaissé après impôt unique (part capital)
+  impotCapitalCHF: number;   // impôt UNIQUE sur le retrait en capital (part capital)
+  renteBruteAnnuelle: number; // rente brute annuelle (part rente)
   renteNetteAnnuelle: number; // rente nette annuelle (part rente)
+  impotRenteAnnuelCHF: number; // impôt sur le revenu prélevé chaque année sur la rente
+  impotFortuneTotalCHF: number; // impôt sur la fortune cumulé sur l'horizon (part capital)
   ageEpuisement: number | null; // âge où le capital investi s'épuise (null si tient jusqu'au décès)
   soldeAuDeces: number;      // capital restant à l'âge de décès (part capital)
   successionEstimee: number; // ce qui reste à la succession = solde capital + épargne surplus
@@ -75,8 +79,10 @@ export function simulate(inp: RentoInputs, partCapital: number): ScenarioResult 
   const capitalPourCapital = inp.capitalLPP * p;
   const capitalPourRente = inp.capitalLPP * (1 - p);
 
-  const capitalNet = capitalPourCapital * (1 - inp.tauxImpotCapital / 100);
-  const { nette: renteNetteAnnuelle } = renteFor(capitalPourRente, inp);
+  const impotCapitalCHF = capitalPourCapital * (inp.tauxImpotCapital / 100);
+  const capitalNet = capitalPourCapital - impotCapitalCHF;
+  const { brute: renteBruteAnnuelle, nette: renteNetteAnnuelle } = renteFor(capitalPourRente, inp);
+  const impotRenteAnnuelCHF = round2(renteBruteAnnuelle - renteNetteAnnuelle);
 
   const horizon = Math.max(0, Math.round(inp.ageDeces - inp.ageRetraite));
   const r = inp.rendement / 100;
@@ -88,6 +94,7 @@ export function simulate(inp: RentoInputs, partCapital: number): ScenarioResult 
   let ageEpuisement: number | null = null;
   let totalConsomme = 0;   // dépenses réellement financées
   let totalDeficit = 0;
+  let impotFortuneTotal = 0; // impôt sur la fortune cumulé
 
   const series: YearPoint[] = [];
 
@@ -119,6 +126,7 @@ export function simulate(inp: RentoInputs, partCapital: number): ScenarioResult 
 
     // 3) fin d'année : impôt sur la fortune puis rendement, sur le capital et l'épargne
     epargne += surplusRente;
+    impotFortuneTotal += (solde > 0 ? solde * wf : 0) + (epargne > 0 ? epargne * wf : 0);
     solde = solde > 0 ? solde * (1 - wf) * (1 + r) : 0;
     epargne = epargne > 0 ? epargne * (1 - wf) * (1 + r) : 0;
 
@@ -139,7 +147,11 @@ export function simulate(inp: RentoInputs, partCapital: number): ScenarioResult 
   return {
     partCapital: Math.round(partCapital),
     capitalNet: round2(capitalNet),
+    impotCapitalCHF: round2(impotCapitalCHF),
+    renteBruteAnnuelle,
     renteNetteAnnuelle,
+    impotRenteAnnuelCHF,
+    impotFortuneTotalCHF: round2(impotFortuneTotal),
     ageEpuisement,
     soldeAuDeces,
     successionEstimee,

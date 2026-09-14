@@ -156,11 +156,8 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
           </section>
         )}
 
-        {!declutter && (
-          <div className="tp-tags">
-            {tool.tags.map((tag) => <span key={tag} className="tp-tagchip">{tag}</span>)}
-          </div>
-        )}
+        {/* Nuage de mots-clés retiré de toutes les pages (cheni inutile côté client).
+           Les mots-clés restent dans les métadonnées (title/description/keywords + JSON-LD) → SEO préservé. */}
 
         {!declutter && faq.length > 0 && (
           <section className="tp-faq">

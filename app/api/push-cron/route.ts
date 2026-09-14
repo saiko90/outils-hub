@@ -38,7 +38,10 @@ export async function GET(req: Request) {
   const VPRIV = process.env.VAPID_PRIVATE_KEY;
   const VSUB = process.env.VAPID_SUBJECT || "mailto:contact@outils.ch";
   if (!SB || !KEY || !VPUB || !VPRIV) {
-    return new Response(JSON.stringify({ error: "not_configured" }), { status: 503 });
+    return Response.json(
+      { error: "not_configured", missing: { SUPABASE_URL: !SB, SERVICE_ROLE_KEY: !KEY, VAPID_PUBLIC: !VPUB, VAPID_PRIVATE: !VPRIV } },
+      { status: 503 }
+    );
   }
   webpush.setVapidDetails(VSUB, VPUB, VPRIV);
 

@@ -22,9 +22,16 @@ import {
   tpProBadge, tpOpenVerb, faqTitle, tpTrust, t,
 } from "@/lib/i18n";
 
+// Outils « épurés » : on masque le fluff de bas de page dont le client n'a pas besoin
+// (nuage de mots-clés, description générique, FAQ générique) tout en gardant le SEO
+// dans les métadonnées invisibles (title/description/keywords + JSON-LD ci-dessous).
+// Pour nettoyer un outil, ajoute son slug ici. (Nettoyage des autres outils : à étendre.)
+const DECLUTTER = new Set<string>(["calorio"]);
+
 export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
   const tool = bySlug(slug);
   if (!tool) notFound();
+  const declutter = DECLUTTER.has(slug);
   const p = langPrefix(lang);
   const home = p || "/";
   const related = TOOLS.filter((x) => x.cat === tool.cat && x.slug !== tool.slug).slice(0, 4);
@@ -54,7 +61,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
       { "@type": "ListItem", position: 3, name: tool.name, item: canon },
     ],
   };
-  const faqLd = faq.length > 0 ? {
+  const faqLd = !declutter && faq.length > 0 ? {
     "@context": "https://schema.org", "@type": "FAQPage",
     mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
   } : null;
@@ -120,8 +127,8 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
         {tool.slug === "scalc" && <ScalcCalc lang={lang} />}
         {(tool.slug === "capimmo" || tool.slug === "ibano") && <FinanceLead slug={tool.slug} lang={lang} />}
 
-        <p className="tp-long">{longDescriptionL(lang, tool)}</p>
-        {proText && <p className="tp-long tp-procontent">{proText}</p>}
+        {!declutter && <p className="tp-long">{longDescriptionL(lang, tool)}</p>}
+        {!declutter && proText && <p className="tp-long tp-procontent">{proText}</p>}
 
         {swissLinked.length > 0 && (
           <section className="tp-swiss">
@@ -149,11 +156,13 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
           </section>
         )}
 
-        <div className="tp-tags">
-          {tool.tags.map((tag) => <span key={tag} className="tp-tagchip">{tag}</span>)}
-        </div>
+        {!declutter && (
+          <div className="tp-tags">
+            {tool.tags.map((tag) => <span key={tag} className="tp-tagchip">{tag}</span>)}
+          </div>
+        )}
 
-        {faq.length > 0 && (
+        {!declutter && faq.length > 0 && (
           <section className="tp-faq">
             <h2>{faqTitle[lang]}</h2>
             {faq.map((f) => (
@@ -177,7 +186,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
         )}
 
         <footer className="tp-foot">
-          <Link href={home}>outils.ch</Link> · {TOOLS.length} {t(lang, "freeTools")} · {t(lang, "madeCH")}
+          <Link href={home}>outils.ch</Link> · {t(lang, "freeTools")} · {t(lang, "madeCH")}
           <br />
           <a href="https://www.swissdigitalstudio.ch" target="_blank" rel="noopener noreferrer" className="tp-studio">
             {t(lang, "footBy")} Swiss Digital Studio ↗

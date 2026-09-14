@@ -58,6 +58,11 @@ const L = {
     authTitle: "Retrouve tes données sur tous tes appareils", authSub: "Crée un compte gratuit — ton journal, ton poids et ton profil te suivent sur téléphone et ordinateur.",
     google: "Continuer avec Google", or: "ou", emailPh: "ton@email.ch", magic: "Recevoir un lien de connexion",
     authSent: "📩 Regarde tes e-mails : clique sur le lien pour te connecter.", authErr: "Souci de connexion, réessaie.", cloudOn: "☁️ Données synchronisées sur ton compte.",
+    proTitle: "Passe en calorio Pro", proSub: "Débloque Avo, ton coach nutrition IA, et l'analyse de tes repas en photo.",
+    planMonthly: "Mensuel", planYearly: "Annuel", perMonth: "/mois", perYear: "/an",
+    yearlySave: "2 mois offerts", trial: "7 jours d'essai gratuit, sans engagement — annulable à tout moment.",
+    subscribe: "S'abonner", loginFirst: "Connecte-toi d'abord pour t'abonner 👇", checkoutErr: "Le paiement n'est pas encore disponible. Réessaie bientôt.",
+    proSuccess: "🎉 Bienvenue en Pro ! Ton coach Avo et l'analyse photo sont débloqués.", close: "Fermer",
     // poids
     poidsAuj: "Ton poids aujourd'hui", enregistrer: "Enregistrer",
     depart: "Départ", actuel: "Actuel", variation: "Variation",
@@ -100,6 +105,11 @@ const L = {
     authTitle: "Deine Daten auf allen Geräten", authSub: "Erstelle ein kostenloses Konto — Journal, Gewicht und Profil folgen dir auf Handy und Computer.",
     google: "Mit Google fortfahren", or: "oder", emailPh: "dein@email.ch", magic: "Login-Link erhalten",
     authSent: "📩 Schau in deine E-Mails: klicke auf den Link zum Anmelden.", authErr: "Verbindungsproblem, nochmal versuchen.", cloudOn: "☁️ Daten mit deinem Konto synchronisiert.",
+    proTitle: "Werde calorio Pro", proSub: "Schalte Avo frei, deinen KI-Ernährungscoach, und die Foto-Analyse deiner Mahlzeiten.",
+    planMonthly: "Monatlich", planYearly: "Jährlich", perMonth: "/Monat", perYear: "/Jahr",
+    yearlySave: "2 Monate gratis", trial: "7 Tage gratis testen, unverbindlich — jederzeit kündbar.",
+    subscribe: "Abonnieren", loginFirst: "Melde dich zuerst an, um zu abonnieren 👇", checkoutErr: "Zahlung noch nicht verfügbar. Bald wieder versuchen.",
+    proSuccess: "🎉 Willkommen bei Pro! Coach Avo und die Foto-Analyse sind freigeschaltet.", close: "Schliessen",
     poidsAuj: "Dein Gewicht heute", enregistrer: "Speichern",
     depart: "Start", actuel: "Aktuell", variation: "Veränderung",
     pasPesee: "Erfasse dein Gewicht regelmässig, um deine Kurve und deinen Fortschritt zu sehen.",
@@ -141,6 +151,11 @@ const L = {
     authTitle: "Your data on every device", authSub: "Create a free account — your log, weight and profile follow you on phone and computer.",
     google: "Continue with Google", or: "or", emailPh: "you@email.com", magic: "Get a sign-in link",
     authSent: "📩 Check your inbox: click the link to sign in.", authErr: "Connection issue, try again.", cloudOn: "☁️ Data synced to your account.",
+    proTitle: "Go calorio Pro", proSub: "Unlock Avo, your AI nutrition coach, and photo analysis of your meals.",
+    planMonthly: "Monthly", planYearly: "Yearly", perMonth: "/mo", perYear: "/yr",
+    yearlySave: "2 months free", trial: "7-day free trial, no commitment — cancel anytime.",
+    subscribe: "Subscribe", loginFirst: "Sign in first to subscribe 👇", checkoutErr: "Payment isn't available yet. Try again soon.",
+    proSuccess: "🎉 Welcome to Pro! Coach Avo and photo analysis are unlocked.", close: "Close",
     poidsAuj: "Your weight today", enregistrer: "Save",
     depart: "Start", actuel: "Current", variation: "Change",
     pasPesee: "Log your weight regularly to see your curve and track your progress.",
@@ -263,6 +278,8 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
   const [authOpen, setAuthOpen] = useState(false);
   const [authEmail, setAuthEmail] = useState("");
   const [authMsg, setAuthMsg] = useState("");
+  const [proOpen, setProOpen] = useState(false);
+  const [checkoutMsg, setCheckoutMsg] = useState("");
 
   const day = todayISO();
 
@@ -390,6 +407,48 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
     setAuthMsg(error ? t.authErr : t.authSent);
   };
   const signOut = async () => { await getSupabase()?.auth.signOut(); setUser(null); setProDb(false); };
+
+  const goPro = () => {
+    if (!user) { setAuthOpen(true); setAuthMsg(t.loginFirst); setTab("besoins"); return; }
+    setCheckoutMsg("");
+    setProOpen(true);
+  };
+  const startCheckout = async (plan: "monthly" | "yearly") => {
+    const supa = getSupabase();
+    if (!supa) return;
+    const { data } = await supa.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) { setProOpen(false); setAuthOpen(true); return; }
+    setCheckoutMsg("…");
+    try {
+      const r = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+        body: JSON.stringify({ plan }),
+      });
+      const j = (await r.json()) as { url?: string };
+      if (j.url) { window.location.href = j.url; return; }
+      setCheckoutMsg(t.checkoutErr);
+    } catch { setCheckoutMsg(t.checkoutErr); }
+  };
+
+  // Retour de paiement réussi : on re-vérifie le statut Pro (le webhook a activé).
+  useEffect(() => {
+    if (!mounted || !user) return;
+    try {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get("pro") === "success") {
+        setProOpen(false);
+        setCheckoutMsg(t.proSuccess);
+        const t1 = setTimeout(() => pullFromCloud(user.id), 2500);
+        const t2 = setTimeout(() => pullFromCloud(user.id), 6000);
+        url.searchParams.delete("pro");
+        window.history.replaceState({}, "", url.toString());
+        return () => { clearTimeout(t1); clearTimeout(t2); };
+      }
+    } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, user]);
 
   const proActive = isPro || proDb;
 
@@ -566,6 +625,7 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
         ) : (
           <button className="cl-acc-btn" onClick={() => setAuthOpen((v) => !v)}>☁️ {t.syncBtn}</button>
         )}
+        {checkoutMsg && checkoutMsg !== "…" && !proOpen && <p className="cl-success">{checkoutMsg}</p>}
         {authOpen && !user && (
           <div className="cl-authpanel">
             <div className="cl-auth-h">{t.authTitle}</div>
@@ -683,7 +743,7 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
                 <span aria-hidden>🍽️</span> {photoBusy ? t.photoAnalyzing : t.photoPro}
               </button>
             ) : (
-              <button className="cl-act lock" onClick={() => setTab("coach")} title={t.photoLock}>
+              <button className="cl-act lock" onClick={goPro} title={t.photoLock}>
                 <span aria-hidden>🔒</span> {t.photoPro} · Pro
               </button>
             )}
@@ -800,8 +860,31 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
         </div>
       )}
 
+      {proOpen && (
+        <div className="cl-scanoverlay" onClick={() => setProOpen(false)}>
+          <div className="cl-promodal" onClick={(e) => e.stopPropagation()}>
+            <div className="cl-pro-h">🥑 {t.proTitle}</div>
+            <p className="cl-pro-s">{t.proSub}</p>
+            <div className="cl-plans">
+              <button className="cl-plan best" onClick={() => startCheckout("yearly")}>
+                <span className="cl-plan-badge">{t.yearlySave}</span>
+                <span className="cl-plan-name">{t.planYearly}</span>
+                <span className="cl-plan-price">CHF 39<small>{t.perYear}</small></span>
+              </button>
+              <button className="cl-plan" onClick={() => startCheckout("monthly")}>
+                <span className="cl-plan-name">{t.planMonthly}</span>
+                <span className="cl-plan-price">CHF 4.90<small>{t.perMonth}</small></span>
+              </button>
+            </div>
+            <p className="cl-pro-trial">🎁 {t.trial}</p>
+            {checkoutMsg && checkoutMsg !== "…" && <p className="cl-scanmsg">{checkoutMsg}</p>}
+            <button className="cl-pro-close" onClick={() => setProOpen(false)}>{t.close}</button>
+          </div>
+        </div>
+      )}
+
       {/* ---------- COACH ---------- */}
-      {tab === "coach" && <CoachNutri ctx={coachCtx} isPro={proActive} onGoPro={() => setAuthOpen(true)} />}
+      {tab === "coach" && <CoachNutri ctx={coachCtx} isPro={proActive} onGoPro={goPro} />}
 
       {tab !== "coach" && <p className="cl-memo">🔒 {t.memo}</p>}
       {tab !== "coach" && <p className="cl-disclaimer">⚠︎ {t.disclaimer}</p>}
@@ -977,6 +1060,21 @@ const CSS = `
 .cl-auth-email input{flex:1;min-width:150px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#f5f6fb;padding:11px 13px;font-size:.9rem}
 .cl-auth-email button{background:linear-gradient(135deg,#22c55e,#84cc16);color:#05210f;border:0;border-radius:10px;padding:11px 16px;font-weight:800;font-size:.85rem;cursor:pointer;white-space:nowrap}
 .cl-auth-msg{margin:12px 0 0;font-size:.85rem;color:#a3e635}
+.cl-success{margin:10px 0 0;padding:11px 14px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);border-radius:12px;color:#a3e635;font-size:.9rem;font-weight:600}
+/* modale Pro */
+.cl-promodal{width:min(94vw,420px);background:#101725;border:1px solid rgba(34,197,94,.3);border-radius:20px;padding:24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.cl-pro-h{font-size:1.4rem;font-weight:800}
+.cl-pro-s{margin:8px 0 18px;color:#c3c8e2;font-size:.92rem;line-height:1.5}
+.cl-plans{display:flex;gap:12px}
+.cl-plan{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.12);border-radius:16px;padding:20px 12px 16px;cursor:pointer;transition:.15s}
+.cl-plan:hover{border-color:rgba(34,197,94,.6);background:rgba(34,197,94,.06)}
+.cl-plan.best{border-color:rgba(34,197,94,.55);background:rgba(34,197,94,.08)}
+.cl-plan-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.66rem;font-weight:800;text-transform:uppercase;background:linear-gradient(135deg,#22c55e,#84cc16);color:#05210f;border-radius:99px;padding:3px 10px}
+.cl-plan-name{font-size:.85rem;color:#8b93b7;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.cl-plan-price{font-size:1.5rem;font-weight:800;color:#f5f6fb}
+.cl-plan-price small{font-size:.8rem;font-weight:600;color:#8b93b7}
+.cl-pro-trial{margin:16px 0 0;font-size:.85rem;color:#a3e635}
+.cl-pro-close{margin-top:14px;background:none;border:1px solid rgba(255,255,255,.15);color:#aeb4d6;border-radius:10px;padding:9px 20px;font-size:.85rem;cursor:pointer}
 .cl-tabs{display:flex;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:5px;margin-bottom:18px;flex-wrap:wrap}
 .cl-tab{flex:1;min-width:110px;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:#aeb4d6;font-size:.9rem;font-weight:700;cursor:pointer;transition:.15s}
 .cl-tab.on{background:linear-gradient(135deg,${ACCENT},${ACCENT2});color:#05210f;box-shadow:0 6px 18px rgba(34,197,94,.25)}

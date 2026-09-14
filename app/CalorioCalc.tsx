@@ -24,7 +24,25 @@ import type { User } from "@supabase/supabase-js";
 /* ---------------- i18n ---------------- */
 const L = {
   fr: {
-    tabs: { besoins: "Mes besoins", journal: "Journal du jour", poids: "Suivi du poids", coach: "Coach 🥑" },
+    tabs: { besoins: "Mes besoins", journal: "Journal", poids: "Poids", coach: "Coach", aide: "Aide" },
+    tagline: "Ton compagnon calories & nutrition, simple et suisse.",
+    intro: {
+      besoins: "Réglons ton profil pour connaître tes calories cible chaque jour.",
+      journal: "Note ce que tu manges — on compare en direct à ton objectif.",
+      poids: "Enregistre ton poids et suis ta courbe dans le temps.",
+      coach: "Discute avec Vito, ton coach nutrition, quand tu veux.",
+      aide: "Les réponses aux questions les plus fréquentes.",
+    },
+    faqTitle: "Questions fréquentes",
+    faq: [
+      { q: "Comment calorio calcule mes besoins ?", a: "On utilise la formule Mifflin-St Jeor pour ton métabolisme de base, multipliée par ton niveau d'activité, puis ajustée selon ton objectif. C'est une estimation solide, pas une vérité absolue — écoute aussi ton corps." },
+      { q: "Mes données sont-elles privées ?", a: "Oui. Sans compte, tout reste dans ton navigateur, sur ton appareil. Avec un compte, tes données sont synchronisées de façon sécurisée sur des serveurs en Europe pour te suivre sur téléphone et ordinateur. On ne vend jamais tes données." },
+      { q: "calorio est gratuit ?", a: "Oui : tes besoins, le journal, la base d'aliments, le scan de code-barres et le suivi du poids sont 100 % gratuits. La version Pro ajoute le coach IA Vito et l'analyse de tes repas en photo." },
+      { q: "Qu'est-ce que la version Pro ?", a: "CHF 4.90/mois ou CHF 39/an, avec 7 jours d'essai gratuit sans engagement. Tu débloques Vito, ton coach nutrition, et l'analyse photo. Annulable à tout moment." },
+      { q: "Comment marche l'analyse photo ?", a: "Tu prends ton assiette en photo, une IA identifie les aliments et estime les calories et macros. Tu peux ensuite ajuster les quantités : ça reste une estimation." },
+      { q: "Comment annuler mon abonnement Pro ?", a: "Depuis le lien de gestion Stripe reçu par e-mail après ton inscription, ou en nous écrivant. Pendant les 7 jours d'essai, aucun engagement." },
+      { q: "Le scan de code-barres ne marche pas ?", a: "Autorise l'accès à la caméra. Sur iPhone, ouvre le site dans Safari. Si le produit n'est pas trouvé, cherche-le simplement par son nom." },
+    ] as { q: string; a: string }[],
     sexe: "Sexe", homme: "Homme", femme: "Femme",
     age: "Âge", poids: "Poids (kg)", taille: "Taille (cm)",
     activite: "Niveau d'activité", objectif: "Objectif",
@@ -49,20 +67,20 @@ const L = {
     scanUnsupported: "Le scan n'est pas supporté par ce navigateur — utilise la recherche.",
     scanDenied: "Accès caméra refusé.", scanSearching: "Recherche du produit…", scanNotFound: "Produit introuvable dans la base.",
     scanTitle: "Vise le code-barres", scanClose: "Fermer",
-    photoTitle: "Avo a repéré ces aliments", photoAddAll: "Tout ajouter", photoAnalyzing: "Avo analyse ta photo…",
+    photoTitle: "Vito a repéré ces aliments", photoAddAll: "Tout ajouter", photoAnalyzing: "Vito analyse ta photo…",
     photoNone: "Je n'ai pas reconnu d'aliment sur la photo. Réessaie avec une photo plus nette.",
     photoErr: "Souci d'analyse. Réessaie.", notReadyShort: "Analyse pas encore activée.",
-    photoLock: "L'analyse photo est réservée au Pro. Prends ton assiette en photo, Avo estime les calories.",
+    photoLock: "L'analyse photo est réservée au Pro. Prends ton assiette en photo, Vito estime les calories.",
     estim: "estimé",
     syncBtn: "Synchroniser mes données", synced: "Synchronisé", logout: "Déconnexion",
     authTitle: "Retrouve tes données sur tous tes appareils", authSub: "Crée un compte gratuit — ton journal, ton poids et ton profil te suivent sur téléphone et ordinateur.",
     google: "Continuer avec Google", or: "ou", emailPh: "ton@email.ch", magic: "Recevoir un lien de connexion",
     authSent: "📩 Regarde tes e-mails : clique sur le lien pour te connecter.", authErr: "Souci de connexion, réessaie.", cloudOn: "☁️ Données synchronisées sur ton compte.",
-    proTitle: "Passe en calorio Pro", proSub: "Débloque Avo, ton coach nutrition IA, et l'analyse de tes repas en photo.",
+    proTitle: "Passe en calorio Pro", proSub: "Débloque Vito, ton coach nutrition IA, et l'analyse de tes repas en photo.",
     planMonthly: "Mensuel", planYearly: "Annuel", perMonth: "/mois", perYear: "/an",
     yearlySave: "2 mois offerts", trial: "7 jours d'essai gratuit, sans engagement — annulable à tout moment.",
     subscribe: "S'abonner", loginFirst: "Connecte-toi d'abord pour t'abonner 👇", checkoutErr: "Le paiement n'est pas encore disponible. Réessaie bientôt.",
-    proSuccess: "🎉 Bienvenue en Pro ! Ton coach Avo et l'analyse photo sont débloqués.", close: "Fermer",
+    proSuccess: "🎉 Bienvenue en Pro ! Ton coach Vito et l'analyse photo sont débloqués.", close: "Fermer",
     // poids
     poidsAuj: "Ton poids aujourd'hui", enregistrer: "Enregistrer",
     depart: "Départ", actuel: "Actuel", variation: "Variation",
@@ -70,9 +88,32 @@ const L = {
     objVer: "objectif", historique: "Historique",
     memo: "Tes données restent sur cet appareil (dans ton navigateur) — rien n'est envoyé sur un serveur.",
     disclaimer: "Estimations basées sur des formules standard (Mifflin-St Jeor) et des valeurs nutritionnelles moyennes. Ce n'est pas un plan nutritionnel ni un avis médical. Pour un suivi personnalisé (régime, pathologie, sport de haut niveau), consulte un·e diététicien·ne ou un·e médecin.",
+    chartTitle: "Tes 14 derniers jours", chartAvg: "Moyenne 7 j", chartCible: "objectif",
+    chartOk: "dans l'objectif", chartOver: "dépassé", chartUnder: "en dessous",
+    chartEmpty: "Note tes repas quelques jours pour voir apparaître ta tendance ici.",
+    nudgeMidi: "Tu as mangé quoi ce midi ? Ajoute ton repas 👇", nudgeSoir: "Pense à noter ton dîner 🍽️", nudgeDismiss: "Masquer",
+    installApp: "Installer l'app", installed: "Installe calorio sur ton écran d'accueil pour un accès en un tap.",
   },
   de: {
-    tabs: { besoins: "Mein Bedarf", journal: "Tagesjournal", poids: "Gewichtsverlauf", coach: "Coach 🥑" },
+    tabs: { besoins: "Bedarf", journal: "Journal", poids: "Gewicht", coach: "Coach", aide: "Hilfe" },
+    tagline: "Dein Kalorien- & Ernährungsbegleiter, einfach und schweizerisch.",
+    intro: {
+      besoins: "Stell dein Profil ein, um deine täglichen Zielkalorien zu kennen.",
+      journal: "Notiere, was du isst — wir vergleichen live mit deinem Ziel.",
+      poids: "Erfasse dein Gewicht und verfolge deine Kurve über die Zeit.",
+      coach: "Chatte mit Vito, deinem Ernährungscoach, wann immer du willst.",
+      aide: "Antworten auf die häufigsten Fragen.",
+    },
+    faqTitle: "Häufige Fragen",
+    faq: [
+      { q: "Wie berechnet calorio meinen Bedarf?", a: "Wir nutzen die Mifflin-St-Jeor-Formel für deinen Grundumsatz, multipliziert mit deinem Aktivitätsniveau und an dein Ziel angepasst. Eine solide Schätzung, keine absolute Wahrheit — höre auch auf deinen Körper." },
+      { q: "Sind meine Daten privat?", a: "Ja. Ohne Konto bleibt alles in deinem Browser, auf deinem Gerät. Mit Konto werden deine Daten sicher auf Servern in Europa synchronisiert, damit du sie auf Handy und Computer hast. Wir verkaufen deine Daten nie." },
+      { q: "Ist calorio gratis?", a: "Ja: Bedarf, Journal, Lebensmittel-Datenbank, Barcode-Scan und Gewichtsverlauf sind 100 % gratis. Pro ergänzt den KI-Coach Vito und die Foto-Analyse deiner Mahlzeiten." },
+      { q: "Was ist die Pro-Version?", a: "CHF 4.90/Monat oder CHF 39/Jahr, mit 7 Tagen Gratis-Test ohne Verpflichtung. Du schaltest Vito, deinen Ernährungscoach, und die Foto-Analyse frei. Jederzeit kündbar." },
+      { q: "Wie funktioniert die Foto-Analyse?", a: "Du fotografierst deinen Teller, eine KI erkennt die Lebensmittel und schätzt Kalorien und Makros. Danach kannst du die Mengen anpassen — es bleibt eine Schätzung." },
+      { q: "Wie kündige ich mein Pro-Abo?", a: "Über den Stripe-Verwaltungslink, den du nach der Anmeldung per E-Mail erhältst, oder schreib uns. Während der 7 Testtage keine Verpflichtung." },
+      { q: "Der Barcode-Scan funktioniert nicht?", a: "Erlaube den Kamerazugriff. Auf dem iPhone öffne die Seite in Safari. Wird das Produkt nicht gefunden, suche es einfach über den Namen." },
+    ] as { q: string; a: string }[],
     sexe: "Geschlecht", homme: "Mann", femme: "Frau",
     age: "Alter", poids: "Gewicht (kg)", taille: "Grösse (cm)",
     activite: "Aktivitätsniveau", objectif: "Ziel",
@@ -96,29 +137,52 @@ const L = {
     scanUnsupported: "Scan wird von diesem Browser nicht unterstützt — nutze die Suche.",
     scanDenied: "Kamerazugriff verweigert.", scanSearching: "Produkt wird gesucht…", scanNotFound: "Produkt nicht in der Datenbank gefunden.",
     scanTitle: "Barcode anvisieren", scanClose: "Schliessen",
-    photoTitle: "Avo hat diese Lebensmittel erkannt", photoAddAll: "Alle hinzufügen", photoAnalyzing: "Avo analysiert dein Foto…",
+    photoTitle: "Vito hat diese Lebensmittel erkannt", photoAddAll: "Alle hinzufügen", photoAnalyzing: "Vito analysiert dein Foto…",
     photoNone: "Kein Lebensmittel erkannt. Versuch ein schärferes Foto.",
     photoErr: "Analyse-Problem. Nochmal versuchen.", notReadyShort: "Analyse noch nicht aktiviert.",
-    photoLock: "Die Foto-Analyse ist Pro. Fotografiere deinen Teller, Avo schätzt die Kalorien.",
+    photoLock: "Die Foto-Analyse ist Pro. Fotografiere deinen Teller, Vito schätzt die Kalorien.",
     estim: "geschätzt",
     syncBtn: "Daten synchronisieren", synced: "Synchronisiert", logout: "Abmelden",
     authTitle: "Deine Daten auf allen Geräten", authSub: "Erstelle ein kostenloses Konto — Journal, Gewicht und Profil folgen dir auf Handy und Computer.",
     google: "Mit Google fortfahren", or: "oder", emailPh: "dein@email.ch", magic: "Login-Link erhalten",
     authSent: "📩 Schau in deine E-Mails: klicke auf den Link zum Anmelden.", authErr: "Verbindungsproblem, nochmal versuchen.", cloudOn: "☁️ Daten mit deinem Konto synchronisiert.",
-    proTitle: "Werde calorio Pro", proSub: "Schalte Avo frei, deinen KI-Ernährungscoach, und die Foto-Analyse deiner Mahlzeiten.",
+    proTitle: "Werde calorio Pro", proSub: "Schalte Vito frei, deinen KI-Ernährungscoach, und die Foto-Analyse deiner Mahlzeiten.",
     planMonthly: "Monatlich", planYearly: "Jährlich", perMonth: "/Monat", perYear: "/Jahr",
     yearlySave: "2 Monate gratis", trial: "7 Tage gratis testen, unverbindlich — jederzeit kündbar.",
     subscribe: "Abonnieren", loginFirst: "Melde dich zuerst an, um zu abonnieren 👇", checkoutErr: "Zahlung noch nicht verfügbar. Bald wieder versuchen.",
-    proSuccess: "🎉 Willkommen bei Pro! Coach Avo und die Foto-Analyse sind freigeschaltet.", close: "Schliessen",
+    proSuccess: "🎉 Willkommen bei Pro! Coach Vito und die Foto-Analyse sind freigeschaltet.", close: "Schliessen",
     poidsAuj: "Dein Gewicht heute", enregistrer: "Speichern",
     depart: "Start", actuel: "Aktuell", variation: "Veränderung",
     pasPesee: "Erfasse dein Gewicht regelmässig, um deine Kurve und deinen Fortschritt zu sehen.",
     objVer: "Ziel", historique: "Verlauf",
     memo: "Deine Daten bleiben auf diesem Gerät (in deinem Browser) — nichts wird an einen Server gesendet.",
     disclaimer: "Schätzungen auf Basis von Standardformeln (Mifflin-St Jeor) und durchschnittlichen Nährwerten. Kein Ernährungsplan und keine medizinische Beratung. Für eine persönliche Begleitung eine Ernährungsberatung oder einen Arzt beiziehen.",
+    chartTitle: "Deine letzten 14 Tage", chartAvg: "Ø 7 Tage", chartCible: "Ziel",
+    chartOk: "im Ziel", chartOver: "überschritten", chartUnder: "darunter",
+    chartEmpty: "Trage ein paar Tage lang deine Mahlzeiten ein, um deinen Trend zu sehen.",
+    nudgeMidi: "Was hast du zu Mittag gegessen? Trag es ein 👇", nudgeSoir: "Denk daran, dein Abendessen einzutragen 🍽️", nudgeDismiss: "Ausblenden",
+    installApp: "App installieren", installed: "Installiere calorio auf deinem Startbildschirm für Zugriff mit einem Tipp.",
   },
   en: {
-    tabs: { besoins: "My needs", journal: "Today's log", poids: "Weight tracking", coach: "Coach 🥑" },
+    tabs: { besoins: "My needs", journal: "Log", poids: "Weight", coach: "Coach", aide: "Help" },
+    tagline: "Your calorie & nutrition companion — simple and Swiss.",
+    intro: {
+      besoins: "Set your profile to know your daily target calories.",
+      journal: "Log what you eat — we compare it live to your goal.",
+      poids: "Record your weight and follow your curve over time.",
+      coach: "Chat with Vito, your nutrition coach, whenever you like.",
+      aide: "Answers to the most common questions.",
+    },
+    faqTitle: "Frequently asked questions",
+    faq: [
+      { q: "How does calorio work out my needs?", a: "We use the Mifflin-St Jeor formula for your basal metabolism, multiplied by your activity level and adjusted to your goal. It's a solid estimate, not an absolute truth — listen to your body too." },
+      { q: "Is my data private?", a: "Yes. Without an account, everything stays in your browser, on your device. With an account, your data is securely synced on servers in Europe so you get it on phone and computer. We never sell your data." },
+      { q: "Is calorio free?", a: "Yes: your needs, the log, the food database, barcode scanning and weight tracking are 100% free. Pro adds the AI coach Vito and photo analysis of your meals." },
+      { q: "What is the Pro version?", a: "CHF 4.90/month or CHF 39/year, with a free 7-day trial and no commitment. You unlock Vito, your nutrition coach, and photo analysis. Cancel anytime." },
+      { q: "How does photo analysis work?", a: "You snap a photo of your plate, an AI identifies the foods and estimates calories and macros. You can then adjust the amounts — it stays an estimate." },
+      { q: "How do I cancel my Pro subscription?", a: "From the Stripe management link e-mailed to you after signing up, or by writing to us. During the 7-day trial there's no commitment." },
+      { q: "Barcode scanning isn't working?", a: "Allow camera access. On iPhone, open the site in Safari. If the product isn't found, just search it by name." },
+    ] as { q: string; a: string }[],
     sexe: "Sex", homme: "Male", femme: "Female",
     age: "Age", poids: "Weight (kg)", taille: "Height (cm)",
     activite: "Activity level", objectif: "Goal",
@@ -142,26 +206,31 @@ const L = {
     scanUnsupported: "Scanning isn't supported by this browser — use search.",
     scanDenied: "Camera access denied.", scanSearching: "Looking up product…", scanNotFound: "Product not found in the database.",
     scanTitle: "Aim at the barcode", scanClose: "Close",
-    photoTitle: "Avo spotted these foods", photoAddAll: "Add all", photoAnalyzing: "Avo is analysing your photo…",
+    photoTitle: "Vito spotted these foods", photoAddAll: "Add all", photoAnalyzing: "Vito is analysing your photo…",
     photoNone: "I didn't recognise any food. Try a sharper photo.",
     photoErr: "Analysis issue. Try again.", notReadyShort: "Analysis not activated yet.",
-    photoLock: "Photo analysis is Pro. Snap your plate, Avo estimates the calories.",
+    photoLock: "Photo analysis is Pro. Snap your plate, Vito estimates the calories.",
     estim: "est.",
     syncBtn: "Sync my data", synced: "Synced", logout: "Sign out",
     authTitle: "Your data on every device", authSub: "Create a free account — your log, weight and profile follow you on phone and computer.",
     google: "Continue with Google", or: "or", emailPh: "you@email.com", magic: "Get a sign-in link",
     authSent: "📩 Check your inbox: click the link to sign in.", authErr: "Connection issue, try again.", cloudOn: "☁️ Data synced to your account.",
-    proTitle: "Go calorio Pro", proSub: "Unlock Avo, your AI nutrition coach, and photo analysis of your meals.",
+    proTitle: "Go calorio Pro", proSub: "Unlock Vito, your AI nutrition coach, and photo analysis of your meals.",
     planMonthly: "Monthly", planYearly: "Yearly", perMonth: "/mo", perYear: "/yr",
     yearlySave: "2 months free", trial: "7-day free trial, no commitment — cancel anytime.",
     subscribe: "Subscribe", loginFirst: "Sign in first to subscribe 👇", checkoutErr: "Payment isn't available yet. Try again soon.",
-    proSuccess: "🎉 Welcome to Pro! Coach Avo and photo analysis are unlocked.", close: "Close",
+    proSuccess: "🎉 Welcome to Pro! Coach Vito and photo analysis are unlocked.", close: "Close",
     poidsAuj: "Your weight today", enregistrer: "Save",
     depart: "Start", actuel: "Current", variation: "Change",
     pasPesee: "Log your weight regularly to see your curve and track your progress.",
     objVer: "goal", historique: "History",
     memo: "Your data stays on this device (in your browser) — nothing is sent to a server.",
     disclaimer: "Estimates based on standard formulas (Mifflin-St Jeor) and average nutritional values. Not a nutrition plan or medical advice. For personalised guidance (diet, condition, high-level sport), consult a dietitian or doctor.",
+    chartTitle: "Your last 14 days", chartAvg: "7-day avg", chartCible: "target",
+    chartOk: "on target", chartOver: "over", chartUnder: "under",
+    chartEmpty: "Log your meals for a few days to see your trend appear here.",
+    nudgeMidi: "What did you have for lunch? Add your meal 👇", nudgeSoir: "Don't forget to log your dinner 🍽️", nudgeDismiss: "Hide",
+    installApp: "Install the app", installed: "Install calorio on your home screen for one-tap access.",
   },
 } as const;
 
@@ -169,6 +238,11 @@ const L = {
 const CATS: AlimentCat[] = ["feculents", "viandes", "laitiers", "fruits", "legumes", "boissons", "snacks", "plats"];
 const C_PROT = "#34d399", C_GLUC = "#f59e0b", C_LIP = "#f472b6";
 const ACCENT = "#22c55e", ACCENT2 = "#84cc16";
+
+type BeforeInstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
+type TabKey = "besoins" | "journal" | "poids" | "coach" | "aide";
+const TABS: TabKey[] = ["besoins", "journal", "poids", "coach", "aide"];
+const TAB_ICON: Record<TabKey, string> = { besoins: "🎯", journal: "🍽️", poids: "⚖️", coach: "🌱", aide: "💬" };
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 const nf = (lang: Lang, d = 0) =>
@@ -241,8 +315,11 @@ function downscale(file: File, max: number): Promise<{ base64: string; mime: str
 /* ---------------- component ---------------- */
 export default function CalorioCalc({ lang }: { lang: Lang }) {
   const t = L[lang] ?? L.fr;
-  const [tab, setTab] = useState<"besoins" | "journal" | "poids" | "coach">("besoins");
+  const [tab, setTab] = useState<TabKey>("besoins");
+  const [faqOpen, setFaqOpen] = useState<number | null>(0);
   const [mounted, setMounted] = useState(false);
+  const [nudgeHidden, setNudgeHidden] = useState(false);
+  const [installEvt, setInstallEvt] = useState<BeforeInstallEvent | null>(null);
 
   // profil
   const [sexe, setSexe] = useState<Sexe>("homme");
@@ -308,6 +385,18 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
     setMounted(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // invite d'installation PWA
+  useEffect(() => {
+    const onPrompt = (e: Event) => { e.preventDefault(); setInstallEvt(e as BeforeInstallEvent); };
+    window.addEventListener("beforeinstallprompt", onPrompt);
+    return () => window.removeEventListener("beforeinstallprompt", onPrompt);
+  }, []);
+  const doInstall = async () => {
+    if (!installEvt) return;
+    try { await installEvt.prompt(); await installEvt.userChoice; } catch { /* ignore */ }
+    setInstallEvt(null);
+  };
 
   // sauvegardes
   useEffect(() => {
@@ -461,6 +550,43 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
   const total = useMemo(() => computeJournal(lignesMap), [lignesMap]);
   const bil = useMemo(() => bilan(total, besoins.cible), [total, besoins.cible]);
   const tend = useMemo(() => tendancePoids(pesees), [pesees]);
+
+  // Historique 14 jours : kcal consommées par jour (aujourd'hui = état courant).
+  const histoire = useMemo(() => {
+    if (!mounted) return [] as { date: string; kcal: number }[];
+    const jour = load<Record<string, unknown[]>>("calorio.journal", {});
+    const today = todayISO();
+    const days: { date: string; kcal: number }[] = [];
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      let kcal = 0;
+      if (key === today) {
+        kcal = total.kcal;
+      } else {
+        const rows = jour[key];
+        if (Array.isArray(rows)) {
+          for (const r of rows as { food?: Food; grammes?: number }[]) {
+            if (r && r.food && typeof r.grammes === "number") {
+              try { kcal += calcAliment(r.food, r.grammes).kcal; } catch { /* ignore */ }
+            }
+          }
+        }
+      }
+      days.push({ date: key, kcal: Math.round(kcal) });
+    }
+    return days;
+  }, [mounted, lines, total.kcal]);
+
+  // Rappel doux (dans l'app) : as-tu noté ton repas ?
+  const nudge = useMemo(() => {
+    if (!mounted || nudgeHidden || total.kcal >= besoins.cible * 0.5) return "";
+    const h = new Date().getHours();
+    if (total.kcal === 0 && h >= 13 && h < 18) return t.nudgeMidi;
+    if (h >= 19 && total.kcal < besoins.cible * 0.5) return t.nudgeSoir;
+    return "";
+  }, [mounted, nudgeHidden, total.kcal, besoins.cible, t]);
 
   const coachCtx: CoachCtx = useMemo(
     () => ({
@@ -616,6 +742,19 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
     <section className="cl" id="calorio">
       <style>{CSS}</style>
 
+      <header className="cl-hero">
+        <span className="cl-hero-logo" aria-hidden>🌱</span>
+        <div className="cl-hero-txt">
+          <div className="cl-hero-name">calorio</div>
+          <p className="cl-hero-tag">{t.tagline}</p>
+        </div>
+        {installEvt && (
+          <button className="cl-install" onClick={doInstall} title={t.installed}>
+            <span aria-hidden>⬇️</span> {t.installApp}
+          </button>
+        )}
+      </header>
+
       <div className="cl-account">
         {user ? (
           <div className="cl-acc-in">
@@ -644,12 +783,25 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
         )}
       </div>
 
-      <div className="cl-tabs" role="tablist">
-        {(["besoins", "journal", "poids", "coach"] as const).map((k) => (
-          <button key={k} role="tab" aria-selected={tab === k} className={`cl-tab ${tab === k ? "on" : ""}`} onClick={() => setTab(k)}>
-            {k === "journal" && lignesMap.length > 0 ? `${t.tabs[k]} · ${lignesMap.length}` : t.tabs[k]}
+      <nav className="cl-nav" role="tablist" aria-label="calorio">
+        {TABS.map((k) => (
+          <button key={k} role="tab" aria-selected={tab === k} className={`cl-navbtn ${tab === k ? "on" : ""}`} onClick={() => setTab(k)}>
+            <span className="cl-navi" aria-hidden>{TAB_ICON[k]}</span>
+            <span className="cl-navl">
+              {t.tabs[k]}
+              {k === "journal" && lignesMap.length > 0 ? <span className="cl-navbadge">{lignesMap.length}</span> : null}
+              {k === "coach" && !proActive ? <span className="cl-navlock" aria-hidden>🔒</span> : null}
+            </span>
           </button>
         ))}
+      </nav>
+
+      <div className="cl-sechead">
+        <span className="cl-sec-ic" aria-hidden>{TAB_ICON[tab]}</span>
+        <div>
+          <h3>{t.tabs[tab]}</h3>
+          <p>{t.intro[tab]}</p>
+        </div>
       </div>
 
       {/* ---------- BESOINS ---------- */}
@@ -705,6 +857,12 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
       {/* ---------- JOURNAL ---------- */}
       {tab === "journal" && (
         <div className="cl-journal">
+          {nudge && (
+            <div className="cl-nudge">
+              <span>{nudge}</span>
+              <button onClick={() => setNudgeHidden(true)} aria-label={t.nudgeDismiss}>×</button>
+            </div>
+          )}
           <div className="cl-jhead">
             <RingGauge pct={bil.pct} consomme={total.kcal} cible={besoins.cible} lang={lang} t={t} />
             <div className="cl-jbars">
@@ -806,6 +964,8 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
             </div>
           </div>
 
+          <CaloriesChart data={histoire} cible={besoins.cible} lang={lang} t={t} />
+
           {scanning && (
             <div className="cl-scanoverlay">
               <div className="cl-scanbox">
@@ -863,7 +1023,7 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
       {proOpen && (
         <div className="cl-scanoverlay" onClick={() => setProOpen(false)}>
           <div className="cl-promodal" onClick={(e) => e.stopPropagation()}>
-            <div className="cl-pro-h">🥑 {t.proTitle}</div>
+            <div className="cl-pro-h">🌱 {t.proTitle}</div>
             <p className="cl-pro-s">{t.proSub}</p>
             <div className="cl-plans">
               <button className="cl-plan best" onClick={() => startCheckout("yearly")}>
@@ -886,8 +1046,23 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
       {/* ---------- COACH ---------- */}
       {tab === "coach" && <CoachNutri ctx={coachCtx} isPro={proActive} onGoPro={goPro} />}
 
-      {tab !== "coach" && <p className="cl-memo">🔒 {t.memo}</p>}
-      {tab !== "coach" && <p className="cl-disclaimer">⚠︎ {t.disclaimer}</p>}
+      {/* ---------- AIDE / FAQ ---------- */}
+      {tab === "aide" && (
+        <div className="cl-faq">
+          {t.faq.map((f, i) => (
+            <div key={i} className={`cl-faqitem ${faqOpen === i ? "open" : ""}`}>
+              <button className="cl-faqq" aria-expanded={faqOpen === i} onClick={() => setFaqOpen(faqOpen === i ? null : i)}>
+                <span>{f.q}</span>
+                <span className="cl-faqchev" aria-hidden>⌄</span>
+              </button>
+              {faqOpen === i && <p className="cl-faqa">{f.a}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tab !== "coach" && tab !== "aide" && <p className="cl-memo">🔒 {t.memo}</p>}
+      {tab !== "coach" && tab !== "aide" && <p className="cl-disclaimer">⚠︎ {t.disclaimer}</p>}
     </section>
   );
 }
@@ -986,6 +1161,59 @@ function MacroBar({ name, color, val, target, lang }: { name: string; color: str
   );
 }
 
+function CaloriesChart({ data, cible, lang, t }: { data: { date: string; kcal: number }[]; cible: number; lang: Lang; t: { chartTitle: string; chartAvg: string; chartCible: string; chartOk: string; chartOver: string; chartEmpty: string } }) {
+  const withData = data.filter((d) => d.kcal > 0);
+  const W = 640, H = 210, PADX = 34, PADT = 20, PADB = 30;
+  const maxV = Math.max(cible * 1.25, ...data.map((d) => d.kcal), 1);
+  const bw = (W - 2 * PADX) / data.length;
+  const y = (v: number) => PADT + (1 - v / maxV) * (H - PADT - PADB);
+  const yc = y(cible);
+  // moyenne des 7 derniers jours renseignés
+  const last7 = withData.slice(-7);
+  const avg = last7.length ? Math.round(last7.reduce((s, d) => s + d.kcal, 0) / last7.length) : 0;
+  const dfmt = (iso: string) => new Date(iso).toLocaleDateString(lang === "de" ? "de-CH" : lang === "en" ? "en-CH" : "fr-CH", { day: "2-digit", month: "2-digit" });
+  return (
+    <div className="cl-card cl-histcard">
+      <div className="cl-histhead">
+        <div className="cl-cardh">📊 {t.chartTitle}</div>
+        {avg > 0 && <div className="cl-histavg">{t.chartAvg}: <b>{nf(lang).format(avg)}</b> kcal</div>}
+      </div>
+      {withData.length === 0 ? (
+        <p className="cl-histempty">{t.chartEmpty}</p>
+      ) : (
+        <>
+          <div className="cl-chart">
+            <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={t.chartTitle}>
+              {/* ligne objectif */}
+              <line x1={PADX} y1={yc} x2={W - PADX / 2} y2={yc} stroke={ACCENT} strokeWidth="1.5" strokeDasharray="5 5" opacity="0.8" />
+              <text x={W - PADX / 2} y={yc - 5} textAnchor="end" className="cl-ytk" fill={ACCENT}>{nf(lang).format(cible)} · {t.chartCible}</text>
+              {data.map((d, i) => {
+                const cx = PADX + i * bw + bw / 2;
+                const over = d.kcal > cible;
+                const bh = d.kcal > 0 ? Math.max(2, (H - PADT - PADB) * (d.kcal / maxV)) : 0;
+                const by = H - PADB - bh;
+                const isToday = i === data.length - 1;
+                return (
+                  <g key={d.date}>
+                    <rect x={cx - bw * 0.32} y={by} width={bw * 0.64} height={bh} rx="3"
+                      fill={d.kcal === 0 ? "rgba(255,255,255,.05)" : over ? "#fbbf24" : ACCENT}
+                      opacity={d.kcal === 0 ? 1 : isToday ? 1 : 0.85} />
+                    {(i % 2 === 0 || isToday) && <text x={cx} y={H - 10} textAnchor="middle" className="cl-xtk">{dfmt(d.date)}</text>}
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
+          <div className="cl-histleg">
+            <span><i style={{ background: ACCENT }} /> {t.chartOk}</span>
+            <span><i style={{ background: "#fbbf24" }} /> {t.chartOver}</span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function WeightChart({ pesees, lang }: { pesees: Pesee[]; lang: Lang }) {
   const ref = useRef<HTMLDivElement>(null);
   const tri = [...pesees].sort((a, b) => a.date.localeCompare(b.date));
@@ -1075,9 +1303,35 @@ const CSS = `
 .cl-plan-price small{font-size:.8rem;font-weight:600;color:#8b93b7}
 .cl-pro-trial{margin:16px 0 0;font-size:.85rem;color:#a3e635}
 .cl-pro-close{margin-top:14px;background:none;border:1px solid rgba(255,255,255,.15);color:#aeb4d6;border-radius:10px;padding:9px 20px;font-size:.85rem;cursor:pointer}
-.cl-tabs{display:flex;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:5px;margin-bottom:18px;flex-wrap:wrap}
-.cl-tab{flex:1;min-width:110px;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:#aeb4d6;font-size:.9rem;font-weight:700;cursor:pointer;transition:.15s}
-.cl-tab.on{background:linear-gradient(135deg,${ACCENT},${ACCENT2});color:#05210f;box-shadow:0 6px 18px rgba(34,197,94,.25)}
+/* hero */
+.cl-hero{display:flex;align-items:center;gap:15px;margin-bottom:18px}
+.cl-hero-logo{font-size:2.6rem;line-height:1;filter:drop-shadow(0 6px 14px rgba(34,197,94,.35))}
+.cl-hero-name{font-size:1.9rem;font-weight:800;letter-spacing:-.5px;background:linear-gradient(120deg,#a3e635,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cl-hero-tag{margin:2px 0 0;font-size:.92rem;color:#aeb4d6;line-height:1.4}
+/* navigation (onglets bien visibles) */
+.cl-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0 4px}
+.cl-navbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:13px 6px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(255,255,255,.045);color:#c3c8e2;font-weight:700;cursor:pointer;transition:transform .12s,box-shadow .15s,background .15s,border-color .15s}
+.cl-navbtn:hover{transform:translateY(-2px);border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.07)}
+.cl-navi{font-size:1.5rem;line-height:1}
+.cl-navl{position:relative;font-size:.84rem;display:inline-flex;align-items:center;gap:5px}
+.cl-navbadge{background:rgba(34,197,94,.9);color:#05210f;font-size:.66rem;font-weight:800;border-radius:99px;padding:1px 6px;line-height:1.4}
+.cl-navlock{font-size:.72rem;opacity:.85}
+.cl-navbtn.on{background:linear-gradient(135deg,${ACCENT},${ACCENT2});color:#05210f;border-color:transparent;box-shadow:0 10px 26px -6px rgba(34,197,94,.55)}
+.cl-navbtn.on .cl-navbadge{background:rgba(5,33,15,.28);color:#05210f}
+@media(max-width:560px){.cl-nav{grid-template-columns:repeat(5,1fr);gap:5px}.cl-navbtn{padding:11px 3px;border-radius:13px}.cl-navi{font-size:1.3rem}.cl-navl{font-size:.72rem}}
+/* en-tête de section */
+.cl-sechead{display:flex;align-items:center;gap:14px;margin:20px 0 16px}
+.cl-sec-ic{flex:none;display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:14px;font-size:1.5rem;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3)}
+.cl-sechead h3{margin:0;font-size:1.25rem;font-weight:800;letter-spacing:-.3px}
+.cl-sechead p{margin:2px 0 0;font-size:.88rem;color:#8b93b7;line-height:1.4}
+/* FAQ */
+.cl-faq{display:flex;flex-direction:column;gap:10px}
+.cl-faqitem{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:14px;overflow:hidden;transition:border-color .15s}
+.cl-faqitem.open{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.05)}
+.cl-faqq{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;background:none;border:0;color:#e6e9f5;font-size:.96rem;font-weight:700;cursor:pointer;padding:15px 17px}
+.cl-faqchev{transition:transform .2s;color:#8b93b7;font-size:1.1rem}
+.cl-faqitem.open .cl-faqchev{transform:rotate(180deg);color:#a3e635}
+.cl-faqa{margin:0;padding:0 17px 16px;font-size:.9rem;line-height:1.6;color:#c3c8e2}
 .cl-grid{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:20px;align-items:start}
 @media(max-width:820px){.cl-grid{grid-template-columns:1fr}}
 .cl-params{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:18px}
@@ -1187,4 +1441,20 @@ const CSS = `
 .cl-prow b{font-size:.95rem}
 .cl-memo{margin:18px 0 0;font-size:.8rem;color:#7fb98f}
 .cl-disclaimer{margin:8px 0 0;font-size:.78rem;line-height:1.5;color:#8b93b7;border-top:1px solid rgba(255,255,255,.08);padding-top:12px}
+/* hero : bouton installer */
+.cl-hero-txt{flex:1;min-width:0}
+.cl-install{flex:none;display:inline-flex;align-items:center;gap:7px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.4);color:#a3e635;border-radius:11px;padding:9px 14px;font-size:.84rem;font-weight:700;cursor:pointer;white-space:nowrap}
+.cl-install:hover{background:rgba(34,197,94,.18)}
+@media(max-width:520px){.cl-install span{display:none}}
+/* rappel doux */
+.cl-nudge{display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,rgba(132,204,22,.14),rgba(34,197,94,.06));border:1px solid rgba(132,204,22,.35);border-radius:13px;padding:11px 15px;margin-bottom:14px;font-size:.9rem;color:#e6e9f5;font-weight:600}
+.cl-nudge button{flex:none;background:none;border:0;color:#8b93b7;font-size:1.3rem;line-height:1;cursor:pointer;padding:0 2px}
+/* graphique historique calories */
+.cl-histcard{margin-top:16px}
+.cl-histhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.cl-histavg{font-size:.82rem;color:#8b93b7}.cl-histavg b{color:#a3e635;font-size:.95rem}
+.cl-histempty{color:#8b93b7;font-size:.88rem;line-height:1.5;margin:10px 0 2px}
+.cl-histleg{display:flex;gap:18px;margin-top:8px;font-size:.78rem;color:#8b93b7}
+.cl-histleg span{display:inline-flex;align-items:center;gap:6px}
+.cl-histleg i{width:11px;height:11px;border-radius:3px;display:inline-block}
 `;

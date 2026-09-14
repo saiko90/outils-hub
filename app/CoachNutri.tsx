@@ -49,92 +49,97 @@ function bumpUsage(): number {
 
 const L = {
   fr: {
-    proBadge: "Pro", coach: "Avo, ton coach nutrition",
-    lockTitle: "Discute avec Avo, ton coach nutrition IA",
+    proBadge: "Pro", coach: "Vito, ton coach nutrition",
+    lockTitle: "Discute avec Vito, ton coach nutrition IA",
     lockSub: "Il connaît tes calories, ce que tu as mangé et ton objectif — et te dit quoi manger ce soir, comment équilibrer, des idées de repas.",
     feats: ["Conseils personnalisés à partir de ton journal du jour", "Idées de repas et de snacks adaptés à ton objectif", "Réponses instantanées, 100 % nutrition, sans jugement"],
     cta: "Passer en Pro", soon: "Bientôt disponible",
-    placeholder: "Écris à Avo…", send: "Envoyer",
+    placeholder: "Écris à Vito…", send: "Envoyer",
     starters: ["Qu'est-ce que je mange ce soir ?", "Il me reste combien de calories ?", "Un snack sain à me conseiller ?"],
-    hello: "Coucou, c'est Avo 🥑 Dis-moi ce que tu as mangé ou ce que tu prévois, et je t'aide à équilibrer ta journée !",
+    hello: "Coucou, c'est Vito 🌱 Dis-moi ce que tu as mangé ou ce que tu prévois, et je t'aide à équilibrer ta journée !",
     notReady: "Le coach sera activé très bientôt. Reviens dans un instant !",
     err: "Oups, petit souci de connexion. Réessaie dans un moment.",
-    limit: "Tu as atteint ta limite de messages pour aujourd'hui — on garde Avo léger et rapide 🥑 Reviens demain !",
-    disclaimer: "Avo donne des conseils généraux de nutrition, pas un avis médical. Pour un suivi personnalisé (pathologie, trouble alimentaire, sport de haut niveau), consulte un·e professionnel·le de santé.",
+    limit: "Tu as atteint ta limite de messages pour aujourd'hui — on garde Vito léger et rapide 🌱 Reviens demain !",
+    disclaimer: "Vito donne des conseils généraux de nutrition, pas un avis médical. Pour un suivi personnalisé (pathologie, trouble alimentaire, sport de haut niveau), consulte un·e professionnel·le de santé.",
   },
   de: {
-    proBadge: "Pro", coach: "Avo, dein Ernährungscoach",
-    lockTitle: "Chatte mit Avo, deinem KI-Ernährungscoach",
+    proBadge: "Pro", coach: "Vito, dein Ernährungscoach",
+    lockTitle: "Chatte mit Vito, deinem KI-Ernährungscoach",
     lockSub: "Er kennt deine Kalorien, dein Essen und dein Ziel — und sagt dir, was du heute Abend essen sollst und wie du ausgleichst.",
     feats: ["Persönliche Tipps aus deinem Tagesjournal", "Mahlzeiten- und Snack-Ideen für dein Ziel", "Sofortige Antworten, 100 % Ernährung, ohne Urteil"],
     cta: "Auf Pro upgraden", soon: "Bald verfügbar",
-    placeholder: "Schreib Avo…", send: "Senden",
+    placeholder: "Schreib Vito…", send: "Senden",
     starters: ["Was esse ich heute Abend?", "Wie viele Kalorien bleiben mir?", "Ein gesunder Snack?"],
-    hello: "Hoi, ich bin Avo 🥑 Sag mir, was du gegessen oder geplant hast, und ich helfe dir, deinen Tag auszugleichen!",
+    hello: "Hoi, ich bin Vito 🌱 Sag mir, was du gegessen oder geplant hast, und ich helfe dir, deinen Tag auszugleichen!",
     notReady: "Der Coach wird ganz bald aktiviert. Schau gleich nochmal vorbei!",
     err: "Ups, kleines Verbindungsproblem. Versuch es gleich nochmal.",
-    limit: "Du hast dein heutiges Nachrichtenlimit erreicht 🥑 Komm morgen wieder!",
-    disclaimer: "Avo gibt allgemeine Ernährungstipps, keine medizinische Beratung. Für persönliche Begleitung eine Fachperson beiziehen.",
+    limit: "Du hast dein heutiges Nachrichtenlimit erreicht 🌱 Komm morgen wieder!",
+    disclaimer: "Vito gibt allgemeine Ernährungstipps, keine medizinische Beratung. Für persönliche Begleitung eine Fachperson beiziehen.",
   },
   en: {
-    proBadge: "Pro", coach: "Avo, your nutrition coach",
-    lockTitle: "Chat with Avo, your AI nutrition coach",
+    proBadge: "Pro", coach: "Vito, your nutrition coach",
+    lockTitle: "Chat with Vito, your AI nutrition coach",
     lockSub: "He knows your calories, what you ate and your goal — and tells you what to eat tonight and how to balance your day.",
     feats: ["Personalised tips from your daily log", "Meal and snack ideas for your goal", "Instant answers, 100% nutrition, no judgement"],
     cta: "Go Pro", soon: "Coming soon",
-    placeholder: "Message Avo…", send: "Send",
+    placeholder: "Message Vito…", send: "Send",
     starters: ["What should I eat tonight?", "How many calories do I have left?", "A healthy snack idea?"],
-    hello: "Hi, I'm Avo 🥑 Tell me what you ate or plan to eat, and I'll help you balance your day!",
+    hello: "Hi, I'm Vito 🌱 Tell me what you ate or plan to eat, and I'll help you balance your day!",
     notReady: "The coach will be activated very soon. Check back in a moment!",
     err: "Oops, small connection hiccup. Try again in a moment.",
-    limit: "You've reached today's message limit 🥑 Come back tomorrow!",
-    disclaimer: "Avo gives general nutrition tips, not medical advice. For personalised guidance, see a health professional.",
+    limit: "You've reached today's message limit 🌱 Come back tomorrow!",
+    disclaimer: "Vito gives general nutrition tips, not medical advice. For personalised guidance, see a health professional.",
   },
 } as const;
 
-/* ---------------- Mascotte Avo ---------------- */
+/* ---------------- Mascotte Vito (la pousse) ---------------- */
 function Avo({ state, size = 120 }: { state: AvoState; size?: number }) {
   return (
     <div className={`avo ${state}`} style={{ width: size, height: size }} aria-hidden>
       <svg viewBox="0 0 200 210" width={size} height={size * 1.05}>
-        {/* bras gauche (salue) */}
+        {/* bras gauche (feuille qui salue) */}
         <g className="avo-armL">
-          <path d="M52 118 q-26 -6 -34 -30" fill="none" stroke="#3f7d3a" strokeWidth="9" strokeLinecap="round" />
-          <circle cx="17" cy="86" r="8" fill="#4c9a45" />
+          <path d="M58 138 q-24 -2 -36 -22" fill="none" stroke="#57c274" strokeWidth="8" strokeLinecap="round" />
+          <ellipse cx="18" cy="110" rx="12" ry="7" fill="#7dd992" transform="rotate(-32 18 110)" />
         </g>
-        {/* bras droit */}
-        <path d="M148 120 q24 4 30 24" fill="none" stroke="#3f7d3a" strokeWidth="9" strokeLinecap="round" />
-        <circle cx="180" cy="146" r="8" fill="#4c9a45" />
-        {/* corps avocat */}
+        {/* bras droit (feuille) */}
+        <path d="M142 140 q22 0 32 18" fill="none" stroke="#57c274" strokeWidth="8" strokeLinecap="round" />
+        <ellipse cx="182" cy="160" rx="12" ry="7" fill="#7dd992" transform="rotate(32 182 160)" />
+        {/* corps pousse */}
         <g className="avo-body">
-          <path d="M100 18 C64 18 44 54 44 96 C44 150 68 192 100 192 C132 192 156 150 156 96 C156 54 136 18 100 18 Z" fill="#4c9a45" />
-          <path d="M100 40 C74 40 60 68 60 100 C60 144 78 176 100 176 C122 176 140 144 140 100 C140 68 126 40 100 40 Z" fill="#e8f2c9" />
-          {/* noyau */}
-          <circle cx="100" cy="132" r="30" fill="#8a5a2b" />
-          <circle cx="100" cy="132" r="30" fill="none" stroke="#7a4d22" strokeWidth="3" />
+          {/* deux feuilles */}
+          <path d="M100 66 C70 22 28 26 33 60 C37 90 80 78 100 66 Z" fill="#6ed88a" />
+          <path d="M100 66 C130 22 172 26 167 60 C163 90 120 78 100 66 Z" fill="#54c877" />
+          <path d="M60 46 q20 9 36 16" fill="none" stroke="#3fae5f" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M140 46 q-20 9 -36 16" fill="none" stroke="#3fae5f" strokeWidth="2.5" strokeLinecap="round" />
+          {/* tige */}
+          <path d="M100 66 L100 100" stroke="#57c274" strokeWidth="7" strokeLinecap="round" />
+          {/* graine / corps */}
+          <ellipse cx="100" cy="146" rx="52" ry="52" fill="#effadf" />
+          <ellipse cx="100" cy="146" rx="52" ry="52" fill="none" stroke="#cdeaa9" strokeWidth="3" />
           {/* joues */}
-          <circle cx="72" cy="98" r="9" fill="#f7b7a0" opacity="0.6" />
-          <circle cx="128" cy="98" r="9" fill="#f7b7a0" opacity="0.6" />
+          <circle cx="70" cy="156" r="9" fill="#f6b9a4" opacity="0.55" />
+          <circle cx="130" cy="156" r="9" fill="#f6b9a4" opacity="0.55" />
           {/* yeux */}
           <g className="avo-eyes">
-            <ellipse cx="82" cy="86" rx="11" ry="12" fill="#fff" />
-            <ellipse cx="118" cy="86" rx="11" ry="12" fill="#fff" />
-            <circle className="avo-pupil" cx="82" cy="88" r="5" fill="#2a2a2a" />
-            <circle className="avo-pupil" cx="118" cy="88" r="5" fill="#2a2a2a" />
-            <circle cx="84" cy="85" r="1.6" fill="#fff" />
-            <circle cx="120" cy="85" r="1.6" fill="#fff" />
+            <ellipse cx="82" cy="140" rx="11" ry="12" fill="#fff" />
+            <ellipse cx="118" cy="140" rx="11" ry="12" fill="#fff" />
+            <circle className="avo-pupil" cx="82" cy="142" r="5" fill="#2f3b2a" />
+            <circle className="avo-pupil" cx="118" cy="142" r="5" fill="#2f3b2a" />
+            <circle cx="84" cy="139" r="1.6" fill="#fff" />
+            <circle cx="120" cy="139" r="1.6" fill="#fff" />
           </g>
           {/* sourcils */}
-          <path className="avo-brow" d="M72 70 q10 -6 20 -1" fill="none" stroke="#3f7d3a" strokeWidth="4" strokeLinecap="round" />
-          <path className="avo-brow" d="M108 69 q10 -5 20 1" fill="none" stroke="#3f7d3a" strokeWidth="4" strokeLinecap="round" />
+          <path className="avo-brow" d="M72 124 q10 -5 20 -1" fill="none" stroke="#57c274" strokeWidth="4" strokeLinecap="round" />
+          <path className="avo-brow" d="M108 123 q10 -4 20 1" fill="none" stroke="#57c274" strokeWidth="4" strokeLinecap="round" />
           {/* bouche */}
-          <ellipse className="avo-mouth" cx="100" cy="112" rx="12" ry="8" fill="#c0392b" />
+          <ellipse className="avo-mouth" cx="100" cy="166" rx="12" ry="8" fill="#e06a5a" />
         </g>
         {/* bulle réflexion */}
         <g className="avo-think">
-          <circle cx="150" cy="40" r="4" fill="#cfe0a3" />
-          <circle cx="163" cy="30" r="6" fill="#cfe0a3" />
-          <circle cx="179" cy="20" r="8" fill="#cfe0a3" />
+          <circle cx="150" cy="40" r="4" fill="#bfe39a" />
+          <circle cx="163" cy="30" r="6" fill="#bfe39a" />
+          <circle cx="179" cy="20" r="8" fill="#bfe39a" />
         </g>
       </svg>
       <style>{AVO_CSS}</style>
@@ -276,7 +281,7 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro }: { ctx: Coac
         />
         <button onClick={() => send(input)} disabled={busy || !input.trim() || used >= DAILY_LIMIT} aria-label={t.send}>➤</button>
       </div>
-      <p className="cn-disc">🥑 {t.disclaimer}</p>
+      <p className="cn-disc">🌱 {t.disclaimer}</p>
     </section>
   );
 }
@@ -285,10 +290,10 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro }: { ctx: Coac
 const AVO_CSS = `
 .avo{position:relative;display:inline-block}
 .avo svg{overflow:visible;display:block}
-.avo .avo-body{transform-origin:100px 190px;animation:avoBob 3.4s ease-in-out infinite}
-.avo .avo-armL{transform-origin:52px 118px}
-.avo .avo-eyes{transform-origin:100px 86px;animation:avoBlink 4.2s infinite}
-.avo .avo-mouth{transform-origin:100px 112px;transform:scaleY(.5)}
+.avo .avo-body{transform-origin:100px 198px;animation:avoBob 3.4s ease-in-out infinite}
+.avo .avo-armL{transform-origin:58px 138px}
+.avo .avo-eyes{transform-origin:100px 140px;animation:avoBlink 4.2s infinite}
+.avo .avo-mouth{transform-origin:100px 166px;transform:scaleY(.5)}
 .avo .avo-think{opacity:0;transition:opacity .2s}
 /* idle : petit coucou du bras */
 .avo.idle .avo-armL{animation:avoWave 3.8s ease-in-out infinite}

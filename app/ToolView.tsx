@@ -17,6 +17,7 @@ import AlcooloCalc from "./AlcooloCalc";
 import ImcaCalc from "./ImcaCalc";
 import CalorioCalc from "./CalorioCalc";
 import ScalcCalc from "./ScalcCalc";
+import AgendoCalc from "./AgendoCalc";
 import {
   type Lang, langPrefix, catLabel, toolTagline, longDescriptionL, faqFor, faqGeneric, proContent,
   tpProBadge, tpOpenVerb, faqTitle, tpTrust, t,
@@ -96,7 +97,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
           </div>
         </header>
 
-        {(tool.slug === "rento" || tool.slug === "legato" || tool.slug === "budgeto" || tool.slug === "lamalo" || tool.slug === "salaro" || tool.slug === "resilio" || tool.slug === "alloco" || tool.slug === "intero" || tool.slug === "preo" || tool.slug === "ideo" || tool.slug === "alcoolo" || tool.slug === "imca" || tool.slug === "calorio" || tool.slug === "scalc") ? (
+        {(tool.slug === "rento" || tool.slug === "legato" || tool.slug === "budgeto" || tool.slug === "lamalo" || tool.slug === "salaro" || tool.slug === "resilio" || tool.slug === "alloco" || tool.slug === "intero" || tool.slug === "preo" || tool.slug === "ideo" || tool.slug === "alcoolo" || tool.slug === "imca" || tool.slug === "calorio" || tool.slug === "scalc" || tool.slug === "agendo") ? (
           <a className="tp-cta" href={`#${tool.slug}`} style={{ background: `linear-gradient(135deg, ${tool.from}, ${tool.to})` }}>
             {tpOpenVerb[lang]} {tool.name} <span aria-hidden>↓</span>
           </a>
@@ -125,6 +126,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
         {tool.slug === "imca" && <ImcaCalc lang={lang} />}
         {tool.slug === "calorio" && <CalorioCalc lang={lang} />}
         {tool.slug === "scalc" && <ScalcCalc lang={lang} />}
+        {tool.slug === "agendo" && <AgendoCalc lang={lang} />}
         {(tool.slug === "capimmo" || tool.slug === "ibano") && <FinanceLead slug={tool.slug} lang={lang} />}
 
         {!declutter && <p className="tp-long">{longDescriptionL(lang, tool)}</p>}

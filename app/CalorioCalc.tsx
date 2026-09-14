@@ -16,11 +16,12 @@ import {
   bilan,
   tendancePoids,
 } from "@/lib/calorio";
+import CoachNutri, { type CoachCtx } from "./CoachNutri";
 
 /* ---------------- i18n ---------------- */
 const L = {
   fr: {
-    tabs: { besoins: "Mes besoins", journal: "Journal du jour", poids: "Suivi du poids" },
+    tabs: { besoins: "Mes besoins", journal: "Journal du jour", poids: "Suivi du poids", coach: "Coach 🥑" },
     sexe: "Sexe", homme: "Homme", femme: "Femme",
     age: "Âge", poids: "Poids (kg)", taille: "Taille (cm)",
     activite: "Niveau d'activité", objectif: "Objectif",
@@ -48,7 +49,7 @@ const L = {
     disclaimer: "Estimations basées sur des formules standard (Mifflin-St Jeor) et des valeurs nutritionnelles moyennes. Ce n'est pas un plan nutritionnel ni un avis médical. Pour un suivi personnalisé (régime, pathologie, sport de haut niveau), consulte un·e diététicien·ne ou un·e médecin.",
   },
   de: {
-    tabs: { besoins: "Mein Bedarf", journal: "Tagesjournal", poids: "Gewichtsverlauf" },
+    tabs: { besoins: "Mein Bedarf", journal: "Tagesjournal", poids: "Gewichtsverlauf", coach: "Coach 🥑" },
     sexe: "Geschlecht", homme: "Mann", femme: "Frau",
     age: "Alter", poids: "Gewicht (kg)", taille: "Grösse (cm)",
     activite: "Aktivitätsniveau", objectif: "Ziel",
@@ -74,7 +75,7 @@ const L = {
     disclaimer: "Schätzungen auf Basis von Standardformeln (Mifflin-St Jeor) und durchschnittlichen Nährwerten. Kein Ernährungsplan und keine medizinische Beratung. Für eine persönliche Begleitung eine Ernährungsberatung oder einen Arzt beiziehen.",
   },
   en: {
-    tabs: { besoins: "My needs", journal: "Today's log", poids: "Weight tracking" },
+    tabs: { besoins: "My needs", journal: "Today's log", poids: "Weight tracking", coach: "Coach 🥑" },
     sexe: "Sex", homme: "Male", femme: "Female",
     age: "Age", poids: "Weight (kg)", taille: "Height (cm)",
     activite: "Activity level", objectif: "Goal",
@@ -132,7 +133,7 @@ function save(k: string, v: unknown) {
 /* ---------------- component ---------------- */
 export default function CalorioCalc({ lang }: { lang: Lang }) {
   const t = L[lang] ?? L.fr;
-  const [tab, setTab] = useState<"besoins" | "journal" | "poids">("besoins");
+  const [tab, setTab] = useState<"besoins" | "journal" | "poids" | "coach">("besoins");
   const [mounted, setMounted] = useState(false);
 
   // profil
@@ -198,6 +199,27 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
   );
   const total = useMemo(() => computeJournal(lignesMap), [lignesMap]);
   const bil = useMemo(() => bilan(total, besoins.cible), [total, besoins.cible]);
+  const tend = useMemo(() => tendancePoids(pesees), [pesees]);
+
+  const coachCtx: CoachCtx = useMemo(
+    () => ({
+      lang,
+      profil: { sexe, age, poids, taille, activite, objectif },
+      cible: besoins.cible,
+      bmr: besoins.bmr,
+      tdee: besoins.tdee,
+      macrosCible: besoins.macros,
+      aujourdhui: {
+        kcal: total.kcal,
+        prot: total.prot,
+        gluc: total.gluc,
+        lip: total.lip,
+        aliments: lignesMap.map(({ al, grammes }) => ({ nom: al.nom[lang], grammes, kcal: calcAliment(al, grammes).kcal })),
+      },
+      poids: tend ? { debut: tend.debut, actuel: tend.actuel, delta: tend.delta } : null,
+    }),
+    [lang, sexe, age, poids, taille, activite, objectif, besoins, total, lignesMap, tend]
+  );
 
   const resultats = useMemo(() => {
     const query = noAccent(q.trim());
@@ -228,14 +250,12 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
   };
   const removePesee = (date: string) => setPesees((prev) => prev.filter((p) => p.date !== date));
 
-  const tend = useMemo(() => tendancePoids(pesees), [pesees]);
-
   return (
     <section className="cl" id="calorio">
       <style>{CSS}</style>
 
       <div className="cl-tabs" role="tablist">
-        {(["besoins", "journal", "poids"] as const).map((k) => (
+        {(["besoins", "journal", "poids", "coach"] as const).map((k) => (
           <button key={k} role="tab" aria-selected={tab === k} className={`cl-tab ${tab === k ? "on" : ""}`} onClick={() => setTab(k)}>
             {k === "journal" && lignesMap.length > 0 ? `${t.tabs[k]} · ${lignesMap.length}` : t.tabs[k]}
           </button>
@@ -391,8 +411,11 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
         </div>
       )}
 
-      <p className="cl-memo">🔒 {t.memo}</p>
-      <p className="cl-disclaimer">⚠︎ {t.disclaimer}</p>
+      {/* ---------- COACH ---------- */}
+      {tab === "coach" && <CoachNutri ctx={coachCtx} />}
+
+      {tab !== "coach" && <p className="cl-memo">🔒 {t.memo}</p>}
+      {tab !== "coach" && <p className="cl-disclaimer">⚠︎ {t.disclaimer}</p>}
     </section>
   );
 }

@@ -17,6 +17,36 @@ export type CoachCtx = {
 type Msg = { role: "user" | "model"; text: string };
 type AvoState = "idle" | "thinking" | "talking";
 
+// Limite de messages par 24 h (protège le coût API si une conversation s'emballe).
+const DAILY_LIMIT = 20;
+
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+function readUsage(): { day: string; count: number } {
+  const day = todayKey();
+  try {
+    const raw = localStorage.getItem("calorio.coach.usage");
+    if (raw) {
+      const u = JSON.parse(raw) as { day: string; count: number };
+      if (u.day === day) return u;
+    }
+  } catch {
+    /* ignore */
+  }
+  return { day, count: 0 };
+}
+function bumpUsage(): number {
+  const u = readUsage();
+  u.count += 1;
+  try {
+    localStorage.setItem("calorio.coach.usage", JSON.stringify(u));
+  } catch {
+    /* ignore */
+  }
+  return u.count;
+}
+
 const L = {
   fr: {
     proBadge: "Pro", coach: "Avo, ton coach nutrition",
@@ -29,6 +59,7 @@ const L = {
     hello: "Coucou, c'est Avo 🥑 Dis-moi ce que tu as mangé ou ce que tu prévois, et je t'aide à équilibrer ta journée !",
     notReady: "Le coach sera activé très bientôt. Reviens dans un instant !",
     err: "Oups, petit souci de connexion. Réessaie dans un moment.",
+    limit: "Tu as atteint ta limite de messages pour aujourd'hui — on garde Avo léger et rapide 🥑 Reviens demain !",
     disclaimer: "Avo donne des conseils généraux de nutrition, pas un avis médical. Pour un suivi personnalisé (pathologie, trouble alimentaire, sport de haut niveau), consulte un·e professionnel·le de santé.",
   },
   de: {
@@ -42,6 +73,7 @@ const L = {
     hello: "Hoi, ich bin Avo 🥑 Sag mir, was du gegessen oder geplant hast, und ich helfe dir, deinen Tag auszugleichen!",
     notReady: "Der Coach wird ganz bald aktiviert. Schau gleich nochmal vorbei!",
     err: "Ups, kleines Verbindungsproblem. Versuch es gleich nochmal.",
+    limit: "Du hast dein heutiges Nachrichtenlimit erreicht 🥑 Komm morgen wieder!",
     disclaimer: "Avo gibt allgemeine Ernährungstipps, keine medizinische Beratung. Für persönliche Begleitung eine Fachperson beiziehen.",
   },
   en: {
@@ -55,6 +87,7 @@ const L = {
     hello: "Hi, I'm Avo 🥑 Tell me what you ate or plan to eat, and I'll help you balance your day!",
     notReady: "The coach will be activated very soon. Check back in a moment!",
     err: "Oops, small connection hiccup. Try again in a moment.",
+    limit: "You've reached today's message limit 🥑 Come back tomorrow!",
     disclaimer: "Avo gives general nutrition tips, not medical advice. For personalised guidance, see a health professional.",
   },
 } as const;
@@ -119,6 +152,7 @@ export default function CoachNutri({ ctx }: { ctx: CoachCtx }) {
   const [input, setInput] = useState("");
   const [avo, setAvo] = useState<AvoState>("idle");
   const [busy, setBusy] = useState(false);
+  const [used, setUsed] = useState(0);
   const scroller = useRef<HTMLDivElement>(null);
   const talkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -134,6 +168,7 @@ export default function CoachNutri({ ctx }: { ctx: CoachCtx }) {
       /* ignore */
     }
     setIsPro(pro);
+    setUsed(readUsage().count);
     setReady(true);
   }, []);
 
@@ -144,11 +179,18 @@ export default function CoachNutri({ ctx }: { ctx: CoachCtx }) {
   const send = async (text: string) => {
     const clean = text.trim();
     if (!clean || busy) return;
+    // Limite quotidienne : on bloque avant tout appel API.
+    if (readUsage().count >= DAILY_LIMIT) {
+      setMsgs((m) => [...m, { role: "user", text: clean }, { role: "model", text: t.limit }]);
+      setInput("");
+      return;
+    }
     const next: Msg[] = [...msgs, { role: "user", text: clean }];
     setMsgs(next);
     setInput("");
     setBusy(true);
     setAvo("thinking");
+    setUsed(bumpUsage());
     try {
       const r = await fetch("/api/coach", {
         method: "POST",
@@ -226,12 +268,12 @@ export default function CoachNutri({ ctx }: { ctx: CoachCtx }) {
       <div className="cn-input">
         <input
           value={input}
-          placeholder={t.placeholder}
+          placeholder={used >= DAILY_LIMIT ? t.limit : t.placeholder}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") send(input); }}
-          disabled={busy}
+          disabled={busy || used >= DAILY_LIMIT}
         />
-        <button onClick={() => send(input)} disabled={busy || !input.trim()} aria-label={t.send}>➤</button>
+        <button onClick={() => send(input)} disabled={busy || !input.trim() || used >= DAILY_LIMIT} aria-label={t.send}>➤</button>
       </div>
       <p className="cn-disc">🥑 {t.disclaimer}</p>
     </section>

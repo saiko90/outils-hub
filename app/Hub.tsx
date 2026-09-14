@@ -359,6 +359,8 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
             <a href="/en" hrefLang="en">English</a>
             <Link href={lang === "de" ? "/de/ueber-uns" : lang === "en" ? "/en/about" : "/a-propos"}>{tr(lang, "footAbout")}</Link>
             <Link href={lang === "de" ? "/de/datenschutz" : lang === "en" ? "/en/privacy" : "/confidentialite"}>{tr(lang, "footPrivacy")}</Link>
+            <Link href={lang === "de" ? "/de/impressum" : lang === "en" ? "/en/legal-notice" : "/mentions-legales"}>{tr(lang, "footLegal")}</Link>
+            <Link href={lang === "de" ? "/de/agb" : lang === "en" ? "/en/terms" : "/conditions"}>{tr(lang, "footTerms")}</Link>
           </nav>
         </div>
         <div className="foot-bottom">

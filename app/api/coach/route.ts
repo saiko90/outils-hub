@@ -75,7 +75,7 @@ export async function POST(req: Request) {
   const payload = {
     system_instruction: { parts: [{ text: sys }] },
     contents,
-    generationConfig: { temperature: 0.6, maxOutputTokens: 700, topP: 0.95 },
+    generationConfig: { temperature: 0.6, maxOutputTokens: 2048, topP: 0.95 },
     safetySettings: [
       { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
       { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },

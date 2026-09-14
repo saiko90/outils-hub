@@ -1,0 +1,19 @@
+{
+  "name": "calorio — calories & nutrition",
+  "short_name": "calorio",
+  "description": "Calories, journal alimentaire, suivi du poids et coach nutrition Vito. Simple, suisse et gratuit.",
+  "id": "/?app=calorio",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#06060c",
+  "theme_color": "#0b1a10",
+  "lang": "fr",
+  "categories": ["health", "lifestyle", "food"],
+  "icons": [
+    { "src": "/calorio-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/calorio-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/calorio-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

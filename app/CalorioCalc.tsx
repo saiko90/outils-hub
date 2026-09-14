@@ -19,6 +19,7 @@ import {
 } from "@/lib/calorio";
 import CoachNutri, { type CoachCtx } from "./CoachNutri";
 import { getSupabase } from "@/lib/supabaseClient";
+import { enablePush, disablePush, pushSupported } from "@/lib/push";
 import type { User } from "@supabase/supabase-js";
 
 /* ---------------- i18n ---------------- */
@@ -93,6 +94,14 @@ const L = {
     chartEmpty: "Note tes repas quelques jours pour voir apparaître ta tendance ici.",
     nudgeMidi: "Tu as mangé quoi ce midi ? Ajoute ton repas 👇", nudgeSoir: "Pense à noter ton dîner 🍽️", nudgeDismiss: "Masquer",
     installApp: "Installer l'app", installed: "Installe calorio sur ton écran d'accueil pour un accès en un tap.",
+    settingsTitle: "Paramètres", langLabel: "Langue de l'app",
+    notifTitle: "Rappels & encouragements", notifSub: "Vito te rappelle de noter tes repas — seulement si tu n'as rien noté — et t'envoie un petit mot d'encouragement de temps en temps.",
+    notifWhat: "Midi & soir (si ton journal est vide) + un encouragement tous les 3 jours. Textes variés, jamais deux fois les mêmes.",
+    notifBtnOn: "Activer les notifications", notifBtnOff: "Désactiver", notifPro: "Pro", notifProLock: "Passe en Pro pour activer les notifications.",
+    notifOnMsg: "🔔 C'est activé ! Vito veillera sur toi 🌱", notifOffMsg: "Notifications désactivées.",
+    notifDenied: "Les notifications sont bloquées. Autorise-les dans les réglages de ton navigateur, puis réessaie.",
+    notifUnsupported: "Ton navigateur ne gère pas les notifications. Sur iPhone : installe d'abord calorio sur l'écran d'accueil, puis réessaie.",
+    notifSoon: "Les notifications seront activées très bientôt.", notifErr: "Souci lors de l'activation. Réessaie dans un moment.",
   },
   de: {
     tabs: { besoins: "Bedarf", journal: "Journal", poids: "Gewicht", coach: "Coach", aide: "Hilfe" },
@@ -162,6 +171,14 @@ const L = {
     chartEmpty: "Trage ein paar Tage lang deine Mahlzeiten ein, um deinen Trend zu sehen.",
     nudgeMidi: "Was hast du zu Mittag gegessen? Trag es ein 👇", nudgeSoir: "Denk daran, dein Abendessen einzutragen 🍽️", nudgeDismiss: "Ausblenden",
     installApp: "App installieren", installed: "Installiere calorio auf deinem Startbildschirm für Zugriff mit einem Tipp.",
+    settingsTitle: "Einstellungen", langLabel: "App-Sprache",
+    notifTitle: "Erinnerungen & Ermutigung", notifSub: "Vito erinnert dich ans Eintragen deiner Mahlzeiten — nur wenn du nichts notiert hast — und schickt dir ab und zu ein aufmunterndes Wort.",
+    notifWhat: "Mittag & Abend (wenn dein Journal leer ist) + alle 3 Tage eine Ermutigung. Abwechslungsreiche Texte, nie zweimal gleich.",
+    notifBtnOn: "Benachrichtigungen aktivieren", notifBtnOff: "Deaktivieren", notifPro: "Pro", notifProLock: "Werde Pro, um Benachrichtigungen zu aktivieren.",
+    notifOnMsg: "🔔 Aktiviert! Vito passt auf dich auf 🌱", notifOffMsg: "Benachrichtigungen deaktiviert.",
+    notifDenied: "Benachrichtigungen sind blockiert. Erlaube sie in den Browser-Einstellungen und versuch es erneut.",
+    notifUnsupported: "Dein Browser unterstützt keine Benachrichtigungen. Auf dem iPhone: installiere calorio zuerst auf dem Startbildschirm.",
+    notifSoon: "Benachrichtigungen werden ganz bald aktiviert.", notifErr: "Fehler beim Aktivieren. Versuch es gleich nochmal.",
   },
   en: {
     tabs: { besoins: "My needs", journal: "Log", poids: "Weight", coach: "Coach", aide: "Help" },
@@ -231,6 +248,14 @@ const L = {
     chartEmpty: "Log your meals for a few days to see your trend appear here.",
     nudgeMidi: "What did you have for lunch? Add your meal 👇", nudgeSoir: "Don't forget to log your dinner 🍽️", nudgeDismiss: "Hide",
     installApp: "Install the app", installed: "Install calorio on your home screen for one-tap access.",
+    settingsTitle: "Settings", langLabel: "App language",
+    notifTitle: "Reminders & encouragement", notifSub: "Vito reminds you to log your meals — only if you haven't logged anything — and sends a little word of encouragement now and then.",
+    notifWhat: "Lunch & evening (if your log is empty) + an encouragement every 3 days. Varied texts, never the same twice.",
+    notifBtnOn: "Enable notifications", notifBtnOff: "Disable", notifPro: "Pro", notifProLock: "Go Pro to enable notifications.",
+    notifOnMsg: "🔔 Enabled! Vito's got your back 🌱", notifOffMsg: "Notifications disabled.",
+    notifDenied: "Notifications are blocked. Allow them in your browser settings, then try again.",
+    notifUnsupported: "Your browser doesn't support notifications. On iPhone: install calorio to your home screen first, then try again.",
+    notifSoon: "Notifications will be enabled very soon.", notifErr: "Something went wrong enabling them. Try again in a moment.",
   },
 } as const;
 
@@ -313,13 +338,19 @@ function downscale(file: File, max: number): Promise<{ base64: string; mime: str
 }
 
 /* ---------------- component ---------------- */
-export default function CalorioCalc({ lang }: { lang: Lang }) {
+export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
+  const [langOv, setLangOv] = useState<Lang | null>(null);
+  const lang: Lang = langOv ?? propLang;
   const t = L[lang] ?? L.fr;
   const [tab, setTab] = useState<TabKey>("besoins");
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
   const [mounted, setMounted] = useState(false);
   const [nudgeHidden, setNudgeHidden] = useState(false);
   const [installEvt, setInstallEvt] = useState<BeforeInstallEvent | null>(null);
+  // notifications
+  const [notifOn, setNotifOn] = useState(false);
+  const [notifBusy, setNotifBusy] = useState(false);
+  const [notifMsg, setNotifMsg] = useState("");
 
   // profil
   const [sexe, setSexe] = useState<Sexe>("homme");
@@ -379,6 +410,8 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
       const url = new URL(window.location.href);
       if (url.searchParams.get("pro") === "preview") localStorage.setItem("calorio.pro", "1");
       setIsPro(localStorage.getItem("calorio.pro") === "1");
+      const savedLang = localStorage.getItem("calorio.lang");
+      if (savedLang === "fr" || savedLang === "de" || savedLang === "en") setLangOv(savedLang);
     } catch {
       /* ignore */
     }
@@ -540,6 +573,51 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
   }, [mounted, user]);
 
   const proActive = isPro || proDb;
+
+  // langue interne (surcharge la langue du site, persistée par appareil)
+  const changeLang = (l: Lang) => {
+    setLangOv(l);
+    try { localStorage.setItem("calorio.lang", l); } catch { /* ignore */ }
+  };
+
+  // état initial des notifications (abonnement push existant ?)
+  useEffect(() => {
+    if (!mounted || !pushSupported()) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const reg = await navigator.serviceWorker.getRegistration();
+        const sub = await reg?.pushManager.getSubscription();
+        if (!cancelled) setNotifOn(!!sub && Notification.permission === "granted");
+      } catch { /* ignore */ }
+    })();
+    return () => { cancelled = true; };
+  }, [mounted, user]);
+
+  const toggleNotif = async () => {
+    if (notifBusy) return;
+    if (!proActive) { goPro(); return; }
+    if (!user) { setTab("besoins"); setAuthOpen(true); setAuthMsg(t.loginFirst); return; }
+    setNotifBusy(true); setNotifMsg("");
+    if (notifOn) {
+      await disablePush(user.id);
+      setNotifOn(false);
+      setNotifMsg(t.notifOffMsg);
+    } else {
+      const r = await enablePush(user.id, lang);
+      if (r.ok) { setNotifOn(true); setNotifMsg(t.notifOnMsg); }
+      else {
+        setNotifOn(false);
+        setNotifMsg(
+          r.reason === "denied" ? t.notifDenied
+          : r.reason === "unsupported" ? t.notifUnsupported
+          : r.reason === "not_configured" ? t.notifSoon
+          : t.notifErr
+        );
+      }
+    }
+    setNotifBusy(false);
+  };
 
   const besoins = useMemo(
     () => computeBesoins({ sexe, age, poids, taille, activite, objectif }),
@@ -1046,18 +1124,48 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
       {/* ---------- COACH ---------- */}
       {tab === "coach" && <CoachNutri ctx={coachCtx} isPro={proActive} onGoPro={goPro} />}
 
-      {/* ---------- AIDE / FAQ ---------- */}
+      {/* ---------- AIDE / FAQ + PARAMÈTRES ---------- */}
       {tab === "aide" && (
-        <div className="cl-faq">
-          {t.faq.map((f, i) => (
-            <div key={i} className={`cl-faqitem ${faqOpen === i ? "open" : ""}`}>
-              <button className="cl-faqq" aria-expanded={faqOpen === i} onClick={() => setFaqOpen(faqOpen === i ? null : i)}>
-                <span>{f.q}</span>
-                <span className="cl-faqchev" aria-hidden>⌄</span>
-              </button>
-              {faqOpen === i && <p className="cl-faqa">{f.a}</p>}
+        <div className="cl-aide">
+          <div className="cl-settings">
+            <div className="cl-setttl">⚙️ {t.settingsTitle}</div>
+
+            <div className="cl-setrow">
+              <div className="cl-setlabel">🌐 {t.langLabel}</div>
+              <div className="cl-langseg">
+                {(["fr", "de", "en"] as Lang[]).map((l) => (
+                  <button key={l} className={lang === l ? "on" : ""} onClick={() => changeLang(l)}>{l.toUpperCase()}</button>
+                ))}
+              </div>
             </div>
-          ))}
+
+            <div className="cl-setrow col">
+              <div className="cl-setlabel">🔔 {t.notifTitle} {!proActive && <span className="cl-setpro">{t.notifPro}</span>}</div>
+              <p className="cl-setsub">{t.notifSub}</p>
+              <p className="cl-setwhat">🌱 {t.notifWhat}</p>
+              {proActive ? (
+                <button className={`cl-notifbtn ${notifOn ? "on" : ""}`} onClick={toggleNotif} disabled={notifBusy}>
+                  {notifBusy ? "…" : notifOn ? `✓ ${t.notifBtnOff}` : t.notifBtnOn}
+                </button>
+              ) : (
+                <button className="cl-notifbtn lock" onClick={goPro}>🔒 {t.notifProLock}</button>
+              )}
+              {notifMsg && <p className="cl-setmsg">{notifMsg}</p>}
+            </div>
+          </div>
+
+          <div className="cl-faqttl">{t.faqTitle}</div>
+          <div className="cl-faq">
+            {t.faq.map((f, i) => (
+              <div key={i} className={`cl-faqitem ${faqOpen === i ? "open" : ""}`}>
+                <button className="cl-faqq" aria-expanded={faqOpen === i} onClick={() => setFaqOpen(faqOpen === i ? null : i)}>
+                  <span>{f.q}</span>
+                  <span className="cl-faqchev" aria-hidden>⌄</span>
+                </button>
+                {faqOpen === i && <p className="cl-faqa">{f.a}</p>}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -1332,6 +1440,24 @@ const CSS = `
 .cl-faqchev{transition:transform .2s;color:#8b93b7;font-size:1.1rem}
 .cl-faqitem.open .cl-faqchev{transform:rotate(180deg);color:#a3e635}
 .cl-faqa{margin:0;padding:0 17px 16px;font-size:.9rem;line-height:1.6;color:#c3c8e2}
+/* paramètres */
+.cl-settings{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:18px;margin-bottom:20px}
+.cl-setttl{font-size:1.05rem;font-weight:800;margin-bottom:14px}
+.cl-setrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-top:1px solid rgba(255,255,255,.07);flex-wrap:wrap}
+.cl-setrow.col{flex-direction:column;align-items:stretch}
+.cl-setlabel{font-size:.95rem;font-weight:700;color:#e6e9f5}
+.cl-setpro{font-size:.64rem;font-weight:800;text-transform:uppercase;color:#05210f;background:#a3e635;border-radius:99px;padding:2px 8px;vertical-align:middle;margin-left:4px}
+.cl-setsub{margin:6px 0 0;font-size:.86rem;line-height:1.5;color:#c3c8e2}
+.cl-setwhat{margin:8px 0 0;font-size:.8rem;line-height:1.5;color:#8b93b7}
+.cl-langseg{display:flex;gap:5px;background:rgba(255,255,255,.04);border-radius:10px;padding:4px}
+.cl-langseg button{padding:7px 13px;border:0;border-radius:8px;background:transparent;color:#aeb4d6;font-size:.82rem;font-weight:800;cursor:pointer}
+.cl-langseg button.on{background:linear-gradient(135deg,${ACCENT},${ACCENT2});color:#05210f}
+.cl-notifbtn{margin-top:12px;align-self:flex-start;background:linear-gradient(135deg,${ACCENT},${ACCENT2});color:#05210f;border:0;border-radius:11px;padding:11px 18px;font-size:.9rem;font-weight:800;cursor:pointer}
+.cl-notifbtn.on{background:rgba(34,197,94,.12);color:#a3e635;border:1px solid rgba(34,197,94,.4)}
+.cl-notifbtn.lock{background:rgba(163,230,53,.06);color:#a3e635;border:1px dashed rgba(163,230,53,.4)}
+.cl-notifbtn:disabled{opacity:.6;cursor:wait}
+.cl-setmsg{margin:10px 0 0;font-size:.85rem;color:#a3e635;line-height:1.5}
+.cl-faqttl{font-size:1.05rem;font-weight:800;margin:4px 2px 12px}
 .cl-grid{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:20px;align-items:start}
 @media(max-width:820px){.cl-grid{grid-template-columns:1fr}}
 .cl-params{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:18px}

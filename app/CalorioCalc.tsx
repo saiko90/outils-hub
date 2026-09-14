@@ -364,34 +364,52 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
   const stopScan = () => { scanStop.current?.(); scanStop.current = null; setScanning(false); };
   const startScan = async () => {
     setScanMsg("");
+    setScanning(true);
+    await new Promise((r) => setTimeout(r, 60));
+    const video = videoRef.current;
+    if (!video) { setScanning(false); return; }
     const BD = (window as unknown as { BarcodeDetector?: new (o: { formats: string[] }) => { detect: (v: unknown) => Promise<{ rawValue: string }[]> } }).BarcodeDetector;
-    if (!BD) { setScanMsg(t.scanUnsupported); return; }
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-      setScanning(true);
-      await new Promise((r) => setTimeout(r, 60));
-      const video = videoRef.current;
-      if (!video) { stream.getTracks().forEach((tk) => tk.stop()); setScanning(false); return; }
-      video.srcObject = stream;
-      await video.play().catch(() => {});
-      const detector = new BD({ formats: ["ean_13", "ean_8", "upc_a", "upc_e", "code_128"] });
-      let active = true;
-      scanStop.current = () => { active = false; stream.getTracks().forEach((tk) => tk.stop()); };
-      const tick = async () => {
-        if (!active) return;
-        try {
-          const codes = await detector.detect(video);
-          if (codes && codes.length) {
-            active = false;
-            stream.getTracks().forEach((tk) => tk.stop());
-            setScanning(false);
-            await lookupBarcode(codes[0].rawValue);
-            return;
-          }
-        } catch { /* ignore frame */ }
+      if (BD) {
+        // Chemin natif rapide (Chrome / Android)
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        video.srcObject = stream;
+        await video.play().catch(() => {});
+        const detector = new BD({ formats: ["ean_13", "ean_8", "upc_a", "upc_e", "code_128"] });
+        let active = true;
+        scanStop.current = () => { active = false; stream.getTracks().forEach((tk) => tk.stop()); };
+        const tick = async () => {
+          if (!active) return;
+          try {
+            const codes = await detector.detect(video);
+            if (codes && codes.length) {
+              active = false;
+              stream.getTracks().forEach((tk) => tk.stop());
+              setScanning(false);
+              await lookupBarcode(codes[0].rawValue);
+              return;
+            }
+          } catch { /* ignore frame */ }
+          requestAnimationFrame(tick);
+        };
         requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
+      } else {
+        // Secours toutes plateformes (Safari iOS/macOS…) via ZXing, chargé à la demande
+        const { BrowserMultiFormatReader } = await import("@zxing/browser");
+        const reader = new BrowserMultiFormatReader();
+        const controls = await reader.decodeFromConstraints(
+          { video: { facingMode: "environment" } },
+          video,
+          (result, _err, ctrls) => {
+            if (result) {
+              ctrls.stop();
+              setScanning(false);
+              lookupBarcode(result.getText());
+            }
+          }
+        );
+        scanStop.current = () => controls.stop();
+      }
     } catch { setScanMsg(t.scanDenied); setScanning(false); }
   };
 

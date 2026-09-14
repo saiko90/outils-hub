@@ -1,5 +1,6 @@
 import webpush from "web-push";
 import { pickPush, type PushType } from "@/lib/pushMessages";
+import { VAPID_PUBLIC_KEY } from "@/lib/vapid";
 
 // Cron d'envoi des notifications calorio Pro (rappels repas + encouragements).
 // Sécurisé par CRON_SECRET (en-tête Authorization: Bearer <secret> ajouté par Vercel Cron).
@@ -33,7 +34,7 @@ export async function GET(req: Request) {
 
   const SB = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const VPUB = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const VPUB = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || VAPID_PUBLIC_KEY;
   const VPRIV = process.env.VAPID_PRIVATE_KEY;
   const VSUB = process.env.VAPID_SUBJECT || "mailto:contact@outils.ch";
   if (!SB || !KEY || !VPUB || !VPRIV) {

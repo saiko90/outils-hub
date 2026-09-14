@@ -1,7 +1,8 @@
 "use client";
 import { getSupabase } from "./supabaseClient";
+import { VAPID_PUBLIC_KEY } from "./vapid";
 
-const VAPID_PUBLIC = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "";
+const VAPID_PUBLIC = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || VAPID_PUBLIC_KEY;
 
 function urlB64ToUint8Array(base64: string): Uint8Array {
   const padding = "=".repeat((4 - (base64.length % 4)) % 4);

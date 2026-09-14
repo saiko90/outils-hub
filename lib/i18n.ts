@@ -99,6 +99,7 @@ export const catLabel = (lang: Lang, cat: string): string => CAT_LABEL[lang]?.[c
 
 /** Taglines traduites (DE). */
 export const TAGLINE_DE: Record<string, string> = {
+  calorio: "Kalorien, Ernährungstagebuch & Gewichtsverlauf",
   facturama: "Schweizer QR-Rechnung, konform (ISO 20022 / SIX)",
   tvaflash: "Schweizer MWST-Abrechnung (8.1 / 2.6 / 3.8 %)",
   csvzen: "CSV bereinigen & Duplikate entfernen",
@@ -147,6 +148,7 @@ export const TAGLINE_DE: Record<string, string> = {
 
 /** Taglines traduites (EN). */
 export const TAGLINE_EN: Record<string, string> = {
+  calorio: "Calories, food diary & weight tracking",
   facturama: "Swiss QR-bill, compliant (ISO 20022 / SIX)",
   tvaflash: "Swiss VAT calculator (8.1 / 2.6 / 3.8%)",
   csvzen: "CSV cleaner & duplicate remover",

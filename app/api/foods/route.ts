@@ -8,12 +8,13 @@ export const dynamic = "force-dynamic";
 
 const UA = "outils.ch-calorio/1.0 (https://outils.ch)";
 const OFF = "https://world.openfoodfacts.org";
+const SEARCH = "https://search.openfoodfacts.org";
 
 type OffProduct = {
   code?: string;
   product_name?: string;
   product_name_fr?: string;
-  brands?: string;
+  brands?: string | string[];
   nutriments?: Record<string, number | string>;
 };
 
@@ -41,7 +42,8 @@ function toFood(p: OffProduct): Food | null {
   if (!kcal) return null;
   const nom = (p.product_name_fr || p.product_name || "").trim();
   if (!nom) return null;
-  const brand = (p.brands || "").split(",")[0].trim();
+  const brandRaw = Array.isArray(p.brands) ? p.brands[0] || "" : p.brands || "";
+  const brand = brandRaw.split(",")[0].trim();
   return {
     id: `off:${p.code || nom}`,
     nom: nom.slice(0, 60),
@@ -76,12 +78,12 @@ export async function GET(req: Request) {
 
     // Recherche texte
     if (q.length < 2) return NextResponse.json({ foods: [] });
-    const search = `${OFF}/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=24&fields=${fields}`;
+    const search = `${SEARCH}/search?q=${encodeURIComponent(q)}&page_size=24&fields=${fields}`;
     const r = await fetch(search, { headers: { "user-agent": UA } });
     if (!r.ok) return NextResponse.json({ foods: [] });
-    const data = (await r.json()) as { products?: OffProduct[] };
+    const data = (await r.json()) as { hits?: OffProduct[] };
     const seen = new Set<string>();
-    const foods = (data.products || [])
+    const foods = (data.hits || [])
       .map(toFood)
       .filter((f): f is Food => {
         if (!f) return false;

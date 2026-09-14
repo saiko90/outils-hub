@@ -198,8 +198,11 @@ export function aliment(id: string): Aliment | undefined {
 
 export type Total = { kcal: number; prot: number; gluc: number; lip: number };
 
+/** Valeurs nutritionnelles par 100 g — commun à la base interne et aux sources externes. */
+export type Nutriments = { kcal: number; prot: number; gluc: number; lip: number };
+
 /** Valeurs d'un aliment pour une quantité donnée (g). */
-export function calcAliment(al: Aliment, grammes: number): Total {
+export function calcAliment(al: Nutriments, grammes: number): Total {
   const f = grammes / 100;
   return {
     kcal: r0(al.kcal * f),
@@ -209,7 +212,7 @@ export function calcAliment(al: Aliment, grammes: number): Total {
   };
 }
 
-export type Ligne = { al: Aliment; grammes: number };
+export type Ligne = { al: Nutriments; grammes: number };
 
 /** Totaux d'un journal (somme des lignes). */
 export function computeJournal(lignes: Ligne[]): Total {

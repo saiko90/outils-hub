@@ -8,6 +8,7 @@ import {
   type Objectif,
   type Pesee,
   type AlimentCat,
+  type Aliment,
   ALIMENTS,
   aliment,
   computeBesoins,
@@ -40,6 +41,17 @@ const L = {
     portion: "portion", supprimer: "Retirer",
     cats: { feculents: "Féculents", viandes: "Viandes & poissons", laitiers: "Laitiers", fruits: "Fruits", legumes: "Légumes", boissons: "Boissons", snacks: "Snacks & sucré", plats: "Plats & fast-food" },
     tousAliments: "Tout",
+    scan: "Scanner un code-barres", photo: "Analyser une photo", photoPro: "Photo → calories",
+    rechercherBig: "Rechercher un produit (Migros, Coop, marques…)",
+    offTitle: "Produits trouvés en ligne", offLoading: "Recherche…", quickTitle: "Accès rapide",
+    scanUnsupported: "Le scan n'est pas supporté par ce navigateur — utilise la recherche.",
+    scanDenied: "Accès caméra refusé.", scanSearching: "Recherche du produit…", scanNotFound: "Produit introuvable dans la base.",
+    scanTitle: "Vise le code-barres", scanClose: "Fermer",
+    photoTitle: "Avo a repéré ces aliments", photoAddAll: "Tout ajouter", photoAnalyzing: "Avo analyse ta photo…",
+    photoNone: "Je n'ai pas reconnu d'aliment sur la photo. Réessaie avec une photo plus nette.",
+    photoErr: "Souci d'analyse. Réessaie.", notReadyShort: "Analyse pas encore activée.",
+    photoLock: "L'analyse photo est réservée au Pro. Prends ton assiette en photo, Avo estime les calories.",
+    estim: "estimé",
     // poids
     poidsAuj: "Ton poids aujourd'hui", enregistrer: "Enregistrer",
     depart: "Départ", actuel: "Actuel", variation: "Variation",
@@ -67,6 +79,17 @@ const L = {
     portion: "Portion", supprimer: "Entfernen",
     cats: { feculents: "Stärke", viandes: "Fleisch & Fisch", laitiers: "Milchprodukte", fruits: "Früchte", legumes: "Gemüse", boissons: "Getränke", snacks: "Snacks & Süsses", plats: "Gerichte & Fast Food" },
     tousAliments: "Alle",
+    scan: "Barcode scannen", photo: "Foto analysieren", photoPro: "Foto → Kalorien",
+    rechercherBig: "Produkt suchen (Migros, Coop, Marken…)",
+    offTitle: "Online gefundene Produkte", offLoading: "Suche…", quickTitle: "Schnellzugriff",
+    scanUnsupported: "Scan wird von diesem Browser nicht unterstützt — nutze die Suche.",
+    scanDenied: "Kamerazugriff verweigert.", scanSearching: "Produkt wird gesucht…", scanNotFound: "Produkt nicht in der Datenbank gefunden.",
+    scanTitle: "Barcode anvisieren", scanClose: "Schliessen",
+    photoTitle: "Avo hat diese Lebensmittel erkannt", photoAddAll: "Alle hinzufügen", photoAnalyzing: "Avo analysiert dein Foto…",
+    photoNone: "Kein Lebensmittel erkannt. Versuch ein schärferes Foto.",
+    photoErr: "Analyse-Problem. Nochmal versuchen.", notReadyShort: "Analyse noch nicht aktiviert.",
+    photoLock: "Die Foto-Analyse ist Pro. Fotografiere deinen Teller, Avo schätzt die Kalorien.",
+    estim: "geschätzt",
     poidsAuj: "Dein Gewicht heute", enregistrer: "Speichern",
     depart: "Start", actuel: "Aktuell", variation: "Veränderung",
     pasPesee: "Erfasse dein Gewicht regelmässig, um deine Kurve und deinen Fortschritt zu sehen.",
@@ -93,6 +116,17 @@ const L = {
     portion: "portion", supprimer: "Remove",
     cats: { feculents: "Starches", viandes: "Meat & fish", laitiers: "Dairy", fruits: "Fruit", legumes: "Vegetables", boissons: "Drinks", snacks: "Snacks & sweets", plats: "Meals & fast food" },
     tousAliments: "All",
+    scan: "Scan a barcode", photo: "Analyse a photo", photoPro: "Photo → calories",
+    rechercherBig: "Search a product (Migros, Coop, brands…)",
+    offTitle: "Products found online", offLoading: "Searching…", quickTitle: "Quick access",
+    scanUnsupported: "Scanning isn't supported by this browser — use search.",
+    scanDenied: "Camera access denied.", scanSearching: "Looking up product…", scanNotFound: "Product not found in the database.",
+    scanTitle: "Aim at the barcode", scanClose: "Close",
+    photoTitle: "Avo spotted these foods", photoAddAll: "Add all", photoAnalyzing: "Avo is analysing your photo…",
+    photoNone: "I didn't recognise any food. Try a sharper photo.",
+    photoErr: "Analysis issue. Try again.", notReadyShort: "Analysis not activated yet.",
+    photoLock: "Photo analysis is Pro. Snap your plate, Avo estimates the calories.",
+    estim: "est.",
     poidsAuj: "Your weight today", enregistrer: "Save",
     depart: "Start", actuel: "Current", variation: "Change",
     pasPesee: "Log your weight regularly to see your curve and track your progress.",
@@ -112,7 +146,29 @@ const nf = (lang: Lang, d = 0) =>
   new Intl.NumberFormat(lang === "de" ? "de-CH" : lang === "en" ? "en-CH" : "fr-CH", { maximumFractionDigits: d });
 const noAccent = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
-type Line = { key: string; alimentId: string; grammes: number };
+// Un aliment « à plat », quelle que soit sa source (base interne, Open Food Facts, photo).
+type Food = { id: string; nom: string; kcal: number; prot: number; gluc: number; lip: number; portion: number; emoji: string; brand?: string };
+type Line = { key: string; food: Food; grammes: number };
+
+const toFood = (al: Aliment, lang: Lang): Food => ({
+  id: al.id, nom: al.nom[lang], kcal: al.kcal, prot: al.prot, gluc: al.gluc, lip: al.lip, portion: al.portion, emoji: al.emoji,
+});
+const newKey = () => `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+
+// Migration : anciennes lignes {alimentId} → {food}.
+function migrateLines(raw: unknown, lang: Lang): Line[] {
+  if (!Array.isArray(raw)) return [];
+  const out: Line[] = [];
+  for (const l of raw as Record<string, unknown>[]) {
+    if (l && typeof l === "object" && l.food) {
+      out.push(l as unknown as Line);
+    } else if (l && typeof l.alimentId === "string") {
+      const al = aliment(l.alimentId);
+      if (al) out.push({ key: String(l.key ?? newKey()), food: toFood(al, lang), grammes: Number(l.grammes) || al.portion });
+    }
+  }
+  return out;
+}
 
 function load<T>(k: string, fallback: T): T {
   try {
@@ -128,6 +184,29 @@ function save(k: string, v: unknown) {
   } catch {
     /* stockage indisponible : on ignore */
   }
+}
+
+// Redimensionne + compresse une image avant envoi (réduit coût & poids).
+function downscale(file: File, max: number): Promise<{ base64: string; mime: string }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { URL.revokeObjectURL(url); reject(new Error("no ctx")); return; }
+      ctx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+      resolve({ base64: dataUrl.split(",")[1] || "", mime: "image/jpeg" });
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("img error")); };
+    img.src = url;
+  });
 }
 
 /* ---------------- component ---------------- */
@@ -150,6 +229,20 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
   const [poidsInput, setPoidsInput] = useState<number | "">("");
   const [q, setQ] = useState("");
   const [catFilter, setCatFilter] = useState<AlimentCat | "tous">("tous");
+  const [isPro, setIsPro] = useState(false);
+  // Open Food Facts
+  const [offResults, setOffResults] = useState<Food[]>([]);
+  const [offLoading, setOffLoading] = useState(false);
+  // scan code-barres
+  const [scanning, setScanning] = useState(false);
+  const [scanMsg, setScanMsg] = useState("");
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const scanStop = useRef<(() => void) | null>(null);
+  // photo → calories
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoItems, setPhotoItems] = useState<Food[] | null>(null);
+  const [photoMsg, setPhotoMsg] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const day = todayISO();
 
@@ -165,9 +258,16 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
       if (p.objectif) setObjectif(p.objectif as Objectif);
     }
     const jour = load<Record<string, Line[]>>("calorio.journal", {});
-    setLines(jour[day] ?? []);
+    setLines(migrateLines(jour[day], lang));
     setPesees(load<Pesee[]>("calorio.pesees", []));
     setPoidsInput("");
+    try {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get("pro") === "preview") localStorage.setItem("calorio.pro", "1");
+      setIsPro(localStorage.getItem("calorio.pro") === "1");
+    } catch {
+      /* ignore */
+    }
     setMounted(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -193,10 +293,7 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
     [sexe, age, poids, taille, activite, objectif]
   );
 
-  const lignesMap = useMemo(
-    () => lines.map((l) => ({ al: aliment(l.alimentId)!, grammes: l.grammes })).filter((x) => x.al),
-    [lines]
-  );
+  const lignesMap = useMemo(() => lines.map((l) => ({ al: l.food, grammes: l.grammes })), [lines]);
   const total = useMemo(() => computeJournal(lignesMap), [lignesMap]);
   const bil = useMemo(() => bilan(total, besoins.cible), [total, besoins.cible]);
   const tend = useMemo(() => tendancePoids(pesees), [pesees]);
@@ -214,7 +311,7 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
         prot: total.prot,
         gluc: total.gluc,
         lip: total.lip,
-        aliments: lignesMap.map(({ al, grammes }) => ({ nom: al.nom[lang], grammes, kcal: calcAliment(al, grammes).kcal })),
+        aliments: lignesMap.map(({ al, grammes }) => ({ nom: (al as Food).nom, grammes, kcal: calcAliment(al, grammes).kcal })),
       },
       poids: tend ? { debut: tend.debut, actuel: tend.actuel, delta: tend.delta } : null,
     }),
@@ -230,15 +327,98 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
     });
   }, [q, catFilter, lang]);
 
-  const addAliment = (id: string) => {
-    const al = aliment(id);
-    if (!al) return;
-    setLines((prev) => [...prev, { key: `${id}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, alimentId: id, grammes: al.portion }]);
-    setTab("journal");
+  const addFood = (food: Food) => {
+    setLines((prev) => [...prev, { key: newKey(), food, grammes: food.portion || 100 }]);
   };
   const setGrammes = (key: string, g: number) =>
     setLines((prev) => prev.map((l) => (l.key === key ? { ...l, grammes: Math.max(0, g) } : l)));
   const removeLine = (key: string) => setLines((prev) => prev.filter((l) => l.key !== key));
+
+  // --- Recherche Open Food Facts (base géante), debounce ---
+  useEffect(() => {
+    const query = q.trim();
+    if (query.length < 2) { setOffResults([]); setOffLoading(false); return; }
+    setOffLoading(true);
+    const ctrl = new AbortController();
+    const id = setTimeout(async () => {
+      try {
+        const r = await fetch(`/api/foods?q=${encodeURIComponent(query)}`, { signal: ctrl.signal });
+        const data = (await r.json()) as { foods?: Food[] };
+        setOffResults(Array.isArray(data.foods) ? data.foods : []);
+      } catch { /* ignore */ }
+      setOffLoading(false);
+    }, 450);
+    return () => { clearTimeout(id); ctrl.abort(); };
+  }, [q]);
+
+  // --- Scan code-barres ---
+  const lookupBarcode = async (code: string) => {
+    setScanMsg(t.scanSearching);
+    try {
+      const r = await fetch(`/api/foods?code=${encodeURIComponent(code)}`);
+      const data = (await r.json()) as { foods?: Food[] };
+      if (data.foods && data.foods.length) { addFood(data.foods[0]); setScanMsg(`✓ ${data.foods[0].nom}`); }
+      else setScanMsg(t.scanNotFound);
+    } catch { setScanMsg(t.scanNotFound); }
+  };
+  const stopScan = () => { scanStop.current?.(); scanStop.current = null; setScanning(false); };
+  const startScan = async () => {
+    setScanMsg("");
+    const BD = (window as unknown as { BarcodeDetector?: new (o: { formats: string[] }) => { detect: (v: unknown) => Promise<{ rawValue: string }[]> } }).BarcodeDetector;
+    if (!BD) { setScanMsg(t.scanUnsupported); return; }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      setScanning(true);
+      await new Promise((r) => setTimeout(r, 60));
+      const video = videoRef.current;
+      if (!video) { stream.getTracks().forEach((tk) => tk.stop()); setScanning(false); return; }
+      video.srcObject = stream;
+      await video.play().catch(() => {});
+      const detector = new BD({ formats: ["ean_13", "ean_8", "upc_a", "upc_e", "code_128"] });
+      let active = true;
+      scanStop.current = () => { active = false; stream.getTracks().forEach((tk) => tk.stop()); };
+      const tick = async () => {
+        if (!active) return;
+        try {
+          const codes = await detector.detect(video);
+          if (codes && codes.length) {
+            active = false;
+            stream.getTracks().forEach((tk) => tk.stop());
+            setScanning(false);
+            await lookupBarcode(codes[0].rawValue);
+            return;
+          }
+        } catch { /* ignore frame */ }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    } catch { setScanMsg(t.scanDenied); setScanning(false); }
+  };
+
+  // --- Photo → calories (Pro) ---
+  const onPhoto = async (file: File) => {
+    if (!isPro) return;
+    setPhotoMsg(""); setPhotoItems(null); setPhotoBusy(true);
+    try {
+      const { base64, mime } = await downscale(file, 1024);
+      const r = await fetch("/api/vision", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ image: base64, mime, lang }) });
+      if (r.status === 503) { setPhotoMsg(t.notReadyShort); }
+      else if (!r.ok) { setPhotoMsg(t.photoErr); }
+      else {
+        const data = (await r.json()) as { items?: { nom: string; grammes: number; kcal: number; prot: number; gluc: number; lip: number }[] };
+        const items = (data.items || []).map((it) => {
+          const g = Math.max(1, it.grammes || 100);
+          const per = (v: number) => Math.round((v * 100) / g);
+          const per1 = (v: number) => Math.round(((v * 100) / g) * 10) / 10;
+          return { id: `photo:${newKey()}`, nom: it.nom, kcal: per(it.kcal), prot: per1(it.prot), gluc: per1(it.gluc), lip: per1(it.lip), portion: g, emoji: "📷" } as Food;
+        });
+        if (items.length === 0) setPhotoMsg(t.photoNone);
+        else setPhotoItems(items);
+      }
+    } catch { setPhotoMsg(t.photoErr); }
+    setPhotoBusy(false);
+  };
+  const addAllPhoto = () => { photoItems?.forEach(addFood); setPhotoItems(null); };
 
   const savePoids = () => {
     if (poidsInput === "" || !(poidsInput > 0)) return;
@@ -329,13 +509,11 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
           ) : (
             <div className="cl-lines">
               {lines.map((l) => {
-                const al = aliment(l.alimentId);
-                if (!al) return null;
-                const c = calcAliment(al, l.grammes);
+                const c = calcAliment(l.food, l.grammes);
                 return (
                   <div key={l.key} className="cl-line">
-                    <span className="cl-lem">{al.emoji}</span>
-                    <span className="cl-lname">{al.nom[lang]}</span>
+                    <span className="cl-lem">{l.food.emoji}</span>
+                    <span className="cl-lname">{l.food.nom}{l.food.brand ? <small className="cl-lbrand"> · {l.food.brand}</small> : null}</span>
                     <span className="cl-lg">
                       <input type="number" min={0} step={10} value={l.grammes} onChange={(e) => setGrammes(l.key, Number(e.target.value))} /> g
                     </span>
@@ -347,10 +525,60 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
             </div>
           )}
 
-          <div className="cl-picker">
-            <div className="cl-picktop">
-              <input className="cl-search" placeholder={t.rechercher} value={q} onChange={(e) => setQ(e.target.value)} />
+          {/* Actions : scan code-barres + photo */}
+          <div className="cl-actions">
+            <button className="cl-act" onClick={startScan}><span aria-hidden>📷</span> {t.scan}</button>
+            {isPro ? (
+              <button className="cl-act pro" onClick={() => fileRef.current?.click()} disabled={photoBusy}>
+                <span aria-hidden>🍽️</span> {photoBusy ? t.photoAnalyzing : t.photoPro}
+              </button>
+            ) : (
+              <button className="cl-act lock" onClick={() => setTab("coach")} title={t.photoLock}>
+                <span aria-hidden>🔒</span> {t.photoPro} · Pro
+              </button>
+            )}
+            <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) onPhoto(f); e.target.value = ""; }} />
+          </div>
+          {(scanMsg || photoMsg) && <p className="cl-scanmsg">{scanMsg || photoMsg}</p>}
+
+          {/* Revue de la photo */}
+          {photoItems && photoItems.length > 0 && (
+            <div className="cl-photorev">
+              <div className="cl-photoh"><b>📷 {t.photoTitle}</b><button className="cl-addall" onClick={addAllPhoto}>{t.photoAddAll}</button></div>
+              {photoItems.map((f) => {
+                const c = calcAliment(f, f.portion);
+                return (
+                  <div key={f.id} className="cl-line">
+                    <span className="cl-lem">🍽️</span>
+                    <span className="cl-lname">{f.nom} <small className="cl-lbrand">· {f.portion} g {t.estim}</small></span>
+                    <span className="cl-lkcal">{nf(lang).format(c.kcal)} kcal</span>
+                    <button className="cl-addone" onClick={() => { addFood(f); setPhotoItems((p) => (p ? p.filter((x) => x.id !== f.id) : p)); }} aria-label="+">+</button>
+                  </div>
+                );
+              })}
             </div>
+          )}
+
+          <div className="cl-picker">
+            <input className="cl-search" placeholder={t.rechercherBig} value={q} onChange={(e) => setQ(e.target.value)} />
+
+            {q.trim().length >= 2 && (
+              <div className="cl-offblock">
+                <div className="cl-secth">🌍 {t.offTitle}{offLoading && <span className="cl-offload"> · {t.offLoading}</span>}</div>
+                <div className="cl-foods">
+                  {offResults.map((f) => (
+                    <button key={f.id} className="cl-food" onClick={() => addFood(f)}>
+                      <span className="cl-fem">{f.emoji}</span>
+                      <span className="cl-fn">{f.nom}{f.brand ? <small> · {f.brand}</small> : null}</span>
+                      <span className="cl-fk">{f.kcal} kcal<small>/100 g</small></span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="cl-secth">⭐ {t.quickTitle}</div>
             <div className="cl-chips">
               <button className={catFilter === "tous" ? "on" : ""} onClick={() => setCatFilter("tous")}>{t.tousAliments}</button>
               {CATS.map((c) => (
@@ -359,7 +587,7 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
             </div>
             <div className="cl-foods">
               {resultats.map((al) => (
-                <button key={al.id} className="cl-food" onClick={() => addAliment(al.id)}>
+                <button key={al.id} className="cl-food" onClick={() => addFood(toFood(al, lang))}>
                   <span className="cl-fem">{al.emoji}</span>
                   <span className="cl-fn">{al.nom[lang]}</span>
                   <span className="cl-fk">{al.kcal} kcal<small>/100 g</small></span>
@@ -367,6 +595,17 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
               ))}
             </div>
           </div>
+
+          {scanning && (
+            <div className="cl-scanoverlay">
+              <div className="cl-scanbox">
+                <video ref={videoRef} className="cl-scanvid" playsInline muted />
+                <div className="cl-scanframe" aria-hidden />
+                <div className="cl-scanttl">{t.scanTitle}</div>
+                <button className="cl-scanclose" onClick={stopScan}>{t.scanClose}</button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -640,6 +879,29 @@ const CSS = `
 .cl-fn{flex:1;min-width:0;font-size:.85rem;color:#e6e9f5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cl-fk{font-size:.72rem;color:#8b93b7;text-align:right;line-height:1.15}
 .cl-fk small{display:block;font-size:.62rem;opacity:.7}
+.cl-lbrand{color:#8b93b7;font-weight:400}
+/* actions scan + photo */
+.cl-actions{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0 4px}
+.cl-act{flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#e6e9f5;font-size:.9rem;font-weight:700;cursor:pointer}
+.cl-act span{font-size:1.15rem}
+.cl-act.pro{background:linear-gradient(135deg,#22c55e,#84cc16);color:#05210f;border-color:transparent}
+.cl-act.pro:disabled{opacity:.7;cursor:wait}
+.cl-act.lock{border-style:dashed;color:#a3e635;border-color:rgba(163,230,53,.4);background:rgba(163,230,53,.06)}
+.cl-scanmsg{margin:8px 0 0;font-size:.85rem;color:#a3e635}
+.cl-photorev{margin:12px 0;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.3);border-radius:14px;padding:12px}
+.cl-photoh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:.95rem}
+.cl-addall{background:linear-gradient(135deg,#22c55e,#84cc16);color:#05210f;border:0;border-radius:9px;padding:7px 14px;font-weight:800;font-size:.82rem;cursor:pointer}
+.cl-addone{width:28px;height:28px;border:0;border-radius:8px;background:rgba(34,197,94,.2);color:#a3e635;font-size:1.2rem;font-weight:800;cursor:pointer;line-height:1}
+.cl-secth{font-size:.78rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#8b93b7;margin:14px 0 8px}
+.cl-offload{color:#84cc16;text-transform:none;letter-spacing:0;font-weight:600}
+.cl-offblock{border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:6px}
+/* overlay scan */
+.cl-scanoverlay{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:20px}
+.cl-scanbox{position:relative;width:min(92vw,420px);display:flex;flex-direction:column;align-items:center;gap:14px}
+.cl-scanvid{width:100%;border-radius:16px;background:#000;aspect-ratio:4/3;object-fit:cover}
+.cl-scanframe{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:70%;height:120px;border:3px solid #a3e635;border-radius:14px;box-shadow:0 0 0 999px rgba(0,0,0,.25)}
+.cl-scanttl{color:#fff;font-weight:700}
+.cl-scanclose{background:#fff;color:#111;border:0;border-radius:10px;padding:11px 22px;font-weight:800;cursor:pointer}
 /* poids */
 .cl-pinput{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:18px}
 .cl-pin{margin:0;flex:1;min-width:200px}

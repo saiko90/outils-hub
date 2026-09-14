@@ -24,6 +24,7 @@ export const TOOLS: Tool[] = [
   { slug: "salaro", name: "salaro", tagline: "Salaire brut → net suisse (AVS, AC, LPP, LAA)", url: "https://outils.ch/o/salaro", cat: "Suisse", tags: ["salaire", "net", "brut", "avs", "lpp", "déductions", "paie", "impôt source"], from: "#34d399", to: "#22d3ee", ch: true },
   { slug: "resilio", name: "resilio", tagline: "Délai de résiliation de bail (Suisse)", url: "https://outils.ch/o/resilio", cat: "Suisse", tags: ["bail", "résiliation", "loyer", "préavis", "congé", "déménagement", "locataire"], from: "#f59e0b", to: "#ef4444", ch: true },
   { slug: "alloco", name: "alloco", tagline: "Allocations familiales par canton (Suisse)", url: "https://outils.ch/o/alloco", cat: "Suisse", tags: ["allocations familiales", "enfants", "canton", "formation", "lafam", "famille"], from: "#f59e0b", to: "#34d399", ch: true },
+  { slug: "intero", name: "intero", tagline: "Intérêts moratoires (retard de paiement, 5 %)", url: "https://outils.ch/o/intero", cat: "Suisse", tags: ["intérêts moratoires", "retard", "paiement", "facture impayée", "demeure", "5%", "recouvrement"], from: "#f59e0b", to: "#f43f5e", ch: true },
   { slug: "tvaflash", name: "tvaflash", tagline: "Décompte TVA suisse (8.1 / 2.6 / 3.8 %)", url: "https://tva-suisse.vercel.app", cat: "Suisse", tags: ["tva", "impôt", "décompte", "ht", "ttc", "comptabilité"], from: "#14b8a6", to: "#0ea5e9", ch: true },
   { slug: "csvzen", name: "csvzen", tagline: "Nettoyeur & dédoublonneur de CSV", url: "https://csvzen.outils.ch", cat: "Données", tags: ["csv", "doublons", "nettoyer", "tableur", "data"], from: "#10b981", to: "#22d3ee" },
   { slug: "dataflip", name: "dataflip", tagline: "Convertisseur JSON ⇄ CSV ⇄ Excel", url: "https://dataflip.outils.ch", cat: "Données", tags: ["json", "csv", "excel", "convertir", "data"], from: "#6366f1", to: "#a855f7" },
@@ -96,7 +97,7 @@ export const toolsByCat = (cat: string): Tool[] => TOOLS.filter((t) => t.cat ===
  * Outils « pro » suisses : réglementés, à livrable officiel, défendables face à l'IA.
  * Cœur de la stratégie de revenu (SaaS / leads B2B). Ordre = priorité, facturama en tête.
  */
-export const PRO_SLUGS = ["facturama", "rento", "legato", "budgeto", "lamalo", "salaro", "resilio", "alloco", "tvaflash", "ibano", "capimmo", "avso", "prorato", "teleco", "lettro"];
+export const PRO_SLUGS = ["facturama", "rento", "legato", "budgeto", "lamalo", "salaro", "resilio", "alloco", "intero", "tvaflash", "ibano", "capimmo", "avso", "prorato", "teleco", "lettro"];
 export const proTools = (): Tool[] => PRO_SLUGS.map((s) => bySlug(s)).filter(Boolean) as Tool[];
 export const isPro = (slug: string): boolean => PRO_SLUGS.includes(slug);
 

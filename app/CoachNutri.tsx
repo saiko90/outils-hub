@@ -143,10 +143,11 @@ function Avo({ state, size = 120 }: { state: AvoState; size?: number }) {
 }
 
 /* ---------------- Coach ---------------- */
-export default function CoachNutri({ ctx }: { ctx: CoachCtx }) {
+export default function CoachNutri({ ctx, isPro: proProp, onGoPro }: { ctx: CoachCtx; isPro?: boolean; onGoPro?: () => void }) {
   const lang = ctx.lang;
   const t = L[lang] ?? L.fr;
-  const [isPro, setIsPro] = useState(false);
+  const [localPro, setLocalPro] = useState(false);
+  const isPro = proProp ?? localPro;
   const [ready, setReady] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -167,7 +168,7 @@ export default function CoachNutri({ ctx }: { ctx: CoachCtx }) {
     } catch {
       /* ignore */
     }
-    setIsPro(pro);
+    setLocalPro(pro);
     setUsed(readUsage().count);
     setReady(true);
   }, []);
@@ -233,7 +234,7 @@ export default function CoachNutri({ ctx }: { ctx: CoachCtx }) {
           <ul className="cn-feats">
             {t.feats.map((f) => <li key={f}><span>✓</span>{f}</li>)}
           </ul>
-          <button className="cn-cta" disabled title={t.soon}>{t.cta} · {t.soon}</button>
+          <button className="cn-cta" onClick={onGoPro}>{t.cta}</button>
         </div>
       </section>
     );
@@ -324,7 +325,7 @@ const CSS = `
 .cn-feats{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:7px}
 .cn-feats li{display:flex;gap:9px;align-items:flex-start;font-size:.9rem;color:#d5d9ec}
 .cn-feats li span{color:#a3e635;font-weight:800;flex:none}
-.cn-cta{background:linear-gradient(135deg,#22c55e,#84cc16);color:#05210f;border:0;border-radius:11px;padding:12px 20px;font-weight:800;font-size:.95rem;cursor:not-allowed;opacity:.85}
+.cn-cta{background:linear-gradient(135deg,#22c55e,#84cc16);color:#05210f;border:0;border-radius:11px;padding:12px 20px;font-weight:800;font-size:.95rem;cursor:pointer}
 /* chat */
 .cn-head{display:flex;align-items:center;gap:12px;padding:10px 4px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
 .cn-name{font-weight:800;font-size:1rem}

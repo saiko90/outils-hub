@@ -18,6 +18,8 @@ import {
   tendancePoids,
 } from "@/lib/calorio";
 import CoachNutri, { type CoachCtx } from "./CoachNutri";
+import { getSupabase } from "@/lib/supabaseClient";
+import type { User } from "@supabase/supabase-js";
 
 /* ---------------- i18n ---------------- */
 const L = {
@@ -52,6 +54,10 @@ const L = {
     photoErr: "Souci d'analyse. Réessaie.", notReadyShort: "Analyse pas encore activée.",
     photoLock: "L'analyse photo est réservée au Pro. Prends ton assiette en photo, Avo estime les calories.",
     estim: "estimé",
+    syncBtn: "Synchroniser mes données", synced: "Synchronisé", logout: "Déconnexion",
+    authTitle: "Retrouve tes données sur tous tes appareils", authSub: "Crée un compte gratuit — ton journal, ton poids et ton profil te suivent sur téléphone et ordinateur.",
+    google: "Continuer avec Google", or: "ou", emailPh: "ton@email.ch", magic: "Recevoir un lien de connexion",
+    authSent: "📩 Regarde tes e-mails : clique sur le lien pour te connecter.", authErr: "Souci de connexion, réessaie.", cloudOn: "☁️ Données synchronisées sur ton compte.",
     // poids
     poidsAuj: "Ton poids aujourd'hui", enregistrer: "Enregistrer",
     depart: "Départ", actuel: "Actuel", variation: "Variation",
@@ -90,6 +96,10 @@ const L = {
     photoErr: "Analyse-Problem. Nochmal versuchen.", notReadyShort: "Analyse noch nicht aktiviert.",
     photoLock: "Die Foto-Analyse ist Pro. Fotografiere deinen Teller, Avo schätzt die Kalorien.",
     estim: "geschätzt",
+    syncBtn: "Daten synchronisieren", synced: "Synchronisiert", logout: "Abmelden",
+    authTitle: "Deine Daten auf allen Geräten", authSub: "Erstelle ein kostenloses Konto — Journal, Gewicht und Profil folgen dir auf Handy und Computer.",
+    google: "Mit Google fortfahren", or: "oder", emailPh: "dein@email.ch", magic: "Login-Link erhalten",
+    authSent: "📩 Schau in deine E-Mails: klicke auf den Link zum Anmelden.", authErr: "Verbindungsproblem, nochmal versuchen.", cloudOn: "☁️ Daten mit deinem Konto synchronisiert.",
     poidsAuj: "Dein Gewicht heute", enregistrer: "Speichern",
     depart: "Start", actuel: "Aktuell", variation: "Veränderung",
     pasPesee: "Erfasse dein Gewicht regelmässig, um deine Kurve und deinen Fortschritt zu sehen.",
@@ -127,6 +137,10 @@ const L = {
     photoErr: "Analysis issue. Try again.", notReadyShort: "Analysis not activated yet.",
     photoLock: "Photo analysis is Pro. Snap your plate, Avo estimates the calories.",
     estim: "est.",
+    syncBtn: "Sync my data", synced: "Synced", logout: "Sign out",
+    authTitle: "Your data on every device", authSub: "Create a free account — your log, weight and profile follow you on phone and computer.",
+    google: "Continue with Google", or: "or", emailPh: "you@email.com", magic: "Get a sign-in link",
+    authSent: "📩 Check your inbox: click the link to sign in.", authErr: "Connection issue, try again.", cloudOn: "☁️ Data synced to your account.",
     poidsAuj: "Your weight today", enregistrer: "Save",
     depart: "Start", actuel: "Current", variation: "Change",
     pasPesee: "Log your weight regularly to see your curve and track your progress.",
@@ -243,6 +257,12 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
   const [photoItems, setPhotoItems] = useState<Food[] | null>(null);
   const [photoMsg, setPhotoMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  // Comptes + synchro
+  const [user, setUser] = useState<User | null>(null);
+  const [proDb, setProDb] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authEmail, setAuthEmail] = useState("");
+  const [authMsg, setAuthMsg] = useState("");
 
   const day = todayISO();
 
@@ -287,6 +307,91 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
     if (!mounted) return;
     save("calorio.pesees", pesees);
   }, [mounted, pesees]);
+
+  // --- Comptes + synchro cloud (Supabase) ---
+  const applyProfil = (p: Record<string, unknown> | null) => {
+    if (!p) return;
+    if (p.sexe) setSexe(p.sexe as Sexe);
+    if (typeof p.age === "number") setAge(p.age);
+    if (typeof p.poids === "number") setPoids(p.poids);
+    if (typeof p.taille === "number") setTaille(p.taille);
+    if (p.activite) setActivite(p.activite as Activite);
+    if (p.objectif) setObjectif(p.objectif as Objectif);
+  };
+
+  const pullFromCloud = async (uid: string) => {
+    const supa = getSupabase();
+    if (!supa) return;
+    try {
+      const { data } = await supa.from("calorio_users").select("profil,journal,pesees").eq("id", uid).maybeSingle();
+      if (data) {
+        applyProfil((data.profil as Record<string, unknown>) || null);
+        if (data.journal) { save("calorio.journal", data.journal); setLines(migrateLines((data.journal as Record<string, unknown[]>)[todayISO()], lang)); }
+        if (Array.isArray(data.pesees)) setPesees(data.pesees as Pesee[]);
+        setAuthMsg("");
+      } else {
+        // Première connexion : on pousse les données locales vers le cloud.
+        await supa.from("calorio_users").upsert({
+          id: uid,
+          profil: load("calorio.profil", {}),
+          journal: load("calorio.journal", {}),
+          pesees: load<Pesee[]>("calorio.pesees", []),
+          updated_at: new Date().toISOString(),
+        });
+      }
+      const { data: pro } = await supa.from("calorio_pro").select("is_pro,pro_until").eq("id", uid).maybeSingle();
+      const active = !!pro?.is_pro && (!pro.pro_until || new Date(pro.pro_until as string) > new Date());
+      setProDb(active);
+    } catch {
+      /* réseau : on reste en local */
+    }
+  };
+
+  useEffect(() => {
+    const supa = getSupabase();
+    if (!supa) return;
+    supa.auth.getSession().then(({ data }) => {
+      if (data.session?.user) { setUser(data.session.user); pullFromCloud(data.session.user.id); }
+    });
+    const { data: sub } = supa.auth.onAuthStateChange((_e, session) => {
+      if (session?.user) { setUser(session.user); setAuthOpen(false); pullFromCloud(session.user.id); }
+      else { setUser(null); setProDb(false); }
+    });
+    return () => sub.subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Push cloud (debounce) quand connecté et que les données changent.
+  useEffect(() => {
+    if (!mounted || !user) return;
+    const supa = getSupabase();
+    if (!supa) return;
+    const id = setTimeout(() => {
+      supa.from("calorio_users").upsert({
+        id: user.id,
+        profil: { sexe, age, poids, taille, activite, objectif },
+        journal: load("calorio.journal", {}),
+        pesees,
+        updated_at: new Date().toISOString(),
+      }).then(() => {});
+    }, 1400);
+    return () => clearTimeout(id);
+  }, [mounted, user, sexe, age, poids, taille, activite, objectif, pesees, lines]);
+
+  const signInGoogle = () => {
+    getSupabase()?.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.href.split("?")[0] } });
+  };
+  const signInEmail = async () => {
+    const email = authEmail.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { setAuthMsg(t.authErr); return; }
+    const supa = getSupabase();
+    if (!supa) return;
+    const { error } = await supa.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href.split("?")[0] } });
+    setAuthMsg(error ? t.authErr : t.authSent);
+  };
+  const signOut = async () => { await getSupabase()?.auth.signOut(); setUser(null); setProDb(false); };
+
+  const proActive = isPro || proDb;
 
   const besoins = useMemo(
     () => computeBesoins({ sexe, age, poids, taille, activite, objectif }),
@@ -415,7 +520,7 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
 
   // --- Photo → calories (Pro) ---
   const onPhoto = async (file: File) => {
-    if (!isPro) return;
+    if (!proActive) return;
     setPhotoMsg(""); setPhotoItems(null); setPhotoBusy(true);
     try {
       const { base64, mime } = await downscale(file, 1024);
@@ -451,6 +556,33 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
   return (
     <section className="cl" id="calorio">
       <style>{CSS}</style>
+
+      <div className="cl-account">
+        {user ? (
+          <div className="cl-acc-in">
+            <span className="cl-acc-mail">☁️ {t.synced}{proDb && <span className="cl-acc-pro">Pro</span>} · {user.email}</span>
+            <button className="cl-acc-out" onClick={signOut}>{t.logout}</button>
+          </div>
+        ) : (
+          <button className="cl-acc-btn" onClick={() => setAuthOpen((v) => !v)}>☁️ {t.syncBtn}</button>
+        )}
+        {authOpen && !user && (
+          <div className="cl-authpanel">
+            <div className="cl-auth-h">{t.authTitle}</div>
+            <p className="cl-auth-s">{t.authSub}</p>
+            <button className="cl-auth-g" onClick={signInGoogle}>
+              <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.1 0 24 0 14.6 0 6.4 5.4 2.5 13.3l7.8 6.1C12.2 13.2 17.6 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.1 5.3-4.6 7l7.1 5.5c4.2-3.9 6.6-9.6 6.6-16z"/><path fill="#FBBC05" d="M10.3 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6l-7.8-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.5 10.7l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.1 0 11.3-2 15-5.5l-7.1-5.5c-2 1.3-4.6 2.1-7.9 2.1-6.4 0-11.8-3.7-13.7-9.4l-7.8 6.1C6.4 42.6 14.6 48 24 48z"/></svg>
+              {t.google}
+            </button>
+            <div className="cl-auth-or"><span>{t.or}</span></div>
+            <div className="cl-auth-email">
+              <input type="email" placeholder={t.emailPh} value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") signInEmail(); }} />
+              <button onClick={signInEmail}>{t.magic}</button>
+            </div>
+            {authMsg && <p className="cl-auth-msg">{authMsg}</p>}
+          </div>
+        )}
+      </div>
 
       <div className="cl-tabs" role="tablist">
         {(["besoins", "journal", "poids", "coach"] as const).map((k) => (
@@ -546,7 +678,7 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
           {/* Actions : scan code-barres + photo */}
           <div className="cl-actions">
             <button className="cl-act" onClick={startScan}><span aria-hidden>📷</span> {t.scan}</button>
-            {isPro ? (
+            {proActive ? (
               <button className="cl-act pro" onClick={() => fileRef.current?.click()} disabled={photoBusy}>
                 <span aria-hidden>🍽️</span> {photoBusy ? t.photoAnalyzing : t.photoPro}
               </button>
@@ -669,7 +801,7 @@ export default function CalorioCalc({ lang }: { lang: Lang }) {
       )}
 
       {/* ---------- COACH ---------- */}
-      {tab === "coach" && <CoachNutri ctx={coachCtx} />}
+      {tab === "coach" && <CoachNutri ctx={coachCtx} isPro={proActive} onGoPro={() => setAuthOpen(true)} />}
 
       {tab !== "coach" && <p className="cl-memo">🔒 {t.memo}</p>}
       {tab !== "coach" && <p className="cl-disclaimer">⚠︎ {t.disclaimer}</p>}
@@ -827,6 +959,24 @@ function deltaColor(delta: number, objectif: Objectif): string {
 /* ---------------- styles ---------------- */
 const CSS = `
 .cl{margin:22px 0 8px;color:#e6e9f5}
+/* compte + synchro */
+.cl-account{margin-bottom:12px}
+.cl-acc-btn{width:100%;padding:11px;border-radius:12px;border:1px dashed rgba(34,197,94,.4);background:rgba(34,197,94,.06);color:#a3e635;font-size:.88rem;font-weight:700;cursor:pointer}
+.cl-acc-in{display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:12px;padding:9px 14px;flex-wrap:wrap}
+.cl-acc-mail{font-size:.85rem;color:#c3c8e2}
+.cl-acc-pro{margin:0 6px;font-size:.66rem;font-weight:800;color:#05210f;background:#a3e635;border-radius:99px;padding:2px 8px;text-transform:uppercase}
+.cl-acc-out{background:none;border:1px solid rgba(255,255,255,.15);color:#aeb4d6;border-radius:8px;padding:6px 12px;font-size:.8rem;cursor:pointer}
+.cl-authpanel{margin-top:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:18px}
+.cl-auth-h{font-weight:800;font-size:1.05rem}
+.cl-auth-s{margin:6px 0 14px;font-size:.88rem;color:#c3c8e2;line-height:1.5}
+.cl-auth-g{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#1f1f1f;border:0;border-radius:11px;padding:12px;font-size:.92rem;font-weight:700;cursor:pointer}
+.cl-auth-or{display:flex;align-items:center;text-align:center;color:#8b93b7;font-size:.8rem;margin:14px 0}
+.cl-auth-or::before,.cl-auth-or::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.1)}
+.cl-auth-or span{padding:0 12px}
+.cl-auth-email{display:flex;gap:8px;flex-wrap:wrap}
+.cl-auth-email input{flex:1;min-width:150px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#f5f6fb;padding:11px 13px;font-size:.9rem}
+.cl-auth-email button{background:linear-gradient(135deg,#22c55e,#84cc16);color:#05210f;border:0;border-radius:10px;padding:11px 16px;font-weight:800;font-size:.85rem;cursor:pointer;white-space:nowrap}
+.cl-auth-msg{margin:12px 0 0;font-size:.85rem;color:#a3e635}
 .cl-tabs{display:flex;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:5px;margin-bottom:18px;flex-wrap:wrap}
 .cl-tab{flex:1;min-width:110px;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:#aeb4d6;font-size:.9rem;font-weight:700;cursor:pointer;transition:.15s}
 .cl-tab.on{background:linear-gradient(135deg,${ACCENT},${ACCENT2});color:#05210f;box-shadow:0 6px 18px rgba(34,197,94,.25)}

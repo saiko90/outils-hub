@@ -64,7 +64,7 @@ const L = {
     tousAliments: "Tout",
     scan: "Scanner un code-barres", photo: "Analyser une photo", photoPro: "Photo → calories",
     rechercherBig: "Rechercher un produit (Migros, Coop, marques…)",
-    offTitle: "Produits trouvés en ligne", offLoading: "Recherche…", quickTitle: "Accès rapide",
+    offTitle: "Produits trouvés en ligne", offLoading: "Recherche…", quickTitle: "Accès rapide", recentTitle: "Récents",
     scanUnsupported: "Le scan n'est pas supporté par ce navigateur — utilise la recherche.",
     scanDenied: "Accès caméra refusé.", scanSearching: "Recherche du produit…", scanNotFound: "Produit introuvable dans la base.",
     scanTitle: "Vise le code-barres", scanClose: "Fermer",
@@ -142,7 +142,7 @@ const L = {
     tousAliments: "Alle",
     scan: "Barcode scannen", photo: "Foto analysieren", photoPro: "Foto → Kalorien",
     rechercherBig: "Produkt suchen (Migros, Coop, Marken…)",
-    offTitle: "Online gefundene Produkte", offLoading: "Suche…", quickTitle: "Schnellzugriff",
+    offTitle: "Online gefundene Produkte", offLoading: "Suche…", quickTitle: "Schnellzugriff", recentTitle: "Kürzlich",
     scanUnsupported: "Scan wird von diesem Browser nicht unterstützt — nutze die Suche.",
     scanDenied: "Kamerazugriff verweigert.", scanSearching: "Produkt wird gesucht…", scanNotFound: "Produkt nicht in der Datenbank gefunden.",
     scanTitle: "Barcode anvisieren", scanClose: "Schliessen",
@@ -219,7 +219,7 @@ const L = {
     tousAliments: "All",
     scan: "Scan a barcode", photo: "Analyse a photo", photoPro: "Photo → calories",
     rechercherBig: "Search a product (Migros, Coop, brands…)",
-    offTitle: "Products found online", offLoading: "Searching…", quickTitle: "Quick access",
+    offTitle: "Products found online", offLoading: "Searching…", quickTitle: "Quick access", recentTitle: "Recent",
     scanUnsupported: "Scanning isn't supported by this browser — use search.",
     scanDenied: "Camera access denied.", scanSearching: "Looking up product…", scanNotFound: "Product not found in the database.",
     scanTitle: "Aim at the barcode", scanClose: "Close",
@@ -362,6 +362,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
   // journal (par date) + poids
   const [lines, setLines] = useState<Line[]>([]);
+  const [recents, setRecents] = useState<Food[]>([]);
   const [pesees, setPesees] = useState<Pesee[]>([]);
   const [poidsInput, setPoidsInput] = useState<number | "">("");
   const [q, setQ] = useState("");
@@ -405,6 +406,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const jour = load<Record<string, Line[]>>("calorio.journal", {});
     setLines(migrateLines(jour[day], lang));
     setPesees(load<Pesee[]>("calorio.pesees", []));
+    setRecents(load<Food[]>("calorio.recents", []));
     setPoidsInput("");
     try {
       const url = new URL(window.location.href);
@@ -697,6 +699,13 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
   const addFood = (food: Food) => {
     setLines((prev) => [...prev, { key: newKey(), food, grammes: food.portion || 100 }]);
+    // Mémorise l'aliment dans les récents (dédup nom+marque, 12 max) pour un ré-ajout en un tap.
+    setRecents((prev) => {
+      const sig = (f: Food) => `${f.nom}|${f.brand || ""}`.toLowerCase();
+      const next = [food, ...prev.filter((f) => sig(f) !== sig(food))].slice(0, 12);
+      save("calorio.recents", next);
+      return next;
+    });
   };
   const setGrammes = (key: string, g: number) =>
     setLines((prev) => prev.map((l) => (l.key === key ? { ...l, grammes: Math.max(0, g) } : l)));
@@ -1008,6 +1017,21 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
           <div className="cl-picker">
             <input className="cl-search" placeholder={t.rechercherBig} value={q} onChange={(e) => setQ(e.target.value)} />
+
+            {q.trim().length < 2 && recents.length > 0 && (
+              <div className="cl-recents">
+                <div className="cl-secth">🕘 {t.recentTitle}</div>
+                <div className="cl-foods">
+                  {recents.map((f, i) => (
+                    <button key={`${f.nom}-${i}`} className="cl-food" onClick={() => addFood(f)}>
+                      <span className="cl-fem">{f.emoji}</span>
+                      <span className="cl-fn">{f.nom}{f.brand ? <small> · {f.brand}</small> : null}</span>
+                      <span className="cl-fk">{f.kcal} kcal<small>/100 g</small></span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {q.trim().length >= 2 && (
               <div className="cl-offblock">

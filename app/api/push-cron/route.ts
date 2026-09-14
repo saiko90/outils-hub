@@ -32,7 +32,7 @@ export async function GET(req: Request) {
     return new Response(JSON.stringify({ error: "bad_job" }), { status: 400 });
   }
 
-  const SB = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const SB = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://srcvnqfgtazupuzwznrr.supabase.co";
   const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const VPUB = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || VAPID_PUBLIC_KEY;
   const VPRIV = process.env.VAPID_PRIVATE_KEY;

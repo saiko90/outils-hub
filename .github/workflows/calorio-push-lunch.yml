@@ -1,5 +1,5 @@
-name: calorio push · midi
-# Rappel de midi (~12:30 heure suisse en été). N'envoie que si rien n'est noté aujourd'hui (géré côté serveur).
+name: calorio push midi
+# Rappel de midi (~12:30 heure suisse en ete). N'envoie que si rien n'est note aujourd'hui (gere cote serveur).
 on:
   schedule:
     - cron: "30 10 * * *"
@@ -8,4 +8,6 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - run: curl -fsS -X GET -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "https://outils.ch/api/push-cron?job=lunch"
+      - name: Declencher le rappel midi
+        run: |
+          curl -fsS -X GET -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "https://outils.ch/api/push-cron?job=lunch"

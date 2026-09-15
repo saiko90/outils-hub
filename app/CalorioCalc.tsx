@@ -836,7 +836,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   if (!mounted) {
     return (
       <section className="cl" id="calorio">
-        <style>{CSS}</style>
+        <style dangerouslySetInnerHTML={{ __html: CSS }} />
         <div style={{ padding: "70px 20px", textAlign: "center" }}>
           <img src="/calorio-icon-192.png" alt="" width={56} height={56} style={{ borderRadius: 14, opacity: 0.95 }} />
           <p style={{ margin: "12px 0 0", fontWeight: 800, color: "#16a34a", fontSize: "1.1rem" }}>calorio</p>
@@ -847,7 +847,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
   return (
     <section className="cl" id="calorio">
-      <style>{CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
       <header className="cl-hero">
         <img className="cl-hero-logo" src="/calorio-icon-192.png" alt="" aria-hidden width={52} height={52} />

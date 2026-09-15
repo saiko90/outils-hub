@@ -34,21 +34,25 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   }
 
-  // 2) Choix du plan
+  // 2) Choix du plan + domaine de retour (calorio.ch reste sur calorio.ch)
   let plan = "yearly";
+  let base = SITE;
   try {
-    const body = (await req.json()) as { plan?: string };
+    const body = (await req.json()) as { plan?: string; origin?: string };
     if (body.plan === "monthly" || body.plan === "yearly") plan = body.plan;
+    const allowed = ["https://calorio.ch", "https://www.calorio.ch", "https://outils.ch"];
+    if (body.origin && allowed.includes(body.origin)) base = body.origin;
   } catch { /* défaut yearly */ }
   const price = plan === "monthly" ? priceMonthly : priceYearly;
+  const returnPath = base === SITE ? "/o/calorio" : "/";
 
   // 3) Créer la session Checkout (abonnement, essai 7 jours)
   const form = new URLSearchParams();
   form.set("mode", "subscription");
   form.set("line_items[0][price]", price);
   form.set("line_items[0][quantity]", "1");
-  form.set("success_url", `${SITE}/o/calorio?pro=success`);
-  form.set("cancel_url", `${SITE}/o/calorio`);
+  form.set("success_url", `${base}${returnPath}?pro=success`);
+  form.set("cancel_url", `${base}${returnPath}`);
   form.set("client_reference_id", uid);
   form.set("customer_email", email);
   form.set("subscription_data[trial_period_days]", "7");

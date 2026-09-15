@@ -76,6 +76,11 @@ const L = {
     estim: "estimé",
     syncBtn: "Synchroniser mes données", synced: "Synchronisé", logout: "Déconnexion",
     authTitle: "Retrouve tes données sur tous tes appareils", authSub: "Crée un compte gratuit — ton journal, ton poids et ton profil te suivent sur téléphone et ordinateur.",
+    inviteTitle: "Invite un ami, gagnez 1 mois Pro chacun", inviteSub: "Partage ton lien : dès qu'un ami crée son compte calorio avec, vous recevez tous les deux 1 mois de Pro offert (coach IA + photo).",
+    copyLink: "Copier", copied2: "Copié ✓", shareInvite: "Partager mon lien",
+    inviteCount: (n: number) => (n === 0 ? "Aucun ami parrainé pour l'instant" : `${n} ami${n > 1 ? "s" : ""} parrainé${n > 1 ? "s" : ""} 🎉`),
+    shareText: "J'utilise calorio pour suivre mes calories — simple et suisse. Rejoins-moi, on gagne chacun 1 mois Pro 🥕",
+    refClaimed: "🎉 1 mois Pro offert à toi et à ton ami ! Bienvenue.",
     google: "Continuer avec Google", or: "ou", emailPh: "ton@email.ch", magic: "Recevoir un lien de connexion",
     authSent: "📩 Regarde tes e-mails : clique sur le lien pour te connecter.", authErr: "Souci de connexion, réessaie.", cloudOn: "☁️ Données synchronisées sur ton compte.",
     proTitle: "Passe en calorio Pro", proSub: "Débloque Vito, ton coach nutrition IA, et l'analyse de tes repas en photo.",
@@ -157,6 +162,11 @@ const L = {
     estim: "geschätzt",
     syncBtn: "Daten synchronisieren", synced: "Synchronisiert", logout: "Abmelden",
     authTitle: "Deine Daten auf allen Geräten", authSub: "Erstelle ein kostenloses Konto — Journal, Gewicht und Profil folgen dir auf Handy und Computer.",
+    inviteTitle: "Lade eine Freundin ein, je 1 Monat Pro gratis", inviteSub: "Teile deinen Link: Sobald jemand mit ihm ein calorio-Konto erstellt, erhaltet ihr beide 1 Monat Pro gratis (KI-Coach + Foto).",
+    copyLink: "Kopieren", copied2: "Kopiert ✓", shareInvite: "Link teilen",
+    inviteCount: (n: number) => (n === 0 ? "Noch niemand geworben" : `${n} Freund${n > 1 ? "e" : ""} geworben 🎉`),
+    shareText: "Ich tracke meine Kalorien mit calorio — einfach und schweizerisch. Mach mit, wir bekommen je 1 Monat Pro 🥕",
+    refClaimed: "🎉 1 Monat Pro gratis für dich und deine Freundin! Willkommen.",
     google: "Mit Google fortfahren", or: "oder", emailPh: "dein@email.ch", magic: "Login-Link erhalten",
     authSent: "📩 Schau in deine E-Mails: klicke auf den Link zum Anmelden.", authErr: "Verbindungsproblem, nochmal versuchen.", cloudOn: "☁️ Daten mit deinem Konto synchronisiert.",
     proTitle: "Werde calorio Pro", proSub: "Schalte Vito frei, deinen KI-Ernährungscoach, und die Foto-Analyse deiner Mahlzeiten.",
@@ -237,6 +247,11 @@ const L = {
     estim: "est.",
     syncBtn: "Sync my data", synced: "Synced", logout: "Sign out",
     authTitle: "Your data on every device", authSub: "Create a free account — your log, weight and profile follow you on phone and computer.",
+    inviteTitle: "Invite a friend, get 1 month Pro each", inviteSub: "Share your link: as soon as a friend creates a calorio account with it, you both get 1 month of Pro free (AI coach + photo).",
+    copyLink: "Copy", copied2: "Copied ✓", shareInvite: "Share my link",
+    inviteCount: (n: number) => (n === 0 ? "No friends referred yet" : `${n} friend${n > 1 ? "s" : ""} referred 🎉`),
+    shareText: "I use calorio to track my calories — simple and Swiss. Join me and we each get 1 month Pro 🥕",
+    refClaimed: "🎉 1 month of Pro for you and your friend! Welcome.",
     google: "Continue with Google", or: "or", emailPh: "you@email.com", magic: "Get a sign-in link",
     authSent: "📩 Check your inbox: click the link to sign in.", authErr: "Connection issue, try again.", cloudOn: "☁️ Data synced to your account.",
     proTitle: "Go calorio Pro", proSub: "Unlock Vito, your AI nutrition coach, and photo analysis of your meals.",
@@ -402,6 +417,11 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [authMsg, setAuthMsg] = useState("");
   const [proOpen, setProOpen] = useState(false);
   const [checkoutMsg, setCheckoutMsg] = useState("");
+  // Parrainage (viralité)
+  const [refCode, setRefCode] = useState("");
+  const [refCount, setRefCount] = useState(0);
+  const [refMsg, setRefMsg] = useState("");
+  const [inviteCopied, setInviteCopied] = useState(false);
 
   const day = todayISO();
 
@@ -427,6 +447,11 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       setIsPro(localStorage.getItem("calorio.pro") === "1");
       const savedLang = localStorage.getItem("calorio.lang");
       if (savedLang === "fr" || savedLang === "de" || savedLang === "en") setLangOv(savedLang);
+      // Capture d'un code de parrainage présent dans l'URL (?ref=CODE) pour le réclamer à la connexion.
+      const ref = url.searchParams.get("ref");
+      if (ref && /^[A-Za-z0-9]{4,10}$/.test(ref) && !localStorage.getItem("calorio.ref")) {
+        localStorage.setItem("calorio.ref", ref.toUpperCase());
+      }
     } catch {
       /* ignore */
     }
@@ -535,6 +560,53 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Parrainage : à la connexion, réclame un code en attente (?ref) puis charge le lien d'invitation.
+  useEffect(() => {
+    if (!mounted || !user) return;
+    const supa = getSupabase();
+    if (!supa) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: sess } = await supa.auth.getSession();
+        const token = sess.session?.access_token;
+        if (!token) return;
+        const headers = { authorization: `Bearer ${token}`, "content-type": "application/json" };
+        let pending = "";
+        try { pending = localStorage.getItem("calorio.ref") || ""; } catch { /* ignore */ }
+        if (pending) {
+          const r = await fetch("/api/referral", { method: "POST", headers, body: JSON.stringify({ action: "claim", code: pending }) });
+          const d = (await r.json().catch(() => ({}))) as { ok?: boolean };
+          try { localStorage.removeItem("calorio.ref"); } catch { /* ignore */ }
+          if (r.ok && d.ok && !cancelled) {
+            setRefMsg(t.refClaimed);
+            const { data: pro } = await supa.from("calorio_pro").select("is_pro,pro_until").eq("id", user.id).maybeSingle();
+            if (!cancelled) setProDb(!!pro?.is_pro && (!pro.pro_until || new Date(pro.pro_until as string) > new Date()));
+          }
+        }
+        const m = await fetch("/api/referral", { method: "POST", headers, body: JSON.stringify({ action: "mine" }) });
+        const md = (await m.json().catch(() => ({}))) as { code?: string; count?: number };
+        if (!cancelled && md.code) { setRefCode(md.code); setRefCount(md.count || 0); }
+      } catch { /* ignore */ }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, user]);
+
+  const inviteLink = refCode ? `https://calorio.ch/?ref=${refCode}` : "";
+  const copyInvite = async () => {
+    if (!inviteLink) return;
+    try { await navigator.clipboard.writeText(inviteLink); setInviteCopied(true); setTimeout(() => setInviteCopied(false), 1800); } catch { /* ignore */ }
+  };
+  const shareInvite = async () => {
+    if (!inviteLink) return;
+    const nav = navigator as Navigator & { share?: (d: { title?: string; text?: string; url?: string }) => Promise<void> };
+    if (nav.share) {
+      try { await nav.share({ title: "calorio", text: t.shareText, url: inviteLink }); return; } catch { /* annulé */ }
+    }
+    copyInvite();
+  };
+
   // Push cloud (debounce) quand connecté et que les données changent.
   useEffect(() => {
     if (!mounted || !user) return;
@@ -581,7 +653,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       const r = await fetch("/api/checkout", {
         method: "POST",
         headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, origin: window.location.origin }),
       });
       const j = (await r.json()) as { url?: string };
       if (j.url) { window.location.href = j.url; return; }
@@ -913,6 +985,21 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
           <button className="cl-acc-btn" onClick={() => setAuthOpen((v) => !v)}>☁️ {t.syncBtn}</button>
         )}
         {checkoutMsg && checkoutMsg !== "…" && !proOpen && <p className="cl-success">{checkoutMsg}</p>}
+        {user && refCode && (
+          <div className="cl-invite">
+            <div className="cl-inv-h">🎁 {t.inviteTitle}</div>
+            <p className="cl-inv-s">{t.inviteSub}</p>
+            <div className="cl-inv-row">
+              <input className="cl-inv-link" readOnly value={inviteLink} onFocus={(e) => e.currentTarget.select()} aria-label={t.inviteTitle} />
+              <button className="cl-inv-copy" onClick={copyInvite}>{inviteCopied ? t.copied2 : t.copyLink}</button>
+            </div>
+            <div className="cl-inv-foot">
+              <button className="cl-inv-share" onClick={shareInvite}>📣 {t.shareInvite}</button>
+              <span className="cl-inv-count">{t.inviteCount(refCount)}</span>
+            </div>
+            {refMsg && <p className="cl-inv-msg">{refMsg}</p>}
+          </div>
+        )}
         {authOpen && !user && (
           <div className="cl-authpanel">
             <div className="cl-auth-h">{t.authTitle}</div>
@@ -1505,6 +1592,19 @@ const CSS = `
 .cl-auth-email button{background:var(--btn);color:#fff;border:0;border-radius:11px;padding:12px 16px;font-weight:800;font-size:.85rem;cursor:pointer;white-space:nowrap}
 .cl-auth-msg{margin:12px 0 0;font-size:.85rem;color:var(--green);font-weight:600}
 .cl-success{margin:10px 0 0;padding:12px 15px;background:var(--greenbg);border:1px solid #cdebd7;border-radius:12px;color:#0f7a3d;font-size:.9rem;font-weight:600}
+/* parrainage (invitation) */
+.cl-invite{margin-top:10px;background:linear-gradient(135deg,#fff6fa,#fdecf1);border:1px solid var(--roseline);border-radius:16px;padding:16px 17px;box-shadow:0 6px 20px -14px rgba(239,74,106,.45)}
+.cl-inv-h{font-weight:800;font-size:1rem;color:var(--ink)}
+.cl-inv-s{margin:5px 0 12px;font-size:.86rem;line-height:1.5;color:#6b5560}
+.cl-inv-row{display:flex;gap:8px;flex-wrap:wrap}
+.cl-inv-link{flex:1;min-width:150px;background:#fff;border:1.5px solid var(--roseline);border-radius:11px;color:#7a3550;padding:11px 13px;font-size:.85rem;font-weight:600}
+.cl-inv-copy{flex:none;background:var(--rose);color:#fff;border:0;border-radius:11px;padding:11px 16px;font-size:.85rem;font-weight:800;cursor:pointer}
+.cl-inv-copy:hover{background:#e23a5c}
+.cl-inv-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:11px;flex-wrap:wrap}
+.cl-inv-share{background:#fff;border:1.5px solid var(--roseline);color:var(--rose);border-radius:11px;padding:9px 15px;font-size:.85rem;font-weight:800;cursor:pointer}
+.cl-inv-share:hover{background:#fff0f5}
+.cl-inv-count{font-size:.82rem;color:#8a6b74;font-weight:600}
+.cl-inv-msg{margin:11px 0 0;padding:10px 13px;background:var(--greenbg);border:1px solid #cdebd7;border-radius:11px;color:#0f7a3d;font-size:.86rem;font-weight:700}
 /* modale Pro */
 .cl-promodal{width:min(94vw,420px);background:#fff;border:1px solid var(--line);border-radius:22px;padding:26px;text-align:center;box-shadow:0 30px 70px -20px rgba(20,40,80,.4)}
 .cl-pro-h{font-size:1.45rem;font-weight:800;color:var(--ink)}

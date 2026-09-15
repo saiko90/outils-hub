@@ -1442,7 +1442,7 @@ function deltaColor(delta: number, objectif: Objectif): string {
 
 /* ---------------- styles ---------------- */
 const CSS = `
-.cl{margin:14px 0 8px;color:#2b3243;--ink:#232a37;--muted:#6b7280;--soft:#9aa2b4;--line:#e7ebf2;--green:#16a34a;--greenbg:#e9f8ee;--red:#ef4457;--redbg:#fdeef1;--btn:linear-gradient(135deg,#34d17f,#16a34a)}
+.cl{margin:14px 0 8px;color:#2b3243;--ink:#232a37;--muted:#6b7280;--soft:#9aa2b4;--line:#e7ebf2;--green:#16a34a;--greenbg:#e9f8ee;--red:#ef4457;--redbg:#fdeef1;--rose:#ef4a6a;--rosebg:#fdecf1;--roseline:#f6cdd9;--btn:linear-gradient(135deg,#34d17f,#16a34a)}
 .cl h3,.cl b{color:var(--ink)}
 /* compte + synchro */
 .cl-account{margin-bottom:14px}
@@ -1495,9 +1495,10 @@ const CSS = `
 .cl-navbtn.on .cl-navbadge{background:rgba(255,255,255,.32);color:#fff}
 @media(max-width:560px){.cl-nav{gap:6px}.cl-navbtn{padding:12px 3px;border-radius:14px}.cl-navi{font-size:1.35rem}.cl-navl{font-size:.72rem}}
 /* en-tête de section */
-.cl-sechead{display:flex;align-items:center;gap:14px;margin:22px 0 16px}
-.cl-sec-ic{flex:none;display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:15px;font-size:1.55rem;background:var(--greenbg);border:1px solid #cdebd7}
+.cl-sechead{display:flex;align-items:center;gap:14px;margin:22px 0 16px;padding-bottom:15px;border-bottom:1px solid var(--roseline)}
+.cl-sec-ic{flex:none;display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:15px;font-size:1.55rem;background:var(--rosebg);border:1px solid var(--roseline);box-shadow:0 4px 12px -6px rgba(239,74,106,.35)}
 .cl-sechead h3{margin:0;font-size:1.3rem;font-weight:800;letter-spacing:-.3px}
+.cl-sechead h3::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--rose);margin-left:7px;vertical-align:middle}
 .cl-sechead p{margin:2px 0 0;font-size:.9rem;color:var(--muted);line-height:1.4}
 /* FAQ */
 .cl-faq{display:flex;flex-direction:column;gap:10px}
@@ -1548,10 +1549,11 @@ const CSS = `
 .cl-stl{font-size:.78rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
 .cl-stv{font-size:2rem;font-weight:800;letter-spacing:-1px;line-height:1.1;margin-top:2px;color:var(--ink)}
 .cl-stat.big .cl-stv{font-size:2.7rem;color:var(--green)}
-.cl-stv span{font-size:.9rem;font-weight:600;color:var(--muted)}
+.cl-stv span{font-size:.9rem;font-weight:700;color:var(--rose)}
 .cl-sts{font-size:.78rem;color:var(--muted);margin-top:2px}
 .cl-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:16px;box-shadow:0 4px 16px -10px rgba(20,40,80,.1)}
-.cl-cardh{font-size:.95rem;font-weight:800;color:var(--ink);margin-bottom:10px}
+.cl-cardh{display:flex;align-items:center;gap:8px;font-size:.95rem;font-weight:800;color:var(--ink);margin-bottom:10px}
+.cl-cardh::before{content:"";width:9px;height:9px;border-radius:3px;background:var(--rose);flex:none;box-shadow:0 2px 5px -1px rgba(239,74,106,.5)}
 .cl-macrorow{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .cl-donut{width:140px;height:140px;flex:none}
 .cl-dcx{fill:#232a37;font-size:26px;font-weight:800}

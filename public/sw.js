@@ -6,7 +6,7 @@ self.addEventListener("push", (event) => {
   } catch (e) {
     data = { body: event.data ? event.data.text() : "" };
   }
-  const title = data.title || "calorio 🌱";
+  const title = data.title || "calorio 🥕";
   const options = {
     body: data.body || "",
     icon: "/calorio-icon-192.png",

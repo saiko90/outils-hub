@@ -100,6 +100,7 @@ export const catLabel = (lang: Lang, cat: string): string => CAT_LABEL[lang]?.[c
 /** Taglines traduites (DE). */
 export const TAGLINE_DE: Record<string, string> = {
   agendo: "Termin-Generator (.ics)",
+  schemo: "JSON-LD-Validator (Schema.org)",
   calorio: "Kalorien, Ernährungstagebuch & Gewichtsverlauf",
   facturama: "Schweizer QR-Rechnung, konform (ISO 20022 / SIX)",
   tvaflash: "Schweizer MWST-Abrechnung (8.1 / 2.6 / 3.8 %)",
@@ -150,6 +151,7 @@ export const TAGLINE_DE: Record<string, string> = {
 /** Taglines traduites (EN). */
 export const TAGLINE_EN: Record<string, string> = {
   agendo: "Calendar event generator (.ics)",
+  schemo: "JSON-LD validator (Schema.org)",
   calorio: "Calories, food diary & weight tracking",
   facturama: "Swiss QR-bill, compliant (ISO 20022 / SIX)",
   tvaflash: "Swiss VAT calculator (8.1 / 2.6 / 3.8%)",

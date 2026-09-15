@@ -1,8 +1,15 @@
 import type { MetadataRoute } from "next";
+import { headers } from "next/headers";
 import { TOOLS, REAL_CATEGORIES, CAT_SLUG } from "@/lib/catalog";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
+  // calorio.ch est un domaine/app distinct : son sitemap ne doit lister que ses
+  // propres URLs, pas celles d'outils.ch.
+  const host = (headers().get("host") || "outils.ch").toLowerCase();
+  if (host === "calorio.ch" || host === "www.calorio.ch") {
+    return [{ url: "https://calorio.ch/", lastModified: now, changeFrequency: "weekly", priority: 1 }];
+  }
   const B = "https://outils.ch";
   const home: MetadataRoute.Sitemap = [
     { url: B, lastModified: now, changeFrequency: "daily", priority: 1 },

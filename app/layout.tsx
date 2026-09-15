@@ -49,6 +49,13 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: "outils.ch — outils gratuits", description: "La boîte à outils suisse : recherche instantanée, 100 % navigateur." },
   robots: { index: true, follow: true },
   alternates: { canonical: "/" },
+  // Vérification moteurs de recherche (Search Console / Bing). On lit des variables
+  // d'env : GOOGLE_SITE_VERIFICATION (une ou plusieurs, séparées par des virgules —
+  // p.ex. jeton outils.ch + jeton calorio.ch) et BING_SITE_VERIFICATION. Vide = aucune balise.
+  verification: {
+    google: (process.env.GOOGLE_SITE_VERIFICATION || "").split(",").map((s) => s.trim()).filter(Boolean),
+    other: process.env.BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION.trim() } : {},
+  },
 };
 
 export const viewport: Viewport = {

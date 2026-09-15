@@ -830,6 +830,21 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   };
   const removePesee = (date: string) => setPesees((prev) => prev.filter((p) => p.date !== date));
 
+  // Rendu identique côté serveur et au 1er rendu client (mounted=false) → évite les erreurs
+  // d'hydratation (formatage Intl / valeurs issues du localStorage divergentes). L'app interactive
+  // ne s'affiche qu'après le montage, côté client.
+  if (!mounted) {
+    return (
+      <section className="cl" id="calorio">
+        <style>{CSS}</style>
+        <div style={{ padding: "70px 20px", textAlign: "center" }}>
+          <img src="/calorio-icon-192.png" alt="" width={56} height={56} style={{ borderRadius: 14, opacity: 0.95 }} />
+          <p style={{ margin: "12px 0 0", fontWeight: 800, color: "#16a34a", fontSize: "1.1rem" }}>calorio</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="cl" id="calorio">
       <style>{CSS}</style>

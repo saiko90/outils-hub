@@ -26,7 +26,10 @@ import type { User } from "@supabase/supabase-js";
 const L = {
   fr: {
     tabs: { besoins: "Mes besoins", journal: "Journal", poids: "Poids", coach: "Coach", aide: "Aide" },
-    tagline: "Ton compagnon calories & nutrition, simple et suisse.",
+    tagline: "Le suivi calories honnête : scan gratuit, zéro pub, tes données privées.",
+    valuesLabel: "Ce qui distingue calorio",
+    values: ["Scan code-barres gratuit", "Sans publicité", "Données privées", "Coach IA (Pro)"],
+    proCompare: "Le coaching nutrition IA que d'autres facturent ~200 $/an — ici à prix juste. Sans pub, données privées, résiliable en un clic.",
     intro: {
       besoins: "Réglons ton profil pour connaître tes calories cible chaque jour.",
       journal: "Note ce que tu manges — on compare en direct à ton objectif.",
@@ -113,7 +116,10 @@ const L = {
   },
   de: {
     tabs: { besoins: "Bedarf", journal: "Journal", poids: "Gewicht", coach: "Coach", aide: "Hilfe" },
-    tagline: "Dein Kalorien- & Ernährungsbegleiter, einfach und schweizerisch.",
+    tagline: "Der ehrliche Kalorienzähler: Gratis-Scan, keine Werbung, private Daten.",
+    valuesLabel: "Was calorio auszeichnet",
+    values: ["Gratis Barcode-Scan", "Keine Werbung", "Private Daten", "KI-Coach (Pro)"],
+    proCompare: "Das KI-Ernährungscoaching, das andere mit ~200 $/Jahr berechnen — hier fair. Keine Werbung, private Daten, jederzeit kündbar.",
     intro: {
       besoins: "Stell dein Profil ein, um deine täglichen Zielkalorien zu kennen.",
       journal: "Notiere, was du isst — wir vergleichen live mit deinem Ziel.",
@@ -198,7 +204,10 @@ const L = {
   },
   en: {
     tabs: { besoins: "My needs", journal: "Log", poids: "Weight", coach: "Coach", aide: "Help" },
-    tagline: "Your calorie & nutrition companion — simple and Swiss.",
+    tagline: "The honest calorie tracker: free scanning, no ads, your data stays private.",
+    valuesLabel: "What sets calorio apart",
+    values: ["Free barcode scanning", "No ads", "Private data", "AI coach (Pro)"],
+    proCompare: "The AI nutrition coaching others charge ~$200/yr for — here at a fair price. No ads, private data, cancel in one click.",
     intro: {
       besoins: "Set your profile to know your daily target calories.",
       journal: "Log what you eat — we compare it live to your goal.",
@@ -962,6 +971,10 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         )}
       </header>
 
+      <div className="cl-values" aria-label={t.valuesLabel}>
+        {t.values.map((v) => <span key={v} className="cl-val">✓ {v}</span>)}
+      </div>
+
       {samsungHint && !saDismissed && (
         <div className="cl-sahint">
           <div className="cl-sahint-top">
@@ -1308,6 +1321,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               </button>
             </div>
             <p className="cl-pro-trial">🎁 {t.trial}</p>
+            <p className="cl-pro-compare">{t.proCompare}</p>
             {checkoutMsg && checkoutMsg !== "…" && <p className="cl-scanmsg">{checkoutMsg}</p>}
             <button className="cl-pro-close" onClick={() => setProOpen(false)}>{t.close}</button>
           </div>
@@ -1624,6 +1638,9 @@ const CSS = `
 .cl-hero-logo{width:52px;height:52px;flex:none;border-radius:15px;box-shadow:0 6px 16px -6px rgba(22,120,60,.4)}
 .cl-hero-name{font-size:2rem;font-weight:800;letter-spacing:-.5px;color:var(--green)}
 .cl-hero-tag{margin:1px 0 0;font-size:.92rem;color:var(--muted);line-height:1.4}
+.cl-values{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 16px}
+.cl-val{display:inline-flex;align-items:center;gap:4px;font-size:.8rem;font-weight:700;color:#166a3a;background:var(--greenbg);border:1px solid #cdebd7;border-radius:99px;padding:5px 11px}
+.cl-pro-compare{margin:12px 0 0;font-size:.82rem;line-height:1.5;color:#6b7280}
 /* navigation (onglets bien visibles) */
 .cl-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:16px 0 4px}
 .cl-navbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 6px;border:1.5px solid var(--line);border-radius:16px;background:#fff;color:#5b6472;font-weight:700;cursor:pointer;transition:transform .12s,box-shadow .15s,background .15s,border-color .15s;box-shadow:0 2px 8px -4px rgba(20,40,80,.1)}

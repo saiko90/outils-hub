@@ -95,6 +95,8 @@ const L = {
     chartEmpty: "Note tes repas quelques jours pour voir apparaître ta tendance ici.",
     nudgeMidi: "Tu as mangé quoi ce midi ? Ajoute ton repas 👇", nudgeSoir: "Pense à noter ton dîner 🍽️", nudgeDismiss: "Masquer",
     installApp: "Installer l'app", installed: "Installe calorio sur ton écran d'accueil pour un accès en un tap.",
+    saMsg: "Sur Samsung Internet, l'installation peut afficher une alerte « Play Protect ». C'est une limitation connue de ce navigateur — pas de calorio, ton téléphone est en sécurité. Pour une installation sans alerte, ouvre calorio.ch dans Chrome.",
+    saBtn: "Ouvrir dans Chrome",
     settingsTitle: "Paramètres", langLabel: "Langue de l'app",
     notifTitle: "Rappels & encouragements", notifSub: "Vito te rappelle de noter tes repas — seulement si tu n'as rien noté — et t'envoie un petit mot d'encouragement de temps en temps.",
     notifWhat: "Midi & soir (si ton journal est vide) + un encouragement tous les 3 jours. Textes variés, jamais deux fois les mêmes.",
@@ -173,6 +175,8 @@ const L = {
     chartEmpty: "Trage ein paar Tage lang deine Mahlzeiten ein, um deinen Trend zu sehen.",
     nudgeMidi: "Was hast du zu Mittag gegessen? Trag es ein 👇", nudgeSoir: "Denk daran, dein Abendessen einzutragen 🍽️", nudgeDismiss: "Ausblenden",
     installApp: "App installieren", installed: "Installiere calorio auf deinem Startbildschirm für Zugriff mit einem Tipp.",
+    saMsg: "Im Samsung Internet Browser kann bei der Installation eine „Play Protect\"-Warnung erscheinen. Das ist eine bekannte Einschränkung dieses Browsers – nicht von calorio, dein Handy ist sicher. Für eine Installation ohne Warnung öffne calorio.ch in Chrome.",
+    saBtn: "In Chrome öffnen",
     settingsTitle: "Einstellungen", langLabel: "App-Sprache",
     notifTitle: "Erinnerungen & Ermutigung", notifSub: "Vito erinnert dich ans Eintragen deiner Mahlzeiten — nur wenn du nichts notiert hast — und schickt dir ab und zu ein aufmunterndes Wort.",
     notifWhat: "Mittag & Abend (wenn dein Journal leer ist) + alle 3 Tage eine Ermutigung. Abwechslungsreiche Texte, nie zweimal gleich.",
@@ -251,6 +255,8 @@ const L = {
     chartEmpty: "Log your meals for a few days to see your trend appear here.",
     nudgeMidi: "What did you have for lunch? Add your meal 👇", nudgeSoir: "Don't forget to log your dinner 🍽️", nudgeDismiss: "Hide",
     installApp: "Install the app", installed: "Install calorio on your home screen for one-tap access.",
+    saMsg: "On Samsung Internet, installing may show a \"Play Protect\" warning. That's a known limitation of this browser — not calorio, your phone is safe. For a clean install, open calorio.ch in Chrome.",
+    saBtn: "Open in Chrome",
     settingsTitle: "Settings", langLabel: "App language",
     notifTitle: "Reminders & encouragement", notifSub: "Vito reminds you to log your meals — only if you haven't logged anything — and sends a little word of encouragement now and then.",
     notifWhat: "Lunch & evening (if your log is empty) + an encouragement every 3 days. Varied texts, never the same twice.",
@@ -350,6 +356,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [mounted, setMounted] = useState(false);
   const [nudgeHidden, setNudgeHidden] = useState(false);
   const [installEvt, setInstallEvt] = useState<BeforeInstallEvent | null>(null);
+  const [samsungHint, setSamsungHint] = useState(false);
+  const [saDismissed, setSaDismissed] = useState(false);
   // notifications
   const [notifOn, setNotifOn] = useState(false);
   const [notifBusy, setNotifBusy] = useState(false);
@@ -430,12 +438,32 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   useEffect(() => {
     const onPrompt = (e: Event) => { e.preventDefault(); setInstallEvt(e as BeforeInstallEvent); };
     window.addEventListener("beforeinstallprompt", onPrompt);
+    // Samsung Internet génère des WebAPK avec un targetSdk ancien → Android 14+ affiche
+    // une alerte Play Protect à l'installation. On invite ces utilisateurs à passer par
+    // Chrome (qui n'a pas ce souci). Uniquement hors mode application installée.
+    try {
+      const ua = navigator.userAgent || "";
+      const standalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        (navigator as unknown as { standalone?: boolean }).standalone === true;
+      if (/SamsungBrowser/i.test(ua) && !standalone) setSamsungHint(true);
+    } catch {
+      /* ignore */
+    }
     return () => window.removeEventListener("beforeinstallprompt", onPrompt);
   }, []);
   const doInstall = async () => {
     if (!installEvt) return;
     try { await installEvt.prompt(); await installEvt.userChoice; } catch { /* ignore */ }
     setInstallEvt(null);
+  };
+  const openInChrome = () => {
+    try {
+      const host = window.location.href.split("#")[0].replace(/^https?:\/\//, "");
+      window.location.href = `intent://${host}#Intent;scheme=https;package=com.android.chrome;end`;
+    } catch {
+      /* ignore */
+    }
   };
 
   // sauvegardes
@@ -861,6 +889,19 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
           </button>
         )}
       </header>
+
+      {samsungHint && !saDismissed && (
+        <div className="cl-sahint">
+          <div className="cl-sahint-top">
+            <span className="cl-sahint-ic" aria-hidden>🛡️</span>
+            <p className="cl-sahint-msg">{t.saMsg}</p>
+            <button className="cl-sahint-x" onClick={() => setSaDismissed(true)} aria-label="×">×</button>
+          </div>
+          <button className="cl-sahint-btn" onClick={openInChrome}>
+            <span aria-hidden>🌐</span> {t.saBtn}
+          </button>
+        </div>
+      )}
 
       <div className="cl-account">
         {user ? (
@@ -1662,6 +1703,13 @@ const CSS = `
 .cl-install{flex:none;display:inline-flex;align-items:center;gap:7px;background:var(--greenbg);border:1.5px solid #bfe6cd;color:var(--green);border-radius:12px;padding:10px 15px;font-size:.85rem;font-weight:800;cursor:pointer;white-space:nowrap}
 .cl-install:hover{background:#dcf3e4}
 @media(max-width:520px){.cl-install span{display:none}}
+.cl-sahint{background:#eef4ff;border:1px solid #cfe0fb;border-radius:16px;padding:14px 16px;margin-bottom:14px;box-shadow:0 4px 16px -12px rgba(30,64,140,.25)}
+.cl-sahint-top{display:flex;align-items:flex-start;gap:11px}
+.cl-sahint-ic{font-size:1.25rem;line-height:1.3;flex:none}
+.cl-sahint-msg{margin:0;flex:1;font-size:.88rem;line-height:1.55;color:#2b4a86;font-weight:600}
+.cl-sahint-x{flex:none;background:none;border:0;color:#7d96c6;font-size:1.4rem;line-height:1;cursor:pointer;padding:0 2px}
+.cl-sahint-btn{margin-top:11px;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#1a73e8;border:0;border-radius:12px;padding:12px;color:#fff;font-size:.9rem;font-weight:800;cursor:pointer}
+.cl-sahint-btn:hover{background:#1667d0}
 /* rappel doux */
 .cl-nudge{display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,#fff3d6,#ffe9c2);border:1px solid #f6d99a;border-radius:14px;padding:13px 16px;margin-bottom:14px;font-size:.92rem;color:#7a5b18;font-weight:600}
 .cl-nudge button{flex:none;background:none;border:0;color:#b08a3a;font-size:1.3rem;line-height:1;cursor:pointer;padding:0 2px}

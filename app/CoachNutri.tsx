@@ -56,10 +56,10 @@ const L = {
     cta: "Passer en Pro", soon: "Bientôt disponible",
     placeholder: "Écris à Vito…", send: "Envoyer",
     starters: ["Qu'est-ce que je mange ce soir ?", "Il me reste combien de calories ?", "Un snack sain à me conseiller ?"],
-    hello: "Coucou, c'est Vito 🌱 Dis-moi ce que tu as mangé ou ce que tu prévois, et je t'aide à équilibrer ta journée !",
+    hello: "Coucou, c'est Vito 🥕 Dis-moi ce que tu as mangé ou ce que tu prévois, et je t'aide à équilibrer ta journée !",
     notReady: "Le coach sera activé très bientôt. Reviens dans un instant !",
     err: "Oups, petit souci de connexion. Réessaie dans un moment.",
-    limit: "Tu as atteint ta limite de messages pour aujourd'hui — on garde Vito léger et rapide 🌱 Reviens demain !",
+    limit: "Tu as atteint ta limite de messages pour aujourd'hui — on garde Vito léger et rapide 🥕 Reviens demain !",
     disclaimer: "Vito donne des conseils généraux de nutrition, pas un avis médical. Pour un suivi personnalisé (pathologie, trouble alimentaire, sport de haut niveau), consulte un·e professionnel·le de santé.",
   },
   de: {
@@ -70,10 +70,10 @@ const L = {
     cta: "Auf Pro upgraden", soon: "Bald verfügbar",
     placeholder: "Schreib Vito…", send: "Senden",
     starters: ["Was esse ich heute Abend?", "Wie viele Kalorien bleiben mir?", "Ein gesunder Snack?"],
-    hello: "Hoi, ich bin Vito 🌱 Sag mir, was du gegessen oder geplant hast, und ich helfe dir, deinen Tag auszugleichen!",
+    hello: "Hoi, ich bin Vito 🥕 Sag mir, was du gegessen oder geplant hast, und ich helfe dir, deinen Tag auszugleichen!",
     notReady: "Der Coach wird ganz bald aktiviert. Schau gleich nochmal vorbei!",
     err: "Ups, kleines Verbindungsproblem. Versuch es gleich nochmal.",
-    limit: "Du hast dein heutiges Nachrichtenlimit erreicht 🌱 Komm morgen wieder!",
+    limit: "Du hast dein heutiges Nachrichtenlimit erreicht 🥕 Komm morgen wieder!",
     disclaimer: "Vito gibt allgemeine Ernährungstipps, keine medizinische Beratung. Für persönliche Begleitung eine Fachperson beiziehen.",
   },
   en: {
@@ -84,62 +84,63 @@ const L = {
     cta: "Go Pro", soon: "Coming soon",
     placeholder: "Message Vito…", send: "Send",
     starters: ["What should I eat tonight?", "How many calories do I have left?", "A healthy snack idea?"],
-    hello: "Hi, I'm Vito 🌱 Tell me what you ate or plan to eat, and I'll help you balance your day!",
+    hello: "Hi, I'm Vito 🥕 Tell me what you ate or plan to eat, and I'll help you balance your day!",
     notReady: "The coach will be activated very soon. Check back in a moment!",
     err: "Oops, small connection hiccup. Try again in a moment.",
-    limit: "You've reached today's message limit 🌱 Come back tomorrow!",
+    limit: "You've reached today's message limit 🥕 Come back tomorrow!",
     disclaimer: "Vito gives general nutrition tips, not medical advice. For personalised guidance, see a health professional.",
   },
 } as const;
 
-/* ---------------- Mascotte Vito (la pousse) ---------------- */
+/* ---------------- Mascotte Vito (le radis) ---------------- */
 function Avo({ state, size = 120 }: { state: AvoState; size?: number }) {
   return (
     <div className={`avo ${state}`} style={{ width: size, height: size }} aria-hidden>
       <svg viewBox="0 0 200 210" width={size} height={size * 1.05}>
-        {/* bras gauche (feuille qui salue) */}
+        {/* bras gauche (petite feuille qui salue) */}
         <g className="avo-armL">
-          <path d="M58 138 q-24 -2 -36 -22" fill="none" stroke="#57c274" strokeWidth="8" strokeLinecap="round" />
-          <ellipse cx="18" cy="110" rx="12" ry="7" fill="#7dd992" transform="rotate(-32 18 110)" />
+          <path d="M52 140 q-22 2 -34 -14" fill="none" stroke="#3fae5f" strokeWidth="7" strokeLinecap="round" />
+          <ellipse cx="16" cy="122" rx="12" ry="7" fill="#6ed07a" transform="rotate(-28 16 122)" />
         </g>
-        {/* bras droit (feuille) */}
-        <path d="M142 140 q22 0 32 18" fill="none" stroke="#57c274" strokeWidth="8" strokeLinecap="round" />
-        <ellipse cx="182" cy="160" rx="12" ry="7" fill="#7dd992" transform="rotate(32 182 160)" />
-        {/* corps pousse */}
+        {/* bras droit (petite feuille) */}
+        <path d="M148 142 q22 2 32 18" fill="none" stroke="#3fae5f" strokeWidth="7" strokeLinecap="round" />
+        <ellipse cx="184" cy="164" rx="12" ry="7" fill="#6ed07a" transform="rotate(30 184 164)" />
+
         <g className="avo-body">
-          {/* deux feuilles */}
-          <path d="M100 66 C70 22 28 26 33 60 C37 90 80 78 100 66 Z" fill="#6ed88a" />
-          <path d="M100 66 C130 22 172 26 167 60 C163 90 120 78 100 66 Z" fill="#54c877" />
-          <path d="M60 46 q20 9 36 16" fill="none" stroke="#3fae5f" strokeWidth="2.5" strokeLinecap="round" />
-          <path d="M140 46 q-20 9 -36 16" fill="none" stroke="#3fae5f" strokeWidth="2.5" strokeLinecap="round" />
-          {/* tige */}
-          <path d="M100 66 L100 100" stroke="#57c274" strokeWidth="7" strokeLinecap="round" />
-          {/* graine / corps */}
-          <ellipse cx="100" cy="146" rx="52" ry="52" fill="#effadf" />
-          <ellipse cx="100" cy="146" rx="52" ry="52" fill="none" stroke="#cdeaa9" strokeWidth="3" />
+          {/* fanes (feuilles du radis) */}
+          <path d="M100 96 C82 64 54 54 50 34 C74 40 94 66 100 92 Z" fill="#5cc26a" />
+          <path d="M100 96 C118 64 146 54 150 34 C126 40 106 66 100 92 Z" fill="#4bb25c" />
+          <path d="M100 96 C93 60 97 36 100 30 C103 36 107 60 100 96 Z" fill="#63cf72" />
+          <path d="M66 48 q20 12 32 34" fill="none" stroke="#2f9c4c" strokeWidth="2.4" strokeLinecap="round" />
+          <path d="M134 48 q-20 12 -32 34" fill="none" stroke="#2f9c4c" strokeWidth="2.4" strokeLinecap="round" />
+          {/* bulbe du radis (rouge, pointe en bas) */}
+          <path d="M100 90 C58 90 44 120 49 148 C53 172 80 198 100 202 C120 198 147 172 151 148 C156 120 142 90 100 90 Z" fill="#f0506e" />
+          <path d="M100 90 C58 90 44 120 49 148 C53 172 80 198 100 202 C120 198 147 172 151 148 C156 120 142 90 100 90 Z" fill="none" stroke="#d83a58" strokeWidth="3" />
+          {/* ventre plus clair */}
+          <ellipse cx="100" cy="150" rx="34" ry="38" fill="#ff738d" opacity="0.45" />
           {/* joues */}
-          <circle cx="70" cy="156" r="9" fill="#f6b9a4" opacity="0.55" />
-          <circle cx="130" cy="156" r="9" fill="#f6b9a4" opacity="0.55" />
+          <circle cx="70" cy="146" r="9" fill="#ffd0d8" opacity="0.7" />
+          <circle cx="130" cy="146" r="9" fill="#ffd0d8" opacity="0.7" />
           {/* yeux */}
           <g className="avo-eyes">
-            <ellipse cx="82" cy="140" rx="11" ry="12" fill="#fff" />
-            <ellipse cx="118" cy="140" rx="11" ry="12" fill="#fff" />
-            <circle className="avo-pupil" cx="82" cy="142" r="5" fill="#2f3b2a" />
-            <circle className="avo-pupil" cx="118" cy="142" r="5" fill="#2f3b2a" />
-            <circle cx="84" cy="139" r="1.6" fill="#fff" />
-            <circle cx="120" cy="139" r="1.6" fill="#fff" />
+            <ellipse cx="83" cy="132" rx="11" ry="12" fill="#fff" />
+            <ellipse cx="117" cy="132" rx="11" ry="12" fill="#fff" />
+            <circle className="avo-pupil" cx="83" cy="134" r="5" fill="#3a2230" />
+            <circle className="avo-pupil" cx="117" cy="134" r="5" fill="#3a2230" />
+            <circle cx="85" cy="131" r="1.7" fill="#fff" />
+            <circle cx="119" cy="131" r="1.7" fill="#fff" />
           </g>
           {/* sourcils */}
-          <path className="avo-brow" d="M72 124 q10 -5 20 -1" fill="none" stroke="#57c274" strokeWidth="4" strokeLinecap="round" />
-          <path className="avo-brow" d="M108 123 q10 -4 20 1" fill="none" stroke="#57c274" strokeWidth="4" strokeLinecap="round" />
+          <path className="avo-brow" d="M73 116 q10 -5 20 -1" fill="none" stroke="#d83a58" strokeWidth="4" strokeLinecap="round" />
+          <path className="avo-brow" d="M107 115 q10 -4 20 1" fill="none" stroke="#d83a58" strokeWidth="4" strokeLinecap="round" />
           {/* bouche */}
-          <ellipse className="avo-mouth" cx="100" cy="166" rx="12" ry="8" fill="#e06a5a" />
+          <ellipse className="avo-mouth" cx="100" cy="156" rx="12" ry="8" fill="#b02a44" />
         </g>
         {/* bulle réflexion */}
         <g className="avo-think">
-          <circle cx="150" cy="40" r="4" fill="#bfe39a" />
-          <circle cx="163" cy="30" r="6" fill="#bfe39a" />
-          <circle cx="179" cy="20" r="8" fill="#bfe39a" />
+          <circle cx="152" cy="42" r="4" fill="#f6a8b6" />
+          <circle cx="165" cy="32" r="6" fill="#f6a8b6" />
+          <circle cx="181" cy="22" r="8" fill="#f6a8b6" />
         </g>
       </svg>
       <style>{AVO_CSS}</style>
@@ -281,7 +282,7 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro }: { ctx: Coac
         />
         <button onClick={() => send(input)} disabled={busy || !input.trim() || used >= DAILY_LIMIT} aria-label={t.send}>➤</button>
       </div>
-      <p className="cn-disc">🌱 {t.disclaimer}</p>
+      <p className="cn-disc">🥕 {t.disclaimer}</p>
     </section>
   );
 }
@@ -290,10 +291,10 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro }: { ctx: Coac
 const AVO_CSS = `
 .avo{position:relative;display:inline-block}
 .avo svg{overflow:visible;display:block}
-.avo .avo-body{transform-origin:100px 198px;animation:avoBob 3.4s ease-in-out infinite}
-.avo .avo-armL{transform-origin:58px 138px}
-.avo .avo-eyes{transform-origin:100px 140px;animation:avoBlink 4.2s infinite}
-.avo .avo-mouth{transform-origin:100px 166px;transform:scaleY(.5)}
+.avo .avo-body{transform-origin:100px 200px;animation:avoBob 3.4s ease-in-out infinite}
+.avo .avo-armL{transform-origin:48px 140px}
+.avo .avo-eyes{transform-origin:100px 132px;animation:avoBlink 4.2s infinite}
+.avo .avo-mouth{transform-origin:100px 156px;transform:scaleY(.5)}
 .avo .avo-think{opacity:0;transition:opacity .2s}
 /* idle : petit coucou du bras */
 .avo.idle .avo-armL{animation:avoWave 3.8s ease-in-out infinite}
@@ -318,40 +319,40 @@ const AVO_CSS = `
 
 /* ---------------- styles coach ---------------- */
 const CSS = `
-.cn{margin:14px 0 8px;color:#e6e9f5}
+.cn{margin:14px 0 8px;color:#2b3243}
 /* paywall */
-.cn-lock{display:flex;gap:22px;align-items:center;flex-wrap:wrap;background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(132,204,22,.04));border:1px solid rgba(34,197,94,.3);border-radius:18px;padding:22px}
+.cn-lock{display:flex;gap:22px;align-items:center;flex-wrap:wrap;background:linear-gradient(135deg,#fdeef1,#e9f8ee);border:1px solid #f3d0d8;border-radius:20px;padding:24px}
 .cn-lockart{flex:none}
 .cn-locktxt{flex:1;min-width:240px}
-.cn-pro{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#a3e635;background:rgba(163,230,53,.14);border:1px solid rgba(163,230,53,.35);border-radius:99px;padding:3px 10px}
-.cn-pro.sm{font-size:.62rem;padding:2px 7px;vertical-align:middle}
-.cn-locktxt h3{margin:10px 0 6px;font-size:1.25rem;line-height:1.2}
-.cn-locktxt p{margin:0 0 12px;color:#c3c8e2;font-size:.92rem;line-height:1.5}
-.cn-feats{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:7px}
-.cn-feats li{display:flex;gap:9px;align-items:flex-start;font-size:.9rem;color:#d5d9ec}
-.cn-feats li span{color:#a3e635;font-weight:800;flex:none}
-.cn-cta{background:linear-gradient(135deg,#22c55e,#84cc16);color:#05210f;border:0;border-radius:11px;padding:12px 20px;font-weight:800;font-size:.95rem;cursor:pointer}
+.cn-pro{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:#ef4457;border-radius:99px;padding:3px 10px}
+.cn-pro.sm{font-size:.62rem;padding:2px 7px;vertical-align:middle;background:#16a34a}
+.cn-locktxt h3{margin:10px 0 6px;font-size:1.28rem;line-height:1.2;color:#232a37}
+.cn-locktxt p{margin:0 0 12px;color:#4b5563;font-size:.93rem;line-height:1.55}
+.cn-feats{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:8px}
+.cn-feats li{display:flex;gap:9px;align-items:flex-start;font-size:.92rem;color:#3b4252}
+.cn-feats li span{color:#16a34a;font-weight:800;flex:none}
+.cn-cta{background:linear-gradient(135deg,#34d17f,#16a34a);color:#fff;border:0;border-radius:12px;padding:13px 22px;font-weight:800;font-size:.97rem;cursor:pointer;box-shadow:0 12px 24px -10px rgba(22,163,74,.5)}
 /* chat */
-.cn-head{display:flex;align-items:center;gap:12px;padding:10px 4px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
-.cn-name{font-weight:800;font-size:1rem}
-.cn-status{font-size:.8rem;color:#8b93b7}
+.cn-head{display:flex;align-items:center;gap:12px;padding:10px 4px 14px;border-bottom:1px solid #e7ebf2}
+.cn-name{font-weight:800;font-size:1.02rem;color:#232a37}
+.cn-status{font-size:.8rem;color:#9aa2b4}
 .cn-scroll{max-height:380px;overflow-y:auto;padding:16px 4px;display:flex;flex-direction:column;gap:10px}
-.cn-bubble{max-width:82%;padding:11px 14px;border-radius:15px;font-size:.93rem;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}
-.cn-bubble.user{align-self:flex-end;background:linear-gradient(135deg,#22c55e,#84cc16);color:#05210f;font-weight:600;border-bottom-right-radius:5px}
-.cn-bubble.model{align-self:flex-start;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-bottom-left-radius:5px}
-.cn-hello{color:#d5d9ec}
+.cn-bubble{max-width:82%;padding:11px 14px;border-radius:16px;font-size:.94rem;line-height:1.5;white-space:pre-wrap;word-wrap:break-word}
+.cn-bubble.user{align-self:flex-end;background:linear-gradient(135deg,#34d17f,#16a34a);color:#fff;font-weight:600;border-bottom-right-radius:5px}
+.cn-bubble.model{align-self:flex-start;background:#f4f6fa;border:1px solid #e7ebf2;color:#2b3243;border-bottom-left-radius:5px}
+.cn-hello{color:#4b5563}
 .cn-typing{display:flex;gap:5px;align-items:center}
-.cn-typing span{width:7px;height:7px;border-radius:50%;background:#84cc16;animation:cnDot 1.2s infinite}
+.cn-typing span{width:7px;height:7px;border-radius:50%;background:#16a34a;animation:cnDot 1.2s infinite}
 .cn-typing span:nth-child(2){animation-delay:.2s}
 .cn-typing span:nth-child(3){animation-delay:.4s}
 @keyframes cnDot{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
-.cn-starters{display:flex;flex-wrap:wrap;gap:7px;padding:4px 4px 10px}
-.cn-starters button{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);color:#a3e635;border-radius:99px;padding:8px 13px;font-size:.83rem;cursor:pointer}
-.cn-starters button:hover{background:rgba(34,197,94,.16)}
+.cn-starters{display:flex;flex-wrap:wrap;gap:8px;padding:4px 4px 10px}
+.cn-starters button{background:#e9f8ee;border:1px solid #bfe6cd;color:#16a34a;border-radius:99px;padding:9px 14px;font-size:.84rem;font-weight:600;cursor:pointer}
+.cn-starters button:hover{background:#dcf3e4}
 .cn-input{display:flex;gap:8px;padding:8px 0}
-.cn-input input{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#f5f6fb;padding:12px 14px;font-size:.93rem}
-.cn-input input:focus{outline:none;border-color:rgba(34,197,94,.5)}
-.cn-input button{background:linear-gradient(135deg,#22c55e,#84cc16);color:#05210f;border:0;border-radius:12px;width:46px;font-size:1.1rem;font-weight:800;cursor:pointer}
+.cn-input input{flex:1;background:#f6f8fb;border:1.5px solid #e7ebf2;border-radius:13px;color:#232a37;padding:13px 15px;font-size:.94rem}
+.cn-input input:focus{outline:none;border-color:#8fdcac}
+.cn-input button{background:linear-gradient(135deg,#34d17f,#16a34a);color:#fff;border:0;border-radius:13px;width:48px;font-size:1.15rem;font-weight:800;cursor:pointer}
 .cn-input button:disabled{opacity:.4;cursor:not-allowed}
-.cn-disc{margin:6px 0 0;font-size:.76rem;line-height:1.5;color:#8b93b7;border-top:1px solid rgba(255,255,255,.08);padding-top:10px}
+.cn-disc{margin:6px 0 0;font-size:.78rem;line-height:1.55;color:#9aa2b4;border-top:1px solid #e7ebf2;padding-top:10px}
 `;

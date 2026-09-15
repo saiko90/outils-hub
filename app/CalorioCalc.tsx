@@ -65,6 +65,7 @@ const L = {
     scan: "Scanner un code-barres", photo: "Analyser une photo", photoPro: "Photo → calories",
     rechercherBig: "Rechercher un produit (Migros, Coop, marques…)",
     offTitle: "Produits trouvés en ligne", offLoading: "Recherche…", quickTitle: "Accès rapide", recentTitle: "Récents",
+    addFood: "Ajouter un aliment", mLib: "Bibliothèque", mLibSub: "Aliments courants, par catégorie", mOnline: "Recherche en ligne", mOnlineSub: "Migros, Coop, marques…", mScan: "Code-barres", mScanSub: "Scanne le produit", mPhoto: "Photo de l'assiette", mPhotoSub: "L'IA estime les calories", rechercheLib: "Filtrer la bibliothèque…", onlineHint: "Tape le nom d'un produit ou d'une marque pour chercher dans la base mondiale.",
     scanUnsupported: "Le scan n'est pas supporté par ce navigateur — utilise la recherche.",
     scanDenied: "Accès caméra refusé.", scanSearching: "Recherche du produit…", scanNotFound: "Produit introuvable dans la base.",
     scanTitle: "Vise le code-barres", scanClose: "Fermer",
@@ -98,7 +99,7 @@ const L = {
     notifTitle: "Rappels & encouragements", notifSub: "Vito te rappelle de noter tes repas — seulement si tu n'as rien noté — et t'envoie un petit mot d'encouragement de temps en temps.",
     notifWhat: "Midi & soir (si ton journal est vide) + un encouragement tous les 3 jours. Textes variés, jamais deux fois les mêmes.",
     notifBtnOn: "Activer les notifications", notifBtnOff: "Désactiver", notifPro: "Pro", notifProLock: "Passe en Pro pour activer les notifications.",
-    notifOnMsg: "🔔 C'est activé ! Vito veillera sur toi 🌱", notifOffMsg: "Notifications désactivées.",
+    notifOnMsg: "🔔 C'est activé ! Vito veillera sur toi 🥕", notifOffMsg: "Notifications désactivées.",
     notifDenied: "Les notifications sont bloquées. Autorise-les dans les réglages de ton navigateur, puis réessaie.",
     notifUnsupported: "Ton navigateur ne gère pas les notifications. Sur iPhone : installe d'abord calorio sur l'écran d'accueil, puis réessaie.",
     notifSoon: "Les notifications seront activées très bientôt.", notifErr: "Souci lors de l'activation. Réessaie dans un moment.",
@@ -143,6 +144,7 @@ const L = {
     scan: "Barcode scannen", photo: "Foto analysieren", photoPro: "Foto → Kalorien",
     rechercherBig: "Produkt suchen (Migros, Coop, Marken…)",
     offTitle: "Online gefundene Produkte", offLoading: "Suche…", quickTitle: "Schnellzugriff", recentTitle: "Kürzlich",
+    addFood: "Lebensmittel hinzufügen", mLib: "Bibliothek", mLibSub: "Häufige Lebensmittel, nach Kategorie", mOnline: "Online-Suche", mOnlineSub: "Migros, Coop, Marken…", mScan: "Barcode", mScanSub: "Produkt scannen", mPhoto: "Foto vom Teller", mPhotoSub: "KI schätzt die Kalorien", rechercheLib: "Bibliothek filtern…", onlineHint: "Gib einen Produkt- oder Markennamen ein, um in der weltweiten Datenbank zu suchen.",
     scanUnsupported: "Scan wird von diesem Browser nicht unterstützt — nutze die Suche.",
     scanDenied: "Kamerazugriff verweigert.", scanSearching: "Produkt wird gesucht…", scanNotFound: "Produkt nicht in der Datenbank gefunden.",
     scanTitle: "Barcode anvisieren", scanClose: "Schliessen",
@@ -175,7 +177,7 @@ const L = {
     notifTitle: "Erinnerungen & Ermutigung", notifSub: "Vito erinnert dich ans Eintragen deiner Mahlzeiten — nur wenn du nichts notiert hast — und schickt dir ab und zu ein aufmunterndes Wort.",
     notifWhat: "Mittag & Abend (wenn dein Journal leer ist) + alle 3 Tage eine Ermutigung. Abwechslungsreiche Texte, nie zweimal gleich.",
     notifBtnOn: "Benachrichtigungen aktivieren", notifBtnOff: "Deaktivieren", notifPro: "Pro", notifProLock: "Werde Pro, um Benachrichtigungen zu aktivieren.",
-    notifOnMsg: "🔔 Aktiviert! Vito passt auf dich auf 🌱", notifOffMsg: "Benachrichtigungen deaktiviert.",
+    notifOnMsg: "🔔 Aktiviert! Vito passt auf dich auf 🥕", notifOffMsg: "Benachrichtigungen deaktiviert.",
     notifDenied: "Benachrichtigungen sind blockiert. Erlaube sie in den Browser-Einstellungen und versuch es erneut.",
     notifUnsupported: "Dein Browser unterstützt keine Benachrichtigungen. Auf dem iPhone: installiere calorio zuerst auf dem Startbildschirm.",
     notifSoon: "Benachrichtigungen werden ganz bald aktiviert.", notifErr: "Fehler beim Aktivieren. Versuch es gleich nochmal.",
@@ -220,6 +222,7 @@ const L = {
     scan: "Scan a barcode", photo: "Analyse a photo", photoPro: "Photo → calories",
     rechercherBig: "Search a product (Migros, Coop, brands…)",
     offTitle: "Products found online", offLoading: "Searching…", quickTitle: "Quick access", recentTitle: "Recent",
+    addFood: "Add a food", mLib: "Library", mLibSub: "Common foods, by category", mOnline: "Online search", mOnlineSub: "Migros, Coop, brands…", mScan: "Barcode", mScanSub: "Scan the product", mPhoto: "Photo of your plate", mPhotoSub: "AI estimates the calories", rechercheLib: "Filter the library…", onlineHint: "Type a product or brand name to search the global database.",
     scanUnsupported: "Scanning isn't supported by this browser — use search.",
     scanDenied: "Camera access denied.", scanSearching: "Looking up product…", scanNotFound: "Product not found in the database.",
     scanTitle: "Aim at the barcode", scanClose: "Close",
@@ -252,7 +255,7 @@ const L = {
     notifTitle: "Reminders & encouragement", notifSub: "Vito reminds you to log your meals — only if you haven't logged anything — and sends a little word of encouragement now and then.",
     notifWhat: "Lunch & evening (if your log is empty) + an encouragement every 3 days. Varied texts, never the same twice.",
     notifBtnOn: "Enable notifications", notifBtnOff: "Disable", notifPro: "Pro", notifProLock: "Go Pro to enable notifications.",
-    notifOnMsg: "🔔 Enabled! Vito's got your back 🌱", notifOffMsg: "Notifications disabled.",
+    notifOnMsg: "🔔 Enabled! Vito's got your back 🥕", notifOffMsg: "Notifications disabled.",
     notifDenied: "Notifications are blocked. Allow them in your browser settings, then try again.",
     notifUnsupported: "Your browser doesn't support notifications. On iPhone: install calorio to your home screen first, then try again.",
     notifSoon: "Notifications will be enabled very soon.", notifErr: "Something went wrong enabling them. Try again in a moment.",
@@ -267,7 +270,7 @@ const ACCENT = "#22c55e", ACCENT2 = "#84cc16";
 type BeforeInstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
 type TabKey = "besoins" | "journal" | "poids" | "coach" | "aide";
 const TABS: TabKey[] = ["besoins", "journal", "poids", "coach", "aide"];
-const TAB_ICON: Record<TabKey, string> = { besoins: "🎯", journal: "🍽️", poids: "⚖️", coach: "🌱", aide: "💬" };
+const TAB_ICON: Record<TabKey, string> = { besoins: "🎯", journal: "🍽️", poids: "⚖️", coach: "🥕", aide: "💬" };
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 const nf = (lang: Lang, d = 0) =>
@@ -363,6 +366,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // journal (par date) + poids
   const [lines, setLines] = useState<Line[]>([]);
   const [recents, setRecents] = useState<Food[]>([]);
+  const [addOpen, setAddOpen] = useState(false);
+  const [addMode, setAddMode] = useState<"menu" | "library" | "online">("menu");
   const [pesees, setPesees] = useState<Pesee[]>([]);
   const [poidsInput, setPoidsInput] = useState<number | "">("");
   const [q, setQ] = useState("");
@@ -793,7 +798,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // --- Photo → calories (Pro) ---
   const onPhoto = async (file: File) => {
     if (!proActive) return;
-    setPhotoMsg(""); setPhotoItems(null); setPhotoBusy(true);
+    setPhotoMsg(t.photoAnalyzing); setPhotoItems(null); setPhotoBusy(true);
     try {
       const { base64, mime } = await downscale(file, 1024);
       const r = await fetch("/api/vision", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ image: base64, mime, lang }) });
@@ -808,7 +813,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
           return { id: `photo:${newKey()}`, nom: it.nom, kcal: per(it.kcal), prot: per1(it.prot), gluc: per1(it.gluc), lip: per1(it.lip), portion: g, emoji: "📷" } as Food;
         });
         if (items.length === 0) setPhotoMsg(t.photoNone);
-        else setPhotoItems(items);
+        else { setPhotoItems(items); setPhotoMsg(""); }
       }
     } catch { setPhotoMsg(t.photoErr); }
     setPhotoBusy(false);
@@ -830,7 +835,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       <style>{CSS}</style>
 
       <header className="cl-hero">
-        <span className="cl-hero-logo" aria-hidden>🌱</span>
+        <img className="cl-hero-logo" src="/calorio-icon-192.png" alt="" aria-hidden width={52} height={52} />
         <div className="cl-hero-txt">
           <div className="cl-hero-name">calorio</div>
           <p className="cl-hero-tag">{t.tagline}</p>
@@ -980,21 +985,12 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
             </div>
           )}
 
-          {/* Actions : scan code-barres + photo */}
-          <div className="cl-actions">
-            <button className="cl-act" onClick={startScan}><span aria-hidden>📷</span> {t.scan}</button>
-            {proActive ? (
-              <button className="cl-act pro" onClick={() => fileRef.current?.click()} disabled={photoBusy}>
-                <span aria-hidden>🍽️</span> {photoBusy ? t.photoAnalyzing : t.photoPro}
-              </button>
-            ) : (
-              <button className="cl-act lock" onClick={goPro} title={t.photoLock}>
-                <span aria-hidden>🔒</span> {t.photoPro} · Pro
-              </button>
-            )}
-            <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) onPhoto(f); e.target.value = ""; }} />
-          </div>
+          {/* Un seul bouton propre : ouvre la bibliothèque */}
+          <button className="cl-addbtn" onClick={() => { setQ(""); setAddMode("menu"); setAddOpen(true); }}>
+            <span aria-hidden>＋</span> {t.addFood}
+          </button>
+          <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) onPhoto(f); e.target.value = ""; }} />
           {(scanMsg || photoMsg) && <p className="cl-scanmsg">{scanMsg || photoMsg}</p>}
 
           {/* Revue de la photo */}
@@ -1015,56 +1011,86 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
             </div>
           )}
 
-          <div className="cl-picker">
-            <input className="cl-search" placeholder={t.rechercherBig} value={q} onChange={(e) => setQ(e.target.value)} />
-
-            {q.trim().length < 2 && recents.length > 0 && (
-              <div className="cl-recents">
-                <div className="cl-secth">🕘 {t.recentTitle}</div>
-                <div className="cl-foods">
-                  {recents.map((f, i) => (
-                    <button key={`${f.nom}-${i}`} className="cl-food" onClick={() => addFood(f)}>
-                      <span className="cl-fem">{f.emoji}</span>
-                      <span className="cl-fn">{f.nom}{f.brand ? <small> · {f.brand}</small> : null}</span>
-                      <span className="cl-fk">{f.kcal} kcal<small>/100 g</small></span>
-                    </button>
-                  ))}
+          {/* Chooser « bibliothèque » : 4 méthodes bien séparées */}
+          {addOpen && (
+            <div className="cl-scanoverlay" onClick={() => setAddOpen(false)}>
+              <div className="cl-chooser" onClick={(e) => e.stopPropagation()}>
+                <div className="cl-chooser-h">
+                  <b>{addMode === "menu" ? t.addFood : addMode === "library" ? `📚 ${t.mLib}` : `🔍 ${t.mOnline}`}</b>
+                  <button className="cl-chooser-x" onClick={() => { if (addMode === "menu") setAddOpen(false); else { setAddMode("menu"); setQ(""); } }}>{addMode === "menu" ? "×" : "‹"}</button>
                 </div>
-              </div>
-            )}
 
-            {q.trim().length >= 2 && (
-              <div className="cl-offblock">
-                <div className="cl-secth">🌍 {t.offTitle}{offLoading && <span className="cl-offload"> · {t.offLoading}</span>}</div>
-                <div className="cl-foods">
-                  {offResults.map((f) => (
-                    <button key={f.id} className="cl-food" onClick={() => addFood(f)}>
-                      <span className="cl-fem">{f.emoji}</span>
-                      <span className="cl-fn">{f.nom}{f.brand ? <small> · {f.brand}</small> : null}</span>
-                      <span className="cl-fk">{f.kcal} kcal<small>/100 g</small></span>
+                {addMode === "menu" && (
+                  <div className="cl-methods">
+                    <button className="cl-method" onClick={() => { setQ(""); setAddMode("library"); }}>
+                      <span className="cl-method-i">📚</span><b>{t.mLib}</b><small>{t.mLibSub}</small>
                     </button>
-                  ))}
-                </div>
-              </div>
-            )}
+                    <button className="cl-method" onClick={() => { setQ(""); setAddMode("online"); }}>
+                      <span className="cl-method-i">🔍</span><b>{t.mOnline}</b><small>{t.mOnlineSub}</small>
+                    </button>
+                    <button className="cl-method" onClick={() => { setAddOpen(false); startScan(); }}>
+                      <span className="cl-method-i">📷</span><b>{t.mScan}</b><small>{t.mScanSub}</small>
+                    </button>
+                    <button className="cl-method pro" onClick={() => { setAddOpen(false); if (proActive) fileRef.current?.click(); else goPro(); }}>
+                      <span className="cl-method-i">🍽️</span><b>{t.mPhoto}</b><small>{t.mPhotoSub}</small>{!proActive && <span className="cl-method-lock">Pro</span>}
+                    </button>
+                  </div>
+                )}
 
-            <div className="cl-secth">⭐ {t.quickTitle}</div>
-            <div className="cl-chips">
-              <button className={catFilter === "tous" ? "on" : ""} onClick={() => setCatFilter("tous")}>{t.tousAliments}</button>
-              {CATS.map((c) => (
-                <button key={c} className={catFilter === c ? "on" : ""} onClick={() => setCatFilter(c)}>{t.cats[c]}</button>
-              ))}
+                {addMode === "library" && (
+                  <div className="cl-picker">
+                    <input className="cl-search" placeholder={t.rechercheLib} value={q} onChange={(e) => setQ(e.target.value)} />
+                    {q.trim().length < 2 && recents.length > 0 && (
+                      <>
+                        <div className="cl-secth">🕘 {t.recentTitle}</div>
+                        <div className="cl-foods">
+                          {recents.map((f, i) => (
+                            <button key={`r-${i}`} className="cl-food" onClick={() => addFood(f)}>
+                              <span className="cl-fem">{f.emoji}</span>
+                              <span className="cl-fn">{f.nom}{f.brand ? <small> · {f.brand}</small> : null}</span>
+                              <span className="cl-fk">{f.kcal} kcal<small>/100 g</small></span>
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                    <div className="cl-secth">⭐ {t.quickTitle}</div>
+                    <div className="cl-chips">
+                      <button className={catFilter === "tous" ? "on" : ""} onClick={() => setCatFilter("tous")}>{t.tousAliments}</button>
+                      {CATS.map((c) => (<button key={c} className={catFilter === c ? "on" : ""} onClick={() => setCatFilter(c)}>{t.cats[c]}</button>))}
+                    </div>
+                    <div className="cl-foods">
+                      {resultats.map((al) => (
+                        <button key={al.id} className="cl-food" onClick={() => addFood(toFood(al, lang))}>
+                          <span className="cl-fem">{al.emoji}</span><span className="cl-fn">{al.nom[lang]}</span><span className="cl-fk">{al.kcal} kcal<small>/100 g</small></span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {addMode === "online" && (
+                  <div className="cl-picker">
+                    <input className="cl-search" placeholder={t.rechercherBig} value={q} onChange={(e) => setQ(e.target.value)} />
+                    {q.trim().length >= 2 ? (
+                      <>
+                        <div className="cl-secth">🌍 {t.offTitle}{offLoading && <span className="cl-offload"> · {t.offLoading}</span>}</div>
+                        <div className="cl-foods">
+                          {offResults.map((f) => (
+                            <button key={f.id} className="cl-food" onClick={() => addFood(f)}>
+                              <span className="cl-fem">{f.emoji}</span><span className="cl-fn">{f.nom}{f.brand ? <small> · {f.brand}</small> : null}</span><span className="cl-fk">{f.kcal} kcal<small>/100 g</small></span>
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <p className="cl-histempty">{t.onlineHint}</p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="cl-foods">
-              {resultats.map((al) => (
-                <button key={al.id} className="cl-food" onClick={() => addFood(toFood(al, lang))}>
-                  <span className="cl-fem">{al.emoji}</span>
-                  <span className="cl-fn">{al.nom[lang]}</span>
-                  <span className="cl-fk">{al.kcal} kcal<small>/100 g</small></span>
-                </button>
-              ))}
-            </div>
-          </div>
+          )}
 
           <CaloriesChart data={histoire} cible={besoins.cible} lang={lang} t={t} />
 
@@ -1125,7 +1151,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       {proOpen && (
         <div className="cl-scanoverlay" onClick={() => setProOpen(false)}>
           <div className="cl-promodal" onClick={(e) => e.stopPropagation()}>
-            <div className="cl-pro-h">🌱 {t.proTitle}</div>
+            <div className="cl-pro-h">🥕 {t.proTitle}</div>
             <p className="cl-pro-s">{t.proSub}</p>
             <div className="cl-plans">
               <button className="cl-plan best" onClick={() => startCheckout("yearly")}>
@@ -1166,7 +1192,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
             <div className="cl-setrow col">
               <div className="cl-setlabel">🔔 {t.notifTitle} {!proActive && <span className="cl-setpro">{t.notifPro}</span>}</div>
               <p className="cl-setsub">{t.notifSub}</p>
-              <p className="cl-setwhat">🌱 {t.notifWhat}</p>
+              <p className="cl-setwhat">🥕 {t.notifWhat}</p>
               {proActive ? (
                 <button className={`cl-notifbtn ${notifOn ? "on" : ""}`} onClick={toggleNotif} disabled={notifBusy}>
                   {notifBusy ? "…" : notifOn ? `✓ ${t.notifBtnOff}` : t.notifBtnOn}
@@ -1244,7 +1270,7 @@ function MacroDonut({ p, g, l }: { p: number; g: number; l: number }) {
   let off = 0;
   return (
     <svg viewBox="0 0 140 140" className="cl-donut" role="img" aria-hidden>
-      <circle cx="70" cy="70" r={R} fill="none" stroke="rgba(255,255,255,.07)" strokeWidth="16" />
+      <circle cx="70" cy="70" r={R} fill="none" stroke="#eef1f6" strokeWidth="16" />
       {segs.map((s, i) => {
         const len = (s.v / tot) * C;
         const el = (
@@ -1269,7 +1295,7 @@ function RingGauge({ pct, consomme, cible, lang, t }: { pct: number; consomme: n
   return (
     <div className="cl-ring">
       <svg viewBox="0 0 150 150" role="img" aria-hidden>
-        <circle cx="75" cy="75" r={R} fill="none" stroke="rgba(255,255,255,.07)" strokeWidth="13" />
+        <circle cx="75" cy="75" r={R} fill="none" stroke="#eef1f6" strokeWidth="13" />
         <circle cx="75" cy="75" r={R} fill="none" stroke={col} strokeWidth="13"
           strokeDasharray={`${(shown / 100) * C} ${C}`} strokeLinecap="round" transform="rotate(-90 75 75)" />
         <text x="75" y="68" textAnchor="middle" className="cl-rgv">{nf(lang).format(consomme)}</text>
@@ -1328,7 +1354,7 @@ function CaloriesChart({ data, cible, lang, t }: { data: { date: string; kcal: n
                 return (
                   <g key={d.date}>
                     <rect x={cx - bw * 0.32} y={by} width={bw * 0.64} height={bh} rx="3"
-                      fill={d.kcal === 0 ? "rgba(255,255,255,.05)" : over ? "#fbbf24" : ACCENT}
+                      fill={d.kcal === 0 ? "#eef1f6" : over ? "#fbbf24" : ACCENT}
                       opacity={d.kcal === 0 ? 1 : isToday ? 1 : 0.85} />
                     {(i % 2 === 0 || isToday) && <text x={cx} y={H - 10} textAnchor="middle" className="cl-xtk">{dfmt(d.date)}</text>}
                   </g>
@@ -1370,7 +1396,7 @@ function WeightChart({ pesees, lang }: { pesees: Pesee[]; lang: Lang }) {
         </defs>
         {ticks.map((tk, i) => (
           <g key={i}>
-            <line x1={PADX} y1={y(tk)} x2={W - PADX / 2} y2={y(tk)} stroke="rgba(255,255,255,.08)" />
+            <line x1={PADX} y1={y(tk)} x2={W - PADX / 2} y2={y(tk)} stroke="#eef1f6" />
             <text x={8} y={y(tk) + 4} className="cl-ytk">{nf(lang, 1).format(tk)}</text>
           </g>
         ))}
@@ -1378,7 +1404,7 @@ function WeightChart({ pesees, lang }: { pesees: Pesee[]; lang: Lang }) {
         <polyline points={pts} fill="none" stroke={ACCENT} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
         {tri.map((p, i) => (
           <g key={p.date}>
-            <circle cx={x(i)} cy={y(p.poids)} r="4" fill={ACCENT2} stroke="#0b1120" strokeWidth="2" />
+            <circle cx={x(i)} cy={y(p.poids)} r="4" fill={ACCENT2} stroke="#fff" strokeWidth="2" />
             {(i === 0 || i === tri.length - 1) && (
               <text x={x(i)} y={y(p.poids) - 12} textAnchor="middle" className="cl-pv">{nf(lang, 1).format(p.poids)}</text>
             )}
@@ -1401,210 +1427,233 @@ function deltaColor(delta: number, objectif: Objectif): string {
 
 /* ---------------- styles ---------------- */
 const CSS = `
-.cl{margin:22px 0 8px;color:#e6e9f5}
+.cl{margin:14px 0 8px;color:#2b3243;--ink:#232a37;--muted:#6b7280;--soft:#9aa2b4;--line:#e7ebf2;--green:#16a34a;--greenbg:#e9f8ee;--red:#ef4457;--redbg:#fdeef1;--btn:linear-gradient(135deg,#34d17f,#16a34a)}
+.cl h3,.cl b{color:var(--ink)}
 /* compte + synchro */
-.cl-account{margin-bottom:12px}
-.cl-acc-btn{width:100%;padding:11px;border-radius:12px;border:1px dashed rgba(34,197,94,.4);background:rgba(34,197,94,.06);color:#a3e635;font-size:.88rem;font-weight:700;cursor:pointer}
-.cl-acc-in{display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:12px;padding:9px 14px;flex-wrap:wrap}
-.cl-acc-mail{font-size:.85rem;color:#c3c8e2}
-.cl-acc-pro{margin:0 6px;font-size:.66rem;font-weight:800;color:#05210f;background:#a3e635;border-radius:99px;padding:2px 8px;text-transform:uppercase}
-.cl-acc-out{background:none;border:1px solid rgba(255,255,255,.15);color:#aeb4d6;border-radius:8px;padding:6px 12px;font-size:.8rem;cursor:pointer}
-.cl-authpanel{margin-top:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:18px}
-.cl-auth-h{font-weight:800;font-size:1.05rem}
-.cl-auth-s{margin:6px 0 14px;font-size:.88rem;color:#c3c8e2;line-height:1.5}
-.cl-auth-g{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#1f1f1f;border:0;border-radius:11px;padding:12px;font-size:.92rem;font-weight:700;cursor:pointer}
-.cl-auth-or{display:flex;align-items:center;text-align:center;color:#8b93b7;font-size:.8rem;margin:14px 0}
-.cl-auth-or::before,.cl-auth-or::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.1)}
+.cl-account{margin-bottom:14px}
+.cl-acc-btn{width:100%;padding:13px;border-radius:14px;border:1.5px dashed #9bd9b3;background:var(--greenbg);color:var(--green);font-size:.9rem;font-weight:800;cursor:pointer}
+.cl-acc-in{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--greenbg);border:1px solid #cdebd7;border-radius:14px;padding:11px 15px;flex-wrap:wrap}
+.cl-acc-mail{font-size:.86rem;color:#4b5563}
+.cl-acc-pro{margin:0 6px;font-size:.66rem;font-weight:800;color:#fff;background:var(--green);border-radius:99px;padding:2px 8px;text-transform:uppercase}
+.cl-acc-out{background:#fff;border:1px solid var(--line);color:#6b7280;border-radius:9px;padding:6px 12px;font-size:.8rem;cursor:pointer}
+.cl-authpanel{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 6px 20px -12px rgba(20,40,80,.15)}
+.cl-auth-h{font-weight:800;font-size:1.05rem;color:var(--ink)}
+.cl-auth-s{margin:6px 0 14px;font-size:.9rem;color:#5b6270;line-height:1.55}
+.cl-auth-g{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#1f2733;border:1.5px solid var(--line);border-radius:12px;padding:12px;font-size:.93rem;font-weight:700;cursor:pointer}
+.cl-auth-g:hover{border-color:#cfd6e4}
+.cl-auth-or{display:flex;align-items:center;text-align:center;color:var(--soft);font-size:.8rem;margin:14px 0}
+.cl-auth-or::before,.cl-auth-or::after{content:"";flex:1;height:1px;background:var(--line)}
 .cl-auth-or span{padding:0 12px}
 .cl-auth-email{display:flex;gap:8px;flex-wrap:wrap}
-.cl-auth-email input{flex:1;min-width:150px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#f5f6fb;padding:11px 13px;font-size:.9rem}
-.cl-auth-email button{background:linear-gradient(135deg,#22c55e,#84cc16);color:#05210f;border:0;border-radius:10px;padding:11px 16px;font-weight:800;font-size:.85rem;cursor:pointer;white-space:nowrap}
-.cl-auth-msg{margin:12px 0 0;font-size:.85rem;color:#a3e635}
-.cl-success{margin:10px 0 0;padding:11px 14px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);border-radius:12px;color:#a3e635;font-size:.9rem;font-weight:600}
+.cl-auth-email input{flex:1;min-width:150px;background:#f6f8fb;border:1.5px solid var(--line);border-radius:11px;color:#232a37;padding:12px 14px;font-size:.92rem}
+.cl-auth-email button{background:var(--btn);color:#fff;border:0;border-radius:11px;padding:12px 16px;font-weight:800;font-size:.85rem;cursor:pointer;white-space:nowrap}
+.cl-auth-msg{margin:12px 0 0;font-size:.85rem;color:var(--green);font-weight:600}
+.cl-success{margin:10px 0 0;padding:12px 15px;background:var(--greenbg);border:1px solid #cdebd7;border-radius:12px;color:#0f7a3d;font-size:.9rem;font-weight:600}
 /* modale Pro */
-.cl-promodal{width:min(94vw,420px);background:#101725;border:1px solid rgba(34,197,94,.3);border-radius:20px;padding:24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.cl-pro-h{font-size:1.4rem;font-weight:800}
-.cl-pro-s{margin:8px 0 18px;color:#c3c8e2;font-size:.92rem;line-height:1.5}
+.cl-promodal{width:min(94vw,420px);background:#fff;border:1px solid var(--line);border-radius:22px;padding:26px;text-align:center;box-shadow:0 30px 70px -20px rgba(20,40,80,.4)}
+.cl-pro-h{font-size:1.45rem;font-weight:800;color:var(--ink)}
+.cl-pro-s{margin:8px 0 18px;color:#5b6270;font-size:.93rem;line-height:1.55}
 .cl-plans{display:flex;gap:12px}
-.cl-plan{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.12);border-radius:16px;padding:20px 12px 16px;cursor:pointer;transition:.15s}
-.cl-plan:hover{border-color:rgba(34,197,94,.6);background:rgba(34,197,94,.06)}
-.cl-plan.best{border-color:rgba(34,197,94,.55);background:rgba(34,197,94,.08)}
-.cl-plan-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.66rem;font-weight:800;text-transform:uppercase;background:linear-gradient(135deg,#22c55e,#84cc16);color:#05210f;border-radius:99px;padding:3px 10px}
-.cl-plan-name{font-size:.85rem;color:#8b93b7;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
-.cl-plan-price{font-size:1.5rem;font-weight:800;color:#f5f6fb}
-.cl-plan-price small{font-size:.8rem;font-weight:600;color:#8b93b7}
-.cl-pro-trial{margin:16px 0 0;font-size:.85rem;color:#a3e635}
-.cl-pro-close{margin-top:14px;background:none;border:1px solid rgba(255,255,255,.15);color:#aeb4d6;border-radius:10px;padding:9px 20px;font-size:.85rem;cursor:pointer}
+.cl-plan{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;background:#f8fafc;border:2px solid var(--line);border-radius:16px;padding:22px 12px 16px;cursor:pointer;transition:.15s}
+.cl-plan:hover{border-color:#9bd9b3;background:var(--greenbg)}
+.cl-plan.best{border-color:var(--green);background:var(--greenbg)}
+.cl-plan-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.66rem;font-weight:800;text-transform:uppercase;background:var(--btn);color:#fff;border-radius:99px;padding:3px 10px}
+.cl-plan-name{font-size:.85rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.cl-plan-price{font-size:1.55rem;font-weight:800;color:var(--ink)}
+.cl-plan-price small{font-size:.8rem;font-weight:600;color:var(--muted)}
+.cl-pro-trial{margin:16px 0 0;font-size:.85rem;color:var(--green);font-weight:600}
+.cl-pro-close{margin-top:14px;background:#fff;border:1px solid var(--line);color:#6b7280;border-radius:11px;padding:10px 20px;font-size:.85rem;cursor:pointer}
 /* hero */
-.cl-hero{display:flex;align-items:center;gap:15px;margin-bottom:18px}
-.cl-hero-logo{font-size:2.6rem;line-height:1;filter:drop-shadow(0 6px 14px rgba(34,197,94,.35))}
-.cl-hero-name{font-size:1.9rem;font-weight:800;letter-spacing:-.5px;background:linear-gradient(120deg,#a3e635,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
-.cl-hero-tag{margin:2px 0 0;font-size:.92rem;color:#aeb4d6;line-height:1.4}
+.cl-hero{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.cl-hero-logo{width:52px;height:52px;flex:none;border-radius:15px;box-shadow:0 6px 16px -6px rgba(22,120,60,.4)}
+.cl-hero-name{font-size:2rem;font-weight:800;letter-spacing:-.5px;color:var(--green)}
+.cl-hero-tag{margin:1px 0 0;font-size:.92rem;color:var(--muted);line-height:1.4}
 /* navigation (onglets bien visibles) */
-.cl-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0 4px}
-.cl-navbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:13px 6px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(255,255,255,.045);color:#c3c8e2;font-weight:700;cursor:pointer;transition:transform .12s,box-shadow .15s,background .15s,border-color .15s}
-.cl-navbtn:hover{transform:translateY(-2px);border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.07)}
-.cl-navi{font-size:1.5rem;line-height:1}
-.cl-navl{position:relative;font-size:.84rem;display:inline-flex;align-items:center;gap:5px}
-.cl-navbadge{background:rgba(34,197,94,.9);color:#05210f;font-size:.66rem;font-weight:800;border-radius:99px;padding:1px 6px;line-height:1.4}
+.cl-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:16px 0 4px}
+.cl-navbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 6px;border:1.5px solid var(--line);border-radius:16px;background:#fff;color:#5b6472;font-weight:700;cursor:pointer;transition:transform .12s,box-shadow .15s,background .15s,border-color .15s;box-shadow:0 2px 8px -4px rgba(20,40,80,.1)}
+.cl-navbtn:hover{transform:translateY(-2px);border-color:#9bd9b3;color:var(--green)}
+.cl-navi{font-size:1.55rem;line-height:1}
+.cl-navl{position:relative;font-size:.85rem;display:inline-flex;align-items:center;gap:5px}
+.cl-navbadge{background:var(--green);color:#fff;font-size:.66rem;font-weight:800;border-radius:99px;padding:1px 6px;line-height:1.4}
 .cl-navlock{font-size:.72rem;opacity:.85}
-.cl-navbtn.on{background:linear-gradient(135deg,${ACCENT},${ACCENT2});color:#05210f;border-color:transparent;box-shadow:0 10px 26px -6px rgba(34,197,94,.55)}
-.cl-navbtn.on .cl-navbadge{background:rgba(5,33,15,.28);color:#05210f}
-@media(max-width:560px){.cl-nav{grid-template-columns:repeat(5,1fr);gap:5px}.cl-navbtn{padding:11px 3px;border-radius:13px}.cl-navi{font-size:1.3rem}.cl-navl{font-size:.72rem}}
+.cl-navbtn.on{background:var(--btn);color:#fff;border-color:transparent;box-shadow:0 12px 26px -8px rgba(22,163,74,.5)}
+.cl-navbtn.on .cl-navbadge{background:rgba(255,255,255,.32);color:#fff}
+@media(max-width:560px){.cl-nav{gap:6px}.cl-navbtn{padding:12px 3px;border-radius:14px}.cl-navi{font-size:1.35rem}.cl-navl{font-size:.72rem}}
 /* en-tête de section */
-.cl-sechead{display:flex;align-items:center;gap:14px;margin:20px 0 16px}
-.cl-sec-ic{flex:none;display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:14px;font-size:1.5rem;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3)}
-.cl-sechead h3{margin:0;font-size:1.25rem;font-weight:800;letter-spacing:-.3px}
-.cl-sechead p{margin:2px 0 0;font-size:.88rem;color:#8b93b7;line-height:1.4}
+.cl-sechead{display:flex;align-items:center;gap:14px;margin:22px 0 16px}
+.cl-sec-ic{flex:none;display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:15px;font-size:1.55rem;background:var(--greenbg);border:1px solid #cdebd7}
+.cl-sechead h3{margin:0;font-size:1.3rem;font-weight:800;letter-spacing:-.3px}
+.cl-sechead p{margin:2px 0 0;font-size:.9rem;color:var(--muted);line-height:1.4}
 /* FAQ */
 .cl-faq{display:flex;flex-direction:column;gap:10px}
-.cl-faqitem{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:14px;overflow:hidden;transition:border-color .15s}
-.cl-faqitem.open{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.05)}
-.cl-faqq{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;background:none;border:0;color:#e6e9f5;font-size:.96rem;font-weight:700;cursor:pointer;padding:15px 17px}
-.cl-faqchev{transition:transform .2s;color:#8b93b7;font-size:1.1rem}
-.cl-faqitem.open .cl-faqchev{transform:rotate(180deg);color:#a3e635}
-.cl-faqa{margin:0;padding:0 17px 16px;font-size:.9rem;line-height:1.6;color:#c3c8e2}
+.cl-faqitem{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.cl-faqitem.open{border-color:#bfe6cd;box-shadow:0 6px 18px -12px rgba(22,163,74,.4)}
+.cl-faqq{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;background:none;border:0;color:var(--ink);font-size:.97rem;font-weight:700;cursor:pointer;padding:15px 17px}
+.cl-faqchev{transition:transform .2s;color:var(--soft);font-size:1.1rem}
+.cl-faqitem.open .cl-faqchev{transform:rotate(180deg);color:var(--green)}
+.cl-faqa{margin:0;padding:0 17px 16px;font-size:.92rem;line-height:1.65;color:#4b5563}
 /* paramètres */
-.cl-settings{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:18px;margin-bottom:20px}
-.cl-setttl{font-size:1.05rem;font-weight:800;margin-bottom:14px}
-.cl-setrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-top:1px solid rgba(255,255,255,.07);flex-wrap:wrap}
+.cl-settings{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:22px;box-shadow:0 4px 16px -10px rgba(20,40,80,.12)}
+.cl-setttl{font-size:1.1rem;font-weight:800;margin-bottom:14px;color:var(--ink)}
+.cl-setrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-top:1px solid var(--line);flex-wrap:wrap}
 .cl-setrow.col{flex-direction:column;align-items:stretch}
-.cl-setlabel{font-size:.95rem;font-weight:700;color:#e6e9f5}
-.cl-setpro{font-size:.64rem;font-weight:800;text-transform:uppercase;color:#05210f;background:#a3e635;border-radius:99px;padding:2px 8px;vertical-align:middle;margin-left:4px}
-.cl-setsub{margin:6px 0 0;font-size:.86rem;line-height:1.5;color:#c3c8e2}
-.cl-setwhat{margin:8px 0 0;font-size:.8rem;line-height:1.5;color:#8b93b7}
-.cl-langseg{display:flex;gap:5px;background:rgba(255,255,255,.04);border-radius:10px;padding:4px}
-.cl-langseg button{padding:7px 13px;border:0;border-radius:8px;background:transparent;color:#aeb4d6;font-size:.82rem;font-weight:800;cursor:pointer}
-.cl-langseg button.on{background:linear-gradient(135deg,${ACCENT},${ACCENT2});color:#05210f}
-.cl-notifbtn{margin-top:12px;align-self:flex-start;background:linear-gradient(135deg,${ACCENT},${ACCENT2});color:#05210f;border:0;border-radius:11px;padding:11px 18px;font-size:.9rem;font-weight:800;cursor:pointer}
-.cl-notifbtn.on{background:rgba(34,197,94,.12);color:#a3e635;border:1px solid rgba(34,197,94,.4)}
-.cl-notifbtn.lock{background:rgba(163,230,53,.06);color:#a3e635;border:1px dashed rgba(163,230,53,.4)}
+.cl-setlabel{font-size:.96rem;font-weight:700;color:var(--ink)}
+.cl-setpro{font-size:.64rem;font-weight:800;text-transform:uppercase;color:#fff;background:var(--green);border-radius:99px;padding:2px 8px;vertical-align:middle;margin-left:4px}
+.cl-setsub{margin:6px 0 0;font-size:.88rem;line-height:1.55;color:#5b6270}
+.cl-setwhat{margin:8px 0 0;font-size:.82rem;line-height:1.55;color:var(--muted)}
+.cl-langseg{display:flex;gap:5px;background:#f0f3f8;border-radius:11px;padding:4px}
+.cl-langseg button{padding:8px 14px;border:0;border-radius:8px;background:transparent;color:#6b7280;font-size:.82rem;font-weight:800;cursor:pointer}
+.cl-langseg button.on{background:var(--btn);color:#fff}
+.cl-notifbtn{margin-top:12px;align-self:flex-start;background:var(--btn);color:#fff;border:0;border-radius:12px;padding:12px 18px;font-size:.9rem;font-weight:800;cursor:pointer}
+.cl-notifbtn.on{background:var(--greenbg);color:var(--green);border:1px solid #bfe6cd}
+.cl-notifbtn.lock{background:#fff5f6;color:var(--red);border:1.5px dashed #f5b6c0}
 .cl-notifbtn:disabled{opacity:.6;cursor:wait}
-.cl-setmsg{margin:10px 0 0;font-size:.85rem;color:#a3e635;line-height:1.5}
-.cl-faqttl{font-size:1.05rem;font-weight:800;margin:4px 2px 12px}
-.cl-grid{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:20px;align-items:start}
+.cl-setmsg{margin:10px 0 0;font-size:.85rem;color:var(--green);line-height:1.5;font-weight:600}
+.cl-faqttl{font-size:1.1rem;font-weight:800;margin:4px 2px 12px;color:var(--ink)}
+.cl-grid{display:grid;grid-template-columns:minmax(0,330px) minmax(0,1fr);gap:22px;align-items:start}
 @media(max-width:820px){.cl-grid{grid-template-columns:1fr}}
-.cl-params{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:18px}
-.cl-field{display:block;margin:0 0 15px}
-.cl-field>span{display:block;font-size:.82rem;color:#c3c8e2;margin-bottom:6px}
-.cl-frow{display:flex;align-items:center;gap:8px}
-.cl-range{flex:1;min-width:0;accent-color:${ACCENT}}
-.cl-num{width:82px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#f5f6fb;padding:8px;font-size:.9rem;text-align:right}
-.cl-select{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#f5f6fb;padding:9px 10px;font-size:.88rem}
-.cl-select option{background:#131a2e}
+.cl-params{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 4px 16px -10px rgba(20,40,80,.12)}
+.cl-field{display:block;margin:0 0 18px}
+.cl-field>span{display:block;font-size:.85rem;font-weight:600;color:#4b5563;margin-bottom:8px}
+.cl-frow{display:flex;align-items:center;gap:12px}
+.cl-range{flex:1;min-width:0;height:26px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+.cl-range::-webkit-slider-runnable-track{height:10px;border-radius:99px;background:#e6ebf2}
+.cl-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--green);box-shadow:0 2px 7px rgba(22,120,60,.28);margin-top:-8px}
+.cl-range::-moz-range-track{height:10px;border-radius:99px;background:#e6ebf2}
+.cl-range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:4px solid var(--green);box-shadow:0 2px 7px rgba(22,120,60,.28)}
+.cl-num{width:88px;background:#f6f8fb;border:1.5px solid var(--line);border-radius:10px;color:#232a37;padding:10px;font-size:1rem;font-weight:700;text-align:center}
+.cl-select{width:100%;background:#f6f8fb;border:1.5px solid var(--line);border-radius:10px;color:#232a37;padding:11px 12px;font-size:.92rem;font-weight:600}
+.cl-select option{background:#fff}
 .cl-seg{display:flex;gap:6px}
-.cl-seg button{flex:1;padding:9px;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:rgba(255,255,255,.04);color:#c3c8e2;font-weight:700;font-size:.88rem;cursor:pointer}
-.cl-seg button.on{background:linear-gradient(135deg,${ACCENT},${ACCENT2});color:#05210f;border-color:transparent}
+.cl-seg button{flex:1;padding:11px;border:1.5px solid var(--line);border-radius:11px;background:#fff;color:#5b6472;font-weight:700;font-size:.9rem;cursor:pointer}
+.cl-seg button.on{background:var(--btn);color:#fff;border-color:transparent}
 .cl-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.cl-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:14px 16px}
-.cl-stat.big{grid-column:1/-1;background:linear-gradient(135deg,rgba(34,197,94,.14),rgba(132,204,22,.06));border-color:rgba(34,197,94,.35)}
-.cl-stl{font-size:.78rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#8b93b7}
-.cl-stv{font-size:1.9rem;font-weight:800;letter-spacing:-1px;line-height:1.1;margin-top:2px}
-.cl-stat.big .cl-stv{font-size:2.6rem;color:#a3e635}
-.cl-stv span{font-size:.9rem;font-weight:600;color:#8b93b7}
-.cl-sts{font-size:.76rem;color:#8b93b7;margin-top:2px}
-.cl-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:16px;margin-top:14px}
-.cl-cardh{font-size:.9rem;font-weight:700;color:#c3c8e2;margin-bottom:8px}
+.cl-stat{background:#f8fafc;border:1px solid var(--line);border-radius:15px;padding:15px 16px}
+.cl-stat.big{grid-column:1/-1;background:var(--greenbg);border-color:#bfe6cd}
+.cl-stl{font-size:.78rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+.cl-stv{font-size:2rem;font-weight:800;letter-spacing:-1px;line-height:1.1;margin-top:2px;color:var(--ink)}
+.cl-stat.big .cl-stv{font-size:2.7rem;color:var(--green)}
+.cl-stv span{font-size:.9rem;font-weight:600;color:var(--muted)}
+.cl-sts{font-size:.78rem;color:var(--muted);margin-top:2px}
+.cl-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:16px;box-shadow:0 4px 16px -10px rgba(20,40,80,.1)}
+.cl-cardh{font-size:.95rem;font-weight:800;color:var(--ink);margin-bottom:10px}
 .cl-macrorow{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .cl-donut{width:140px;height:140px;flex:none}
-.cl-dcx{fill:#f5f6fb;font-size:26px;font-weight:800}
-.cl-dcs{fill:#8b93b7;font-size:12px;font-weight:600}
-.cl-macleg{flex:1;min-width:180px;display:flex;flex-direction:column;gap:9px}
-.cl-mleg{display:flex;align-items:center;gap:9px;font-size:.9rem}
-.cl-dot{width:11px;height:11px;border-radius:3px;flex:none}
-.cl-mln{color:#c3c8e2;min-width:74px}
-.cl-mlg{color:#8b93b7}.cl-mlg b{color:#e6e9f5}
+.cl-dcx{fill:#232a37;font-size:26px;font-weight:800}
+.cl-dcs{fill:var(--muted);font-size:12px;font-weight:600}
+.cl-macleg{flex:1;min-width:180px;display:flex;flex-direction:column;gap:10px}
+.cl-mleg{display:flex;align-items:center;gap:9px;font-size:.92rem}
+.cl-dot{width:12px;height:12px;border-radius:4px;flex:none}
+.cl-mln{color:#4b5563;min-width:74px;font-weight:600}
+.cl-mlg{color:var(--muted)}.cl-mlg b{color:var(--ink)}
 /* journal */
-.cl-jhead{display:flex;gap:22px;align-items:center;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:18px;flex-wrap:wrap}
+.cl-jhead{display:flex;gap:24px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;flex-wrap:wrap;box-shadow:0 4px 16px -10px rgba(20,40,80,.1)}
 .cl-ring{display:flex;flex-direction:column;align-items:center;gap:8px}
 .cl-ring svg{width:150px;height:150px}
-.cl-rgv{fill:#f5f6fb;font-size:26px;font-weight:800}
-.cl-rgs{fill:#8b93b7;font-size:11px}
+.cl-rgv{fill:#232a37;font-size:26px;font-weight:800}
+.cl-rgs{fill:var(--muted);font-size:11px}
 .cl-rgp{font-size:15px;font-weight:800}
-.cl-rgr{font-size:.9rem;font-weight:700}
-.cl-jbars{flex:1;min-width:220px;display:flex;flex-direction:column;gap:12px}
-.cl-mbar{}
-.cl-mbh{display:flex;justify-content:space-between;font-size:.84rem;margin-bottom:5px;color:#c3c8e2}
+.cl-rgr{font-size:.92rem;font-weight:700}
+.cl-jbars{flex:1;min-width:220px;display:flex;flex-direction:column;gap:14px}
+.cl-mbh{display:flex;justify-content:space-between;font-size:.86rem;margin-bottom:6px;color:#4b5563}
 .cl-mbh span:first-child{font-weight:700}
-.cl-mbt{height:9px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.cl-mbt{height:11px;border-radius:99px;background:#eef1f6;overflow:hidden}
 .cl-mbt span{display:block;height:100%;border-radius:99px;transition:width .25s}
-.cl-empty{color:#8b93b7;font-size:.9rem;text-align:center;padding:26px 16px;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.12);border-radius:14px;margin:16px 0}
-.cl-lines{margin:16px 0;display:flex;flex-direction:column;gap:7px}
-.cl-line{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:8px 12px}
-.cl-lem{font-size:1.2rem}
-.cl-lname{flex:1;min-width:0;font-size:.92rem;color:#e6e9f5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cl-lg{font-size:.82rem;color:#8b93b7;display:flex;align-items:center;gap:4px}
-.cl-lg input{width:64px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:7px;color:#f5f6fb;padding:5px 6px;font-size:.82rem;text-align:right}
-.cl-lkcal{font-size:.88rem;font-weight:700;color:#a3e635;min-width:74px;text-align:right}
-.cl-lx{width:26px;height:26px;border:0;border-radius:7px;background:rgba(248,113,113,.13);color:#f87171;font-size:1.1rem;cursor:pointer;line-height:1}
+.cl-empty{color:var(--muted);font-size:.92rem;text-align:center;padding:28px 16px;background:#f8fafc;border:1.5px dashed #d7deea;border-radius:16px;margin:16px 0}
+.cl-lines{margin:16px 0;display:flex;flex-direction:column;gap:8px}
+.cl-line{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px 13px;box-shadow:0 2px 8px -6px rgba(20,40,80,.12)}
+.cl-lem{font-size:1.3rem}
+.cl-lname{flex:1;min-width:0;font-size:.94rem;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cl-lg{font-size:.82rem;color:var(--muted);display:flex;align-items:center;gap:4px}
+.cl-lg input{width:66px;background:#f6f8fb;border:1.5px solid var(--line);border-radius:8px;color:#232a37;padding:6px;font-size:.85rem;text-align:center;font-weight:700}
+.cl-lkcal{font-size:.9rem;font-weight:800;color:var(--green);min-width:74px;text-align:right}
+.cl-lx{width:28px;height:28px;border:0;border-radius:8px;background:var(--redbg);color:var(--red);font-size:1.15rem;cursor:pointer;line-height:1}
+/* bouton + chooser bibliothèque */
+.cl-addbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;margin:6px 0 4px;padding:15px;border-radius:15px;border:0;background:var(--btn);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;box-shadow:0 12px 24px -10px rgba(22,163,74,.5)}
+.cl-addbtn span{font-size:1.25rem}
 .cl-picker{margin-top:8px}
-.cl-search{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#f5f6fb;padding:11px 14px;font-size:.92rem;margin-bottom:10px}
-.cl-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.cl-chips button{padding:6px 11px;border:1px solid rgba(255,255,255,.12);border-radius:99px;background:rgba(255,255,255,.04);color:#aeb4d6;font-size:.8rem;font-weight:600;cursor:pointer}
-.cl-chips button.on{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.45);color:#a3e635}
-.cl-foods{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
-.cl-food{display:flex;align-items:center;gap:9px;text-align:left;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:11px;padding:9px 11px;cursor:pointer;transition:.15s}
-.cl-food:hover{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.06)}
-.cl-fem{font-size:1.25rem;flex:none}
-.cl-fn{flex:1;min-width:0;font-size:.85rem;color:#e6e9f5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cl-fk{font-size:.72rem;color:#8b93b7;text-align:right;line-height:1.15}
-.cl-fk small{display:block;font-size:.62rem;opacity:.7}
-.cl-lbrand{color:#8b93b7;font-weight:400}
+.cl-search{width:100%;background:#f6f8fb;border:1.5px solid var(--line);border-radius:12px;color:#232a37;padding:13px 15px;font-size:.95rem;margin-bottom:12px}
+.cl-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.cl-chips button{padding:8px 13px;border:1.5px solid var(--line);border-radius:99px;background:#fff;color:#5b6472;font-size:.82rem;font-weight:700;cursor:pointer}
+.cl-chips button.on{background:var(--greenbg);border-color:#bfe6cd;color:var(--green)}
+.cl-foods{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
+.cl-food{display:flex;align-items:center;gap:10px;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:13px;padding:11px 12px;cursor:pointer;transition:.15s}
+.cl-food:hover{border-color:#9bd9b3;background:var(--greenbg);transform:translateY(-1px)}
+.cl-fem{font-size:1.3rem;flex:none}
+.cl-fn{flex:1;min-width:0;font-size:.88rem;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cl-fk{font-size:.74rem;color:var(--muted);text-align:right;line-height:1.15}
+.cl-fk small{display:block;font-size:.62rem;opacity:.75}
+.cl-lbrand{color:var(--muted);font-weight:400}
 /* actions scan + photo */
-.cl-actions{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0 4px}
-.cl-act{flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#e6e9f5;font-size:.9rem;font-weight:700;cursor:pointer}
-.cl-act span{font-size:1.15rem}
-.cl-act.pro{background:linear-gradient(135deg,#22c55e,#84cc16);color:#05210f;border-color:transparent}
+.cl-actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px}
+.cl-act{flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-size:.92rem;font-weight:700;cursor:pointer}
+.cl-act:hover{border-color:#9bd9b3}
+.cl-act span{font-size:1.2rem}
+.cl-act.pro{background:var(--btn);color:#fff;border-color:transparent}
 .cl-act.pro:disabled{opacity:.7;cursor:wait}
-.cl-act.lock{border-style:dashed;color:#a3e635;border-color:rgba(163,230,53,.4);background:rgba(163,230,53,.06)}
-.cl-scanmsg{margin:8px 0 0;font-size:.85rem;color:#a3e635}
-.cl-photorev{margin:12px 0;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.3);border-radius:14px;padding:12px}
-.cl-photoh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:.95rem}
-.cl-addall{background:linear-gradient(135deg,#22c55e,#84cc16);color:#05210f;border:0;border-radius:9px;padding:7px 14px;font-weight:800;font-size:.82rem;cursor:pointer}
-.cl-addone{width:28px;height:28px;border:0;border-radius:8px;background:rgba(34,197,94,.2);color:#a3e635;font-size:1.2rem;font-weight:800;cursor:pointer;line-height:1}
-.cl-secth{font-size:.78rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#8b93b7;margin:14px 0 8px}
-.cl-offload{color:#84cc16;text-transform:none;letter-spacing:0;font-weight:600}
-.cl-offblock{border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:6px}
-/* overlay scan */
-.cl-scanoverlay{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:20px}
+.cl-act.lock{border-style:dashed;color:var(--red);border-color:#f5b6c0;background:#fff5f6}
+.cl-scanmsg{margin:8px 0 0;font-size:.85rem;color:var(--green);font-weight:600}
+.cl-photorev{margin:12px 0;background:var(--greenbg);border:1px solid #bfe6cd;border-radius:14px;padding:14px}
+.cl-photoh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:.95rem;color:var(--ink)}
+.cl-addall{background:var(--btn);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:800;font-size:.82rem;cursor:pointer}
+.cl-addone{width:30px;height:30px;border:0;border-radius:9px;background:var(--green);color:#fff;font-size:1.2rem;font-weight:800;cursor:pointer;line-height:1}
+.cl-secth{font-size:.78rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin:16px 0 9px}
+.cl-offload{color:var(--green);text-transform:none;letter-spacing:0;font-weight:600}
+.cl-offblock{border-bottom:1px solid var(--line);padding-bottom:8px}
+/* overlay scan (reste sombre : caméra) */
+.cl-scanoverlay{position:fixed;inset:0;z-index:60;background:rgba(15,20,30,.8);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
 .cl-scanbox{position:relative;width:min(92vw,420px);display:flex;flex-direction:column;align-items:center;gap:14px}
-.cl-scanvid{width:100%;border-radius:16px;background:#000;aspect-ratio:4/3;object-fit:cover}
-.cl-scanframe{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:70%;height:120px;border:3px solid #a3e635;border-radius:14px;box-shadow:0 0 0 999px rgba(0,0,0,.25)}
+.cl-scanvid{width:100%;border-radius:18px;background:#000;aspect-ratio:4/3;object-fit:cover}
+.cl-scanframe{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:70%;height:120px;border:3px solid #34d17f;border-radius:14px;box-shadow:0 0 0 999px rgba(0,0,0,.25)}
 .cl-scanttl{color:#fff;font-weight:700}
-.cl-scanclose{background:#fff;color:#111;border:0;border-radius:10px;padding:11px 22px;font-weight:800;cursor:pointer}
+.cl-scanclose{background:#fff;color:#111;border:0;border-radius:11px;padding:12px 22px;font-weight:800;cursor:pointer}
+/* modale chooser bibliothèque */
+.cl-chooser{width:min(94vw,460px);max-height:90vh;overflow:auto;background:#fff;border-radius:22px;padding:22px;box-shadow:0 30px 70px -20px rgba(20,40,80,.45)}
+.cl-chooser .cl-picker{margin-top:0}
+.cl-chooser-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.cl-chooser-h b{font-size:1.15rem;color:var(--ink)}
+.cl-chooser-x{background:#f0f3f8;border:0;color:#6b7280;width:34px;height:34px;border-radius:10px;font-size:1.2rem;cursor:pointer;line-height:1}
+.cl-methods{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cl-method{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;background:#f8fafc;border:1.5px solid var(--line);border-radius:16px;padding:20px 12px;cursor:pointer;transition:.15s}
+.cl-method:hover{border-color:#9bd9b3;background:var(--greenbg);transform:translateY(-2px)}
+.cl-method-i{width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:15px;font-size:1.7rem;background:#fff;border:1px solid var(--line)}
+.cl-method b{font-size:.95rem;color:var(--ink)}
+.cl-method small{font-size:.76rem;color:var(--muted);line-height:1.4}
+.cl-method.pro .cl-method-i{background:var(--greenbg)}
+.cl-method-lock{font-size:.62rem;font-weight:800;text-transform:uppercase;color:var(--green);background:var(--greenbg);border:1px solid #bfe6cd;border-radius:99px;padding:1px 7px;margin-top:2px}
 /* poids */
-.cl-pinput{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:18px}
+.cl-pinput{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 4px 16px -10px rgba(20,40,80,.1)}
 .cl-pin{margin:0;flex:1;min-width:200px}
-.cl-save{background:linear-gradient(135deg,${ACCENT},${ACCENT2});color:#05210f;border:0;border-radius:9px;padding:9px 18px;font-weight:800;font-size:.9rem;cursor:pointer;white-space:nowrap}
-.cl-trend{display:flex;gap:20px}
+.cl-save{background:var(--btn);color:#fff;border:0;border-radius:11px;padding:11px 18px;font-weight:800;font-size:.9rem;cursor:pointer;white-space:nowrap}
+.cl-trend{display:flex;gap:22px}
 .cl-trend div{display:flex;flex-direction:column}
-.cl-trend small{font-size:.72rem;color:#8b93b7;text-transform:uppercase;letter-spacing:.03em}
-.cl-trend b{font-size:1.3rem;font-weight:800}
-.cl-chart{margin-top:16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:12px}
+.cl-trend small{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.cl-trend b{font-size:1.4rem;font-weight:800}
+.cl-chart{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 4px 16px -10px rgba(20,40,80,.1)}
 .cl-chart svg{width:100%;height:auto;display:block}
-.cl-ytk,.cl-xtk{fill:#8b93b7;font-size:11px}
-.cl-pv{fill:#e6e9f5;font-size:12px;font-weight:700}
+.cl-ytk,.cl-xtk{fill:#9aa2b4;font-size:11px}
+.cl-pv{fill:#232a37;font-size:12px;font-weight:700}
 .cl-plist{margin-top:14px}
-.cl-plisth{font-size:.82rem;font-weight:700;color:#8b93b7;text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px}
-.cl-prow{display:flex;align-items:center;gap:12px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)}
-.cl-prow span{flex:1;font-size:.88rem;color:#c3c8e2}
-.cl-prow b{font-size:.95rem}
-.cl-memo{margin:18px 0 0;font-size:.8rem;color:#7fb98f}
-.cl-disclaimer{margin:8px 0 0;font-size:.78rem;line-height:1.5;color:#8b93b7;border-top:1px solid rgba(255,255,255,.08);padding-top:12px}
+.cl-plisth{font-size:.82rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px}
+.cl-prow{display:flex;align-items:center;gap:12px;padding:11px 12px;border-bottom:1px solid var(--line)}
+.cl-prow span{flex:1;font-size:.9rem;color:#4b5563}
+.cl-prow b{font-size:.97rem}
+.cl-memo{margin:20px 0 0;font-size:.82rem;line-height:1.5;color:#6b7d70;background:var(--greenbg);border:1px solid #d7eede;border-radius:12px;padding:12px 14px}
+.cl-disclaimer{margin:10px 0 0;font-size:.8rem;line-height:1.55;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
 /* hero : bouton installer */
 .cl-hero-txt{flex:1;min-width:0}
-.cl-install{flex:none;display:inline-flex;align-items:center;gap:7px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.4);color:#a3e635;border-radius:11px;padding:9px 14px;font-size:.84rem;font-weight:700;cursor:pointer;white-space:nowrap}
-.cl-install:hover{background:rgba(34,197,94,.18)}
+.cl-install{flex:none;display:inline-flex;align-items:center;gap:7px;background:var(--greenbg);border:1.5px solid #bfe6cd;color:var(--green);border-radius:12px;padding:10px 15px;font-size:.85rem;font-weight:800;cursor:pointer;white-space:nowrap}
+.cl-install:hover{background:#dcf3e4}
 @media(max-width:520px){.cl-install span{display:none}}
 /* rappel doux */
-.cl-nudge{display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,rgba(132,204,22,.14),rgba(34,197,94,.06));border:1px solid rgba(132,204,22,.35);border-radius:13px;padding:11px 15px;margin-bottom:14px;font-size:.9rem;color:#e6e9f5;font-weight:600}
-.cl-nudge button{flex:none;background:none;border:0;color:#8b93b7;font-size:1.3rem;line-height:1;cursor:pointer;padding:0 2px}
+.cl-nudge{display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,#fff3d6,#ffe9c2);border:1px solid #f6d99a;border-radius:14px;padding:13px 16px;margin-bottom:14px;font-size:.92rem;color:#7a5b18;font-weight:600}
+.cl-nudge button{flex:none;background:none;border:0;color:#b08a3a;font-size:1.3rem;line-height:1;cursor:pointer;padding:0 2px}
 /* graphique historique calories */
 .cl-histcard{margin-top:16px}
 .cl-histhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
-.cl-histavg{font-size:.82rem;color:#8b93b7}.cl-histavg b{color:#a3e635;font-size:.95rem}
-.cl-histempty{color:#8b93b7;font-size:.88rem;line-height:1.5;margin:10px 0 2px}
-.cl-histleg{display:flex;gap:18px;margin-top:8px;font-size:.78rem;color:#8b93b7}
+.cl-histavg{font-size:.84rem;color:var(--muted)}.cl-histavg b{color:var(--green);font-size:.97rem}
+.cl-histempty{color:var(--muted);font-size:.9rem;line-height:1.55;margin:10px 0 2px}
+.cl-histleg{display:flex;gap:18px;margin-top:8px;font-size:.8rem;color:var(--muted)}
 .cl-histleg span{display:inline-flex;align-items:center;gap:6px}
-.cl-histleg i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.cl-histleg i{width:12px;height:12px;border-radius:4px;display:inline-block}
 `;

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b1a10",
+  themeColor: "#f3f7f2",
 };
 
 export default function CalorioApp() {
@@ -38,14 +38,11 @@ export default function CalorioApp() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className="fx" aria-hidden>
-        <div className="aurora a1" /><div className="aurora a2" /><div className="aurora a3" /><div className="aurora a4" />
-      </div>
-      <div className="grid-fx" aria-hidden />
+      <div className="ca-bg" aria-hidden />
 
       <main className="calorio-app">
         <header className="ca-top">
-          <span className="ca-brand"><span className="ca-logo" aria-hidden>🌱</span> calorio</span>
+          <span className="ca-brand"><img className="ca-logo" src="/calorio-icon-192.png" alt="" width={30} height={30} /> calorio</span>
           <a className="ca-by" href="https://outils.ch" target="_blank" rel="noopener noreferrer">par outils.ch ↗</a>
         </header>
 
@@ -64,16 +61,18 @@ export default function CalorioApp() {
       </main>
 
       <style>{`
-        .calorio-app{max-width:820px;margin:0 auto;padding:20px 18px 60px}
-        .ca-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 2px 4px}
-        .ca-brand{display:inline-flex;align-items:center;gap:9px;font-size:1.15rem;font-weight:800;letter-spacing:-.3px;color:#eef1fb}
-        .ca-logo{font-size:1.5rem}
-        .ca-by{font-size:.8rem;color:#97a0be;text-decoration:none;border:1px solid rgba(150,165,240,.18);border-radius:99px;padding:6px 12px}
-        .ca-by:hover{color:#a3e635;border-color:rgba(163,230,53,.4)}
-        .ca-foot{margin-top:34px;padding-top:18px;border-top:1px solid rgba(150,165,240,.12);text-align:center;color:#97a0be;font-size:.82rem;line-height:1.7}
+        body{background:#f3f7f2 !important}
+        .ca-bg{position:fixed;inset:0;z-index:-5;background:radial-gradient(1100px 560px at 50% -8%, #e9faf0, #f3f7f2 62%)}
+        .calorio-app{max-width:840px;margin:0 auto;padding:16px 18px 60px}
+        .ca-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 2px 2px}
+        .ca-brand{display:inline-flex;align-items:center;gap:9px;font-size:1.2rem;font-weight:800;letter-spacing:-.3px;color:#16a34a}
+        .ca-logo{border-radius:9px;box-shadow:0 4px 10px -4px rgba(22,120,60,.4)}
+        .ca-by{font-size:.8rem;color:#6b7280;text-decoration:none;border:1px solid #e0e6ee;background:#fff;border-radius:99px;padding:7px 13px}
+        .ca-by:hover{color:#16a34a;border-color:#bfe6cd}
+        .ca-foot{margin-top:36px;padding-top:18px;border-top:1px solid #e4e9f0;text-align:center;color:#8a93a3;font-size:.82rem;line-height:1.7}
         .ca-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-        .ca-links a{color:#97a0be;text-decoration:none}
-        .ca-links a:hover{color:#a3e635}
+        .ca-links a{color:#8a93a3;text-decoration:none}
+        .ca-links a:hover{color:#16a34a}
         .ca-foot p{margin:8px 0 0}
       `}</style>
     </>

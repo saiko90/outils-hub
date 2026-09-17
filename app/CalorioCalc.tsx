@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { type Lang } from "@/lib/i18n";
 import {
   type Sexe,
@@ -320,6 +320,23 @@ const LX = {
     vitoOver: ["Petit dépassement — on rééquilibre demain 💪", "Pas de panique, demain repart à zéro 🌱", "Un écart, ça arrive — reste régulier 🥕"],
     avg7: "Moyenne 7 j · kcal", bestStreak: "Meilleure série", atThisRate: "À ce rythme :",
     addPeseeLabel: "Enregistrer un poids", pesePastHint: "Astuce : choisis une date passée pour ton poids d'avant le régime — tu verras tout le chemin déjà parcouru 🎯",
+    troTitle: "Trophées", troToast: "Trophée débloqué !", troSub: (n: number, tot: number) => `${n} / ${tot} obtenus`,
+    tro: {
+      premier_pas: ["Premier pas", "Note ton tout premier aliment"],
+      pesee: ["Sur la balance", "Enregistre ta première pesée"],
+      trois_repas: ["Journée complète", "Note 3 repas différents le même jour"],
+      vert: ["Dans le vert", "Termine une journée dans ton objectif"],
+      explorateur: ["Explorateur", "Cherche un produit en ligne ou scanne un code-barres"],
+      serie3: ["En feu", "3 jours de suite"],
+      serie7: ["Une semaine pleine", "7 jours de suite"],
+      kilo: ["Premier kilo", "1 kg de progrès vers ton objectif"],
+      coach: ["Confident", "Discute avec Vito, ton coach"],
+      photo: ["Photographe", "Analyse un repas en photo"],
+      serie14: ["Machine", "14 jours d'affilée"],
+      objectif: ["Objectif atteint", "Atteins ton poids cible"],
+    } as Record<string, [string, string]>,
+    gradeLabel: "Grade", gradeNames: ["Débutant", "Motivé", "Régulier", "Assidu", "Expert", "Légende"],
+    gradeNext: (n: number) => `Plus que ${n} trophée${n > 1 ? "s" : ""} pour le grade suivant`, gradeMax: "Grade maximum atteint 👑",
      objVal: (v: string) => v,
   },
   de: {
@@ -348,6 +365,23 @@ const LX = {
     vitoOver: ["Kleine Überschreitung — morgen gleicht sich's aus 💪", "Kein Stress, morgen neu 🌱", "Ein Ausrutscher passiert — bleib dran 🥕"],
     avg7: "Ø 7 Tage · kcal", bestStreak: "Beste Serie", atThisRate: "In diesem Tempo:",
     addPeseeLabel: "Gewicht speichern", pesePastHint: "Tipp: Wähle ein früheres Datum für dein Gewicht vor der Diät — so siehst du den ganzen Weg 🎯",
+    troTitle: "Trophäen", troToast: "Trophäe freigeschaltet!", troSub: (n: number, tot: number) => `${n} / ${tot} erreicht`,
+    tro: {
+      premier_pas: ["Erster Schritt", "Trag dein allererstes Lebensmittel ein"],
+      pesee: ["Auf die Waage", "Erfasse deine erste Wägung"],
+      trois_repas: ["Voller Tag", "3 verschiedene Mahlzeiten an einem Tag"],
+      vert: ["Im grünen Bereich", "Beende einen Tag im Ziel"],
+      explorateur: ["Entdecker", "Produkt online suchen oder Barcode scannen"],
+      serie3: ["In Flammen", "3 Tage in Folge"],
+      serie7: ["Volle Woche", "7 Tage in Folge"],
+      kilo: ["Erstes Kilo", "1 kg Fortschritt zum Ziel"],
+      coach: ["Vertraut", "Chatte mit Vito, deinem Coach"],
+      photo: ["Fotograf", "Analysiere eine Mahlzeit per Foto"],
+      serie14: ["Maschine", "14 Tage in Folge"],
+      objectif: ["Ziel erreicht", "Erreiche dein Zielgewicht"],
+    } as Record<string, [string, string]>,
+    gradeLabel: "Rang", gradeNames: ["Anfänger", "Motiviert", "Regelmässig", "Fleissig", "Experte", "Legende"],
+    gradeNext: (n: number) => `Noch ${n} Trophäe${n > 1 ? "n" : ""} bis zum nächsten Rang`, gradeMax: "Höchster Rang erreicht 👑",
     objVal: (v: string) => v,
   },
   en: {
@@ -376,6 +410,23 @@ const LX = {
     vitoOver: ["A little over — we'll rebalance tomorrow 💪", "No worries, tomorrow's a fresh start 🌱", "One slip is fine — stay consistent 🥕"],
     avg7: "7-day avg · kcal", bestStreak: "Best streak", atThisRate: "At this rate:",
     addPeseeLabel: "Log a weight", pesePastHint: "Tip: pick a past date for your pre-diet weight — you'll see all the progress you've already made 🎯",
+    troTitle: "Trophies", troToast: "Trophy unlocked!", troSub: (n: number, tot: number) => `${n} / ${tot} earned`,
+    tro: {
+      premier_pas: ["First step", "Log your very first food"],
+      pesee: ["On the scale", "Record your first weigh-in"],
+      trois_repas: ["Full day", "Log 3 different meals in one day"],
+      vert: ["In the green", "Finish a day within your target"],
+      explorateur: ["Explorer", "Search a product online or scan a barcode"],
+      serie3: ["On fire", "3 days in a row"],
+      serie7: ["Full week", "7 days in a row"],
+      kilo: ["First kilo", "1 kg of progress toward your goal"],
+      coach: ["Confidant", "Chat with Vito, your coach"],
+      photo: ["Photographer", "Analyse a meal from a photo"],
+      serie14: ["Machine", "14 days in a row"],
+      objectif: ["Goal reached", "Reach your target weight"],
+    } as Record<string, [string, string]>,
+    gradeLabel: "Rank", gradeNames: ["Beginner", "Motivated", "Regular", "Dedicated", "Expert", "Legend"],
+    gradeNext: (n: number) => `${n} more troph${n > 1 ? "ies" : "y"} to the next rank`, gradeMax: "Top rank reached 👑",
     objVal: (v: string) => v,
   },
 } as const;
@@ -392,6 +443,37 @@ type MealKey = "matin" | "midi" | "snack" | "soir";
 const MEALS: MealKey[] = ["matin", "midi", "snack", "soir"];
 const mealOfHour = (h: number): MealKey => (h < 11 ? "matin" : h < 15 ? "midi" : h < 18 ? "snack" : "soir");
 const MEAL_EMO: Record<MealKey, string> = { matin: "🌅", midi: "🍽️", snack: "🍎", soir: "🌙" };
+
+// Trophées : ordre d'affichage + emoji. Le premier ("Premier pas") est très facile pour montrer que ça existe.
+type TrophyId =
+  | "premier_pas" | "pesee" | "trois_repas" | "vert" | "explorateur"
+  | "serie3" | "serie7" | "kilo" | "coach" | "photo" | "serie14" | "objectif";
+const TROPHIES: { id: TrophyId; emo: string }[] = [
+  { id: "premier_pas", emo: "👣" },
+  { id: "pesee", emo: "⚖️" },
+  { id: "trois_repas", emo: "🍽️" },
+  { id: "vert", emo: "🎯" },
+  { id: "explorateur", emo: "🔎" },
+  { id: "serie3", emo: "🔥" },
+  { id: "serie7", emo: "🗓️" },
+  { id: "kilo", emo: "🥉" },
+  { id: "coach", emo: "🥕" },
+  { id: "photo", emo: "📷" },
+  { id: "serie14", emo: "💪" },
+  { id: "objectif", emo: "🏆" },
+];
+
+// Grades (rangs) : montent avec le nombre de trophées obtenus (récurrence + collection).
+const GRADES: { min: number; emo: string }[] = [
+  { min: 0, emo: "🌱" },
+  { min: 2, emo: "🌿" },
+  { min: 4, emo: "⭐" },
+  { min: 6, emo: "🔥" },
+  { min: 9, emo: "💎" },
+  { min: 12, emo: "👑" },
+];
+// Indice du grade courant à partir du nombre de trophées obtenus.
+const gradeIndex = (n: number) => { let i = 0; for (let k = 0; k < GRADES.length; k++) if (n >= GRADES[k].min) i = k; return i; };
 const MEAL_BG: Record<MealKey, string> = { matin: "#fff3e0", midi: "#e6f7ee", snack: "#fdeaf0", soir: "#eef1fb" };
 
 // Icônes SVG de la barre d'onglets (traits, style moderne).
@@ -510,6 +592,11 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [poidsInput, setPoidsInput] = useState<number | "">("");
   const [poidsDate, setPoidsDate] = useState<string>("");
   const [streakBest, setStreakBest] = useState(0);
+  // Trophées (rétention & motivation)
+  const [trophies, setTrophies] = useState<Record<string, number>>({});
+  const [used, setUsed] = useState<{ search?: boolean; scan?: boolean; photo?: boolean; coach?: boolean }>({});
+  const [newTrophy, setNewTrophy] = useState<string>("");
+  const trophyInit = useRef(false);
   const [q, setQ] = useState("");
   const [catFilter, setCatFilter] = useState<AlimentCat | "tous">("tous");
   const [isPro, setIsPro] = useState(false);
@@ -559,6 +646,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     setPesees(load<Pesee[]>("calorio.pesees", []));
     setRecents(load<Food[]>("calorio.recents", []));
     setStreakBest(load<number>("calorio.streakBest", 0));
+    setTrophies(load<Record<string, number>>("calorio.trophies", {}));
+    setUsed(load("calorio.used", {}));
     setPoidsInput("");
     setPoidsDate(todayISO());
     try {
@@ -637,6 +726,15 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     if (p.activite) setActivite(p.activite as Activite);
     if (p.objectif) setObjectif(p.objectif as Objectif);
     if (typeof p.poidsCible === "number") setPoidsCible(p.poidsCible);
+    // Union des trophées/actions (local + cloud), pour ne jamais perdre un trophée déjà gagné.
+    if (p.trophies && typeof p.trophies === "object") {
+      const cloud = p.trophies as Record<string, number>;
+      setTrophies((prev) => { const next = { ...cloud, ...prev }; save("calorio.trophies", next); return next; });
+    }
+    if (p.used && typeof p.used === "object") {
+      const cloud = p.used as Record<string, boolean>;
+      setUsed((prev) => { const next = { ...cloud, ...prev }; save("calorio.used", next); return next; });
+    }
   };
 
   const pullFromCloud = async (uid: string) => {
@@ -736,14 +834,14 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const id = setTimeout(() => {
       supa.from("calorio_users").upsert({
         id: user.id,
-        profil: { sexe, age, poids, taille, activite, objectif, poidsCible },
+        profil: { sexe, age, poids, taille, activite, objectif, poidsCible, trophies, used },
         journal: load("calorio.journal", {}),
         pesees,
         updated_at: new Date().toISOString(),
       }).then(() => {});
     }, 1400);
     return () => clearTimeout(id);
-  }, [mounted, user, sexe, age, poids, taille, activite, objectif, poidsCible, pesees, lines]);
+  }, [mounted, user, sexe, age, poids, taille, activite, objectif, poidsCible, pesees, lines, trophies, used]);
 
   const signInGoogle = () => {
     getSupabase()?.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.href.split("?")[0] } });
@@ -897,7 +995,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const coachCtx: CoachCtx = useMemo(
     () => ({
       lang,
-      profil: { sexe, age, poids, taille, activite, objectif, poidsCible },
+      profil: { sexe, age, poids, taille, activite, objectif, poidsCible, trophies, used },
       cible: besoins.cible,
       bmr: besoins.bmr,
       tdee: besoins.tdee,
@@ -952,6 +1050,66 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const base = tri.filter((p) => p.date >= limit)[0] ?? tri[0];
     return Math.round((last.poids - base.poids) * 10) / 10;
   }, [pesees]);
+
+  // Marque une action utilisée (recherche en ligne, scan, photo, coach) pour les trophées.
+  const markUsed = (k: "search" | "scan" | "photo" | "coach") =>
+    setUsed((prev) => { if (prev[k]) return prev; const next = { ...prev, [k]: true }; save("calorio.used", next); return next; });
+
+  // Trophées : conditions calculées à partir des données + actions.
+  const trophyConds = useMemo(() => {
+    const jour = load<Record<string, unknown[]>>("calorio.journal", {});
+    const loggedAny = lines.length > 0 || Object.values(jour).some((a) => Array.isArray(a) && a.length > 0);
+    const mealsToday = MEALS.filter((m) => mealGroups[m].length > 0).length;
+    const inTarget = (k: number) => besoins.cible > 0 && k >= besoins.cible * 0.85 && k <= besoins.cible * 1.05;
+    const vert = histoire.some((d) => inTarget(d.kcal)) || inTarget(total.kcal);
+    const wantsGain = objectif === "prise" || objectif === "prise_rapide";
+    const progress = tend ? (wantsGain ? tend.actuel - tend.debut : tend.debut - tend.actuel) : 0;
+    const goalReached = poidsCible !== "" && !!tend && Math.abs(tend.actuel - poidsCible) < 0.3;
+    return {
+      premier_pas: loggedAny,
+      pesee: pesees.length >= 1,
+      trois_repas: mealsToday >= 3,
+      vert,
+      explorateur: !!used.search || !!used.scan,
+      serie3: Math.max(streak, streakBest) >= 3,
+      serie7: Math.max(streak, streakBest) >= 7,
+      serie14: Math.max(streak, streakBest) >= 14,
+      kilo: progress >= 1,
+      coach: !!used.coach,
+      photo: !!used.photo,
+      objectif: goalReached,
+    } as Record<TrophyId, boolean>;
+  }, [lines, mealGroups, pesees, histoire, total.kcal, besoins.cible, objectif, tend, poidsCible, used, streak, streakBest]);
+
+  // Débloque les trophées atteints, persiste, et fête le premier nouveau (hors chargement initial).
+  useEffect(() => {
+    if (!mounted) return;
+    const toUnlock = TROPHIES.filter((tr) => trophyConds[tr.id] && !trophies[tr.id]).map((tr) => tr.id);
+    if (toUnlock.length) {
+      setTrophies((prev) => {
+        const next = { ...prev }; const now = Date.now();
+        toUnlock.forEach((id) => { if (!next[id]) next[id] = now; });
+        save("calorio.trophies", next);
+        return next;
+      });
+      if (trophyInit.current) setNewTrophy(toUnlock[0]);
+    }
+    trophyInit.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, trophyConds]);
+
+  // Trophée « Confident » : ouvrir l'écran Vito compte comme un échange avec le coach.
+  useEffect(() => {
+    if (mounted && tab === "coach") markUsed("coach");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, tab]);
+
+  const trophyCount = useMemo(() => TROPHIES.filter((tr) => trophies[tr.id]).length, [trophies]);
+  const grade = useMemo(() => {
+    const gi = gradeIndex(trophyCount);
+    const next = GRADES[gi + 1];
+    return { index: gi, emo: GRADES[gi].emo, need: next ? next.min - trophyCount : 0, isMax: !next };
+  }, [trophyCount]);
 
   // Moyenne des 7 derniers jours renseignés (kcal).
   const avg7 = useMemo(() => {
@@ -1052,7 +1210,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     try {
       const r = await fetch(`/api/foods?code=${encodeURIComponent(code)}`);
       const data = (await r.json()) as { foods?: Food[] };
-      if (data.foods && data.foods.length) { addFood(data.foods[0]); setScanMsg(`✓ ${data.foods[0].nom}`); }
+      if (data.foods && data.foods.length) { addFood(data.foods[0]); markUsed("scan"); setScanMsg(`✓ ${data.foods[0].nom}`); }
       else setScanMsg(t.scanNotFound);
     } catch { setScanMsg(t.scanNotFound); }
   };
@@ -1126,7 +1284,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
           return { id: `photo:${newKey()}`, nom: it.nom, kcal: per(it.kcal), prot: per1(it.prot), gluc: per1(it.gluc), lip: per1(it.lip), portion: g, emoji: "📷" } as Food;
         });
         if (items.length === 0) setPhotoMsg(t.photoNone);
-        else { setPhotoItems(items); setPhotoMsg(""); }
+        else { setPhotoItems(items); setPhotoMsg(""); markUsed("photo"); }
       }
     } catch { setPhotoMsg(t.photoErr); }
     setPhotoBusy(false);
@@ -1417,6 +1575,33 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
           <div className="cl-screen play" key="aide">
             <div className="cl-head"><div><h1>{x.helpTitle}</h1><div className="cl-sub">{x.helpSub}</div></div></div>
 
+            <div className="cl-sectt"><span className="cl-dot" />{x.troTitle}</div>
+            <div className="cl-card cl-trocard">
+              <div className="cl-grade">
+                <div className="cl-grade-emo">{grade.emo}</div>
+                <div className="cl-grade-tx">
+                  <div className="cl-grade-lb">{x.gradeLabel}</div>
+                  <div className="cl-grade-nm">{x.gradeNames[grade.index]}</div>
+                </div>
+                <div className="cl-grade-cnt">{x.troSub(trophyCount, TROPHIES.length)}</div>
+              </div>
+              <div className="cl-gradebar"><span style={{ width: `${Math.round((trophyCount / TROPHIES.length) * 100)}%` }} /></div>
+              <div className="cl-grade-next">{grade.isMax ? x.gradeMax : x.gradeNext(grade.need)}</div>
+              <div className="cl-trogrid">
+                {TROPHIES.map((tr) => {
+                  const got = !!trophies[tr.id];
+                  const meta = x.tro[tr.id];
+                  return (
+                    <div key={tr.id} className={`cl-tro ${got ? "got" : ""}`} title={meta[1]}>
+                      <span className="cl-tro-emo">{got ? tr.emo : "🔒"}</span>
+                      <span className="cl-tro-nm">{meta[0]}</span>
+                      <span className="cl-tro-d">{meta[1]}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
             {user && refCode && (
               <div className="cl-card cl-invite">
                 <div className="cl-inv-h">🎁 {t.inviteTitle}</div>
@@ -1586,7 +1771,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                     <div className="cl-secth">🌍 {t.offTitle}{offLoading && <span className="cl-offload"> · {t.offLoading}</span>}</div>
                     <div className="cl-foods">
                       {offResults.map((f) => (
-                        <button key={f.id} className="cl-food2" onClick={() => { addFood(f, addMeal ?? undefined); setAddOpen(false); }}>
+                        <button key={f.id} className="cl-food2" onClick={() => { addFood(f, addMeal ?? undefined); markUsed("search"); setAddOpen(false); }}>
                           <span className="cl-fem">{f.emoji}</span><span className="cl-f2n">{f.nom}{f.brand ? <small> · {f.brand}</small> : null}</span><span className="cl-f2k">{f.kcal} kcal<small>/100 g</small></span>
                         </button>
                       ))}
@@ -1655,6 +1840,24 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
           </div>
         </div>
       )}
+
+      {/* ===== Trophée débloqué (célébration) ===== */}
+      {newTrophy && (() => {
+        const tr = TROPHIES.find((z) => z.id === newTrophy);
+        const meta = tr ? x.tro[tr.id] : ["", ""];
+        return (
+          <div className="cl-scanoverlay cl-trofx" onClick={() => setNewTrophy("")}>
+            <div className="cl-tromodal" onClick={(e) => e.stopPropagation()}>
+              <div className="cl-troburst" aria-hidden>{["🎉", "✨", "🎊", "⭐", "🌟", "✨", "🎉", "⭐"].map((c, i) => <span key={i} style={{ "--i": i } as CSSProperties}>{c}</span>)}</div>
+              <div className="cl-tromodal-emo">{tr?.emo}</div>
+              <div className="cl-tromodal-h">🏆 {x.troToast}</div>
+              <div className="cl-tromodal-nm">{meta[0]}</div>
+              <div className="cl-tromodal-d">{meta[1]}</div>
+              <button className="cl-tromodal-ok" onClick={() => setNewTrophy("")}>{t.close}</button>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ===== Vito flottant (coach toujours là) ===== */}
       {tab !== "coach" && tab !== "journee" && (
@@ -2136,6 +2339,40 @@ const CSS = `
 .cl-vito-bubble{pointer-events:none;max-width:180px;background:#fff;border:1px solid var(--line);border-radius:16px;border-bottom-right-radius:5px;padding:9px 13px;font-size:.82rem;font-weight:800;color:var(--ink);line-height:1.3;
   box-shadow:0 14px 30px -14px rgba(20,50,30,.45);animation:clpop .32s cubic-bezier(.2,1.3,.5,1) both}
 @keyframes clpop{from{opacity:0;transform:translateY(8px) scale(.85)}}
+/* trophées & grade */
+.cl-trocard{background:linear-gradient(180deg,#fffdf6,#fbfff8)}
+.cl-grade{display:flex;align-items:center;gap:13px}
+.cl-grade-emo{flex:none;width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.7rem;
+  background:radial-gradient(circle at 50% 32%,#fffbeb,#fdf0c9);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 8px 18px -8px rgba(201,150,26,.5)}
+.cl-grade-tx{flex:1;min-width:0}
+.cl-grade-lb{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--soft);font-weight:800}
+.cl-grade-nm{font-family:var(--disp);font-weight:600;font-size:1.25rem;color:var(--ink);line-height:1.1}
+.cl-grade-cnt{flex:none;font-weight:800;font-size:.8rem;color:var(--gold);background:var(--goldbg);border:1px solid var(--goldline);border-radius:99px;padding:4px 10px}
+.cl-gradebar{height:9px;border-radius:99px;background:#eef1ee;overflow:hidden;margin:13px 0 7px}
+.cl-gradebar span{display:block;height:100%;border-radius:99px;background:var(--goldbg);transition:width .4s}
+.cl-grade-next{font-size:.78rem;color:var(--muted);font-weight:700;text-align:center}
+.cl-trogrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-top:15px}
+.cl-tro{display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;padding:12px 6px;border-radius:15px;background:#f4f6f4;border:1px solid var(--line);opacity:.72}
+.cl-tro.got{background:linear-gradient(180deg,#fffdf4,#f4fbf6);border-color:var(--goldline);opacity:1;box-shadow:0 8px 18px -12px rgba(201,150,26,.5)}
+.cl-tro-emo{font-size:1.5rem;filter:grayscale(1);opacity:.55}
+.cl-tro.got .cl-tro-emo{filter:none;opacity:1}
+.cl-tro-nm{font-weight:800;font-size:.74rem;color:var(--ink);line-height:1.15;overflow-wrap:anywhere}
+.cl-tro-d{font-size:.64rem;color:var(--soft);font-weight:600;line-height:1.2;overflow-wrap:anywhere}
+/* célébration */
+.cl-trofx{z-index:90}
+.cl-tromodal{position:relative;width:min(90vw,340px);background:#fff;border-radius:26px;padding:30px 24px 22px;text-align:center;box-shadow:0 30px 70px -20px rgba(14,40,24,.55);animation:cltropop .45s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes cltropop{from{opacity:0;transform:scale(.7) translateY(20px)}}
+.cl-tromodal-emo{font-size:4rem;line-height:1;animation:cltrospin .7s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes cltrospin{from{transform:scale(0) rotate(-40deg)}}
+.cl-tromodal-h{margin-top:12px;font-weight:900;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gold)}
+.cl-tromodal-nm{font-family:var(--disp);font-weight:600;font-size:1.5rem;color:var(--ink);margin-top:4px}
+.cl-tromodal-d{font-size:.86rem;color:var(--muted);font-weight:600;margin-top:5px;line-height:1.4}
+.cl-tromodal-ok{margin-top:18px;background:var(--btn);color:#fff;border:0;border-radius:13px;padding:12px 26px;font-family:var(--disp);font-weight:600;font-size:1rem;cursor:pointer;box-shadow:0 12px 24px -10px rgba(22,163,74,.6)}
+.cl-troburst{position:absolute;inset:0;overflow:visible;pointer-events:none}
+.cl-troburst span{position:absolute;top:34%;left:50%;font-size:1.3rem;animation:cltroburst .9s ease-out both;animation-delay:calc(var(--i) * .04s)}
+@keyframes cltroburst{0%{opacity:0;transform:translate(-50%,-50%) rotate(0) translateY(0)}
+  20%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-50%) rotate(calc(var(--i) * 45deg)) translateY(-120px)}}
 /* barre d'onglets */
 .cl-tabbar{position:relative;z-index:2;flex:none;display:flex;justify-content:space-around;gap:2px;
   padding:9px 10px calc(env(safe-area-inset-bottom,0px) + 10px);

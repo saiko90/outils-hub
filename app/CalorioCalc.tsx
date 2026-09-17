@@ -313,6 +313,13 @@ const LX = {
     goalWeight: "Poids objectif", toGoal: (v: string) => `plus que ${v} kg`, goalReached: "Objectif atteint 🎉",
     vitoHi: ["Bonjour 👋", "Coucou, c'est parti !", "Salut, prêt·e ?", "Hey, content de te voir 🥕"],
     vitoBack: ["Ah, te revoilà ! 🥕", "Content de te revoir 😊", "On continue ? 💪", "Je veille sur toi 🥕", "Beau boulot, continue !"],
+    vitoMorning: ["Bon matin ! On note le petit-déj ? 🌅", "Nouvelle journée, nouvelle énergie ☀️", "Bien dormi ? On y va 🥕"],
+    vitoLunch: ["Et ce midi, tu as mangé quoi ? 🍽️", "Pense à noter ton déjeuner 😋", "Petite pause repas ? Note-la 📝"],
+    vitoEvening: ["Pense à noter ton dîner 🌙", "La journée se termine, on complète le journal ?", "Un dernier repas à noter ? 🍽️"],
+    vitoGood: ["Tu es dans le vert, beau boulot 🎉", "Journée bien équilibrée 💪", "Continue comme ça, c'est top 🌟"],
+    vitoOver: ["Petit dépassement — on rééquilibre demain 💪", "Pas de panique, demain repart à zéro 🌱", "Un écart, ça arrive — reste régulier 🥕"],
+    avg7: "Moyenne 7 j · kcal", bestStreak: "Meilleure série", atThisRate: "À ce rythme :",
+    addPeseeLabel: "Enregistrer un poids", pesePastHint: "Astuce : choisis une date passée pour ton poids d'avant le régime — tu verras tout le chemin déjà parcouru 🎯",
      objVal: (v: string) => v,
   },
   de: {
@@ -334,6 +341,13 @@ const LX = {
     goalWeight: "Zielgewicht", toGoal: (v: string) => `noch ${v} kg`, goalReached: "Ziel erreicht 🎉",
     vitoHi: ["Hallo 👋", "Hoi, los geht's!", "Bereit?", "Schön, dich zu sehen 🥕"],
     vitoBack: ["Ah, da bist du wieder! 🥕", "Schön, dich wiederzusehen 😊", "Weiter so? 💪", "Ich pass auf dich auf 🥕", "Gut gemacht, weiter!"],
+    vitoMorning: ["Guten Morgen! Frühstück eintragen? 🌅", "Neuer Tag, neue Energie ☀️", "Gut geschlafen? Los geht's 🥕"],
+    vitoLunch: ["Und was gab's zu Mittag? 🍽️", "Denk ans Mittagessen 😋", "Kurze Pause? Trag's ein 📝"],
+    vitoEvening: ["Denk ans Abendessen 🌙", "Der Tag endet — Journal vervollständigen?", "Noch eine Mahlzeit einzutragen? 🍽️"],
+    vitoGood: ["Du bist im grünen Bereich, super 🎉", "Schön ausgewogener Tag 💪", "Weiter so, top 🌟"],
+    vitoOver: ["Kleine Überschreitung — morgen gleicht sich's aus 💪", "Kein Stress, morgen neu 🌱", "Ein Ausrutscher passiert — bleib dran 🥕"],
+    avg7: "Ø 7 Tage · kcal", bestStreak: "Beste Serie", atThisRate: "In diesem Tempo:",
+    addPeseeLabel: "Gewicht speichern", pesePastHint: "Tipp: Wähle ein früheres Datum für dein Gewicht vor der Diät — so siehst du den ganzen Weg 🎯",
     objVal: (v: string) => v,
   },
   en: {
@@ -355,6 +369,13 @@ const LX = {
     goalWeight: "Target weight", toGoal: (v: string) => `${v} kg to go`, goalReached: "Goal reached 🎉",
     vitoHi: ["Hi 👋", "Hey, let's go!", "Ready?", "Good to see you 🥕"],
     vitoBack: ["Ah, you're back! 🥕", "Good to see you again 😊", "Keep going? 💪", "I've got your back 🥕", "Nice work, keep it up!"],
+    vitoMorning: ["Good morning! Log your breakfast? 🌅", "New day, new energy ☀️", "Slept well? Let's go 🥕"],
+    vitoLunch: ["What did you have for lunch? 🍽️", "Don't forget your lunch 😋", "Meal break? Log it 📝"],
+    vitoEvening: ["Don't forget your dinner 🌙", "Day's ending — complete your log?", "One more meal to log? 🍽️"],
+    vitoGood: ["You're in the green, nice work 🎉", "Nicely balanced day 💪", "Keep it up, looking great 🌟"],
+    vitoOver: ["A little over — we'll rebalance tomorrow 💪", "No worries, tomorrow's a fresh start 🌱", "One slip is fine — stay consistent 🥕"],
+    avg7: "7-day avg · kcal", bestStreak: "Best streak", atThisRate: "At this rate:",
+    addPeseeLabel: "Log a weight", pesePastHint: "Tip: pick a past date for your pre-diet weight — you'll see all the progress you've already made 🎯",
     objVal: (v: string) => v,
   },
 } as const;
@@ -487,6 +508,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [addMeal, setAddMeal] = useState<MealKey | null>(null);
   const [pesees, setPesees] = useState<Pesee[]>([]);
   const [poidsInput, setPoidsInput] = useState<number | "">("");
+  const [poidsDate, setPoidsDate] = useState<string>("");
+  const [streakBest, setStreakBest] = useState(0);
   const [q, setQ] = useState("");
   const [catFilter, setCatFilter] = useState<AlimentCat | "tous">("tous");
   const [isPro, setIsPro] = useState(false);
@@ -535,7 +558,9 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     setLines(migrateLines(jour[day], lang));
     setPesees(load<Pesee[]>("calorio.pesees", []));
     setRecents(load<Food[]>("calorio.recents", []));
+    setStreakBest(load<number>("calorio.streakBest", 0));
     setPoidsInput("");
+    setPoidsDate(todayISO());
     try {
       const url = new URL(window.location.href);
       if (url.searchParams.get("pro") === "preview") localStorage.setItem("calorio.pro", "1");
@@ -928,13 +953,54 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     return Math.round((last.poids - base.poids) * 10) / 10;
   }, [pesees]);
 
-  // Vito « vivant » : petit mot dans une bulle à l'ouverture puis à chaque changement d'écran, qui s'efface.
+  // Moyenne des 7 derniers jours renseignés (kcal).
+  const avg7 = useMemo(() => {
+    const withData = histoire.filter((d) => d.kcal > 0).slice(-7);
+    if (!withData.length) return 0;
+    return Math.round(withData.reduce((s, d) => s + d.kcal, 0) / withData.length);
+  }, [histoire]);
+
+  // Mémorise la meilleure série (record) quand la série courante la dépasse.
+  useEffect(() => {
+    if (!mounted) return;
+    if (streak > streakBest) { setStreakBest(streak); save("calorio.streakBest", streak); }
+  }, [mounted, streak, streakBest]);
+
+  // Projection : à ce rythme, quand atteint-on le poids cible ?
+  const eta = useMemo(() => {
+    if (poidsCible === "" || pesees.length < 2) return null;
+    const tri = [...pesees].sort((a, b) => a.date.localeCompare(b.date));
+    const first = tri[0], last = tri[tri.length - 1];
+    const days = (new Date(last.date).getTime() - new Date(first.date).getTime()) / 864e5;
+    if (days < 1) return null;
+    const need = poidsCible - last.poids;
+    if (Math.abs(need) < 0.15) return { reached: true, date: "" };
+    const rate = (last.poids - first.poids) / days; // kg/jour
+    if (rate === 0 || Math.sign(rate) !== Math.sign(need)) return null;
+    const daysToGoal = need / rate;
+    if (!isFinite(daysToGoal) || daysToGoal <= 0 || daysToGoal > 365 * 3) return null;
+    const d = new Date(Date.now() + daysToGoal * 864e5);
+    return { reached: false, date: d.toLocaleDateString(locale, { day: "numeric", month: "long", year: daysToGoal > 320 ? "numeric" : undefined }) };
+  }, [poidsCible, pesees, locale]);
+
+  // Vito « vivant » : petit mot contextuel (heure + progrès du jour) à l'ouverture et à chaque écran, puis s'efface.
   useEffect(() => {
     if (!mounted || tab === "coach") return;
-    const pool = vitoSeen.current ? x.vitoBack : x.vitoHi;
+    const pick = (a: readonly string[]) => a[Math.floor(Math.random() * a.length)];
+    let msg: string;
+    if (!vitoSeen.current) {
+      msg = pick(x.vitoHi);
+    } else {
+      const h = new Date().getHours();
+      const ratio = besoins.cible > 0 ? total.kcal / besoins.cible : 0;
+      if (ratio > 1.05) msg = pick(x.vitoOver);
+      else if (ratio < 0.05) msg = pick(h < 11 ? x.vitoMorning : h < 15 ? x.vitoLunch : h >= 19 ? x.vitoEvening : x.vitoBack);
+      else if (ratio >= 0.8) msg = pick(x.vitoGood);
+      else msg = pick(x.vitoBack);
+    }
     vitoSeen.current = true;
-    setVitoBubble(pool[Math.floor(Math.random() * pool.length)]);
-    const id = setTimeout(() => setVitoBubble(""), 4200);
+    setVitoBubble(msg);
+    const id = setTimeout(() => setVitoBubble(""), 4600);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, tab]);
@@ -1069,11 +1135,13 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
   const savePoids = () => {
     if (poidsInput === "" || !(poidsInput > 0)) return;
+    const d = poidsDate && poidsDate <= day ? poidsDate : day;
     setPesees((prev) => {
-      const others = prev.filter((p) => p.date !== day);
-      return [...others, { date: day, poids: Number(poidsInput) }].sort((x, y) => x.date.localeCompare(y.date));
+      const others = prev.filter((p) => p.date !== d);
+      return [...others, { date: d, poids: Number(poidsInput) }].sort((a, b) => a.date.localeCompare(b.date));
     });
     setPoidsInput("");
+    setPoidsDate(todayISO());
   };
   const removePesee = (date: string) => setPesees((prev) => prev.filter((p) => p.date !== date));
 
@@ -1187,6 +1255,10 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                     </div>
                   ))}
                 </div>
+                <div className="cl-statrow">
+                  <div className="cl-stile"><div className="k">{avg7 > 0 ? nf(lang).format(avg7) : "—"}</div><div className="l">{x.avg7}</div></div>
+                  <div className="cl-stile"><div className="k">{Math.max(streakBest, streak)} <span className="cl-flame">🔥</span></div><div className="l">{x.bestStreak}</div></div>
+                </div>
               </div>
 
               <div className="cl-nudge">
@@ -1278,6 +1350,9 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                         {Math.abs(tend.actuel - poidsCible) < 0.15 ? x.goalReached : x.toGoal(nf(lang, 1).format(Math.abs(tend.actuel - poidsCible)))}
                       </div>
                     )}
+                    {eta && !eta.reached && (
+                      <div className="cl-eta">📅 {x.atThisRate} {nf(lang, 1).format(poidsCible as number)} kg · {eta.date}</div>
+                    )}
                   </div>
                   {pesees.length >= 2 && <WeightChart pesees={pesees} lang={lang} cible={poidsCible === "" ? undefined : poidsCible} />}
                 </div>
@@ -1297,13 +1372,15 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
             )}
 
             <div className="cl-card cl-pesee">
-              <label className="cl-pin">
-                <span>{t.poidsAuj}</span>
-                <span className="cl-frow">
-                  <input type="number" min={0} step={0.1} value={poidsInput} placeholder={String(poids)} onChange={(e) => setPoidsInput(e.target.value === "" ? "" : Number(e.target.value))} className="cl-num" />
+              <div className="cl-pin">
+                <span>{x.addPeseeLabel}</span>
+                <div className="cl-peserow">
+                  <input type="number" min={0} step={0.1} value={poidsInput} placeholder={String(poids)} onChange={(e) => setPoidsInput(e.target.value === "" ? "" : Number(e.target.value))} className="cl-num" aria-label={x.addPeseeLabel} />
+                  <input type="date" value={poidsDate} max={day} onChange={(e) => setPoidsDate(e.target.value)} className="cl-datein" aria-label="Date" />
                   <button className="cl-save" onClick={savePoids}>{t.enregistrer}</button>
-                </span>
-              </label>
+                </div>
+                <p className="cl-pesehint">{x.pesePastHint}</p>
+              </div>
               <label className="cl-pin cl-goalset">
                 <span>🎯 {x.goalWeight}</span>
                 <span className="cl-frow">
@@ -2035,6 +2112,18 @@ const CSS = `
 .cl-pro-trial{margin:16px 0 0;font-size:.85rem;color:var(--green);font-weight:700}
 .cl-pro-compare{margin:12px 0 0;font-size:.8rem;line-height:1.5;color:var(--muted)}
 .cl-pro-close{margin-top:14px;background:#fff;border:1px solid var(--line);color:var(--muted);border-radius:12px;padding:11px 20px;font-size:.85rem;cursor:pointer}
+/* mini-stats (moyenne 7j + record) */
+.cl-statrow{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:14px;padding-top:15px;border-top:1px solid var(--line)}
+.cl-stile{text-align:center}
+.cl-stile .k{font-family:var(--disp);font-weight:700;font-size:1.5rem;line-height:1;font-variant-numeric:tabular-nums;color:var(--ink);display:inline-flex;align-items:center;gap:5px}
+.cl-stile .l{font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;color:var(--soft);font-weight:800;margin-top:5px}
+/* projection objectif */
+.cl-eta{margin-top:8px;font-size:.8rem;font-weight:800;color:var(--green);background:var(--greenbg);border:1px solid var(--greenline);border-radius:99px;padding:5px 12px;display:inline-block}
+/* pesée : date + astuce */
+.cl-peserow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cl-peserow .cl-num{flex:1 1 90px;min-width:0}
+.cl-datein{flex:1 1 130px;min-width:0;background:#f4f7f4;border:1.5px solid var(--line);border-radius:11px;color:var(--ink);padding:11px 12px;font-size:.9rem;font-weight:700;font-family:var(--body)}
+.cl-pesehint{margin:10px 0 0;font-size:.78rem;line-height:1.5;color:var(--muted);font-weight:600}
 /* poids objectif */
 .cl-goalset{margin-top:14px;padding-top:15px;border-top:1px solid var(--line)}
 .cl-goalunit{flex:none;font-weight:800;color:var(--soft);font-size:1rem}

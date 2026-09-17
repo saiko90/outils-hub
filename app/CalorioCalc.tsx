@@ -310,6 +310,9 @@ const LX = {
     madeIn: "Fait en Suisse 🇨🇭 · Swiss Digital Studio",
     loginB: "Connecte-toi", loginS: "Synchronise tes données, gratuit", loginBtn: "Se connecter",
     syncedB: "Données synchronisées", vitoDispo: "Ton coach nutrition, dispo 24/7",
+    goalWeight: "Poids objectif", toGoal: (v: string) => `plus que ${v} kg`, goalReached: "Objectif atteint 🎉",
+    vitoHi: ["Bonjour 👋", "Coucou, c'est parti !", "Salut, prêt·e ?", "Hey, content de te voir 🥕"],
+    vitoBack: ["Ah, te revoilà ! 🥕", "Content de te revoir 😊", "On continue ? 💪", "Je veille sur toi 🥕", "Beau boulot, continue !"],
      objVal: (v: string) => v,
   },
   de: {
@@ -328,6 +331,9 @@ const LX = {
     madeIn: "Gemacht in der Schweiz 🇨🇭 · Swiss Digital Studio",
     loginB: "Melde dich an", loginS: "Synchronisiere deine Daten, gratis", loginBtn: "Anmelden",
     syncedB: "Daten synchronisiert", vitoDispo: "Dein Ernährungscoach, 24/7 da",
+    goalWeight: "Zielgewicht", toGoal: (v: string) => `noch ${v} kg`, goalReached: "Ziel erreicht 🎉",
+    vitoHi: ["Hallo 👋", "Hoi, los geht's!", "Bereit?", "Schön, dich zu sehen 🥕"],
+    vitoBack: ["Ah, da bist du wieder! 🥕", "Schön, dich wiederzusehen 😊", "Weiter so? 💪", "Ich pass auf dich auf 🥕", "Gut gemacht, weiter!"],
     objVal: (v: string) => v,
   },
   en: {
@@ -346,6 +352,9 @@ const LX = {
     madeIn: "Made in Switzerland 🇨🇭 · Swiss Digital Studio",
     loginB: "Sign in", loginS: "Sync your data, free", loginBtn: "Sign in",
     syncedB: "Data synced", vitoDispo: "Your nutrition coach, 24/7",
+    goalWeight: "Target weight", toGoal: (v: string) => `${v} kg to go`, goalReached: "Goal reached 🎉",
+    vitoHi: ["Hi 👋", "Hey, let's go!", "Ready?", "Good to see you 🥕"],
+    vitoBack: ["Ah, you're back! 🥕", "Good to see you again 😊", "Keep going? 💪", "I've got your back 🥕", "Nice work, keep it up!"],
     objVal: (v: string) => v,
   },
 } as const;
@@ -451,6 +460,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
   const [mounted, setMounted] = useState(false);
   const [nudgeHidden, setNudgeHidden] = useState(false);
+  const [vitoBubble, setVitoBubble] = useState("");
+  const vitoSeen = useRef(false);
   const [installEvt, setInstallEvt] = useState<BeforeInstallEvent | null>(null);
   const [samsungHint, setSamsungHint] = useState(false);
   const [saDismissed, setSaDismissed] = useState(false);
@@ -466,6 +477,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [taille, setTaille] = useState(180);
   const [activite, setActivite] = useState<Activite>("modere");
   const [objectif, setObjectif] = useState<Objectif>("maintien");
+  const [poidsCible, setPoidsCible] = useState<number | "">("");
 
   // journal (par date) + poids
   const [lines, setLines] = useState<Line[]>([]);
@@ -517,6 +529,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       if (typeof p.taille === "number") setTaille(p.taille);
       if (p.activite) setActivite(p.activite as Activite);
       if (p.objectif) setObjectif(p.objectif as Objectif);
+      if (typeof p.poidsCible === "number") setPoidsCible(p.poidsCible);
     }
     const jour = load<Record<string, Line[]>>("calorio.journal", {});
     setLines(migrateLines(jour[day], lang));
@@ -576,8 +589,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // sauvegardes
   useEffect(() => {
     if (!mounted) return;
-    save("calorio.profil", { sexe, age, poids, taille, activite, objectif });
-  }, [mounted, sexe, age, poids, taille, activite, objectif]);
+    save("calorio.profil", { sexe, age, poids, taille, activite, objectif, poidsCible });
+  }, [mounted, sexe, age, poids, taille, activite, objectif, poidsCible]);
   useEffect(() => {
     if (!mounted) return;
     const jour = load<Record<string, Line[]>>("calorio.journal", {});
@@ -598,6 +611,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     if (typeof p.taille === "number") setTaille(p.taille);
     if (p.activite) setActivite(p.activite as Activite);
     if (p.objectif) setObjectif(p.objectif as Objectif);
+    if (typeof p.poidsCible === "number") setPoidsCible(p.poidsCible);
   };
 
   const pullFromCloud = async (uid: string) => {
@@ -697,14 +711,14 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const id = setTimeout(() => {
       supa.from("calorio_users").upsert({
         id: user.id,
-        profil: { sexe, age, poids, taille, activite, objectif },
+        profil: { sexe, age, poids, taille, activite, objectif, poidsCible },
         journal: load("calorio.journal", {}),
         pesees,
         updated_at: new Date().toISOString(),
       }).then(() => {});
     }, 1400);
     return () => clearTimeout(id);
-  }, [mounted, user, sexe, age, poids, taille, activite, objectif, pesees, lines]);
+  }, [mounted, user, sexe, age, poids, taille, activite, objectif, poidsCible, pesees, lines]);
 
   const signInGoogle = () => {
     getSupabase()?.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.href.split("?")[0] } });
@@ -858,7 +872,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const coachCtx: CoachCtx = useMemo(
     () => ({
       lang,
-      profil: { sexe, age, poids, taille, activite, objectif },
+      profil: { sexe, age, poids, taille, activite, objectif, poidsCible },
       cible: besoins.cible,
       bmr: besoins.bmr,
       tdee: besoins.tdee,
@@ -913,6 +927,17 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const base = tri.filter((p) => p.date >= limit)[0] ?? tri[0];
     return Math.round((last.poids - base.poids) * 10) / 10;
   }, [pesees]);
+
+  // Vito « vivant » : petit mot dans une bulle à l'ouverture puis à chaque changement d'écran, qui s'efface.
+  useEffect(() => {
+    if (!mounted || tab === "coach") return;
+    const pool = vitoSeen.current ? x.vitoBack : x.vitoHi;
+    vitoSeen.current = true;
+    setVitoBubble(pool[Math.floor(Math.random() * pool.length)]);
+    const id = setTimeout(() => setVitoBubble(""), 4200);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, tab]);
 
   const resultats = useMemo(() => {
     const query = noAccent(q.trim());
@@ -1238,7 +1263,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         {/* ========== 3. POIDS ========== */}
         {tab === "poids" && (
           <div className="cl-screen play" key="poids">
-            <div className="cl-head"><div><h1>{x.weightTitle}</h1><div className="cl-sub">{t.objectif} : {t.obj[objectif]}</div></div></div>
+            <div className="cl-head"><div><h1>{x.weightTitle}</h1><div className="cl-sub">{poidsCible !== "" ? `${x.tileGoal} : ${nf(lang, 1).format(poidsCible)} kg` : `${t.objectif} : ${t.obj[objectif]}`}</div></div></div>
 
             {tend ? (
               <>
@@ -1248,13 +1273,22 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                     <div className="cl-delta" style={{ color: deltaColor(tend.delta, objectif) }}>
                       {tend.delta > 0 ? "▲ +" : "▼ "}{nf(lang, 1).format(Math.abs(tend.delta))} kg {x.sinceStart}
                     </div>
+                    {poidsCible !== "" && (
+                      <div className="cl-togoal">
+                        {Math.abs(tend.actuel - poidsCible) < 0.15 ? x.goalReached : x.toGoal(nf(lang, 1).format(Math.abs(tend.actuel - poidsCible)))}
+                      </div>
+                    )}
                   </div>
-                  {pesees.length >= 2 && <WeightChart pesees={pesees} lang={lang} />}
+                  {pesees.length >= 2 && <WeightChart pesees={pesees} lang={lang} cible={poidsCible === "" ? undefined : poidsCible} />}
                 </div>
                 <div className="cl-wtiles">
                   <div className="cl-wtile"><div className="l">{x.tileStart}</div><div className="v">{nf(lang, 1).format(tend.debut)}<small> kg</small></div></div>
                   <div className="cl-wtile"><div className="l">{x.tileNow}</div><div className="v" style={{ color: "var(--green)" }}>{nf(lang, 1).format(tend.actuel)}<small> kg</small></div></div>
-                  <div className="cl-wtile"><div className="l">{t.variation}</div><div className="v" style={{ color: deltaColor(tend.delta, objectif) }}>{tend.delta > 0 ? "+" : ""}{nf(lang, 1).format(tend.delta)}<small> kg</small></div></div>
+                  {poidsCible !== "" ? (
+                    <div className="cl-wtile"><div className="l">{x.tileGoal}</div><div className="v">{nf(lang, 1).format(poidsCible)}<small> kg</small></div></div>
+                  ) : (
+                    <div className="cl-wtile"><div className="l">{t.variation}</div><div className="v" style={{ color: deltaColor(tend.delta, objectif) }}>{tend.delta > 0 ? "+" : ""}{nf(lang, 1).format(tend.delta)}<small> kg</small></div></div>
+                  )}
                   <div className="cl-wtile"><div className="l">{x.tileWeek}</div><div className="v" style={{ color: deltaColor(weekDelta, objectif) }}>{(weekDelta) > 0 ? "+" : ""}{nf(lang, 1).format(weekDelta)}<small> kg</small></div></div>
                 </div>
               </>
@@ -1268,6 +1302,13 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                 <span className="cl-frow">
                   <input type="number" min={0} step={0.1} value={poidsInput} placeholder={String(poids)} onChange={(e) => setPoidsInput(e.target.value === "" ? "" : Number(e.target.value))} className="cl-num" />
                   <button className="cl-save" onClick={savePoids}>{t.enregistrer}</button>
+                </span>
+              </label>
+              <label className="cl-pin cl-goalset">
+                <span>🎯 {x.goalWeight}</span>
+                <span className="cl-frow">
+                  <input type="number" min={0} step={0.1} value={poidsCible} placeholder="—" onChange={(e) => setPoidsCible(e.target.value === "" ? "" : Number(e.target.value))} className="cl-num" />
+                  <span className="cl-goalunit">kg</span>
                 </span>
               </label>
             </div>
@@ -1538,6 +1579,16 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         </div>
       )}
 
+      {/* ===== Vito flottant (coach toujours là) ===== */}
+      {tab !== "coach" && tab !== "journee" && (
+        <div className="cl-vito">
+          {vitoBubble && <div className="cl-vito-bubble" key={vitoBubble}>{vitoBubble}</div>}
+          <button className="cl-vito-btn" onClick={() => setTab("coach")} aria-label="Vito">
+            <Radish className="cl-rad" size={42} />
+          </button>
+        </div>
+      )}
+
       {/* ===== Barre d'onglets ===== */}
       <nav className="cl-tabbar" role="tablist" aria-label="calorio">
         {TABS.map((k) => (
@@ -1638,12 +1689,13 @@ function MacroBar({ name, color, val, target, lang }: { name: string; color: str
   );
 }
 
-function WeightChart({ pesees, lang }: { pesees: Pesee[]; lang: Lang }) {
+function WeightChart({ pesees, lang, cible }: { pesees: Pesee[]; lang: Lang; cible?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const tri = [...pesees].sort((a, b) => a.date.localeCompare(b.date));
   const W = 640, H = 220, PADX = 40, PADY = 26;
   const poids = tri.map((p) => p.poids);
-  const min = Math.min(...poids), max = Math.max(...poids);
+  const min = Math.min(...poids, ...(cible != null ? [cible] : []));
+  const max = Math.max(...poids, ...(cible != null ? [cible] : []));
   const span = Math.max(1, max - min);
   const lo = min - span * 0.25, hi = max + span * 0.25;
   const x = (i: number) => PADX + (tri.length === 1 ? (W - 2 * PADX) / 2 : (i / (tri.length - 1)) * (W - 2 * PADX));
@@ -1667,6 +1719,12 @@ function WeightChart({ pesees, lang }: { pesees: Pesee[]; lang: Lang }) {
           </g>
         ))}
         <polygon points={area} fill="url(#clg)" />
+        {cible != null && (
+          <g>
+            <line x1={PADX} y1={y(cible)} x2={W - PADX / 2} y2={y(cible)} stroke="#ef4a6a" strokeWidth="1.5" strokeDasharray="5 5" />
+            <text x={W - PADX / 2} y={y(cible) - 6} textAnchor="end" className="cl-pv" fill="#ef4a6a">🎯 {nf(lang, 1).format(cible)} kg</text>
+          </g>
+        )}
         <polyline points={pts} fill="none" stroke={ACCENT} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
         {tri.map((p, i) => (
           <g key={p.date}>
@@ -1695,10 +1753,11 @@ function deltaColor(delta: number, objectif: Objectif): string {
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap');
 .cl{position:fixed;inset:0;max-width:480px;margin:0 auto;z-index:1;display:flex;flex-direction:column;overflow:hidden;
-  background:linear-gradient(180deg,#e4efe6 0%,#dceae0 55%,#e6ece8 100%);
+  background:radial-gradient(115% 65% at 88% 106%, #fbdbe7 0%, transparent 52%), radial-gradient(90% 55% at 6% -6%, #eafaf0 0%, transparent 55%), linear-gradient(180deg,#e4efe6 0%,#dde9e1 52%,#ece6ec 100%);
   --ink:#18231b;--muted:#5f6d62;--soft:#96a29a;--line:#e7ece7;
   --green:#16a34a;--green2:#34d17f;--greenbg:#e6f7ee;--greenline:#c7ecd4;
   --rose:#ef4a6a;--rosebg:#fdeaf0;--roseline:#f7cbd8;
+  --gold:#b57e07;--goldbg:linear-gradient(135deg,#fcd34d,#f59e0b);--goldline:#f6d789;
   --prot:#12b3a3;--gluc:#f4a52e;--lip:#ef4a6a;--red:#ef4457;--redbg:#fdeef1;
   --btn:linear-gradient(135deg,#34d17f,#16a34a);
   --disp:"Fredoka","Nunito",system-ui,sans-serif;--body:"Nunito",system-ui,-apple-system,sans-serif;
@@ -1709,7 +1768,7 @@ const CSS = `
 .cl-amb{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
 .cl-amb::before,.cl-amb::after{content:"";position:absolute;width:460px;height:460px;border-radius:50%;filter:blur(66px);opacity:.7;will-change:transform}
 .cl-amb::before{background:radial-gradient(circle,#8ff0b8,transparent 68%);top:-150px;left:-140px;animation:cldrift1 20s ease-in-out infinite}
-.cl-amb::after{background:radial-gradient(circle,#ffc2d4,transparent 68%);bottom:-160px;right:-140px;animation:cldrift2 24s ease-in-out infinite}
+.cl-amb::after{background:radial-gradient(circle,#ffb9cf,transparent 68%);width:520px;height:520px;opacity:.9;bottom:-170px;right:-150px;animation:cldrift2 24s ease-in-out infinite}
 @keyframes cldrift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(60px,50px) scale(1.15)}}
 @keyframes cldrift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-50px,-40px) scale(1.1)}}
 /* bannière login */
@@ -1725,7 +1784,7 @@ const CSS = `
 @keyframes clshine{0%{transform:translateX(-180%) skewX(-18deg)}22%,100%{transform:translateX(320%) skewX(-18deg)}}
 .cl-login-out{flex:none;background:#fff;border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:8px 13px;font-size:.78rem;font-weight:700;cursor:pointer}
 .cl-login-inst{flex:none;background:var(--greenbg);border:1px solid var(--greenline);border-radius:11px;width:38px;height:38px;font-size:1rem;cursor:pointer}
-.cl-acc-pro{margin-left:6px;font-size:.6rem;font-weight:900;color:#fff;background:var(--rose);border-radius:99px;padding:2px 7px;text-transform:uppercase;vertical-align:middle}
+.cl-acc-pro{margin-left:6px;font-size:.6rem;font-weight:900;color:#5a3d00;background:var(--goldbg);border:1px solid var(--goldline);border-radius:99px;padding:2px 7px;text-transform:uppercase;vertical-align:middle;box-shadow:0 2px 6px -2px rgba(201,150,26,.6)}
 .cl-toast{position:relative;z-index:2;flex:none;margin:0;padding:11px 16px;background:var(--greenbg);border-bottom:1px solid var(--greenline);color:#0f7a3d;font-size:.88rem;font-weight:700;text-align:center}
 /* alerte Samsung */
 .cl-sahint{position:relative;z-index:2;flex:none;background:#eef4ff;border-bottom:1px solid #cfe0fb;padding:13px 16px}
@@ -1846,7 +1905,7 @@ const CSS = `
 .cl-prow b{font-size:.97rem;font-variant-numeric:tabular-nums}
 .cl-empty{color:var(--muted);font-size:.9rem;text-align:center;padding:26px 16px;background:rgba(255,255,255,.55);border:1.5px dashed var(--greenline);border-radius:20px}
 /* coach */
-.cl-protag,.cl-setpro{display:inline-flex;align-items:center;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#fff;background:var(--rose);border-radius:99px;padding:3px 9px;margin-left:6px;vertical-align:middle}
+.cl-protag,.cl-setpro{display:inline-flex;align-items:center;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#5a3d00;background:var(--goldbg);border:1px solid var(--goldline);border-radius:99px;padding:3px 9px;margin-left:6px;vertical-align:middle}
 /* aide : champs profil + réglages */
 .cl-card .cl-field{padding:13px 0;border-top:1px solid var(--line)}
 .cl-card .cl-field:first-child{border-top:0;padding-top:2px}
@@ -1926,7 +1985,7 @@ const CSS = `
 .cl-method b{font-size:.95rem;color:var(--ink)}
 .cl-method small{font-size:.76rem;color:var(--muted);line-height:1.4}
 .cl-method.pro .cl-method-i{background:var(--greenbg)}
-.cl-method-lock{font-size:.6rem;font-weight:900;text-transform:uppercase;color:#fff;background:var(--rose);border-radius:99px;padding:2px 8px;margin-top:2px}
+.cl-method-lock{font-size:.6rem;font-weight:900;text-transform:uppercase;color:#5a3d00;background:var(--goldbg);border:1px solid var(--goldline);border-radius:99px;padding:2px 8px;margin-top:2px}
 .cl-picker{margin-top:2px}
 .cl-search{width:100%;background:#f4f7f4;border:1.5px solid var(--line);border-radius:13px;color:var(--ink);padding:13px 15px;font-size:.95rem;margin-bottom:12px}
 .cl-secth{font-size:.74rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin:14px 0 9px}
@@ -1976,6 +2035,18 @@ const CSS = `
 .cl-pro-trial{margin:16px 0 0;font-size:.85rem;color:var(--green);font-weight:700}
 .cl-pro-compare{margin:12px 0 0;font-size:.8rem;line-height:1.5;color:var(--muted)}
 .cl-pro-close{margin-top:14px;background:#fff;border:1px solid var(--line);color:var(--muted);border-radius:12px;padding:11px 20px;font-size:.85rem;cursor:pointer}
+/* poids objectif */
+.cl-goalset{margin-top:14px;padding-top:15px;border-top:1px solid var(--line)}
+.cl-goalunit{flex:none;font-weight:800;color:var(--soft);font-size:1rem}
+.cl-togoal{display:inline-block;margin-top:8px;font-weight:800;font-size:.8rem;color:var(--rose);background:var(--rosebg);border:1px solid var(--roseline);border-radius:99px;padding:5px 12px}
+/* Vito flottant */
+.cl-vito{position:absolute;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);z-index:4;display:flex;align-items:flex-end;flex-direction:row-reverse;gap:8px;pointer-events:none}
+.cl-vito-btn{pointer-events:auto;flex:none;width:58px;height:58px;border-radius:50%;border:0;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 32%,#ffffff,#eef8f1);box-shadow:0 14px 28px -10px rgba(20,90,48,.55),inset 0 2px 0 rgba(255,255,255,.95),inset 0 0 0 1px rgba(199,236,212,.9)}
+.cl-vito-btn:active{transform:scale(.92)}
+.cl-vito-bubble{pointer-events:none;max-width:180px;background:#fff;border:1px solid var(--line);border-radius:16px;border-bottom-right-radius:5px;padding:9px 13px;font-size:.82rem;font-weight:800;color:var(--ink);line-height:1.3;
+  box-shadow:0 14px 30px -14px rgba(20,50,30,.45);animation:clpop .32s cubic-bezier(.2,1.3,.5,1) both}
+@keyframes clpop{from{opacity:0;transform:translateY(8px) scale(.85)}}
 /* barre d'onglets */
 .cl-tabbar{position:relative;z-index:2;flex:none;display:flex;justify-content:space-around;gap:2px;
   padding:9px 10px calc(env(safe-area-inset-bottom,0px) + 10px);

@@ -337,6 +337,9 @@ const LX = {
     } as Record<string, [string, string]>,
     gradeLabel: "Grade", gradeNames: ["Débutant", "Motivé", "Régulier", "Assidu", "Expert", "Légende"],
     gradeNext: (n: number) => `Plus que ${n} trophée${n > 1 ? "s" : ""} pour le grade suivant`, gradeMax: "Grade maximum atteint 👑",
+    troShareBtn: "Partager", troShareMine: "Partager mes trophées", troCopiedMsg: "Copié ✓",
+    troShare: (nm: string) => `J'ai débloqué le trophée « ${nm} » sur calorio 🥕 Et toi, tu tiens combien de jours ? Rejoins-moi :`,
+    troShareGrade: (g: string, n: number) => `Grade ${g} sur calorio 🥕 ${n} trophée${n > 1 ? "s" : ""} débloqué${n > 1 ? "s" : ""} — et toi ? Rejoins-moi :`,
      objVal: (v: string) => v,
   },
   de: {
@@ -382,6 +385,9 @@ const LX = {
     } as Record<string, [string, string]>,
     gradeLabel: "Rang", gradeNames: ["Anfänger", "Motiviert", "Regelmässig", "Fleissig", "Experte", "Legende"],
     gradeNext: (n: number) => `Noch ${n} Trophäe${n > 1 ? "n" : ""} bis zum nächsten Rang`, gradeMax: "Höchster Rang erreicht 👑",
+    troShareBtn: "Teilen", troShareMine: "Meine Trophäen teilen", troCopiedMsg: "Kopiert ✓",
+    troShare: (nm: string) => `Ich habe die Trophäe « ${nm} » auf calorio freigeschaltet 🥕 Und du, wie lange hältst du durch? Mach mit:`,
+    troShareGrade: (g: string, n: number) => `Rang ${g} auf calorio 🥕 ${n} Trophäe${n > 1 ? "n" : ""} freigeschaltet — und du? Mach mit:`,
     objVal: (v: string) => v,
   },
   en: {
@@ -427,6 +433,9 @@ const LX = {
     } as Record<string, [string, string]>,
     gradeLabel: "Rank", gradeNames: ["Beginner", "Motivated", "Regular", "Dedicated", "Expert", "Legend"],
     gradeNext: (n: number) => `${n} more troph${n > 1 ? "ies" : "y"} to the next rank`, gradeMax: "Top rank reached 👑",
+    troShareBtn: "Share", troShareMine: "Share my trophies", troCopiedMsg: "Copied ✓",
+    troShare: (nm: string) => `I just unlocked the « ${nm} » trophy on calorio 🥕 How many days can you keep it up? Join me:`,
+    troShareGrade: (g: string, n: number) => `${g} rank on calorio 🥕 ${n} troph${n > 1 ? "ies" : "y"} unlocked — and you? Join me:`,
     objVal: (v: string) => v,
   },
 } as const;
@@ -596,6 +605,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [trophies, setTrophies] = useState<Record<string, number>>({});
   const [used, setUsed] = useState<{ search?: boolean; scan?: boolean; photo?: boolean; coach?: boolean }>({});
   const [newTrophy, setNewTrophy] = useState<string>("");
+  const [troCopied, setTroCopied] = useState(false);
   const trophyInit = useRef(false);
   const [q, setQ] = useState("");
   const [catFilter, setCatFilter] = useState<AlimentCat | "tous">("tous");
@@ -825,6 +835,16 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     }
     copyInvite();
   };
+
+  // Partage d'un trophée / du grade — utilise le lien de parrainage si dispo (viralité).
+  const shareText = (msg: string) => {
+    const url = inviteLink || "https://calorio.ch/";
+    const nav = navigator as Navigator & { share?: (d: { title?: string; text?: string; url?: string }) => Promise<void> };
+    if (nav.share) { nav.share({ title: "calorio", text: msg, url }).catch(() => {}); return; }
+    try { navigator.clipboard.writeText(`${msg} ${url}`); setTroCopied(true); setTimeout(() => setTroCopied(false), 1800); } catch { /* ignore */ }
+  };
+  const shareTrophy = (id: string) => shareText(x.troShare(x.tro[id]?.[0] ?? ""));
+  const shareGrade = () => shareText(x.troShareGrade(x.gradeNames[grade.index], trophyCount));
 
   // Push cloud (debounce) quand connecté et que les données changent.
   useEffect(() => {
@@ -1600,6 +1620,9 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                   );
                 })}
               </div>
+              {trophyCount > 0 && (
+                <button className="cl-troshare-btn" onClick={shareGrade}>📣 {troCopied ? x.troCopiedMsg : x.troShareMine}</button>
+              )}
             </div>
 
             {user && refCode && (
@@ -1853,7 +1876,10 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               <div className="cl-tromodal-h">🏆 {x.troToast}</div>
               <div className="cl-tromodal-nm">{meta[0]}</div>
               <div className="cl-tromodal-d">{meta[1]}</div>
-              <button className="cl-tromodal-ok" onClick={() => setNewTrophy("")}>{t.close}</button>
+              <div className="cl-tromodal-btns">
+                <button className="cl-tromodal-share" onClick={() => shareTrophy(newTrophy)}>🥕 {troCopied ? x.troCopiedMsg : x.troShareBtn}</button>
+                <button className="cl-tromodal-ok" onClick={() => setNewTrophy("")}>{t.close}</button>
+              </div>
             </div>
           </div>
         );
@@ -2367,7 +2393,11 @@ const CSS = `
 .cl-tromodal-h{margin-top:12px;font-weight:900;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gold)}
 .cl-tromodal-nm{font-family:var(--disp);font-weight:600;font-size:1.5rem;color:var(--ink);margin-top:4px}
 .cl-tromodal-d{font-size:.86rem;color:var(--muted);font-weight:600;margin-top:5px;line-height:1.4}
-.cl-tromodal-ok{margin-top:18px;background:var(--btn);color:#fff;border:0;border-radius:13px;padding:12px 26px;font-family:var(--disp);font-weight:600;font-size:1rem;cursor:pointer;box-shadow:0 12px 24px -10px rgba(22,163,74,.6)}
+.cl-tromodal-btns{display:flex;gap:9px;margin-top:18px}
+.cl-tromodal-share{flex:1;background:var(--goldbg);color:#5a3d00;border:1px solid var(--goldline);border-radius:13px;padding:12px 14px;font-family:var(--disp);font-weight:600;font-size:.95rem;cursor:pointer}
+.cl-tromodal-ok{flex:1;background:var(--btn);color:#fff;border:0;border-radius:13px;padding:12px 14px;font-family:var(--disp);font-weight:600;font-size:.95rem;cursor:pointer;box-shadow:0 12px 24px -10px rgba(22,163,74,.6)}
+.cl-troshare-btn{width:100%;margin-top:14px;background:#fff;border:1.5px solid var(--greenline);color:var(--green);border-radius:13px;padding:12px;font-weight:800;font-size:.9rem;cursor:pointer}
+.cl-troshare-btn:hover{background:var(--greenbg)}
 .cl-troburst{position:absolute;inset:0;overflow:visible;pointer-events:none}
 .cl-troburst span{position:absolute;top:34%;left:50%;font-size:1.3rem;animation:cltroburst .9s ease-out both;animation-delay:calc(var(--i) * .04s)}
 @keyframes cltroburst{0%{opacity:0;transform:translate(-50%,-50%) rotate(0) translateY(0)}

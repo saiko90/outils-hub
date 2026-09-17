@@ -292,15 +292,86 @@ const L = {
   },
 } as const;
 
+/* ---- libellés du nouveau design (dashboard, journée, bannière) ---- */
+const LX = {
+  fr: {
+    nav: { stats: "Stats", journee: "Journée", poids: "Poids", coach: "Vito", aide: "Aide" },
+    today: "Aujourd'hui", kcalLeft: "kcal restantes", kcalOver: "kcal de trop",
+    objectif: "Objectif", mange: "Mangé", reste: "Reste",
+    macrosDay: "Macros du jour", weekTitle: "Cette semaine",
+    streak: (n: number) => `${n} jour${n > 1 ? "s" : ""}`,
+    myDay: "Ma journée", meals: { matin: "Petit-déjeuner", midi: "Déjeuner", snack: "Collations", soir: "Dîner" },
+    addShort: "Ajouter", addMealSoir: "Ajouter ton repas du soir",
+    weightTitle: "Mon poids", goalLine: (v: string) => `Objectif : ${v} kg`,
+    sinceStart: "depuis le début", tileStart: "Départ", tileNow: "Actuel", tileGoal: "Objectif", tileWeek: "Cette semaine",
+    addPesee: "Ajouter une pesée",
+    helpTitle: "Aide & réglages", helpSub: "Ton profil, tes préférences",
+    myNeeds: "Mes besoins", reglages: "Réglages", passPro: "Passer Pro", proSubShort: "Coach IA + analyse photo",
+    madeIn: "Fait en Suisse 🇨🇭 · Swiss Digital Studio",
+    loginB: "Connecte-toi", loginS: "Synchronise tes données, gratuit", loginBtn: "Se connecter",
+    syncedB: "Données synchronisées", vitoDispo: "Ton coach nutrition, dispo 24/7",
+     objVal: (v: string) => v,
+  },
+  de: {
+    nav: { stats: "Stats", journee: "Tag", poids: "Gewicht", coach: "Vito", aide: "Hilfe" },
+    today: "Heute", kcalLeft: "kcal übrig", kcalOver: "kcal zu viel",
+    objectif: "Ziel", mange: "Gegessen", reste: "Übrig",
+    macrosDay: "Makros heute", weekTitle: "Diese Woche",
+    streak: (n: number) => `${n} Tag${n > 1 ? "e" : ""}`,
+    myDay: "Mein Tag", meals: { matin: "Frühstück", midi: "Mittagessen", snack: "Snacks", soir: "Abendessen" },
+    addShort: "Hinzufügen", addMealSoir: "Abendessen hinzufügen",
+    weightTitle: "Mein Gewicht", goalLine: (v: string) => `Ziel: ${v} kg`,
+    sinceStart: "seit Beginn", tileStart: "Start", tileNow: "Aktuell", tileGoal: "Ziel", tileWeek: "Diese Woche",
+    addPesee: "Gewicht eintragen",
+    helpTitle: "Hilfe & Einstellungen", helpSub: "Dein Profil, deine Vorlieben",
+    myNeeds: "Mein Bedarf", reglages: "Einstellungen", passPro: "Pro werden", proSubShort: "KI-Coach + Foto-Analyse",
+    madeIn: "Gemacht in der Schweiz 🇨🇭 · Swiss Digital Studio",
+    loginB: "Melde dich an", loginS: "Synchronisiere deine Daten, gratis", loginBtn: "Anmelden",
+    syncedB: "Daten synchronisiert", vitoDispo: "Dein Ernährungscoach, 24/7 da",
+    objVal: (v: string) => v,
+  },
+  en: {
+    nav: { stats: "Stats", journee: "Day", poids: "Weight", coach: "Vito", aide: "Help" },
+    today: "Today", kcalLeft: "kcal left", kcalOver: "kcal over",
+    objectif: "Goal", mange: "Eaten", reste: "Left",
+    macrosDay: "Today's macros", weekTitle: "This week",
+    streak: (n: number) => `${n} day${n > 1 ? "s" : ""}`,
+    myDay: "My day", meals: { matin: "Breakfast", midi: "Lunch", snack: "Snacks", soir: "Dinner" },
+    addShort: "Add", addMealSoir: "Add your dinner",
+    weightTitle: "My weight", goalLine: (v: string) => `Goal: ${v} kg`,
+    sinceStart: "since the start", tileStart: "Start", tileNow: "Current", tileGoal: "Goal", tileWeek: "This week",
+    addPesee: "Add a weigh-in",
+    helpTitle: "Help & settings", helpSub: "Your profile, your preferences",
+    myNeeds: "My needs", reglages: "Settings", passPro: "Go Pro", proSubShort: "AI coach + photo analysis",
+    madeIn: "Made in Switzerland 🇨🇭 · Swiss Digital Studio",
+    loginB: "Sign in", loginS: "Sync your data, free", loginBtn: "Sign in",
+    syncedB: "Data synced", vitoDispo: "Your nutrition coach, 24/7",
+    objVal: (v: string) => v,
+  },
+} as const;
+
 /* ---------------- helpers ---------------- */
 const CATS: AlimentCat[] = ["feculents", "viandes", "laitiers", "fruits", "legumes", "boissons", "snacks", "plats"];
 const C_PROT = "#34d399", C_GLUC = "#f59e0b", C_LIP = "#f472b6";
 const ACCENT = "#22c55e", ACCENT2 = "#84cc16";
 
 type BeforeInstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
-type TabKey = "besoins" | "journal" | "poids" | "coach" | "aide";
-const TABS: TabKey[] = ["besoins", "journal", "poids", "coach", "aide"];
-const TAB_ICON: Record<TabKey, string> = { besoins: "🎯", journal: "🍽️", poids: "⚖️", coach: "🥕", aide: "💬" };
+type TabKey = "stats" | "journee" | "poids" | "coach" | "aide";
+const TABS: TabKey[] = ["stats", "journee", "poids", "coach", "aide"];
+type MealKey = "matin" | "midi" | "snack" | "soir";
+const MEALS: MealKey[] = ["matin", "midi", "snack", "soir"];
+const mealOfHour = (h: number): MealKey => (h < 11 ? "matin" : h < 15 ? "midi" : h < 18 ? "snack" : "soir");
+const MEAL_EMO: Record<MealKey, string> = { matin: "🌅", midi: "🍽️", snack: "🍎", soir: "🌙" };
+const MEAL_BG: Record<MealKey, string> = { matin: "#fff3e0", midi: "#e6f7ee", snack: "#fdeaf0", soir: "#eef1fb" };
+
+// Icônes SVG de la barre d'onglets (traits, style moderne).
+const TAB_SVG: Record<TabKey, string> = {
+  stats: "M4 19V10M9.5 19V5M15 19v-6M20.5 19v-9",
+  journee: "M4 6h16M4 12h16M4 18h10",
+  poids: "M12 4a8 8 0 0 1 8 8 8 8 0 0 1-16 0 8 8 0 0 1 8-8ZM12 12l3-4",
+  coach: "M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.6A8 8 0 1 1 21 12Z",
+  aide: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.1 1-1.1 1.8M12 17h.01",
+};
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 const nf = (lang: Lang, d = 0) =>
@@ -309,7 +380,7 @@ const noAccent = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLow
 
 // Un aliment « à plat », quelle que soit sa source (base interne, Open Food Facts, photo).
 type Food = { id: string; nom: string; kcal: number; prot: number; gluc: number; lip: number; portion: number; emoji: string; brand?: string };
-type Line = { key: string; food: Food; grammes: number };
+type Line = { key: string; food: Food; grammes: number; meal?: MealKey };
 
 const toFood = (al: Aliment, lang: Lang): Food => ({
   id: al.id, nom: al.nom[lang], kcal: al.kcal, prot: al.prot, gluc: al.gluc, lip: al.lip, portion: al.portion, emoji: al.emoji,
@@ -375,7 +446,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [langOv, setLangOv] = useState<Lang | null>(null);
   const lang: Lang = langOv ?? propLang;
   const t = L[lang] ?? L.fr;
-  const [tab, setTab] = useState<TabKey>("besoins");
+  const x = LX[lang] ?? LX.fr;
+  const [tab, setTab] = useState<TabKey>("stats");
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
   const [mounted, setMounted] = useState(false);
   const [nudgeHidden, setNudgeHidden] = useState(false);
@@ -400,6 +472,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [recents, setRecents] = useState<Food[]>([]);
   const [addOpen, setAddOpen] = useState(false);
   const [addMode, setAddMode] = useState<"menu" | "library" | "online">("menu");
+  const [addMeal, setAddMeal] = useState<MealKey | null>(null);
   const [pesees, setPesees] = useState<Pesee[]>([]);
   const [poidsInput, setPoidsInput] = useState<number | "">("");
   const [q, setQ] = useState("");
@@ -647,7 +720,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const signOut = async () => { await getSupabase()?.auth.signOut(); setUser(null); setProDb(false); };
 
   const goPro = () => {
-    if (!user) { setAuthOpen(true); setAuthMsg(t.loginFirst); setTab("besoins"); return; }
+    if (!user) { setAuthOpen(true); setAuthMsg(t.loginFirst); return; }
     setCheckoutMsg("");
     setProOpen(true);
   };
@@ -713,7 +786,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const toggleNotif = async () => {
     if (notifBusy) return;
     if (!proActive) { goPro(); return; }
-    if (!user) { setTab("besoins"); setAuthOpen(true); setAuthMsg(t.loginFirst); return; }
+    if (!user) { setAuthOpen(true); setAuthMsg(t.loginFirst); return; }
     setNotifBusy(true); setNotifMsg("");
     if (notifOn) {
       await disablePush(user.id);
@@ -802,6 +875,45 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     [lang, sexe, age, poids, taille, activite, objectif, besoins, total, lignesMap, tend]
   );
 
+  // --- Données dérivées pour le tableau de bord (écran Stats) ---
+  const locale = lang === "de" ? "de-CH" : lang === "en" ? "en-CH" : "fr-CH";
+  const dateLabel = useMemo(() => {
+    if (!mounted) return "";
+    const s = new Date().toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" });
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }, [mounted, locale]);
+  const week = useMemo(() => {
+    const maxV = Math.max(besoins.cible * 1.1, ...histoire.map((d) => d.kcal), 1);
+    return histoire.slice(-7).map((d) => ({
+      ...d,
+      pct: Math.round((d.kcal / maxV) * 100),
+      over: d.kcal > besoins.cible,
+      letter: new Date(d.date).toLocaleDateString(locale, { weekday: "narrow" }).toUpperCase(),
+    }));
+  }, [histoire, besoins.cible, locale]);
+  const streak = useMemo(() => {
+    let n = 0;
+    for (let i = histoire.length - 1; i >= 0; i--) { if (histoire[i].kcal > 0) n++; else break; }
+    return n;
+  }, [histoire]);
+  const mealGroups = useMemo(() => {
+    const g: Record<MealKey, { line: Line; kcal: number }[]> = { matin: [], midi: [], snack: [], soir: [] };
+    for (const l of lines) {
+      const m: MealKey = l.meal ?? "midi";
+      g[m].push({ line: l, kcal: calcAliment(l.food, l.grammes).kcal });
+    }
+    return g;
+  }, [lines]);
+  // Variation de poids sur les 7 derniers jours (dernière pesée − pesée la plus ancienne dans la fenêtre).
+  const weekDelta = useMemo(() => {
+    if (pesees.length < 2) return 0;
+    const tri = [...pesees].sort((a, b) => a.date.localeCompare(b.date));
+    const last = tri[tri.length - 1];
+    const limit = new Date(new Date(last.date).getTime() - 7 * 864e5).toISOString().slice(0, 10);
+    const base = tri.filter((p) => p.date >= limit)[0] ?? tri[0];
+    return Math.round((last.poids - base.poids) * 10) / 10;
+  }, [pesees]);
+
   const resultats = useMemo(() => {
     const query = noAccent(q.trim());
     return ALIMENTS.filter((al) => {
@@ -811,8 +923,9 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     });
   }, [q, catFilter, lang]);
 
-  const addFood = (food: Food) => {
-    setLines((prev) => [...prev, { key: newKey(), food, grammes: food.portion || 100 }]);
+  const addFood = (food: Food, meal?: MealKey) => {
+    const m = meal ?? mealOfHour(new Date().getHours());
+    setLines((prev) => [...prev, { key: newKey(), food, grammes: food.portion || 100, meal: m }]);
     // Mémorise l'aliment dans les récents (dédup nom+marque, 12 max) pour un ré-ajout en un tap.
     setRecents((prev) => {
       const sig = (f: Food) => `${f.nom}|${f.brand || ""}`.toLowerCase();
@@ -927,7 +1040,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     } catch { setPhotoMsg(t.photoErr); }
     setPhotoBusy(false);
   };
-  const addAllPhoto = () => { photoItems?.forEach(addFood); setPhotoItems(null); };
+  const addAllPhoto = () => { photoItems?.forEach((f) => addFood(f)); setPhotoItems(null); };
 
   const savePoids = () => {
     if (poidsInput === "" || !(poidsInput > 0)) return;
@@ -958,22 +1071,29 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     <section className="cl" id="calorio">
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      <header className="cl-hero">
-        <img className="cl-hero-logo" src="/calorio-icon-192.png" alt="" aria-hidden width={52} height={52} />
-        <div className="cl-hero-txt">
-          <div className="cl-hero-name">calorio</div>
-          <p className="cl-hero-tag">{t.tagline}</p>
-        </div>
-        {installEvt && (
-          <button className="cl-install" onClick={doInstall} title={t.installed}>
-            <span aria-hidden>⬇️</span> {t.installApp}
-          </button>
-        )}
-      </header>
+      <div className="cl-amb" aria-hidden />
 
-      <div className="cl-values" aria-label={t.valuesLabel}>
-        {t.values.map((v) => <span key={v} className="cl-val">✓ {v}</span>)}
+      {/* ===== Bannière login ===== */}
+      <div className="cl-login">
+        <Radish className="cl-rad" size={30} />
+        {user ? (
+          <>
+            <div className="cl-login-tx">
+              <b>☁️ {t.synced}{proDb && <span className="cl-acc-pro">Pro</span>}</b>
+              <span>{user.email}</span>
+            </div>
+            <button className="cl-login-out" onClick={signOut}>{t.logout}</button>
+          </>
+        ) : (
+          <>
+            <div className="cl-login-tx"><b>{x.loginB}</b><span>{x.loginS}</span></div>
+            {installEvt && <button className="cl-login-inst" onClick={doInstall} title={t.installed} aria-label={t.installApp}>⬇️</button>}
+            <button className="cl-login-btn" onClick={() => { setAuthMsg(""); setAuthOpen(true); }}>{x.loginBtn}</button>
+          </>
+        )}
       </div>
+
+      {checkoutMsg && checkoutMsg !== "…" && !proOpen && <p className="cl-toast">{checkoutMsg}</p>}
 
       {samsungHint && !saDismissed && (
         <div className="cl-sahint">
@@ -982,113 +1102,250 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
             <p className="cl-sahint-msg">{t.saMsg}</p>
             <button className="cl-sahint-x" onClick={() => setSaDismissed(true)} aria-label="×">×</button>
           </div>
-          <button className="cl-sahint-btn" onClick={openInChrome}>
-            <span aria-hidden>🌐</span> {t.saBtn}
-          </button>
+          <button className="cl-sahint-btn" onClick={openInChrome}><span aria-hidden>🌐</span> {t.saBtn}</button>
         </div>
       )}
 
-      <div className="cl-account">
-        {user ? (
-          <div className="cl-acc-in">
-            <span className="cl-acc-mail">☁️ {t.synced}{proDb && <span className="cl-acc-pro">Pro</span>} · {user.email}</span>
-            <button className="cl-acc-out" onClick={signOut}>{t.logout}</button>
-          </div>
-        ) : (
-          <button className="cl-acc-btn" onClick={() => setAuthOpen((v) => !v)}>☁️ {t.syncBtn}</button>
-        )}
-        {checkoutMsg && checkoutMsg !== "…" && !proOpen && <p className="cl-success">{checkoutMsg}</p>}
-        {user && refCode && (
-          <div className="cl-invite">
-            <div className="cl-inv-h">🎁 {t.inviteTitle}</div>
-            <p className="cl-inv-s">{t.inviteSub}</p>
-            <div className="cl-inv-row">
-              <input className="cl-inv-link" readOnly value={inviteLink} onFocus={(e) => e.currentTarget.select()} aria-label={t.inviteTitle} />
-              <button className="cl-inv-copy" onClick={copyInvite}>{inviteCopied ? t.copied2 : t.copyLink}</button>
-            </div>
-            <div className="cl-inv-foot">
-              <button className="cl-inv-share" onClick={shareInvite}>📣 {t.shareInvite}</button>
-              <span className="cl-inv-count">{t.inviteCount(refCount)}</span>
-            </div>
-            {refMsg && <p className="cl-inv-msg">{refMsg}</p>}
-          </div>
-        )}
-        {authOpen && !user && (
-          <div className="cl-authpanel">
-            <div className="cl-auth-h">{t.authTitle}</div>
-            <p className="cl-auth-s">{t.authSub}</p>
-            <button className="cl-auth-g" onClick={signInGoogle}>
-              <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.1 0 24 0 14.6 0 6.4 5.4 2.5 13.3l7.8 6.1C12.2 13.2 17.6 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.1 5.3-4.6 7l7.1 5.5c4.2-3.9 6.6-9.6 6.6-16z"/><path fill="#FBBC05" d="M10.3 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6l-7.8-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.5 10.7l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.1 0 11.3-2 15-5.5l-7.1-5.5c-2 1.3-4.6 2.1-7.9 2.1-6.4 0-11.8-3.7-13.7-9.4l-7.8 6.1C6.4 42.6 14.6 48 24 48z"/></svg>
-              {t.google}
-            </button>
-            <div className="cl-auth-or"><span>{t.or}</span></div>
-            <div className="cl-auth-email">
-              <input type="email" placeholder={t.emailPh} value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") signInEmail(); }} />
-              <button onClick={signInEmail}>{t.magic}</button>
-            </div>
-            {authMsg && <p className="cl-auth-msg">{authMsg}</p>}
-          </div>
-        )}
-      </div>
+      <div className="cl-screens">
 
-      <nav className="cl-nav" role="tablist" aria-label="calorio">
-        {TABS.map((k) => (
-          <button key={k} role="tab" aria-selected={tab === k} className={`cl-navbtn ${tab === k ? "on" : ""}`} onClick={() => setTab(k)}>
-            <span className="cl-navi" aria-hidden>{TAB_ICON[k]}</span>
-            <span className="cl-navl">
-              {t.tabs[k]}
-              {k === "journal" && lignesMap.length > 0 ? <span className="cl-navbadge">{lignesMap.length}</span> : null}
-              {k === "coach" && !proActive ? <span className="cl-navlock" aria-hidden>🔒</span> : null}
-            </span>
-          </button>
-        ))}
-      </nav>
+        {/* ========== 1. STATS ========== */}
+        {tab === "stats" && (() => {
+          const cibleK = besoins.cible, eaten = total.kcal, restK = cibleK - eaten;
+          const over = restK < 0;
+          const ringPct = cibleK > 0 ? Math.round((eaten / cibleK) * 100) : 0;
+          const R = 92, Ccirc = 2 * Math.PI * R;
+          const ringOff = Ccirc * (1 - Math.min(ringPct, 100) / 100);
+          const ringCol = over ? "#ef4a6a" : ringPct > 85 ? "#f4a52e" : "#16a34a";
+          return (
+            <div className="cl-screen play" key="stats">
+              <div className="cl-head">
+                <div><h1>{x.today}</h1><div className="cl-sub">{dateLabel}</div></div>
+                {streak > 0 && <span className="cl-chip"><span className="cl-flame">🔥</span> {x.streak(streak)}</span>}
+              </div>
 
-      <div className="cl-sechead">
-        <span className="cl-sec-ic" aria-hidden>{TAB_ICON[tab]}</span>
-        <div>
-          <h3>{t.tabs[tab]}</h3>
-          <p>{t.intro[tab]}</p>
-        </div>
-      </div>
+              <div className="cl-card cl-ringcard">
+                <div className="cl-ringwrap">
+                  <svg width="210" height="210" viewBox="0 0 210 210">
+                    <circle cx="105" cy="105" r={R} stroke="#eaf1ea" strokeWidth="19" fill="none" />
+                    <defs><linearGradient id="clrg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#4bd489" /><stop offset="1" stopColor={ringCol} /></linearGradient></defs>
+                    <circle id="clProgArc" cx="105" cy="105" r={R} stroke="url(#clrg)" strokeWidth="19" fill="none"
+                      strokeLinecap="round" strokeDasharray={Ccirc} strokeDashoffset={ringOff} transform="rotate(-90 105 105)" />
+                  </svg>
+                  <div className="cl-ring-c">
+                    <div className="cl-ring-big">{nf(lang).format(Math.abs(restK))}</div>
+                    <div className="cl-ring-lb">{over ? x.kcalOver : x.kcalLeft}</div>
+                  </div>
+                </div>
+                <div className="cl-ring-foot">
+                  <div><div className="cl-rk">{nf(lang).format(cibleK)}</div><div className="cl-rl">{x.objectif}</div></div>
+                  <div className="cl-rsep" />
+                  <div><div className="cl-rk" style={{ color: "var(--green)" }}>{nf(lang).format(eaten)}</div><div className="cl-rl">{x.mange}</div></div>
+                  <div className="cl-rsep" />
+                  <div><div className="cl-rk" style={{ color: over ? "var(--rose)" : "var(--ink)" }}>{ringPct}%</div><div className="cl-rl">{x.objectif}</div></div>
+                </div>
+              </div>
 
-      {/* ---------- BESOINS ---------- */}
-      {tab === "besoins" && (
-        <div className="cl-grid">
-          <div className="cl-params">
-            <div className="cl-field">
-              <span>{t.sexe}</span>
-              <div className="cl-seg">
-                <button className={sexe === "homme" ? "on" : ""} onClick={() => setSexe("homme")}>{t.homme}</button>
-                <button className={sexe === "femme" ? "on" : ""} onClick={() => setSexe("femme")}>{t.femme}</button>
+              <div className="cl-sectt"><span className="cl-dot" />{x.macrosDay}</div>
+              <div className="cl-card cl-macros">
+                <MacroBar name={t.prot} color={C_PROT} val={total.prot} target={besoins.macros.proteines} lang={lang} />
+                <MacroBar name={t.gluc} color={C_GLUC} val={total.gluc} target={besoins.macros.glucides} lang={lang} />
+                <MacroBar name={t.lip} color={C_LIP} val={total.lip} target={besoins.macros.lipides} lang={lang} />
+              </div>
+
+              <div className="cl-sectt"><span className="cl-dot" />{x.weekTitle}</div>
+              <div className="cl-card">
+                <div className="cl-week">
+                  {week.map((d, i) => (
+                    <div className="cl-wk" key={d.date}>
+                      <div className={`cl-col ${d.over ? "over" : ""} ${i === week.length - 1 ? "today" : ""}`} style={{ height: `${Math.max(4, d.pct)}%` }} />
+                      <small style={i === week.length - 1 ? { color: "var(--green)" } : undefined}>{d.letter}</small>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="cl-nudge">
+                <Radish className="cl-rad" size={34} />
+                <p><b>Vito :</b> {nudge ? nudge : `${over ? t.depasse : t.reste} ${nf(lang).format(Math.abs(restK))} kcal.`}</p>
+                {nudge && <button className="cl-nudge-x" onClick={() => setNudgeHidden(true)} aria-label={t.nudgeDismiss}>×</button>}
               </div>
             </div>
-            <Slider label={t.age} value={age} min={14} max={99} onChange={setAge} />
-            <Slider label={t.poids} value={poids} min={35} max={200} onChange={setPoids} />
-            <Slider label={t.taille} value={taille} min={130} max={220} onChange={setTaille} />
-            <label className="cl-field">
-              <span>{t.activite}</span>
-              <select className="cl-select" value={activite} onChange={(e) => setActivite(e.target.value as Activite)}>
-                {(Object.keys(t.act) as Activite[]).map((k) => <option key={k} value={k}>{t.act[k]}</option>)}
-              </select>
-            </label>
-            <label className="cl-field">
-              <span>{t.objectif}</span>
-              <select className="cl-select" value={objectif} onChange={(e) => setObjectif(e.target.value as Objectif)}>
-                {(Object.keys(t.obj) as Objectif[]).map((k) => <option key={k} value={k}>{t.obj[k]}</option>)}
-              </select>
-            </label>
-          </div>
+          );
+        })()}
 
-          <div className="cl-out">
-            <div className="cl-stats">
-              <Stat label={t.bmr} sub={t.bmrSub} val={nf(lang).format(besoins.bmr)} unit="kcal" />
-              <Stat label={t.tdee} sub={t.tdeeSub} val={nf(lang).format(besoins.tdee)} unit="kcal" />
-              <Stat label={t.cible} sub={t.cibleSub} val={nf(lang).format(besoins.cible)} unit="kcal" big />
+        {/* ========== 2. JOURNÉE ========== */}
+        {tab === "journee" && (
+          <div className="cl-screen play" key="journee">
+            <div className="cl-head"><div><h1>{x.myDay}</h1><div className="cl-sub">{nf(lang).format(total.kcal)} kcal · {bil.pct}%</div></div></div>
+
+            {MEALS.map((m) => {
+              const items = mealGroups[m];
+              const sum = items.reduce((s, it) => s + it.kcal, 0);
+              return (
+                <div className="cl-card cl-meal" key={m}>
+                  <div className="cl-meal-h">
+                    <span className="cl-meal-ic" style={{ background: MEAL_BG[m] }}>{MEAL_EMO[m]}</span>
+                    <span className="cl-meal-nm">{x.meals[m]}</span>
+                    <span className="cl-meal-kc">{nf(lang).format(sum)} kcal</span>
+                  </div>
+                  {items.map(({ line, kcal }) => (
+                    <div className="cl-food" key={line.key}>
+                      <span className="cl-fe">{line.food.emoji}</span>
+                      <div className="cl-fn">
+                        <b>{line.food.nom}{line.food.brand ? <small> · {line.food.brand}</small> : null}</b>
+                        <span className="cl-fg">
+                          <input type="number" min={0} step={10} value={line.grammes} onChange={(e) => setGrammes(line.key, Number(e.target.value))} /> g
+                        </span>
+                      </div>
+                      <span className="cl-fk">{nf(lang).format(kcal)}</span>
+                      <button className="cl-fx" onClick={() => removeLine(line.key)} aria-label={t.supprimer}>×</button>
+                    </div>
+                  ))}
+                  <button className="cl-addrow" onClick={() => { setQ(""); setAddMode("menu"); setAddMeal(m); setAddOpen(true); }}>
+                    ＋ {items.length === 0 && m === "soir" ? x.addMealSoir : x.addShort}
+                  </button>
+                </div>
+              );
+            })}
+
+            <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) onPhoto(f); e.target.value = ""; }} />
+            {(scanMsg || photoMsg) && <p className="cl-scanmsg">{scanMsg || photoMsg}</p>}
+
+            {photoItems && photoItems.length > 0 && (
+              <div className="cl-card cl-photorev">
+                <div className="cl-photoh"><b>📷 {t.photoTitle}</b><button className="cl-addall" onClick={addAllPhoto}>{t.photoAddAll}</button></div>
+                {photoItems.map((f) => {
+                  const c = calcAliment(f, f.portion);
+                  return (
+                    <div key={f.id} className="cl-food">
+                      <span className="cl-fe">🍽️</span>
+                      <div className="cl-fn"><b>{f.nom}</b><small className="cl-festim">{f.portion} g {t.estim}</small></div>
+                      <span className="cl-fk">{nf(lang).format(c.kcal)}</span>
+                      <button className="cl-addone" onClick={() => { addFood(f); setPhotoItems((p) => (p ? p.filter((y) => y.id !== f.id) : p)); }} aria-label="+">+</button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <button className="cl-fab" onClick={() => { setQ(""); setAddMode("menu"); setAddMeal(null); setAddOpen(true); }}>
+              <span aria-hidden>＋</span> {t.addFood}
+            </button>
+          </div>
+        )}
+
+        {/* ========== 3. POIDS ========== */}
+        {tab === "poids" && (
+          <div className="cl-screen play" key="poids">
+            <div className="cl-head"><div><h1>{x.weightTitle}</h1><div className="cl-sub">{t.objectif} : {t.obj[objectif]}</div></div></div>
+
+            {tend ? (
+              <>
+                <div className="cl-card">
+                  <div className="cl-weight-big">
+                    <div className="cl-wv">{nf(lang, 1).format(tend.actuel)}<small>kg</small></div>
+                    <div className="cl-delta" style={{ color: deltaColor(tend.delta, objectif) }}>
+                      {tend.delta > 0 ? "▲ +" : "▼ "}{nf(lang, 1).format(Math.abs(tend.delta))} kg {x.sinceStart}
+                    </div>
+                  </div>
+                  {pesees.length >= 2 && <WeightChart pesees={pesees} lang={lang} />}
+                </div>
+                <div className="cl-wtiles">
+                  <div className="cl-wtile"><div className="l">{x.tileStart}</div><div className="v">{nf(lang, 1).format(tend.debut)}<small> kg</small></div></div>
+                  <div className="cl-wtile"><div className="l">{x.tileNow}</div><div className="v" style={{ color: "var(--green)" }}>{nf(lang, 1).format(tend.actuel)}<small> kg</small></div></div>
+                  <div className="cl-wtile"><div className="l">{t.variation}</div><div className="v" style={{ color: deltaColor(tend.delta, objectif) }}>{tend.delta > 0 ? "+" : ""}{nf(lang, 1).format(tend.delta)}<small> kg</small></div></div>
+                  <div className="cl-wtile"><div className="l">{x.tileWeek}</div><div className="v" style={{ color: deltaColor(weekDelta, objectif) }}>{(weekDelta) > 0 ? "+" : ""}{nf(lang, 1).format(weekDelta)}<small> kg</small></div></div>
+                </div>
+              </>
+            ) : (
+              <p className="cl-empty">{t.pasPesee}</p>
+            )}
+
+            <div className="cl-card cl-pesee">
+              <label className="cl-pin">
+                <span>{t.poidsAuj}</span>
+                <span className="cl-frow">
+                  <input type="number" min={0} step={0.1} value={poidsInput} placeholder={String(poids)} onChange={(e) => setPoidsInput(e.target.value === "" ? "" : Number(e.target.value))} className="cl-num" />
+                  <button className="cl-save" onClick={savePoids}>{t.enregistrer}</button>
+                </span>
+              </label>
             </div>
 
+            {pesees.length > 0 && (
+              <div className="cl-card cl-plist">
+                <div className="cl-plisth">{t.historique}</div>
+                {[...pesees].reverse().map((p) => (
+                  <div key={p.date} className="cl-prow">
+                    <span>{new Date(p.date).toLocaleDateString(locale, { day: "2-digit", month: "short", year: "numeric" })}</span>
+                    <b>{nf(lang, 1).format(p.poids)} kg</b>
+                    <button className="cl-fx" onClick={() => removePesee(p.date)} aria-label={t.supprimer}>×</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ========== 4. VITO (coach) ========== */}
+        {tab === "coach" && (
+          <div className="cl-screen play cl-coachwrap" key="coach">
+            <CoachNutri ctx={coachCtx} isPro={proActive} onGoPro={goPro} />
+          </div>
+        )}
+
+        {/* ========== 5. AIDE & RÉGLAGES ========== */}
+        {tab === "aide" && (
+          <div className="cl-screen play" key="aide">
+            <div className="cl-head"><div><h1>{x.helpTitle}</h1><div className="cl-sub">{x.helpSub}</div></div></div>
+
+            {user && refCode && (
+              <div className="cl-card cl-invite">
+                <div className="cl-inv-h">🎁 {t.inviteTitle}</div>
+                <p className="cl-inv-s">{t.inviteSub}</p>
+                <div className="cl-inv-row">
+                  <input className="cl-inv-link" readOnly value={inviteLink} onFocus={(e) => e.currentTarget.select()} aria-label={t.inviteTitle} />
+                  <button className="cl-inv-copy" onClick={copyInvite}>{inviteCopied ? t.copied2 : t.copyLink}</button>
+                </div>
+                <div className="cl-inv-foot">
+                  <button className="cl-inv-share" onClick={shareInvite}>📣 {t.shareInvite}</button>
+                  <span className="cl-inv-count">{t.inviteCount(refCount)}</span>
+                </div>
+                {refMsg && <p className="cl-inv-msg">{refMsg}</p>}
+              </div>
+            )}
+
+            <div className="cl-sectt"><span className="cl-dot" />{x.myNeeds}</div>
             <div className="cl-card">
-              <div className="cl-cardh">{t.repartition}</div>
+              <div className="cl-field">
+                <span>{t.sexe}</span>
+                <div className="cl-seg">
+                  <button className={sexe === "homme" ? "on" : ""} onClick={() => setSexe("homme")}>{t.homme}</button>
+                  <button className={sexe === "femme" ? "on" : ""} onClick={() => setSexe("femme")}>{t.femme}</button>
+                </div>
+              </div>
+              <Slider label={t.age} value={age} min={14} max={99} onChange={setAge} />
+              <Slider label={t.poids} value={poids} min={35} max={200} onChange={setPoids} />
+              <Slider label={t.taille} value={taille} min={130} max={220} onChange={setTaille} />
+              <label className="cl-field">
+                <span>{t.activite}</span>
+                <select className="cl-select" value={activite} onChange={(e) => setActivite(e.target.value as Activite)}>
+                  {(Object.keys(t.act) as Activite[]).map((k) => <option key={k} value={k}>{t.act[k]}</option>)}
+                </select>
+              </label>
+              <label className="cl-field">
+                <span>{t.objectif}</span>
+                <select className="cl-select" value={objectif} onChange={(e) => setObjectif(e.target.value as Objectif)}>
+                  {(Object.keys(t.obj) as Objectif[]).map((k) => <option key={k} value={k}>{t.obj[k]}</option>)}
+                </select>
+              </label>
+            </div>
+            <div className="cl-card">
+              <div className="cl-stats">
+                <Stat label={t.bmr} sub={t.bmrSub} val={nf(lang).format(besoins.bmr)} unit="kcal" />
+                <Stat label={t.tdee} sub={t.tdeeSub} val={nf(lang).format(besoins.tdee)} unit="kcal" />
+                <Stat label={t.cible} sub={t.cibleSub} val={nf(lang).format(besoins.cible)} unit="kcal" big />
+              </div>
               <div className="cl-macrorow">
                 <MacroDonut p={besoins.macros.proteines} g={besoins.macros.glucides} l={besoins.macros.lipides} />
                 <div className="cl-macleg">
@@ -1098,209 +1355,162 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* ---------- JOURNAL ---------- */}
-      {tab === "journal" && (
-        <div className="cl-journal">
-          {nudge && (
-            <div className="cl-nudge">
-              <span>{nudge}</span>
-              <button onClick={() => setNudgeHidden(true)} aria-label={t.nudgeDismiss}>×</button>
-            </div>
-          )}
-          <div className="cl-jhead">
-            <RingGauge pct={bil.pct} consomme={total.kcal} cible={besoins.cible} lang={lang} t={t} />
-            <div className="cl-jbars">
-              <MacroBar name={t.prot} color={C_PROT} val={total.prot} target={besoins.macros.proteines} lang={lang} />
-              <MacroBar name={t.gluc} color={C_GLUC} val={total.gluc} target={besoins.macros.glucides} lang={lang} />
-              <MacroBar name={t.lip} color={C_LIP} val={total.lip} target={besoins.macros.lipides} lang={lang} />
-            </div>
-          </div>
-
-          {lignesMap.length === 0 ? (
-            <p className="cl-empty">{t.vide}</p>
-          ) : (
-            <div className="cl-lines">
-              {lines.map((l) => {
-                const c = calcAliment(l.food, l.grammes);
-                return (
-                  <div key={l.key} className="cl-line">
-                    <span className="cl-lem">{l.food.emoji}</span>
-                    <span className="cl-lname">{l.food.nom}{l.food.brand ? <small className="cl-lbrand"> · {l.food.brand}</small> : null}</span>
-                    <span className="cl-lg">
-                      <input type="number" min={0} step={10} value={l.grammes} onChange={(e) => setGrammes(l.key, Number(e.target.value))} /> g
-                    </span>
-                    <span className="cl-lkcal">{nf(lang).format(c.kcal)} kcal</span>
-                    <button className="cl-lx" onClick={() => removeLine(l.key)} aria-label={t.supprimer}>×</button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Un seul bouton propre : ouvre la bibliothèque */}
-          <button className="cl-addbtn" onClick={() => { setQ(""); setAddMode("menu"); setAddOpen(true); }}>
-            <span aria-hidden>＋</span> {t.addFood}
-          </button>
-          <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) onPhoto(f); e.target.value = ""; }} />
-          {(scanMsg || photoMsg) && <p className="cl-scanmsg">{scanMsg || photoMsg}</p>}
-
-          {/* Revue de la photo */}
-          {photoItems && photoItems.length > 0 && (
-            <div className="cl-photorev">
-              <div className="cl-photoh"><b>📷 {t.photoTitle}</b><button className="cl-addall" onClick={addAllPhoto}>{t.photoAddAll}</button></div>
-              {photoItems.map((f) => {
-                const c = calcAliment(f, f.portion);
-                return (
-                  <div key={f.id} className="cl-line">
-                    <span className="cl-lem">🍽️</span>
-                    <span className="cl-lname">{f.nom} <small className="cl-lbrand">· {f.portion} g {t.estim}</small></span>
-                    <span className="cl-lkcal">{nf(lang).format(c.kcal)} kcal</span>
-                    <button className="cl-addone" onClick={() => { addFood(f); setPhotoItems((p) => (p ? p.filter((x) => x.id !== f.id) : p)); }} aria-label="+">+</button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Chooser « bibliothèque » : 4 méthodes bien séparées */}
-          {addOpen && (
-            <div className="cl-scanoverlay" onClick={() => setAddOpen(false)}>
-              <div className="cl-chooser" onClick={(e) => e.stopPropagation()}>
-                <div className="cl-chooser-h">
-                  <b>{addMode === "menu" ? t.addFood : addMode === "library" ? `📚 ${t.mLib}` : `🔍 ${t.mOnline}`}</b>
-                  <button className="cl-chooser-x" onClick={() => { if (addMode === "menu") setAddOpen(false); else { setAddMode("menu"); setQ(""); } }}>{addMode === "menu" ? "×" : "‹"}</button>
+            <div className="cl-sectt"><span className="cl-dot" />{x.reglages}</div>
+            <div className="cl-card">
+              <div className="cl-field">
+                <div className="cl-fl">🌐 {t.langLabel}</div>
+                <div className="cl-seg">
+                  {(["fr", "de", "en"] as Lang[]).map((l) => (
+                    <button key={l} className={lang === l ? "on" : ""} onClick={() => changeLang(l)}>{l.toUpperCase()}</button>
+                  ))}
                 </div>
-
-                {addMode === "menu" && (
-                  <div className="cl-methods">
-                    <button className="cl-method" onClick={() => { setQ(""); setAddMode("library"); }}>
-                      <span className="cl-method-i">📚</span><b>{t.mLib}</b><small>{t.mLibSub}</small>
-                    </button>
-                    <button className="cl-method" onClick={() => { setQ(""); setAddMode("online"); }}>
-                      <span className="cl-method-i">🔍</span><b>{t.mOnline}</b><small>{t.mOnlineSub}</small>
-                    </button>
-                    <button className="cl-method" onClick={() => { setAddOpen(false); startScan(); }}>
-                      <span className="cl-method-i">📷</span><b>{t.mScan}</b><small>{t.mScanSub}</small>
-                    </button>
-                    <button className="cl-method pro" onClick={() => { setAddOpen(false); if (proActive) fileRef.current?.click(); else goPro(); }}>
-                      <span className="cl-method-i">🍽️</span><b>{t.mPhoto}</b><small>{t.mPhotoSub}</small>{!proActive && <span className="cl-method-lock">Pro</span>}
-                    </button>
-                  </div>
+              </div>
+              <div className="cl-field col">
+                <div className="cl-fl">🔔 {t.notifTitle} {!proActive && <span className="cl-setpro">{t.notifPro}</span>}</div>
+                <p className="cl-setsub">{t.notifSub}</p>
+                {proActive ? (
+                  <button className={`cl-notifbtn ${notifOn ? "on" : ""}`} onClick={toggleNotif} disabled={notifBusy}>
+                    {notifBusy ? "…" : notifOn ? `✓ ${t.notifBtnOff}` : t.notifBtnOn}
+                  </button>
+                ) : (
+                  <button className="cl-notifbtn lock" onClick={goPro}>🔒 {t.notifProLock}</button>
                 )}
+                {notifMsg && <p className="cl-setmsg">{notifMsg}</p>}
+              </div>
+              {!proActive && (
+                <div className="cl-field">
+                  <div className="cl-fl">🥕 calorio Pro<small>{x.proSubShort}</small></div>
+                  <button className="cl-login-btn" onClick={goPro}>{x.passPro}</button>
+                </div>
+              )}
+            </div>
 
-                {addMode === "library" && (
-                  <div className="cl-picker">
-                    <input className="cl-search" placeholder={t.rechercheLib} value={q} onChange={(e) => setQ(e.target.value)} />
-                    {q.trim().length < 2 && recents.length > 0 && (
-                      <>
-                        <div className="cl-secth">🕘 {t.recentTitle}</div>
-                        <div className="cl-foods">
-                          {recents.map((f, i) => (
-                            <button key={`r-${i}`} className="cl-food" onClick={() => addFood(f)}>
-                              <span className="cl-fem">{f.emoji}</span>
-                              <span className="cl-fn">{f.nom}{f.brand ? <small> · {f.brand}</small> : null}</span>
-                              <span className="cl-fk">{f.kcal} kcal<small>/100 g</small></span>
-                            </button>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                    <div className="cl-secth">⭐ {t.quickTitle}</div>
-                    <div className="cl-chips">
-                      <button className={catFilter === "tous" ? "on" : ""} onClick={() => setCatFilter("tous")}>{t.tousAliments}</button>
-                      {CATS.map((c) => (<button key={c} className={catFilter === c ? "on" : ""} onClick={() => setCatFilter(c)}>{t.cats[c]}</button>))}
-                    </div>
+            <div className="cl-sectt"><span className="cl-dot" />{t.faqTitle}</div>
+            <div className="cl-card cl-faq">
+              {t.faq.map((f, i) => (
+                <details className="cl-faqitem" key={i} open={faqOpen === i} onToggle={(e) => { if ((e.target as HTMLDetailsElement).open) setFaqOpen(i); }}>
+                  <summary>{f.q}</summary>
+                  <p>{f.a}</p>
+                </details>
+              ))}
+            </div>
+
+            <p className="cl-disclaimer">⚠︎ {t.disclaimer}</p>
+            <div className="cl-legal">🔒 {t.memo}<div className="cl-madein">{x.madeIn}</div></div>
+          </div>
+        )}
+      </div>
+
+      {/* ===== Overlays (chooser, scan, auth, pro) ===== */}
+      {addOpen && (
+        <div className="cl-scanoverlay" onClick={() => setAddOpen(false)}>
+          <div className="cl-chooser" onClick={(e) => e.stopPropagation()}>
+            <div className="cl-chooser-h">
+              <b>{addMode === "menu" ? t.addFood : addMode === "library" ? `📚 ${t.mLib}` : `🔍 ${t.mOnline}`}</b>
+              <button className="cl-chooser-x" onClick={() => { if (addMode === "menu") setAddOpen(false); else { setAddMode("menu"); setQ(""); } }}>{addMode === "menu" ? "×" : "‹"}</button>
+            </div>
+
+            {addMode === "menu" && (
+              <div className="cl-methods">
+                <button className="cl-method" onClick={() => { setQ(""); setAddMode("library"); }}>
+                  <span className="cl-method-i">📚</span><b>{t.mLib}</b><small>{t.mLibSub}</small>
+                </button>
+                <button className="cl-method" onClick={() => { setQ(""); setAddMode("online"); }}>
+                  <span className="cl-method-i">🔍</span><b>{t.mOnline}</b><small>{t.mOnlineSub}</small>
+                </button>
+                <button className="cl-method" onClick={() => { setAddOpen(false); startScan(); }}>
+                  <span className="cl-method-i">📷</span><b>{t.mScan}</b><small>{t.mScanSub}</small>
+                </button>
+                <button className="cl-method pro" onClick={() => { setAddOpen(false); if (proActive) fileRef.current?.click(); else goPro(); }}>
+                  <span className="cl-method-i">🍽️</span><b>{t.mPhoto}</b><small>{t.mPhotoSub}</small>{!proActive && <span className="cl-method-lock">Pro</span>}
+                </button>
+              </div>
+            )}
+
+            {addMode === "library" && (
+              <div className="cl-picker">
+                <input className="cl-search" placeholder={t.rechercheLib} value={q} onChange={(e) => setQ(e.target.value)} />
+                {q.trim().length < 2 && recents.length > 0 && (
+                  <>
+                    <div className="cl-secth">🕘 {t.recentTitle}</div>
                     <div className="cl-foods">
-                      {resultats.map((al) => (
-                        <button key={al.id} className="cl-food" onClick={() => addFood(toFood(al, lang))}>
-                          <span className="cl-fem">{al.emoji}</span><span className="cl-fn">{al.nom[lang]}</span><span className="cl-fk">{al.kcal} kcal<small>/100 g</small></span>
+                      {recents.map((f, i) => (
+                        <button key={`r-${i}`} className="cl-food2" onClick={() => { addFood(f, addMeal ?? undefined); setAddOpen(false); }}>
+                          <span className="cl-fem">{f.emoji}</span>
+                          <span className="cl-f2n">{f.nom}{f.brand ? <small> · {f.brand}</small> : null}</span>
+                          <span className="cl-f2k">{f.kcal} kcal<small>/100 g</small></span>
                         </button>
                       ))}
                     </div>
-                  </div>
+                  </>
                 )}
+                <div className="cl-secth">⭐ {t.quickTitle}</div>
+                <div className="cl-chips">
+                  <button className={catFilter === "tous" ? "on" : ""} onClick={() => setCatFilter("tous")}>{t.tousAliments}</button>
+                  {CATS.map((c) => (<button key={c} className={catFilter === c ? "on" : ""} onClick={() => setCatFilter(c)}>{t.cats[c]}</button>))}
+                </div>
+                <div className="cl-foods">
+                  {resultats.map((al) => (
+                    <button key={al.id} className="cl-food2" onClick={() => { addFood(toFood(al, lang), addMeal ?? undefined); setAddOpen(false); }}>
+                      <span className="cl-fem">{al.emoji}</span><span className="cl-f2n">{al.nom[lang]}</span><span className="cl-f2k">{al.kcal} kcal<small>/100 g</small></span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
-                {addMode === "online" && (
-                  <div className="cl-picker">
-                    <input className="cl-search" placeholder={t.rechercherBig} value={q} onChange={(e) => setQ(e.target.value)} />
-                    {q.trim().length >= 2 ? (
-                      <>
-                        <div className="cl-secth">🌍 {t.offTitle}{offLoading && <span className="cl-offload"> · {t.offLoading}</span>}</div>
-                        <div className="cl-foods">
-                          {offResults.map((f) => (
-                            <button key={f.id} className="cl-food" onClick={() => addFood(f)}>
-                              <span className="cl-fem">{f.emoji}</span><span className="cl-fn">{f.nom}{f.brand ? <small> · {f.brand}</small> : null}</span><span className="cl-fk">{f.kcal} kcal<small>/100 g</small></span>
-                            </button>
-                          ))}
-                        </div>
-                      </>
-                    ) : (
-                      <p className="cl-histempty">{t.onlineHint}</p>
-                    )}
-                  </div>
+            {addMode === "online" && (
+              <div className="cl-picker">
+                <input className="cl-search" placeholder={t.rechercherBig} value={q} onChange={(e) => setQ(e.target.value)} />
+                {q.trim().length >= 2 ? (
+                  <>
+                    <div className="cl-secth">🌍 {t.offTitle}{offLoading && <span className="cl-offload"> · {t.offLoading}</span>}</div>
+                    <div className="cl-foods">
+                      {offResults.map((f) => (
+                        <button key={f.id} className="cl-food2" onClick={() => { addFood(f, addMeal ?? undefined); setAddOpen(false); }}>
+                          <span className="cl-fem">{f.emoji}</span><span className="cl-f2n">{f.nom}{f.brand ? <small> · {f.brand}</small> : null}</span><span className="cl-f2k">{f.kcal} kcal<small>/100 g</small></span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <p className="cl-histempty">{t.onlineHint}</p>
                 )}
-              </div>
-            </div>
-          )}
-
-          <CaloriesChart data={histoire} cible={besoins.cible} lang={lang} t={t} />
-
-          {scanning && (
-            <div className="cl-scanoverlay">
-              <div className="cl-scanbox">
-                <video ref={videoRef} className="cl-scanvid" playsInline muted />
-                <div className="cl-scanframe" aria-hidden />
-                <div className="cl-scanttl">{t.scanTitle}</div>
-                <button className="cl-scanclose" onClick={stopScan}>{t.scanClose}</button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ---------- POIDS ---------- */}
-      {tab === "poids" && (
-        <div className="cl-poids">
-          <div className="cl-pinput">
-            <label className="cl-field cl-pin">
-              <span>{t.poidsAuj}</span>
-              <span className="cl-frow">
-                <input type="number" min={0} step={0.1} value={poidsInput} placeholder={String(poids)} onChange={(e) => setPoidsInput(e.target.value === "" ? "" : Number(e.target.value))} className="cl-num" />
-                <button className="cl-save" onClick={savePoids}>{t.enregistrer}</button>
-              </span>
-            </label>
-            {tend && (
-              <div className="cl-trend">
-                <div><small>{t.depart}</small><b>{nf(lang, 1).format(tend.debut)} kg</b></div>
-                <div><small>{t.actuel}</small><b>{nf(lang, 1).format(tend.actuel)} kg</b></div>
-                <div><small>{t.variation}</small><b style={{ color: deltaColor(tend.delta, objectif) }}>{tend.delta > 0 ? "+" : ""}{nf(lang, 1).format(tend.delta)} kg</b></div>
               </div>
             )}
           </div>
+        </div>
+      )}
 
-          {pesees.length >= 2 ? (
-            <WeightChart pesees={pesees} lang={lang} />
-          ) : (
-            <p className="cl-empty">{t.pasPesee}</p>
-          )}
+      {scanning && (
+        <div className="cl-scanoverlay">
+          <div className="cl-scanbox">
+            <video ref={videoRef} className="cl-scanvid" playsInline muted />
+            <div className="cl-scanframe" aria-hidden />
+            <div className="cl-scanttl">{t.scanTitle}</div>
+            <button className="cl-scanclose" onClick={stopScan}>{t.scanClose}</button>
+          </div>
+        </div>
+      )}
 
-          {pesees.length > 0 && (
-            <div className="cl-plist">
-              <div className="cl-plisth">{t.historique}</div>
-              {[...pesees].reverse().map((p) => (
-                <div key={p.date} className="cl-prow">
-                  <span>{new Date(p.date).toLocaleDateString(lang === "de" ? "de-CH" : lang === "en" ? "en-CH" : "fr-CH", { day: "2-digit", month: "short", year: "numeric" })}</span>
-                  <b>{nf(lang, 1).format(p.poids)} kg</b>
-                  <button className="cl-lx" onClick={() => removePesee(p.date)} aria-label={t.supprimer}>×</button>
-                </div>
-              ))}
+      {authOpen && !user && (
+        <div className="cl-scanoverlay" onClick={() => setAuthOpen(false)}>
+          <div className="cl-authpanel" onClick={(e) => e.stopPropagation()}>
+            <button className="cl-chooser-x cl-auth-close" onClick={() => setAuthOpen(false)} aria-label={t.close}>×</button>
+            <div className="cl-auth-h">{t.authTitle}</div>
+            <p className="cl-auth-s">{t.authSub}</p>
+            <button className="cl-auth-g" onClick={signInGoogle}>
+              <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.1 0 24 0 14.6 0 6.4 5.4 2.5 13.3l7.8 6.1C12.2 13.2 17.6 9.5 24 9.5z" /><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.1 5.3-4.6 7l7.1 5.5c4.2-3.9 6.6-9.6 6.6-16z" /><path fill="#FBBC05" d="M10.3 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6l-7.8-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.5 10.7l7.8-6.1z" /><path fill="#34A853" d="M24 48c6.1 0 11.3-2 15-5.5l-7.1-5.5c-2 1.3-4.6 2.1-7.9 2.1-6.4 0-11.8-3.7-13.7-9.4l-7.8 6.1C6.4 42.6 14.6 48 24 48z" /></svg>
+              {t.google}
+            </button>
+            <div className="cl-auth-or"><span>{t.or}</span></div>
+            <div className="cl-auth-email">
+              <input type="email" placeholder={t.emailPh} value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") signInEmail(); }} />
+              <button onClick={signInEmail}>{t.magic}</button>
             </div>
-          )}
+            {authMsg && <p className="cl-auth-msg">{authMsg}</p>}
+          </div>
         </div>
       )}
 
@@ -1328,61 +1538,36 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         </div>
       )}
 
-      {/* ---------- COACH ---------- */}
-      {tab === "coach" && <CoachNutri ctx={coachCtx} isPro={proActive} onGoPro={goPro} />}
-
-      {/* ---------- AIDE / FAQ + PARAMÈTRES ---------- */}
-      {tab === "aide" && (
-        <div className="cl-aide">
-          <div className="cl-settings">
-            <div className="cl-setttl">⚙️ {t.settingsTitle}</div>
-
-            <div className="cl-setrow">
-              <div className="cl-setlabel">🌐 {t.langLabel}</div>
-              <div className="cl-langseg">
-                {(["fr", "de", "en"] as Lang[]).map((l) => (
-                  <button key={l} className={lang === l ? "on" : ""} onClick={() => changeLang(l)}>{l.toUpperCase()}</button>
-                ))}
-              </div>
-            </div>
-
-            <div className="cl-setrow col">
-              <div className="cl-setlabel">🔔 {t.notifTitle} {!proActive && <span className="cl-setpro">{t.notifPro}</span>}</div>
-              <p className="cl-setsub">{t.notifSub}</p>
-              <p className="cl-setwhat">🥕 {t.notifWhat}</p>
-              {proActive ? (
-                <button className={`cl-notifbtn ${notifOn ? "on" : ""}`} onClick={toggleNotif} disabled={notifBusy}>
-                  {notifBusy ? "…" : notifOn ? `✓ ${t.notifBtnOff}` : t.notifBtnOn}
-                </button>
-              ) : (
-                <button className="cl-notifbtn lock" onClick={goPro}>🔒 {t.notifProLock}</button>
-              )}
-              {notifMsg && <p className="cl-setmsg">{notifMsg}</p>}
-            </div>
-          </div>
-
-          <div className="cl-faqttl">{t.faqTitle}</div>
-          <div className="cl-faq">
-            {t.faq.map((f, i) => (
-              <div key={i} className={`cl-faqitem ${faqOpen === i ? "open" : ""}`}>
-                <button className="cl-faqq" aria-expanded={faqOpen === i} onClick={() => setFaqOpen(faqOpen === i ? null : i)}>
-                  <span>{f.q}</span>
-                  <span className="cl-faqchev" aria-hidden>⌄</span>
-                </button>
-                {faqOpen === i && <p className="cl-faqa">{f.a}</p>}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {tab !== "coach" && tab !== "aide" && <p className="cl-memo">🔒 {t.memo}</p>}
-      {tab !== "coach" && tab !== "aide" && <p className="cl-disclaimer">⚠︎ {t.disclaimer}</p>}
+      {/* ===== Barre d'onglets ===== */}
+      <nav className="cl-tabbar" role="tablist" aria-label="calorio">
+        {TABS.map((k) => (
+          <button key={k} role="tab" aria-selected={tab === k} className={`cl-tab ${tab === k ? "on" : ""}`} onClick={() => setTab(k)}>
+            <span className="cl-ic" aria-hidden>
+              <svg viewBox="0 0 24 24"><path d={TAB_SVG[k]} /></svg>
+              {k === "journee" && lignesMap.length > 0 ? <span className="cl-tabbadge">{lignesMap.length}</span> : null}
+              {k === "coach" && !proActive ? <span className="cl-tablock" aria-hidden>🔒</span> : null}
+            </span>
+            {x.nav[k]}
+          </button>
+        ))}
+      </nav>
     </section>
   );
 }
 
 /* ---------------- sub-components ---------------- */
+function Radish({ size = 32, className }: { size?: number; className?: string }) {
+  return (
+    <svg className={className} width={size} height={size} viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M24 6c-1 4-4 6-8 6 3 3 6 3 8 1 2 2 5 2 8-1-4 0-7-2-8-6z" fill="#5cc26a" />
+      <path d="M24 8c0 5-3 7-3 7h6s-3-2-3-7z" fill="#4bb25c" />
+      <path d="M24 15c8 0 14 5 14 13 0 9-7 15-14 15s-14-6-14-15c0-8 6-13 14-13z" fill="#f0506e" />
+      <circle cx="19.5" cy="27" r="2.1" fill="#fff" /><circle cx="28.5" cy="27" r="2.1" fill="#fff" />
+      <circle cx="19.8" cy="27.3" r="1" fill="#3a2230" /><circle cx="28.8" cy="27.3" r="1" fill="#3a2230" />
+      <path d="M21 32c1.6 1.4 4.4 1.4 6 0" stroke="#c0324c" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+    </svg>
+  );
+}
 function Slider({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange: (n: number) => void }) {
   return (
     <label className="cl-field">
@@ -1443,88 +1628,12 @@ function MacroDonut({ p, g, l }: { p: number; g: number; l: number }) {
   );
 }
 
-function RingGauge({ pct, consomme, cible, lang, t }: { pct: number; consomme: number; cible: number; lang: Lang; t: { surCible: string; reste: string; depasse: string } }) {
-  const R = 62, C = 2 * Math.PI * R;
-  const shown = Math.min(pct, 100);
-  const over = consomme > cible;
-  const reste = cible - consomme;
-  const col = over ? "#f87171" : pct > 85 ? "#fbbf24" : ACCENT;
-  return (
-    <div className="cl-ring">
-      <svg viewBox="0 0 150 150" role="img" aria-hidden>
-        <circle cx="75" cy="75" r={R} fill="none" stroke="#eef1f6" strokeWidth="13" />
-        <circle cx="75" cy="75" r={R} fill="none" stroke={col} strokeWidth="13"
-          strokeDasharray={`${(shown / 100) * C} ${C}`} strokeLinecap="round" transform="rotate(-90 75 75)" />
-        <text x="75" y="68" textAnchor="middle" className="cl-rgv">{nf(lang).format(consomme)}</text>
-        <text x="75" y="88" textAnchor="middle" className="cl-rgs">{t.surCible} {nf(lang).format(cible)} kcal</text>
-        <text x="75" y="106" textAnchor="middle" className="cl-rgp" fill={col}>{pct}%</text>
-      </svg>
-      <div className="cl-rgr" style={{ color: over ? "#f87171" : ACCENT }}>
-        {over ? `${t.depasse} ${nf(lang).format(Math.abs(reste))} kcal` : `${t.reste} ${nf(lang).format(reste)} kcal`}
-      </div>
-    </div>
-  );
-}
-
 function MacroBar({ name, color, val, target, lang }: { name: string; color: string; val: number; target: number; lang: Lang }) {
   const pct = target > 0 ? Math.min(100, (val / target) * 100) : 0;
   return (
     <div className="cl-mbar">
       <div className="cl-mbh"><span style={{ color }}>{name}</span><span>{nf(lang).format(val)} / {nf(lang).format(target)} g</span></div>
       <div className="cl-mbt"><span style={{ width: `${pct}%`, background: color }} /></div>
-    </div>
-  );
-}
-
-function CaloriesChart({ data, cible, lang, t }: { data: { date: string; kcal: number }[]; cible: number; lang: Lang; t: { chartTitle: string; chartAvg: string; chartCible: string; chartOk: string; chartOver: string; chartEmpty: string } }) {
-  const withData = data.filter((d) => d.kcal > 0);
-  const W = 640, H = 210, PADX = 34, PADT = 20, PADB = 30;
-  const maxV = Math.max(cible * 1.25, ...data.map((d) => d.kcal), 1);
-  const bw = (W - 2 * PADX) / data.length;
-  const y = (v: number) => PADT + (1 - v / maxV) * (H - PADT - PADB);
-  const yc = y(cible);
-  // moyenne des 7 derniers jours renseignés
-  const last7 = withData.slice(-7);
-  const avg = last7.length ? Math.round(last7.reduce((s, d) => s + d.kcal, 0) / last7.length) : 0;
-  const dfmt = (iso: string) => new Date(iso).toLocaleDateString(lang === "de" ? "de-CH" : lang === "en" ? "en-CH" : "fr-CH", { day: "2-digit", month: "2-digit" });
-  return (
-    <div className="cl-card cl-histcard">
-      <div className="cl-histhead">
-        <div className="cl-cardh">📊 {t.chartTitle}</div>
-        {avg > 0 && <div className="cl-histavg">{t.chartAvg}: <b>{nf(lang).format(avg)}</b> kcal</div>}
-      </div>
-      {withData.length === 0 ? (
-        <p className="cl-histempty">{t.chartEmpty}</p>
-      ) : (
-        <>
-          <div className="cl-chart">
-            <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={t.chartTitle}>
-              {/* ligne objectif */}
-              <line x1={PADX} y1={yc} x2={W - PADX / 2} y2={yc} stroke={ACCENT} strokeWidth="1.5" strokeDasharray="5 5" opacity="0.8" />
-              <text x={W - PADX / 2} y={yc - 5} textAnchor="end" className="cl-ytk" fill={ACCENT}>{nf(lang).format(cible)} · {t.chartCible}</text>
-              {data.map((d, i) => {
-                const cx = PADX + i * bw + bw / 2;
-                const over = d.kcal > cible;
-                const bh = d.kcal > 0 ? Math.max(2, (H - PADT - PADB) * (d.kcal / maxV)) : 0;
-                const by = H - PADB - bh;
-                const isToday = i === data.length - 1;
-                return (
-                  <g key={d.date}>
-                    <rect x={cx - bw * 0.32} y={by} width={bw * 0.64} height={bh} rx="3"
-                      fill={d.kcal === 0 ? "#eef1f6" : over ? "#fbbf24" : ACCENT}
-                      opacity={d.kcal === 0 ? 1 : isToday ? 1 : 0.85} />
-                    {(i % 2 === 0 || isToday) && <text x={cx} y={H - 10} textAnchor="middle" className="cl-xtk">{dfmt(d.date)}</text>}
-                  </g>
-                );
-              })}
-            </svg>
-          </div>
-          <div className="cl-histleg">
-            <span><i style={{ background: ACCENT }} /> {t.chartOk}</span>
-            <span><i style={{ background: "#fbbf24" }} /> {t.chartOver}</span>
-          </div>
-        </>
-      )}
     </div>
   );
 }
@@ -1584,258 +1693,310 @@ function deltaColor(delta: number, objectif: Objectif): string {
 
 /* ---------------- styles ---------------- */
 const CSS = `
-.cl{margin:14px 0 8px;color:#2b3243;--ink:#232a37;--muted:#6b7280;--soft:#9aa2b4;--line:#e7ebf2;--green:#16a34a;--greenbg:#e9f8ee;--red:#ef4457;--redbg:#fdeef1;--rose:#ef4a6a;--rosebg:#fdecf1;--roseline:#f6cdd9;--btn:linear-gradient(135deg,#34d17f,#16a34a)}
-.cl h3,.cl b{color:var(--ink)}
-/* compte + synchro */
-.cl-account{margin-bottom:14px}
-.cl-acc-btn{width:100%;padding:13px;border-radius:14px;border:1.5px dashed #9bd9b3;background:var(--greenbg);color:var(--green);font-size:.9rem;font-weight:800;cursor:pointer}
-.cl-acc-in{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--greenbg);border:1px solid #cdebd7;border-radius:14px;padding:11px 15px;flex-wrap:wrap}
-.cl-acc-mail{font-size:.86rem;color:#4b5563}
-.cl-acc-pro{margin:0 6px;font-size:.66rem;font-weight:800;color:#fff;background:var(--green);border-radius:99px;padding:2px 8px;text-transform:uppercase}
-.cl-acc-out{background:#fff;border:1px solid var(--line);color:#6b7280;border-radius:9px;padding:6px 12px;font-size:.8rem;cursor:pointer}
-.cl-authpanel{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 6px 20px -12px rgba(20,40,80,.15)}
-.cl-auth-h{font-weight:800;font-size:1.05rem;color:var(--ink)}
-.cl-auth-s{margin:6px 0 14px;font-size:.9rem;color:#5b6270;line-height:1.55}
-.cl-auth-g{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#1f2733;border:1.5px solid var(--line);border-radius:12px;padding:12px;font-size:.93rem;font-weight:700;cursor:pointer}
-.cl-auth-g:hover{border-color:#cfd6e4}
-.cl-auth-or{display:flex;align-items:center;text-align:center;color:var(--soft);font-size:.8rem;margin:14px 0}
-.cl-auth-or::before,.cl-auth-or::after{content:"";flex:1;height:1px;background:var(--line)}
-.cl-auth-or span{padding:0 12px}
-.cl-auth-email{display:flex;gap:8px;flex-wrap:wrap}
-.cl-auth-email input{flex:1;min-width:150px;background:#f6f8fb;border:1.5px solid var(--line);border-radius:11px;color:#232a37;padding:12px 14px;font-size:.92rem}
-.cl-auth-email button{background:var(--btn);color:#fff;border:0;border-radius:11px;padding:12px 16px;font-weight:800;font-size:.85rem;cursor:pointer;white-space:nowrap}
-.cl-auth-msg{margin:12px 0 0;font-size:.85rem;color:var(--green);font-weight:600}
-.cl-success{margin:10px 0 0;padding:12px 15px;background:var(--greenbg);border:1px solid #cdebd7;border-radius:12px;color:#0f7a3d;font-size:.9rem;font-weight:600}
-/* parrainage (invitation) */
-.cl-invite{margin-top:10px;background:linear-gradient(135deg,#fff6fa,#fdecf1);border:1px solid var(--roseline);border-radius:16px;padding:16px 17px;box-shadow:0 6px 20px -14px rgba(239,74,106,.45)}
-.cl-inv-h{font-weight:800;font-size:1rem;color:var(--ink)}
-.cl-inv-s{margin:5px 0 12px;font-size:.86rem;line-height:1.5;color:#6b5560}
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap');
+.cl{position:fixed;inset:0;max-width:480px;margin:0 auto;z-index:1;display:flex;flex-direction:column;overflow:hidden;
+  background:linear-gradient(180deg,#e4efe6 0%,#dceae0 55%,#e6ece8 100%);
+  --ink:#18231b;--muted:#5f6d62;--soft:#96a29a;--line:#e7ece7;
+  --green:#16a34a;--green2:#34d17f;--greenbg:#e6f7ee;--greenline:#c7ecd4;
+  --rose:#ef4a6a;--rosebg:#fdeaf0;--roseline:#f7cbd8;
+  --prot:#12b3a3;--gluc:#f4a52e;--lip:#ef4a6a;--red:#ef4457;--redbg:#fdeef1;
+  --btn:linear-gradient(135deg,#34d17f,#16a34a);
+  --disp:"Fredoka","Nunito",system-ui,sans-serif;--body:"Nunito",system-ui,-apple-system,sans-serif;
+  font-family:var(--body);color:var(--ink);-webkit-font-smoothing:antialiased}
+.cl *{box-sizing:border-box}
+.cl h1,.cl h3,.cl b{color:var(--ink)}
+/* ambiance : lumière qui dérive */
+.cl-amb{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.cl-amb::before,.cl-amb::after{content:"";position:absolute;width:460px;height:460px;border-radius:50%;filter:blur(66px);opacity:.7;will-change:transform}
+.cl-amb::before{background:radial-gradient(circle,#8ff0b8,transparent 68%);top:-150px;left:-140px;animation:cldrift1 20s ease-in-out infinite}
+.cl-amb::after{background:radial-gradient(circle,#ffc2d4,transparent 68%);bottom:-160px;right:-140px;animation:cldrift2 24s ease-in-out infinite}
+@keyframes cldrift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(60px,50px) scale(1.15)}}
+@keyframes cldrift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-50px,-40px) scale(1.1)}}
+/* bannière login */
+.cl-login{position:relative;z-index:2;flex:none;display:flex;align-items:center;gap:11px;
+  padding:calc(env(safe-area-inset-top,0px) + 11px) 15px 11px;
+  background:linear-gradient(100deg,#fff6fa,#eafaf0);border-bottom:1px solid var(--line)}
+.cl-login-tx{flex:1;min-width:0;line-height:1.2}
+.cl-login-tx b{display:block;font-family:var(--disp);font-weight:600;font-size:.98rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-login-tx span{display:block;font-size:.76rem;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-login-btn{flex:none;border:0;cursor:pointer;font-family:var(--disp);font-weight:600;font-size:.82rem;color:#fff;
+  background:var(--btn);border-radius:99px;padding:9px 15px;box-shadow:0 8px 16px -8px rgba(22,163,74,.6);position:relative;overflow:hidden}
+.cl-login-btn::after{content:"";position:absolute;top:0;left:0;width:60%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:translateX(-180%) skewX(-18deg);animation:clshine 4.5s ease-in-out 1.5s infinite}
+@keyframes clshine{0%{transform:translateX(-180%) skewX(-18deg)}22%,100%{transform:translateX(320%) skewX(-18deg)}}
+.cl-login-out{flex:none;background:#fff;border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:8px 13px;font-size:.78rem;font-weight:700;cursor:pointer}
+.cl-login-inst{flex:none;background:var(--greenbg);border:1px solid var(--greenline);border-radius:11px;width:38px;height:38px;font-size:1rem;cursor:pointer}
+.cl-acc-pro{margin-left:6px;font-size:.6rem;font-weight:900;color:#fff;background:var(--rose);border-radius:99px;padding:2px 7px;text-transform:uppercase;vertical-align:middle}
+.cl-toast{position:relative;z-index:2;flex:none;margin:0;padding:11px 16px;background:var(--greenbg);border-bottom:1px solid var(--greenline);color:#0f7a3d;font-size:.88rem;font-weight:700;text-align:center}
+/* alerte Samsung */
+.cl-sahint{position:relative;z-index:2;flex:none;background:#eef4ff;border-bottom:1px solid #cfe0fb;padding:13px 16px}
+.cl-sahint-top{display:flex;align-items:flex-start;gap:11px}
+.cl-sahint-ic{font-size:1.2rem;line-height:1.3;flex:none}
+.cl-sahint-msg{margin:0;flex:1;font-size:.85rem;line-height:1.5;color:#2b4a86;font-weight:600}
+.cl-sahint-x{flex:none;background:none;border:0;color:#7d96c6;font-size:1.4rem;line-height:1;cursor:pointer}
+.cl-sahint-btn{margin-top:10px;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#1a73e8;border:0;border-radius:12px;padding:11px;color:#fff;font-size:.88rem;font-weight:800;cursor:pointer}
+/* zone écrans */
+.cl-screens{position:relative;z-index:1;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.cl-screen{padding:16px 15px 122px}
+.cl-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:4px 2px 16px}
+.cl-head h1{font-family:var(--disp);font-weight:600;font-size:1.5rem;letter-spacing:-.3px;margin:0;line-height:1}
+.cl-sub{font-size:.8rem;color:var(--muted);margin-top:5px;font-weight:700}
+.cl-chip{display:inline-flex;align-items:center;gap:5px;font-weight:800;font-size:.78rem;background:#fff3e0;color:#c9761a;border:1px solid #f6dcae;border-radius:99px;padding:6px 11px;white-space:nowrap}
+.cl-flame{display:inline-block;animation:clflick 1.5s ease-in-out infinite;transform-origin:center bottom}
+@keyframes clflick{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.15)}}
+.cl-sectt{font-family:var(--disp);font-weight:600;font-size:1.02rem;margin:22px 2px 11px;display:flex;align-items:center;gap:8px}
+.cl-dot{width:9px;height:9px;border-radius:3px;background:var(--rose);flex:none;display:inline-block}
+/* carte */
+.cl-card{background:#fff;border:1px solid rgba(255,255,255,.7);border-radius:24px;padding:18px;
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.95),0 22px 46px -20px rgba(14,52,30,.5),0 7px 18px -8px rgba(14,52,30,.32);
+  transition:transform .2s ease,box-shadow .2s ease}
+.cl-card + .cl-card{margin-top:13px}
+/* anneau calories */
+.cl-ringcard{background:linear-gradient(180deg,#ffffff,#f7fdf9);position:relative;overflow:hidden;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,1),0 32px 62px -22px rgba(20,130,66,.5),0 10px 24px -10px rgba(14,52,30,.34)}
+.cl-ringwrap{position:relative;width:210px;height:210px;margin:6px auto 4px}
+.cl-ring-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.cl-ring-big{font-family:var(--disp);font-weight:700;font-size:3rem;line-height:.95;letter-spacing:-1px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.cl-ring-lb{font-size:.8rem;color:var(--muted);font-weight:700;margin-top:3px}
+#clProgArc{filter:drop-shadow(0 5px 10px rgba(22,163,74,.5))}
+.cl-ring-foot{display:flex;justify-content:space-around;margin-top:10px;text-align:center}
+.cl-ring-foot>div{flex:1}
+.cl-rk{font-family:var(--disp);font-weight:600;font-size:1.12rem;font-variant-numeric:tabular-nums}
+.cl-rl{font-size:.7rem;color:var(--soft);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+.cl-rsep{flex:0 0 1px;background:var(--line);align-self:stretch;margin:3px 0}
+/* macros (barres) */
+.cl-macros{display:flex;flex-direction:column;gap:14px}
+.cl-mbar .cl-mbh,.cl-mbh{display:flex;justify-content:space-between;font-size:.86rem;font-weight:700;margin-bottom:6px;color:var(--muted)}
+.cl-mbh span:first-child{font-weight:800}
+.cl-mbt{height:9px;border-radius:99px;background:#eef1ee;overflow:hidden}
+.cl-mbt span{display:block;height:100%;border-radius:99px;position:relative;overflow:hidden}
+.cl-mbt span::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.6),transparent 80%);transform:translateX(-120%)}
+.cl-screen.play .cl-mbt span::after{animation:clsheen 3s ease-in-out 1.1s infinite}
+@keyframes clsheen{to{transform:translateX(320%)}}
+/* semaine */
+.cl-week{display:flex;align-items:flex-end;gap:7px;height:96px;padding-top:6px}
+.cl-wk{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.cl-col{width:100%;max-width:26px;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,#4bd489,#16a34a);transform-origin:bottom}
+.cl-col.over{background:linear-gradient(180deg,#ff8aa2,#ef4a6a)}
+.cl-col.today{box-shadow:0 0 0 3px #d8f3e2}
+.cl-wk small{font-size:.66rem;color:var(--soft);font-weight:800}
+.cl-screen.play .cl-col{animation:clgrowcol .7s cubic-bezier(.2,.85,.3,1) both}
+.cl-screen.play .cl-wk:nth-child(2) .cl-col{animation-delay:.06s}
+.cl-screen.play .cl-wk:nth-child(3) .cl-col{animation-delay:.12s}
+.cl-screen.play .cl-wk:nth-child(4) .cl-col{animation-delay:.18s}
+.cl-screen.play .cl-wk:nth-child(5) .cl-col{animation-delay:.24s}
+.cl-screen.play .cl-wk:nth-child(6) .cl-col{animation-delay:.3s}
+.cl-screen.play .cl-wk:nth-child(7) .cl-col{animation-delay:.36s}
+@keyframes clgrowcol{from{transform:scaleY(0)}}
+/* nudge Vito */
+.cl-nudge{display:flex;align-items:center;gap:12px;background:linear-gradient(100deg,#fef1f5,#eafaf0);border:1px solid var(--roseline);border-radius:22px;padding:14px 15px;margin-top:13px;
+  box-shadow:0 12px 26px -18px rgba(239,74,106,.4)}
+.cl-nudge p{margin:0;font-size:.88rem;line-height:1.4;font-weight:600;color:#3c4a40;flex:1}
+.cl-nudge-x{flex:none;background:none;border:0;color:#b98;font-size:1.3rem;line-height:1;cursor:pointer}
+.cl-rad{flex:none;animation:clbreathe 3.4s ease-in-out infinite;transform-origin:center 70%}
+@keyframes clbreathe{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.045)}}
+/* journée : repas */
+.cl-meal{padding:15px 16px}
+.cl-meal-h{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.cl-meal-ic{width:38px;height:38px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex:none;box-shadow:inset 0 1px 2px rgba(255,255,255,.6),0 4px 10px -5px rgba(14,52,30,.35)}
+.cl-meal-nm{font-family:var(--disp);font-weight:600;font-size:1.02rem;flex:1;min-width:0;overflow-wrap:anywhere}
+.cl-meal-kc{font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
+.cl-food{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--line)}
+.cl-food:first-of-type{border-top:0;margin-top:4px}
+.cl-fe{font-size:1.2rem;width:24px;text-align:center;flex:none}
+.cl-fn{flex:1;min-width:0}
+.cl-fn b{font-weight:700;font-size:.92rem;display:block;line-height:1.25;overflow-wrap:anywhere}
+.cl-fn b small{font-weight:600;color:var(--soft)}
+.cl-fg{display:inline-flex;align-items:center;gap:4px;color:var(--soft);font-weight:700;font-size:.76rem;margin-top:2px}
+.cl-fg input{width:60px;background:#f4f7f4;border:1.5px solid var(--line);border-radius:8px;color:var(--ink);padding:5px 6px;font-size:.8rem;text-align:center;font-weight:700}
+.cl-festim{color:var(--soft);font-weight:700;font-size:.76rem}
+.cl-fk{font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink);flex:none}
+.cl-fx{flex:none;width:28px;height:28px;border:0;border-radius:8px;background:var(--redbg);color:var(--red);font-size:1.15rem;cursor:pointer;line-height:1}
+.cl-addrow{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;color:var(--green);font-weight:800;font-size:.88rem;
+  border:1.5px dashed var(--greenline);border-radius:13px;padding:10px;background:var(--greenbg);cursor:pointer;width:100%}
+.cl-fab{position:sticky;bottom:14px;margin:16px auto 0;display:flex;width:min(100%,340px);align-items:center;justify-content:center;gap:9px;
+  border:0;cursor:pointer;font-family:var(--disp);font-weight:600;font-size:1.04rem;color:#fff;background:var(--btn);border-radius:18px;padding:15px;
+  box-shadow:0 16px 30px -12px rgba(22,163,74,.6);animation:clfabglow 2.6s ease-in-out infinite}
+.cl-fab:active{transform:scale(.97)}
+@keyframes clfabglow{0%,100%{box-shadow:0 16px 30px -12px rgba(22,163,74,.55)}50%{box-shadow:0 22px 44px -10px rgba(22,163,74,.85)}}
+/* poids */
+.cl-weight-big{text-align:center;padding:6px 0 2px}
+.cl-wv{font-family:var(--disp);font-weight:700;font-size:3rem;letter-spacing:-1px;font-variant-numeric:tabular-nums;line-height:1}
+.cl-wv small{font-size:1.1rem;color:var(--soft);font-weight:600;margin-left:3px}
+.cl-delta{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-weight:800;font-size:.84rem;background:var(--greenbg);border:1px solid var(--greenline);border-radius:99px;padding:6px 12px}
+.cl-wtiles{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:13px}
+.cl-wtile{background:#fff;border:1px solid var(--line);border-radius:18px;padding:13px 15px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 12px 26px -16px rgba(14,52,30,.42),0 4px 10px -6px rgba(14,52,30,.22)}
+.cl-wtile .l{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--soft);font-weight:800}
+.cl-wtile .v{font-family:var(--disp);font-weight:600;font-size:1.35rem;font-variant-numeric:tabular-nums;margin-top:2px}
+.cl-wtile .v small{font-size:.8rem;color:var(--soft);font-weight:600}
+.cl-pesee{margin-top:13px}
+.cl-pin{display:block}
+.cl-pin>span{display:block;font-size:.85rem;font-weight:700;color:var(--muted);margin-bottom:9px}
+.cl-frow{display:flex;align-items:center;gap:10px}
+.cl-num{flex:1;min-width:0;background:#f4f7f4;border:1.5px solid var(--line);border-radius:11px;color:var(--ink);padding:12px;font-size:1.05rem;font-weight:700;text-align:center}
+.cl-save{flex:none;background:var(--btn);color:#fff;border:0;border-radius:11px;padding:12px 18px;font-weight:800;font-size:.9rem;cursor:pointer;white-space:nowrap}
+.cl-chart{margin-top:12px}
+.cl-chart svg{width:100%;height:auto;display:block}
+.cl-ytk,.cl-xtk{fill:#9aa2b4;font-size:11px}
+.cl-pv{fill:var(--ink);font-size:12px;font-weight:700}
+.cl-plist{margin-top:13px}
+.cl-plisth{font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-bottom:6px}
+.cl-prow{display:flex;align-items:center;gap:12px;padding:11px 2px;border-top:1px solid var(--line)}
+.cl-prow:first-of-type{border-top:0}
+.cl-prow span{flex:1;font-size:.9rem;color:var(--muted);font-weight:600}
+.cl-prow b{font-size:.97rem;font-variant-numeric:tabular-nums}
+.cl-empty{color:var(--muted);font-size:.9rem;text-align:center;padding:26px 16px;background:rgba(255,255,255,.55);border:1.5px dashed var(--greenline);border-radius:20px}
+/* coach */
+.cl-protag,.cl-setpro{display:inline-flex;align-items:center;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#fff;background:var(--rose);border-radius:99px;padding:3px 9px;margin-left:6px;vertical-align:middle}
+/* aide : champs profil + réglages */
+.cl-card .cl-field{padding:13px 0;border-top:1px solid var(--line)}
+.cl-card .cl-field:first-child{border-top:0;padding-top:2px}
+.cl-field>span{display:block;font-size:.85rem;font-weight:700;color:var(--muted);margin-bottom:9px}
+.cl-fl{font-weight:700;font-size:.92rem;color:var(--ink);margin-bottom:9px}
+.cl-fl small{display:block;color:var(--soft);font-weight:600;font-size:.75rem;margin-top:2px}
+.cl-seg{display:inline-flex;gap:6px;background:#eef2ee;border-radius:12px;padding:4px;flex-wrap:wrap}
+.cl-seg button{border:0;background:transparent;font-family:var(--body);font-weight:800;font-size:.85rem;color:var(--muted);padding:9px 14px;border-radius:9px;cursor:pointer}
+.cl-seg button.on{background:#fff;color:var(--green);box-shadow:0 4px 10px -6px rgba(20,50,30,.3)}
+.cl-select{width:100%;background:#f4f7f4;border:1.5px solid var(--line);border-radius:11px;color:var(--ink);padding:12px;font-size:.92rem;font-weight:600}
+.cl-frow .cl-range{flex:1;min-width:0;height:26px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+.cl-range::-webkit-slider-runnable-track{height:10px;border-radius:99px;background:#e6ebe6}
+.cl-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--green);box-shadow:0 2px 7px rgba(22,120,60,.28);margin-top:-8px}
+.cl-range::-moz-range-track{height:10px;border-radius:99px;background:#e6ebe6}
+.cl-range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:4px solid var(--green)}
+.cl-frow .cl-num{width:82px;flex:none}
+.cl-stats{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.cl-stat{background:#f6faf6;border:1px solid var(--line);border-radius:16px;padding:14px 15px}
+.cl-stat.big{grid-column:1/-1;background:var(--greenbg);border-color:var(--greenline)}
+.cl-stl{font-size:.72rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+.cl-stv{font-family:var(--disp);font-size:1.7rem;font-weight:600;letter-spacing:-.5px;line-height:1.1;margin-top:2px;color:var(--ink);font-variant-numeric:tabular-nums}
+.cl-stat.big .cl-stv{font-size:2.3rem;color:var(--green)}
+.cl-stv span{font-size:.85rem;font-weight:700;color:var(--soft)}
+.cl-sts{font-size:.74rem;color:var(--soft);margin-top:2px;font-weight:600}
+.cl-macrorow{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:14px}
+.cl-donut{width:130px;height:130px;flex:none}
+.cl-dcx{fill:var(--ink);font-size:26px;font-weight:800}
+.cl-dcs{fill:var(--muted);font-size:12px;font-weight:600}
+.cl-macleg{flex:1;min-width:170px;display:flex;flex-direction:column;gap:10px}
+.cl-mleg{display:flex;align-items:center;gap:9px;font-size:.9rem}
+.cl-mln{color:var(--muted);min-width:70px;font-weight:700}
+.cl-mlg{color:var(--soft)}.cl-mlg b{color:var(--ink)}
+.cl-setsub{margin:0 0 4px;font-size:.83rem;line-height:1.5;color:var(--muted)}
+.cl-notifbtn{margin-top:10px;background:var(--btn);color:#fff;border:0;border-radius:12px;padding:12px 18px;font-size:.9rem;font-weight:800;cursor:pointer}
+.cl-notifbtn.on{background:var(--greenbg);color:var(--green);border:1px solid var(--greenline)}
+.cl-notifbtn.lock{background:#fff5f6;color:var(--red);border:1.5px dashed #f5b6c0}
+.cl-notifbtn:disabled{opacity:.6;cursor:wait}
+.cl-setmsg{margin:9px 0 0;font-size:.84rem;color:var(--green);line-height:1.5;font-weight:700}
+/* FAQ (details) */
+.cl-faq{padding:4px 18px}
+.cl-faqitem{border-top:1px solid var(--line);padding:2px 0}
+.cl-faqitem:first-child{border-top:0}
+.cl-faqitem summary{list-style:none;cursor:pointer;font-weight:700;font-size:.92rem;padding:13px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--ink)}
+.cl-faqitem summary::-webkit-details-marker{display:none}
+.cl-faqitem summary::after{content:"+";color:var(--green);font-weight:800;font-size:1.1rem}
+.cl-faqitem[open] summary::after{content:"−"}
+.cl-faqitem p{margin:0 0 13px;color:var(--muted);font-weight:600;font-size:.86rem;line-height:1.6}
+.cl-disclaimer{margin:18px 2px 0;font-size:.76rem;line-height:1.55;color:var(--soft);font-weight:600}
+.cl-legal{margin:12px 2px 0;text-align:center;color:var(--soft);font-size:.78rem;line-height:1.6;font-weight:600}
+.cl-madein{margin-top:8px;font-weight:700}
+/* invitation */
+.cl-invite{background:linear-gradient(135deg,#fff6fa,#fdecf1);border:1px solid var(--roseline)}
+.cl-inv-h{font-family:var(--disp);font-weight:600;font-size:1.02rem;color:var(--ink)}
+.cl-inv-s{margin:5px 0 12px;font-size:.85rem;line-height:1.5;color:#6b5560}
 .cl-inv-row{display:flex;gap:8px;flex-wrap:wrap}
 .cl-inv-link{flex:1;min-width:150px;background:#fff;border:1.5px solid var(--roseline);border-radius:11px;color:#7a3550;padding:11px 13px;font-size:.85rem;font-weight:600}
 .cl-inv-copy{flex:none;background:var(--rose);color:#fff;border:0;border-radius:11px;padding:11px 16px;font-size:.85rem;font-weight:800;cursor:pointer}
-.cl-inv-copy:hover{background:#e23a5c}
 .cl-inv-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:11px;flex-wrap:wrap}
 .cl-inv-share{background:#fff;border:1.5px solid var(--roseline);color:var(--rose);border-radius:11px;padding:9px 15px;font-size:.85rem;font-weight:800;cursor:pointer}
-.cl-inv-share:hover{background:#fff0f5}
-.cl-inv-count{font-size:.82rem;color:#8a6b74;font-weight:600}
-.cl-inv-msg{margin:11px 0 0;padding:10px 13px;background:var(--greenbg);border:1px solid #cdebd7;border-radius:11px;color:#0f7a3d;font-size:.86rem;font-weight:700}
-/* modale Pro */
-.cl-promodal{width:min(94vw,420px);background:#fff;border:1px solid var(--line);border-radius:22px;padding:26px;text-align:center;box-shadow:0 30px 70px -20px rgba(20,40,80,.4)}
-.cl-pro-h{font-size:1.45rem;font-weight:800;color:var(--ink)}
-.cl-pro-s{margin:8px 0 18px;color:#5b6270;font-size:.93rem;line-height:1.55}
-.cl-plans{display:flex;gap:12px}
-.cl-plan{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;background:#f8fafc;border:2px solid var(--line);border-radius:16px;padding:22px 12px 16px;cursor:pointer;transition:.15s}
-.cl-plan:hover{border-color:#9bd9b3;background:var(--greenbg)}
-.cl-plan.best{border-color:var(--green);background:var(--greenbg)}
-.cl-plan-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.66rem;font-weight:800;text-transform:uppercase;background:var(--btn);color:#fff;border-radius:99px;padding:3px 10px}
-.cl-plan-name{font-size:.85rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
-.cl-plan-price{font-size:1.55rem;font-weight:800;color:var(--ink)}
-.cl-plan-price small{font-size:.8rem;font-weight:600;color:var(--muted)}
-.cl-pro-trial{margin:16px 0 0;font-size:.85rem;color:var(--green);font-weight:600}
-.cl-pro-close{margin-top:14px;background:#fff;border:1px solid var(--line);color:#6b7280;border-radius:11px;padding:10px 20px;font-size:.85rem;cursor:pointer}
-/* hero */
-.cl-hero{display:flex;align-items:center;gap:14px;margin-bottom:16px}
-.cl-hero-logo{width:52px;height:52px;flex:none;border-radius:15px;box-shadow:0 6px 16px -6px rgba(22,120,60,.4)}
-.cl-hero-name{font-size:2rem;font-weight:800;letter-spacing:-.5px;color:var(--green)}
-.cl-hero-tag{margin:1px 0 0;font-size:.92rem;color:var(--muted);line-height:1.4}
-.cl-values{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 16px}
-.cl-val{display:inline-flex;align-items:center;gap:4px;font-size:.8rem;font-weight:700;color:#166a3a;background:var(--greenbg);border:1px solid #cdebd7;border-radius:99px;padding:5px 11px}
-.cl-pro-compare{margin:12px 0 0;font-size:.82rem;line-height:1.5;color:#6b7280}
-/* navigation (onglets bien visibles) */
-.cl-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:16px 0 4px}
-.cl-navbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 6px;border:1.5px solid var(--line);border-radius:16px;background:#fff;color:#5b6472;font-weight:700;cursor:pointer;transition:transform .12s,box-shadow .15s,background .15s,border-color .15s;box-shadow:0 2px 8px -4px rgba(20,40,80,.1)}
-.cl-navbtn:hover{transform:translateY(-2px);border-color:#9bd9b3;color:var(--green)}
-.cl-navi{font-size:1.55rem;line-height:1}
-.cl-navl{position:relative;font-size:.85rem;display:inline-flex;align-items:center;gap:5px}
-.cl-navbadge{background:var(--green);color:#fff;font-size:.66rem;font-weight:800;border-radius:99px;padding:1px 6px;line-height:1.4}
-.cl-navlock{font-size:.72rem;opacity:.85}
-.cl-navbtn.on{background:var(--btn);color:#fff;border-color:transparent;box-shadow:0 12px 26px -8px rgba(22,163,74,.5)}
-.cl-navbtn.on .cl-navbadge{background:rgba(255,255,255,.32);color:#fff}
-@media(max-width:560px){.cl-nav{gap:6px}.cl-navbtn{padding:12px 3px;border-radius:14px}.cl-navi{font-size:1.35rem}.cl-navl{font-size:.72rem}}
-/* en-tête de section */
-.cl-sechead{display:flex;align-items:center;gap:14px;margin:22px 0 16px;padding-bottom:15px;border-bottom:1px solid var(--roseline)}
-.cl-sec-ic{flex:none;display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:15px;font-size:1.55rem;background:var(--rosebg);border:1px solid var(--roseline);box-shadow:0 4px 12px -6px rgba(239,74,106,.35)}
-.cl-sechead h3{margin:0;font-size:1.3rem;font-weight:800;letter-spacing:-.3px}
-.cl-sechead h3::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--rose);margin-left:7px;vertical-align:middle}
-.cl-sechead p{margin:2px 0 0;font-size:.9rem;color:var(--muted);line-height:1.4}
-/* FAQ */
-.cl-faq{display:flex;flex-direction:column;gap:10px}
-.cl-faqitem{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:border-color .15s,box-shadow .15s}
-.cl-faqitem.open{border-color:#bfe6cd;box-shadow:0 6px 18px -12px rgba(22,163,74,.4)}
-.cl-faqq{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;background:none;border:0;color:var(--ink);font-size:.97rem;font-weight:700;cursor:pointer;padding:15px 17px}
-.cl-faqchev{transition:transform .2s;color:var(--soft);font-size:1.1rem}
-.cl-faqitem.open .cl-faqchev{transform:rotate(180deg);color:var(--green)}
-.cl-faqa{margin:0;padding:0 17px 16px;font-size:.92rem;line-height:1.65;color:#4b5563}
-/* paramètres */
-.cl-settings{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:22px;box-shadow:0 4px 16px -10px rgba(20,40,80,.12)}
-.cl-setttl{font-size:1.1rem;font-weight:800;margin-bottom:14px;color:var(--ink)}
-.cl-setrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-top:1px solid var(--line);flex-wrap:wrap}
-.cl-setrow.col{flex-direction:column;align-items:stretch}
-.cl-setlabel{font-size:.96rem;font-weight:700;color:var(--ink)}
-.cl-setpro{font-size:.64rem;font-weight:800;text-transform:uppercase;color:#fff;background:var(--green);border-radius:99px;padding:2px 8px;vertical-align:middle;margin-left:4px}
-.cl-setsub{margin:6px 0 0;font-size:.88rem;line-height:1.55;color:#5b6270}
-.cl-setwhat{margin:8px 0 0;font-size:.82rem;line-height:1.55;color:var(--muted)}
-.cl-langseg{display:flex;gap:5px;background:#f0f3f8;border-radius:11px;padding:4px}
-.cl-langseg button{padding:8px 14px;border:0;border-radius:8px;background:transparent;color:#6b7280;font-size:.82rem;font-weight:800;cursor:pointer}
-.cl-langseg button.on{background:var(--btn);color:#fff}
-.cl-notifbtn{margin-top:12px;align-self:flex-start;background:var(--btn);color:#fff;border:0;border-radius:12px;padding:12px 18px;font-size:.9rem;font-weight:800;cursor:pointer}
-.cl-notifbtn.on{background:var(--greenbg);color:var(--green);border:1px solid #bfe6cd}
-.cl-notifbtn.lock{background:#fff5f6;color:var(--red);border:1.5px dashed #f5b6c0}
-.cl-notifbtn:disabled{opacity:.6;cursor:wait}
-.cl-setmsg{margin:10px 0 0;font-size:.85rem;color:var(--green);line-height:1.5;font-weight:600}
-.cl-faqttl{font-size:1.1rem;font-weight:800;margin:4px 2px 12px;color:var(--ink)}
-.cl-grid{display:grid;grid-template-columns:minmax(0,330px) minmax(0,1fr);gap:22px;align-items:start}
-@media(max-width:820px){.cl-grid{grid-template-columns:1fr}}
-.cl-params{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 4px 16px -10px rgba(20,40,80,.12)}
-.cl-field{display:block;margin:0 0 18px}
-.cl-field>span{display:block;font-size:.85rem;font-weight:600;color:#4b5563;margin-bottom:8px}
-.cl-frow{display:flex;align-items:center;gap:12px}
-.cl-range{flex:1;min-width:0;height:26px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
-.cl-range::-webkit-slider-runnable-track{height:10px;border-radius:99px;background:#e6ebf2}
-.cl-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--green);box-shadow:0 2px 7px rgba(22,120,60,.28);margin-top:-8px}
-.cl-range::-moz-range-track{height:10px;border-radius:99px;background:#e6ebf2}
-.cl-range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:4px solid var(--green);box-shadow:0 2px 7px rgba(22,120,60,.28)}
-.cl-num{width:88px;background:#f6f8fb;border:1.5px solid var(--line);border-radius:10px;color:#232a37;padding:10px;font-size:1rem;font-weight:700;text-align:center}
-.cl-select{width:100%;background:#f6f8fb;border:1.5px solid var(--line);border-radius:10px;color:#232a37;padding:11px 12px;font-size:.92rem;font-weight:600}
-.cl-select option{background:#fff}
-.cl-seg{display:flex;gap:6px}
-.cl-seg button{flex:1;padding:11px;border:1.5px solid var(--line);border-radius:11px;background:#fff;color:#5b6472;font-weight:700;font-size:.9rem;cursor:pointer}
-.cl-seg button.on{background:var(--btn);color:#fff;border-color:transparent}
-.cl-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.cl-stat{background:#f8fafc;border:1px solid var(--line);border-radius:15px;padding:15px 16px}
-.cl-stat.big{grid-column:1/-1;background:var(--greenbg);border-color:#bfe6cd}
-.cl-stl{font-size:.78rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
-.cl-stv{font-size:2rem;font-weight:800;letter-spacing:-1px;line-height:1.1;margin-top:2px;color:var(--ink)}
-.cl-stat.big .cl-stv{font-size:2.7rem;color:var(--green)}
-.cl-stv span{font-size:.9rem;font-weight:700;color:var(--rose)}
-.cl-sts{font-size:.78rem;color:var(--muted);margin-top:2px}
-.cl-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:16px;box-shadow:0 4px 16px -10px rgba(20,40,80,.1)}
-.cl-cardh{display:flex;align-items:center;gap:8px;font-size:.95rem;font-weight:800;color:var(--ink);margin-bottom:10px}
-.cl-cardh::before{content:"";width:9px;height:9px;border-radius:3px;background:var(--rose);flex:none;box-shadow:0 2px 5px -1px rgba(239,74,106,.5)}
-.cl-macrorow{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-.cl-donut{width:140px;height:140px;flex:none}
-.cl-dcx{fill:#232a37;font-size:26px;font-weight:800}
-.cl-dcs{fill:var(--muted);font-size:12px;font-weight:600}
-.cl-macleg{flex:1;min-width:180px;display:flex;flex-direction:column;gap:10px}
-.cl-mleg{display:flex;align-items:center;gap:9px;font-size:.92rem}
-.cl-dot{width:12px;height:12px;border-radius:4px;flex:none}
-.cl-mln{color:#4b5563;min-width:74px;font-weight:600}
-.cl-mlg{color:var(--muted)}.cl-mlg b{color:var(--ink)}
-/* journal */
-.cl-jhead{display:flex;gap:24px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;flex-wrap:wrap;box-shadow:0 4px 16px -10px rgba(20,40,80,.1)}
-.cl-ring{display:flex;flex-direction:column;align-items:center;gap:8px}
-.cl-ring svg{width:150px;height:150px}
-.cl-rgv{fill:#232a37;font-size:26px;font-weight:800}
-.cl-rgs{fill:var(--muted);font-size:11px}
-.cl-rgp{font-size:15px;font-weight:800}
-.cl-rgr{font-size:.92rem;font-weight:700}
-.cl-jbars{flex:1;min-width:220px;display:flex;flex-direction:column;gap:14px}
-.cl-mbh{display:flex;justify-content:space-between;font-size:.86rem;margin-bottom:6px;color:#4b5563}
-.cl-mbh span:first-child{font-weight:700}
-.cl-mbt{height:11px;border-radius:99px;background:#eef1f6;overflow:hidden}
-.cl-mbt span{display:block;height:100%;border-radius:99px;transition:width .25s}
-.cl-empty{color:var(--muted);font-size:.92rem;text-align:center;padding:28px 16px;background:#f8fafc;border:1.5px dashed #d7deea;border-radius:16px;margin:16px 0}
-.cl-lines{margin:16px 0;display:flex;flex-direction:column;gap:8px}
-.cl-line{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px 13px;box-shadow:0 2px 8px -6px rgba(20,40,80,.12)}
-.cl-lem{font-size:1.3rem}
-.cl-lname{flex:1;min-width:0;font-size:.94rem;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cl-lg{font-size:.82rem;color:var(--muted);display:flex;align-items:center;gap:4px}
-.cl-lg input{width:66px;background:#f6f8fb;border:1.5px solid var(--line);border-radius:8px;color:#232a37;padding:6px;font-size:.85rem;text-align:center;font-weight:700}
-.cl-lkcal{font-size:.9rem;font-weight:800;color:var(--green);min-width:74px;text-align:right}
-.cl-lx{width:28px;height:28px;border:0;border-radius:8px;background:var(--redbg);color:var(--red);font-size:1.15rem;cursor:pointer;line-height:1}
-/* bouton + chooser bibliothèque */
-.cl-addbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;margin:6px 0 4px;padding:15px;border-radius:15px;border:0;background:var(--btn);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;box-shadow:0 12px 24px -10px rgba(22,163,74,.5)}
-.cl-addbtn span{font-size:1.25rem}
-.cl-picker{margin-top:8px}
-.cl-search{width:100%;background:#f6f8fb;border:1.5px solid var(--line);border-radius:12px;color:#232a37;padding:13px 15px;font-size:.95rem;margin-bottom:12px}
-.cl-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
-.cl-chips button{padding:8px 13px;border:1.5px solid var(--line);border-radius:99px;background:#fff;color:#5b6472;font-size:.82rem;font-weight:700;cursor:pointer}
-.cl-chips button.on{background:var(--greenbg);border-color:#bfe6cd;color:var(--green)}
-.cl-foods{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
-.cl-food{display:flex;align-items:center;gap:10px;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:13px;padding:11px 12px;cursor:pointer;transition:.15s}
-.cl-food:hover{border-color:#9bd9b3;background:var(--greenbg);transform:translateY(-1px)}
-.cl-fem{font-size:1.3rem;flex:none}
-.cl-fn{flex:1;min-width:0;font-size:.88rem;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cl-fk{font-size:.74rem;color:var(--muted);text-align:right;line-height:1.15}
-.cl-fk small{display:block;font-size:.62rem;opacity:.75}
-.cl-lbrand{color:var(--muted);font-weight:400}
-/* actions scan + photo */
-.cl-actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px}
-.cl-act{flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-size:.92rem;font-weight:700;cursor:pointer}
-.cl-act:hover{border-color:#9bd9b3}
-.cl-act span{font-size:1.2rem}
-.cl-act.pro{background:var(--btn);color:#fff;border-color:transparent}
-.cl-act.pro:disabled{opacity:.7;cursor:wait}
-.cl-act.lock{border-style:dashed;color:var(--red);border-color:#f5b6c0;background:#fff5f6}
-.cl-scanmsg{margin:8px 0 0;font-size:.85rem;color:var(--green);font-weight:600}
-.cl-photorev{margin:12px 0;background:var(--greenbg);border:1px solid #bfe6cd;border-radius:14px;padding:14px}
-.cl-photoh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:.95rem;color:var(--ink)}
-.cl-addall{background:var(--btn);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:800;font-size:.82rem;cursor:pointer}
-.cl-addone{width:30px;height:30px;border:0;border-radius:9px;background:var(--green);color:#fff;font-size:1.2rem;font-weight:800;cursor:pointer;line-height:1}
-.cl-secth{font-size:.78rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin:16px 0 9px}
-.cl-offload{color:var(--green);text-transform:none;letter-spacing:0;font-weight:600}
-.cl-offblock{border-bottom:1px solid var(--line);padding-bottom:8px}
-/* overlay scan (reste sombre : caméra) */
-.cl-scanoverlay{position:fixed;inset:0;z-index:60;background:rgba(15,20,30,.8);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
+.cl-inv-count{font-size:.82rem;color:#8a6b74;font-weight:700}
+.cl-inv-msg{margin:11px 0 0;padding:10px 13px;background:var(--greenbg);border:1px solid var(--greenline);border-radius:11px;color:#0f7a3d;font-size:.85rem;font-weight:700}
+/* overlays */
+.cl-scanoverlay{position:fixed;inset:0;z-index:80;background:rgba(15,20,18,.72);display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(4px)}
 .cl-scanbox{position:relative;width:min(92vw,420px);display:flex;flex-direction:column;align-items:center;gap:14px}
 .cl-scanvid{width:100%;border-radius:18px;background:#000;aspect-ratio:4/3;object-fit:cover}
 .cl-scanframe{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:70%;height:120px;border:3px solid #34d17f;border-radius:14px;box-shadow:0 0 0 999px rgba(0,0,0,.25)}
 .cl-scanttl{color:#fff;font-weight:700}
 .cl-scanclose{background:#fff;color:#111;border:0;border-radius:11px;padding:12px 22px;font-weight:800;cursor:pointer}
-/* modale chooser bibliothèque */
-.cl-chooser{width:min(94vw,460px);max-height:90vh;overflow:auto;background:#fff;border-radius:22px;padding:22px;box-shadow:0 30px 70px -20px rgba(20,40,80,.45)}
-.cl-chooser .cl-picker{margin-top:0}
+.cl-chooser{width:min(94vw,460px);max-height:86vh;overflow:auto;background:#fff;border-radius:26px;padding:22px;box-shadow:0 30px 70px -20px rgba(14,40,24,.5)}
 .cl-chooser-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.cl-chooser-h b{font-size:1.15rem;color:var(--ink)}
-.cl-chooser-x{background:#f0f3f8;border:0;color:#6b7280;width:34px;height:34px;border-radius:10px;font-size:1.2rem;cursor:pointer;line-height:1}
+.cl-chooser-h b{font-family:var(--disp);font-weight:600;font-size:1.15rem;color:var(--ink)}
+.cl-chooser-x{background:#eef2ee;border:0;color:var(--muted);width:34px;height:34px;border-radius:10px;font-size:1.2rem;cursor:pointer;line-height:1;flex:none}
 .cl-methods{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.cl-method{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;background:#f8fafc;border:1.5px solid var(--line);border-radius:16px;padding:20px 12px;cursor:pointer;transition:.15s}
-.cl-method:hover{border-color:#9bd9b3;background:var(--greenbg);transform:translateY(-2px)}
+.cl-method{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;background:#f6faf6;border:1.5px solid var(--line);border-radius:18px;padding:20px 12px;cursor:pointer;transition:.15s}
+.cl-method:hover{border-color:var(--greenline);background:var(--greenbg);transform:translateY(-2px)}
 .cl-method-i{width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:15px;font-size:1.7rem;background:#fff;border:1px solid var(--line)}
 .cl-method b{font-size:.95rem;color:var(--ink)}
 .cl-method small{font-size:.76rem;color:var(--muted);line-height:1.4}
 .cl-method.pro .cl-method-i{background:var(--greenbg)}
-.cl-method-lock{font-size:.62rem;font-weight:800;text-transform:uppercase;color:var(--green);background:var(--greenbg);border:1px solid #bfe6cd;border-radius:99px;padding:1px 7px;margin-top:2px}
-/* poids */
-.cl-pinput{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 4px 16px -10px rgba(20,40,80,.1)}
-.cl-pin{margin:0;flex:1;min-width:200px}
-.cl-save{background:var(--btn);color:#fff;border:0;border-radius:11px;padding:11px 18px;font-weight:800;font-size:.9rem;cursor:pointer;white-space:nowrap}
-.cl-trend{display:flex;gap:22px}
-.cl-trend div{display:flex;flex-direction:column}
-.cl-trend small{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
-.cl-trend b{font-size:1.4rem;font-weight:800}
-.cl-chart{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 4px 16px -10px rgba(20,40,80,.1)}
-.cl-chart svg{width:100%;height:auto;display:block}
-.cl-ytk,.cl-xtk{fill:#9aa2b4;font-size:11px}
-.cl-pv{fill:#232a37;font-size:12px;font-weight:700}
-.cl-plist{margin-top:14px}
-.cl-plisth{font-size:.82rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px}
-.cl-prow{display:flex;align-items:center;gap:12px;padding:11px 12px;border-bottom:1px solid var(--line)}
-.cl-prow span{flex:1;font-size:.9rem;color:#4b5563}
-.cl-prow b{font-size:.97rem}
-.cl-memo{margin:20px 0 0;font-size:.82rem;line-height:1.5;color:#6b7d70;background:var(--greenbg);border:1px solid #d7eede;border-radius:12px;padding:12px 14px}
-.cl-disclaimer{margin:10px 0 0;font-size:.8rem;line-height:1.55;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
-/* hero : bouton installer */
-.cl-hero-txt{flex:1;min-width:0}
-.cl-install{flex:none;display:inline-flex;align-items:center;gap:7px;background:var(--greenbg);border:1.5px solid #bfe6cd;color:var(--green);border-radius:12px;padding:10px 15px;font-size:.85rem;font-weight:800;cursor:pointer;white-space:nowrap}
-.cl-install:hover{background:#dcf3e4}
-@media(max-width:520px){.cl-install span{display:none}}
-.cl-sahint{background:#eef4ff;border:1px solid #cfe0fb;border-radius:16px;padding:14px 16px;margin-bottom:14px;box-shadow:0 4px 16px -12px rgba(30,64,140,.25)}
-.cl-sahint-top{display:flex;align-items:flex-start;gap:11px}
-.cl-sahint-ic{font-size:1.25rem;line-height:1.3;flex:none}
-.cl-sahint-msg{margin:0;flex:1;font-size:.88rem;line-height:1.55;color:#2b4a86;font-weight:600}
-.cl-sahint-x{flex:none;background:none;border:0;color:#7d96c6;font-size:1.4rem;line-height:1;cursor:pointer;padding:0 2px}
-.cl-sahint-btn{margin-top:11px;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#1a73e8;border:0;border-radius:12px;padding:12px;color:#fff;font-size:.9rem;font-weight:800;cursor:pointer}
-.cl-sahint-btn:hover{background:#1667d0}
-/* rappel doux */
-.cl-nudge{display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,#fff3d6,#ffe9c2);border:1px solid #f6d99a;border-radius:14px;padding:13px 16px;margin-bottom:14px;font-size:.92rem;color:#7a5b18;font-weight:600}
-.cl-nudge button{flex:none;background:none;border:0;color:#b08a3a;font-size:1.3rem;line-height:1;cursor:pointer;padding:0 2px}
-/* graphique historique calories */
-.cl-histcard{margin-top:16px}
-.cl-histhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
-.cl-histavg{font-size:.84rem;color:var(--muted)}.cl-histavg b{color:var(--green);font-size:.97rem}
-.cl-histempty{color:var(--muted);font-size:.9rem;line-height:1.55;margin:10px 0 2px}
-.cl-histleg{display:flex;gap:18px;margin-top:8px;font-size:.8rem;color:var(--muted)}
-.cl-histleg span{display:inline-flex;align-items:center;gap:6px}
-.cl-histleg i{width:12px;height:12px;border-radius:4px;display:inline-block}
+.cl-method-lock{font-size:.6rem;font-weight:900;text-transform:uppercase;color:#fff;background:var(--rose);border-radius:99px;padding:2px 8px;margin-top:2px}
+.cl-picker{margin-top:2px}
+.cl-search{width:100%;background:#f4f7f4;border:1.5px solid var(--line);border-radius:13px;color:var(--ink);padding:13px 15px;font-size:.95rem;margin-bottom:12px}
+.cl-secth{font-size:.74rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin:14px 0 9px}
+.cl-offload{color:var(--green);text-transform:none;letter-spacing:0;font-weight:600}
+.cl-histempty{color:var(--muted);font-size:.88rem;line-height:1.55;margin:8px 2px}
+.cl-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.cl-chips button{padding:8px 13px;border:1.5px solid var(--line);border-radius:99px;background:#fff;color:var(--muted);font-size:.82rem;font-weight:800;cursor:pointer}
+.cl-chips button.on{background:var(--greenbg);border-color:var(--greenline);color:var(--green)}
+.cl-foods{display:grid;grid-template-columns:1fr;gap:9px}
+.cl-food2{display:flex;align-items:center;gap:10px;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:11px 13px;cursor:pointer;transition:.15s;width:100%}
+.cl-food2:hover{border-color:var(--greenline);background:var(--greenbg)}
+.cl-fem{font-size:1.3rem;flex:none}
+.cl-f2n{flex:1;min-width:0;font-size:.9rem;font-weight:700;color:var(--ink);overflow-wrap:anywhere;line-height:1.3}
+.cl-f2n small{color:var(--soft);font-weight:600}
+.cl-f2k{flex:none;font-size:.76rem;color:var(--muted);text-align:right;line-height:1.15;font-weight:700}
+.cl-f2k small{display:block;font-size:.62rem;opacity:.75;font-weight:600}
+.cl-scanmsg{margin:8px 2px 0;font-size:.85rem;color:var(--green);font-weight:700}
+.cl-photorev{margin-top:13px}
+.cl-photoh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:.95rem;color:var(--ink)}
+.cl-addall{background:var(--btn);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:800;font-size:.82rem;cursor:pointer}
+.cl-addone{flex:none;width:30px;height:30px;border:0;border-radius:9px;background:var(--green);color:#fff;font-size:1.2rem;font-weight:800;cursor:pointer;line-height:1}
+/* auth (modale) */
+.cl-authpanel{position:relative;width:min(94vw,420px);background:#fff;border-radius:24px;padding:26px 24px;box-shadow:0 30px 70px -20px rgba(14,40,24,.5)}
+.cl-auth-close{position:absolute;top:16px;right:16px}
+.cl-auth-h{font-family:var(--disp);font-weight:600;font-size:1.2rem;color:var(--ink);padding-right:30px}
+.cl-auth-s{margin:6px 0 16px;font-size:.9rem;color:var(--muted);line-height:1.55}
+.cl-auth-g{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:var(--ink);border:1.5px solid var(--line);border-radius:13px;padding:13px;font-size:.93rem;font-weight:700;cursor:pointer}
+.cl-auth-or{display:flex;align-items:center;text-align:center;color:var(--soft);font-size:.8rem;margin:14px 0}
+.cl-auth-or::before,.cl-auth-or::after{content:"";flex:1;height:1px;background:var(--line)}
+.cl-auth-or span{padding:0 12px}
+.cl-auth-email{display:flex;gap:8px;flex-wrap:wrap}
+.cl-auth-email input{flex:1;min-width:150px;background:#f4f7f4;border:1.5px solid var(--line);border-radius:12px;color:var(--ink);padding:13px 14px;font-size:.92rem}
+.cl-auth-email button{background:var(--btn);color:#fff;border:0;border-radius:12px;padding:13px 16px;font-weight:800;font-size:.85rem;cursor:pointer;white-space:nowrap}
+.cl-auth-msg{margin:12px 0 0;font-size:.85rem;color:var(--green);font-weight:700}
+/* modale Pro */
+.cl-promodal{width:min(94vw,420px);background:#fff;border-radius:24px;padding:26px;text-align:center;box-shadow:0 30px 70px -20px rgba(14,40,24,.5)}
+.cl-pro-h{font-family:var(--disp);font-size:1.4rem;font-weight:600;color:var(--ink)}
+.cl-pro-s{margin:8px 0 18px;color:var(--muted);font-size:.92rem;line-height:1.55}
+.cl-plans{display:flex;gap:12px}
+.cl-plan{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;background:#f6faf6;border:2px solid var(--line);border-radius:18px;padding:22px 12px 16px;cursor:pointer;transition:.15s}
+.cl-plan:hover{border-color:var(--greenline);background:var(--greenbg)}
+.cl-plan.best{border-color:var(--green);background:var(--greenbg)}
+.cl-plan-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.64rem;font-weight:900;text-transform:uppercase;background:var(--btn);color:#fff;border-radius:99px;padding:3px 10px}
+.cl-plan-name{font-size:.82rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.03em}
+.cl-plan-price{font-family:var(--disp);font-size:1.5rem;font-weight:600;color:var(--ink)}
+.cl-plan-price small{font-size:.78rem;font-weight:600;color:var(--muted)}
+.cl-pro-trial{margin:16px 0 0;font-size:.85rem;color:var(--green);font-weight:700}
+.cl-pro-compare{margin:12px 0 0;font-size:.8rem;line-height:1.5;color:var(--muted)}
+.cl-pro-close{margin-top:14px;background:#fff;border:1px solid var(--line);color:var(--muted);border-radius:12px;padding:11px 20px;font-size:.85rem;cursor:pointer}
+/* barre d'onglets */
+.cl-tabbar{position:relative;z-index:2;flex:none;display:flex;justify-content:space-around;gap:2px;
+  padding:9px 10px calc(env(safe-area-inset-bottom,0px) + 10px);
+  background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+.cl-tab{flex:1;border:0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:15px;color:var(--soft);font-weight:800;font-size:.66rem;font-family:var(--body)}
+.cl-ic{position:relative;width:46px;height:32px;border-radius:12px;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .2s cubic-bezier(.3,1.5,.5,1)}
+.cl-ic svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cl-tab.on{color:var(--green)}
+.cl-tab.on .cl-ic{background:var(--greenbg);box-shadow:inset 0 0 0 1px var(--greenline);transform:scale(1.08)}
+.cl-tab:active .cl-ic{transform:scale(.86)}
+.cl-tabbadge{position:absolute;top:-3px;right:2px;background:var(--rose);color:#fff;font-size:.58rem;font-weight:900;border-radius:99px;padding:1px 5px;line-height:1.3}
+.cl-tablock{position:absolute;top:-3px;right:2px;font-size:.7rem}
+/* entrée des écrans */
+.cl-screen.play>*:not(.cl-fab){animation:clrise .55s cubic-bezier(.2,.75,.3,1) both}
+.cl-screen.play>*:nth-child(2){animation-delay:.05s}
+.cl-screen.play>*:nth-child(3){animation-delay:.1s}
+.cl-screen.play>*:nth-child(4){animation-delay:.15s}
+.cl-screen.play>*:nth-child(5){animation-delay:.2s}
+.cl-screen.play>*:nth-child(6){animation-delay:.25s}
+.cl-screen.play>*:nth-child(n+7){animation-delay:.3s}
+@keyframes clrise{from{opacity:0;transform:translateY(16px)}}
+.cl-card:active{transform:none}
+@media(prefers-reduced-motion:reduce){.cl *{animation:none!important;transition:none!important}}
 `;

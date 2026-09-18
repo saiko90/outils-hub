@@ -90,10 +90,12 @@ export async function POST(req: Request) {
     ],
   };
 
-  // Modèle principal + repli. Les surcharges Gemini (503/429) sont transitoires :
-  // on réessaie avec petit délai, puis on bascule sur le modèle de repli.
-  const FALLBACK = process.env.GEMINI_MODEL_FALLBACK || "gemini-2.5-flash";
-  const MODELS = Array.from(new Set([MODEL, FALLBACK]));
+  // Les surcharges Gemini (503/429) sont transitoires : on réessaie le même modèle
+  // avec un petit délai (gemini-3.6-flash est le modèle flash courant, il n'y a pas de
+  // repli plus ancien valable). Un modèle de repli explicite est possible via env.
+  const FALLBACK = process.env.GEMINI_MODEL_FALLBACK || "";
+  const MODELS = Array.from(new Set([MODEL, ...(FALLBACK ? [FALLBACK] : [])]));
+  const MAX_CALLS = 4;
   const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
   const busyMsg =
     lang === "de" ? "Ich bin gerade etwas überlastet 🥕 versuch es gleich nochmal, ich bin schnell zurück!"
@@ -119,7 +121,7 @@ export async function POST(req: Request) {
   let lastDetail = "";
   let calls = 0;
   for (const model of MODELS) {
-    for (let attempt = 0; attempt < 2 && calls < 3; attempt++) {
+    for (let attempt = 0; attempt < MAX_CALLS && calls < MAX_CALLS; attempt++) {
       calls++;
       const r = await callOnce(model);
       if (!r) { lastStatus = 504; await sleep(300); continue; } // timeout réseau → on retente

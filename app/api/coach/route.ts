@@ -93,9 +93,9 @@ export async function POST(req: Request) {
   // Les surcharges Gemini (503/429) sont transitoires : on réessaie le même modèle
   // avec un petit délai (gemini-3.6-flash est le modèle flash courant, il n'y a pas de
   // repli plus ancien valable). Un modèle de repli explicite est possible via env.
-  const FALLBACK = process.env.GEMINI_MODEL_FALLBACK || "";
-  const MODELS = Array.from(new Set([MODEL, ...(FALLBACK ? [FALLBACK] : [])]));
-  const MAX_CALLS = 4;
+  const FALLBACK = process.env.GEMINI_MODEL_FALLBACK || "gemini-flash-latest";
+  const MODELS = Array.from(new Set([MODEL, ...(FALLBACK && FALLBACK !== MODEL ? [FALLBACK] : [])]));
+  const MAX_CALLS = 5;
   const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
   const busyMsg =
     lang === "de" ? "Ich bin gerade etwas überlastet 🥕 versuch es gleich nochmal, ich bin schnell zurück!"
@@ -139,11 +139,13 @@ export async function POST(req: Request) {
       }
       lastStatus = r.status;
       lastDetail = (await r.text().catch(() => "")).slice(0, 300);
+      if (r.status === 404) break; // modèle indisponible → on tente le modèle suivant (sans jamais exposer l'erreur)
       const retryable = r.status === 503 || r.status === 429 || r.status === 500 || r.status === 502;
       if (!retryable) {
+        // 400/403… = vraie erreur (payload/clé) : utile de la remonter pour diagnostic.
         return NextResponse.json({ error: "gemini_error", status: r.status, message: lastDetail }, { status: 502 });
       }
-      await sleep(400 * (attempt + 1)); // 400 ms, 800 ms
+      await sleep(400 * (attempt + 1)); // 400, 800, 1200…
     }
   }
   // Toujours surchargé/lent après plusieurs essais : Vito répond gentiment plutôt qu'une erreur « connexion ».

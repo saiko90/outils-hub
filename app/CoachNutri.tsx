@@ -197,7 +197,6 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro }: { ctx: Coac
     setInput("");
     setBusy(true);
     setAvo("thinking");
-    setUsed(bumpUsage());
     try {
       const r = await fetch("/api/coach", {
         method: "POST",
@@ -209,8 +208,10 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro }: { ctx: Coac
       } else if (!r.ok) {
         setMsgs((m) => [...m, { role: "model", text: t.err }]);
       } else {
-        const data = (await r.json()) as { reply?: string };
+        const data = (await r.json()) as { reply?: string; busy?: boolean };
         const reply = data.reply || t.err;
+        // On ne décompte le quota que pour une vraie réponse (pas un « je suis débordé » ni une erreur).
+        if (data.reply && !data.busy) setUsed(bumpUsage());
         setMsgs((m) => [...m, { role: "model", text: reply }]);
         setAvo("talking");
         if (talkTimer.current) clearTimeout(talkTimer.current);

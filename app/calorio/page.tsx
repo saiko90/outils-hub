@@ -44,10 +44,19 @@ export default function CalorioApp() {
 
       <CalorioCalc lang="fr" />
 
+      {/* Liens internes (SEO) — présents dans le HTML pour l'exploration, hors du flux visuel de l'app plein écran. */}
+      <nav className="ca-seo" aria-label="Liens utiles calorio">
+        <a href="/calories">Calories des aliments</a>
+        <a href="/calorio-vs-myfitnesspal">calorio vs MyFitnessPal</a>
+        <a href="/calorio-vs-yazio">calorio vs YAZIO</a>
+        <a href="/calorio-vs-lifesum">calorio vs Lifesum</a>
+      </nav>
+
       <style>{`
         html,body{height:100%;margin:0;overflow:hidden;background:#e7efe8 !important;
           overscroll-behavior:none}
         body{background:radial-gradient(1200px 700px at 50% -10%, #f0f8f1, #e7efe8 60%) !important}
+        .ca-seo{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
       `}</style>
     </>
   );

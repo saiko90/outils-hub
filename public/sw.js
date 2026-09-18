@@ -35,5 +35,50 @@ self.addEventListener("notificationclick", (event) => {
   );
 });
 
-self.addEventListener("install", () => self.skipWaiting());
-self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
+/* ---- Cache hors-ligne (app-shell) ---- */
+const CACHE = "calorio-cache-v1";
+const PRECACHE = ["/", "/calorio-icon-192.png", "/calorio-icon-180.png", "/manifest.webmanifest"];
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE).then((c) => Promise.allSettled(PRECACHE.map((u) => c.add(u)))).then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener("fetch", (event) => {
+  const req = event.request;
+  if (req.method !== "GET") return;
+  let url;
+  try { url = new URL(req.url); } catch (e) { return; }
+  if (url.origin !== self.location.origin) return;          // tiers (fonts, OFF…) : laisser le réseau
+  if (url.pathname.startsWith("/api/")) return;             // API : jamais de cache
+  if (url.pathname === "/sw.js") return;
+
+  // Navigations : réseau d'abord, repli sur la page en cache (offline).
+  if (req.mode === "navigate") {
+    event.respondWith(
+      fetch(req)
+        .then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {}); return res; })
+        .catch(() => caches.match(req).then((m) => m || caches.match("/")))
+    );
+    return;
+  }
+
+  // Assets same-origin (JS/CSS/images/police) : cache d'abord + mise à jour en arrière-plan.
+  event.respondWith(
+    caches.match(req).then((cached) => {
+      const network = fetch(req)
+        .then((res) => { if (res && res.status === 200) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {}); } return res; })
+        .catch(() => cached);
+      return cached || network;
+    })
+  );
+});

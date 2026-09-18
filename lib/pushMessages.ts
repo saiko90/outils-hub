@@ -6,6 +6,60 @@ export type PushLang = "fr" | "de" | "en";
 export type PushType = "lunch" | "dinner" | "encourage";
 export type PushVariant = { title: string; body: string };
 
+const toLang = (lang: string): PushLang => (lang === "de" ? "de" : lang === "en" ? "en" : "fr");
+
+/* Notifications « série en jeu » (aversion à la perte) — les plus puissantes pour la rétention.
+   Envoyées le soir uniquement si rien n'a été noté aujourd'hui ET qu'une série est en cours. */
+const STREAK: Record<PushLang, ((n: number) => PushVariant)[]> = {
+  fr: [
+    (n) => ({ title: `Ta série de ${n} jours est en jeu 🔥`, body: "Note un repas maintenant pour ne pas la perdre — ce serait dommage si près du but !" }),
+    (n) => ({ title: `${n} jours d'affilée, on lâche rien 🔥`, body: "Un repas noté ce soir et ta série continue. Tu tiens le bon bout !" }),
+    (n) => ({ title: "Ne casse pas ta série 🥕", body: `${n} jours de suite, c'est du beau travail. Ajoute ton repas du jour pour la garder intacte.` }),
+    (n) => ({ title: `Plus que ce soir pour garder tes ${n} jours 🔥`, body: "Deux tapes suffisent. Vito compte sur toi !" }),
+  ],
+  de: [
+    (n) => ({ title: `Deine ${n}-Tage-Serie steht auf dem Spiel 🔥`, body: "Trag jetzt eine Mahlzeit ein, damit du sie nicht verlierst — so kurz vorm Ziel!" }),
+    (n) => ({ title: `${n} Tage am Stück, wir bleiben dran 🔥`, body: "Eine Mahlzeit heute Abend und deine Serie läuft weiter. Du hast's drauf!" }),
+    (n) => ({ title: "Brich deine Serie nicht ab 🥕", body: `${n} Tage in Folge — starke Arbeit. Trag dein Essen ein, um sie zu halten.` }),
+    (n) => ({ title: `Nur noch heute für deine ${n} Tage 🔥`, body: "Zwei Tipps reichen. Vito zählt auf dich!" }),
+  ],
+  en: [
+    (n) => ({ title: `Your ${n}-day streak is at risk 🔥`, body: "Log a meal now so you don't lose it — not this close to your goal!" }),
+    (n) => ({ title: `${n} days in a row, let's not quit 🔥`, body: "One meal tonight and your streak keeps going. You've got this!" }),
+    (n) => ({ title: "Don't break your streak 🥕", body: `${n} days straight — great work. Add today's meal to keep it alive.` }),
+    (n) => ({ title: `Just tonight left to keep your ${n} days 🔥`, body: "Two taps is all it takes. Vito's counting on you!" }),
+  ],
+};
+
+export function buildStreak(lang: string, n: number, seed?: number): PushVariant {
+  const pool = STREAK[toLang(lang)];
+  const idx = typeof seed === "number" ? seed % pool.length : Math.floor(Math.random() * pool.length);
+  return pool[idx](n);
+}
+
+/* Bilan hebdo (dimanche soir) — construit à partir des chiffres réels de la semaine. */
+export function buildRecap(lang: string, days: number, avgKcal: number, weightDelta: number | null): PushVariant {
+  const l = toLang(lang);
+  const kcal = avgKcal > 0 ? Math.round(avgKcal).toLocaleString(l === "de" ? "de-CH" : l === "en" ? "en-CH" : "fr-CH") : null;
+  const w = weightDelta != null ? `${weightDelta > 0 ? "+" : ""}${weightDelta.toFixed(1)} kg` : null;
+  if (l === "de") {
+    const parts = [`${days} Tag${days > 1 ? "e" : ""} erfasst`];
+    if (kcal) parts.push(`Ø ${kcal} kcal`);
+    if (w) parts.push(`Gewicht ${w}`);
+    return { title: "Deine Woche mit calorio 📊", body: `${parts.join(" · ")}. Weiter so — Vito ist stolz auf dich! 🥕` };
+  }
+  if (l === "en") {
+    const parts = [`${days} day${days > 1 ? "s" : ""} logged`];
+    if (kcal) parts.push(`avg ${kcal} kcal`);
+    if (w) parts.push(`weight ${w}`);
+    return { title: "Your week with calorio 📊", body: `${parts.join(" · ")}. Keep it up — Vito's proud of you! 🥕` };
+  }
+  const parts = [`${days} jour${days > 1 ? "s" : ""} noté${days > 1 ? "s" : ""}`];
+  if (kcal) parts.push(`moyenne ${kcal} kcal`);
+  if (w) parts.push(`poids ${w}`);
+  return { title: "Ton bilan de la semaine 📊", body: `${parts.join(" · ")}. Continue comme ça — Vito est fier de toi ! 🥕` };
+}
+
 const MSGS: Record<PushLang, Record<PushType, PushVariant[]>> = {
   fr: {
     lunch: [

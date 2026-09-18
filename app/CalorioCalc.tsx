@@ -340,6 +340,8 @@ const LX = {
     troShareBtn: "Partager", troShareMine: "Partager mes trophées", troCopiedMsg: "Copié ✓",
     troShare: (nm: string) => `J'ai débloqué le trophée « ${nm} » sur calorio 🥕 Et toi, tu tiens combien de jours ? Rejoins-moi :`,
     troShareGrade: (g: string, n: number) => `Grade ${g} sur calorio 🥕 ${n} trophée${n > 1 ? "s" : ""} débloqué${n > 1 ? "s" : ""} — et toi ? Rejoins-moi :`,
+    dataTitle: "Mes données", dataSub: "Télécharge une sauvegarde ou restaure-la sur un autre appareil.", exportBtn: "⬇️ Télécharger", importBtn: "⬆️ Importer",
+    importOk: "✓ Données importées, rechargement…", importErr: "Fichier invalide. Choisis un export calorio.",
      objVal: (v: string) => v,
   },
   de: {
@@ -388,6 +390,8 @@ const LX = {
     troShareBtn: "Teilen", troShareMine: "Meine Trophäen teilen", troCopiedMsg: "Kopiert ✓",
     troShare: (nm: string) => `Ich habe die Trophäe « ${nm} » auf calorio freigeschaltet 🥕 Und du, wie lange hältst du durch? Mach mit:`,
     troShareGrade: (g: string, n: number) => `Rang ${g} auf calorio 🥕 ${n} Trophäe${n > 1 ? "n" : ""} freigeschaltet — und du? Mach mit:`,
+    dataTitle: "Meine Daten", dataSub: "Lade eine Sicherung herunter oder stelle sie auf einem anderen Gerät wieder her.", exportBtn: "⬇️ Herunterladen", importBtn: "⬆️ Importieren",
+    importOk: "✓ Daten importiert, wird neu geladen…", importErr: "Ungültige Datei. Wähle einen calorio-Export.",
     objVal: (v: string) => v,
   },
   en: {
@@ -436,6 +440,8 @@ const LX = {
     troShareBtn: "Share", troShareMine: "Share my trophies", troCopiedMsg: "Copied ✓",
     troShare: (nm: string) => `I just unlocked the « ${nm} » trophy on calorio 🥕 How many days can you keep it up? Join me:`,
     troShareGrade: (g: string, n: number) => `${g} rank on calorio 🥕 ${n} troph${n > 1 ? "ies" : "y"} unlocked — and you? Join me:`,
+    dataTitle: "My data", dataSub: "Download a backup or restore it on another device.", exportBtn: "⬇️ Download", importBtn: "⬆️ Import",
+    importOk: "✓ Data imported, reloading…", importErr: "Invalid file. Pick a calorio export.",
     objVal: (v: string) => v,
   },
 } as const;
@@ -607,6 +613,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [newTrophy, setNewTrophy] = useState<string>("");
   const [troCopied, setTroCopied] = useState(false);
   const trophyInit = useRef(false);
+  const [dataMsg, setDataMsg] = useState("");
+  const importRef = useRef<HTMLInputElement>(null);
   const [q, setQ] = useState("");
   const [catFilter, setCatFilter] = useState<AlimentCat | "tous">("tous");
   const [isPro, setIsPro] = useState(false);
@@ -845,6 +853,33 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   };
   const shareTrophy = (id: string) => shareText(x.troShare(x.tro[id]?.[0] ?? ""));
   const shareGrade = () => shareText(x.troShareGrade(x.gradeNames[grade.index], trophyCount));
+
+  // Export / import des données (confiance + portabilité). Clés locales connues.
+  const CAL_KEYS = ["calorio.profil", "calorio.journal", "calorio.pesees", "calorio.recents", "calorio.trophies", "calorio.used", "calorio.streakBest", "calorio.lang", "calorio.pro"];
+  const exportData = () => {
+    const out: Record<string, unknown> = { _app: "calorio", _v: 1, _date: new Date().toISOString() };
+    for (const k of CAL_KEYS) {
+      try { const v = localStorage.getItem(k); if (v != null) { try { out[k] = JSON.parse(v); } catch { out[k] = v; } } } catch { /* ignore */ }
+    }
+    try {
+      const blob = new Blob([JSON.stringify(out, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `calorio-donnees-${todayISO()}.json`; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    } catch { /* ignore */ }
+  };
+  const importData = async (file: File) => {
+    try {
+      const obj = JSON.parse(await file.text()) as Record<string, unknown>;
+      if (!obj || obj._app !== "calorio") { setDataMsg(x.importErr); return; }
+      for (const k of CAL_KEYS) {
+        if (k in obj) { const v = obj[k]; localStorage.setItem(k, typeof v === "string" ? v : JSON.stringify(v)); }
+      }
+      setDataMsg(x.importOk);
+      setTimeout(() => window.location.reload(), 900);
+    } catch { setDataMsg(x.importErr); }
+  };
 
   // Push cloud (debounce) quand connecté et que les données changent.
   useEffect(() => {
@@ -1712,6 +1747,18 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               )}
             </div>
 
+            <div className="cl-sectt"><span className="cl-dot" />{x.dataTitle}</div>
+            <div className="cl-card">
+              <p className="cl-setsub" style={{ marginBottom: 12 }}>{x.dataSub}</p>
+              <div className="cl-datarow">
+                <button className="cl-databtn" onClick={exportData}>{x.exportBtn}</button>
+                <button className="cl-databtn" onClick={() => importRef.current?.click()}>{x.importBtn}</button>
+                <input ref={importRef} type="file" accept="application/json,.json" hidden
+                  onChange={(e) => { const f = e.target.files?.[0]; if (f) importData(f); e.target.value = ""; }} />
+              </div>
+              {dataMsg && <p className="cl-setmsg">{dataMsg}</p>}
+            </div>
+
             <div className="cl-sectt"><span className="cl-dot" />{t.faqTitle}</div>
             <div className="cl-card cl-faq">
               {t.faq.map((f, i) => (
@@ -2365,6 +2412,10 @@ const CSS = `
 .cl-vito-bubble{pointer-events:none;max-width:180px;background:#fff;border:1px solid var(--line);border-radius:16px;border-bottom-right-radius:5px;padding:9px 13px;font-size:.82rem;font-weight:800;color:var(--ink);line-height:1.3;
   box-shadow:0 14px 30px -14px rgba(20,50,30,.45);animation:clpop .32s cubic-bezier(.2,1.3,.5,1) both}
 @keyframes clpop{from{opacity:0;transform:translateY(8px) scale(.85)}}
+/* export / import données */
+.cl-datarow{display:flex;gap:9px;flex-wrap:wrap}
+.cl-databtn{flex:1;min-width:130px;background:#f4f7f4;border:1.5px solid var(--line);color:var(--ink);border-radius:12px;padding:12px;font-weight:800;font-size:.88rem;cursor:pointer}
+.cl-databtn:hover{border-color:var(--greenline);background:var(--greenbg);color:var(--green)}
 /* trophées & grade */
 .cl-trocard{background:linear-gradient(180deg,#fffdf6,#fbfff8)}
 .cl-grade{display:flex;align-items:center;gap:13px}

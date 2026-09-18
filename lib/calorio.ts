@@ -196,6 +196,32 @@ export function aliment(id: string): Aliment | undefined {
   return BY_ID[id];
 }
 
+/* --- Slugs SEO (pages « combien de calories dans X ») --- */
+export function slugify(s: string): string {
+  return s
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+export const ALIMENT_SLUGS: { slug: string; al: Aliment }[] = (() => {
+  const seen = new Set<string>();
+  const out: { slug: string; al: Aliment }[] = [];
+  for (const al of ALIMENTS) {
+    let sl = slugify(al.nom.fr);
+    if (!sl || seen.has(sl)) sl = `${sl || "aliment"}-${al.id}`;
+    seen.add(sl);
+    out.push({ slug: sl, al });
+  }
+  return out;
+})();
+const BY_SLUG: Record<string, Aliment> = Object.fromEntries(ALIMENT_SLUGS.map((x) => [x.slug, x.al]));
+const SLUG_BY_ID: Record<string, string> = Object.fromEntries(ALIMENT_SLUGS.map((x) => [x.al.id, x.slug]));
+export function alimentBySlug(slug: string): Aliment | undefined {
+  return BY_SLUG[slug];
+}
+export function alimentSlug(al: Aliment): string {
+  return SLUG_BY_ID[al.id] || al.id;
+}
+
 export type Total = { kcal: number; prot: number; gluc: number; lip: number };
 
 /** Valeurs nutritionnelles par 100 g — commun à la base interne et aux sources externes. */

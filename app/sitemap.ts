@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { headers } from "next/headers";
 import { TOOLS, REAL_CATEGORIES, CAT_SLUG } from "@/lib/catalog";
+import { ALIMENT_SLUGS } from "@/lib/calorio";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -8,10 +9,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // propres URLs, pas celles d'outils.ch.
   const host = (headers().get("host") || "outils.ch").toLowerCase();
   if (host === "calorio.ch" || host === "www.calorio.ch") {
+    const vs = ["calorio-vs-myfitnesspal", "calorio-vs-yazio", "calorio-vs-lifesum"];
     return [
       { url: "https://calorio.ch/", lastModified: now, changeFrequency: "weekly", priority: 1 },
-      { url: "https://calorio.ch/calorio-vs-myfitnesspal", lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-      { url: "https://calorio.ch/calorio-vs-myfitnesspal/en", lastModified: now, changeFrequency: "monthly", priority: 0.75 },
+      ...vs.flatMap((s) => [
+        { url: `https://calorio.ch/${s}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
+        { url: `https://calorio.ch/${s}/en`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
+      ]),
+      { url: "https://calorio.ch/calories", lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+      ...ALIMENT_SLUGS.map((x) => ({ url: `https://calorio.ch/calories/${x.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 })),
     ];
   }
   const B = "https://outils.ch";

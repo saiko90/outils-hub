@@ -90,33 +90,60 @@ export async function POST(req: Request) {
     ],
   };
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
-  try {
-    const ctrl = new AbortController();
-    const to = setTimeout(() => ctrl.abort(), 25000);
-    const r = await fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-goog-api-key": key },
-      body: JSON.stringify(payload),
-      signal: ctrl.signal,
-    });
-    clearTimeout(to);
+  // Modèle principal + repli. Les surcharges Gemini (503/429) sont transitoires :
+  // on réessaie avec petit délai, puis on bascule sur le modèle de repli.
+  const FALLBACK = process.env.GEMINI_MODEL_FALLBACK || "gemini-2.5-flash";
+  const MODELS = Array.from(new Set([MODEL, FALLBACK]));
+  const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+  const busyMsg =
+    lang === "de" ? "Ich bin gerade etwas überlastet 🥕 versuch es gleich nochmal, ich bin schnell zurück!"
+    : lang === "en" ? "I'm a bit swamped right now 🥕 try again in a moment, I'll be right back!"
+    : "Je suis un peu débordé là 🥕 réessaie dans un instant, je reviens vite !";
 
-    if (!r.ok) {
-      const detail = await r.text().catch(() => "");
-      return NextResponse.json({ error: "gemini_error", status: r.status, message: detail.slice(0, 300) }, { status: 502 });
+  const callOnce = async (model: string): Promise<Response | null> => {
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), 12000);
+    try {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-goog-api-key": key },
+        body: JSON.stringify(payload),
+        signal: ctrl.signal,
+      });
+      clearTimeout(to);
+      return r;
+    } catch { clearTimeout(to); return null; }
+  };
+
+  let lastStatus = 0;
+  let lastDetail = "";
+  let calls = 0;
+  for (const model of MODELS) {
+    for (let attempt = 0; attempt < 2 && calls < 3; attempt++) {
+      calls++;
+      const r = await callOnce(model);
+      if (!r) { lastStatus = 504; await sleep(300); continue; } // timeout réseau → on retente
+      if (r.ok) {
+        const data = (await r.json().catch(() => ({}))) as {
+          candidates?: { content?: { parts?: { text?: string }[] } }[];
+          promptFeedback?: { blockReason?: string };
+        };
+        const reply = data.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("").trim();
+        if (!reply) {
+          const blocked = data.promptFeedback?.blockReason;
+          return NextResponse.json({ reply: blocked ? "Désolé, je préfère ne pas répondre à ça — on reste sur la nutrition ? 🥕" : "Hmm, je n'ai pas de réponse là. Reformule ?" });
+        }
+        return NextResponse.json({ reply });
+      }
+      lastStatus = r.status;
+      lastDetail = (await r.text().catch(() => "")).slice(0, 300);
+      const retryable = r.status === 503 || r.status === 429 || r.status === 500 || r.status === 502;
+      if (!retryable) {
+        return NextResponse.json({ error: "gemini_error", status: r.status, message: lastDetail }, { status: 502 });
+      }
+      await sleep(400 * (attempt + 1)); // 400 ms, 800 ms
     }
-    const data = (await r.json()) as {
-      candidates?: { content?: { parts?: { text?: string }[] } }[];
-      promptFeedback?: { blockReason?: string };
-    };
-    const reply = data.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("").trim();
-    if (!reply) {
-      const blocked = data.promptFeedback?.blockReason;
-      return NextResponse.json({ reply: blocked ? "Désolé, je préfère ne pas répondre à ça — on reste sur la nutrition ? 🥕" : "Hmm, je n'ai pas de réponse là. Reformule ?" });
-    }
-    return NextResponse.json({ reply });
-  } catch {
-    return NextResponse.json({ error: "timeout", message: "Le coach a mis trop de temps à répondre. Réessaie." }, { status: 504 });
   }
+  // Toujours surchargé/lent après plusieurs essais : Vito répond gentiment plutôt qu'une erreur « connexion ».
+  return NextResponse.json({ reply: busyMsg, busy: true, lastStatus });
 }

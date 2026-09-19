@@ -29,6 +29,9 @@ export async function POST(req: Request) {
 
     const country = (req.headers.get("x-vercel-ip-country") || "XX").slice(0, 2);
     const ref = (typeof body.ref === "string" ? body.ref : "").toLowerCase().slice(0, 100);
+    // Domaine du visiteur (calorio.ch vs outils.ch) : le beacon est same-origin, donc
+    // l'en-tête Host = le site visité. On normalise (minuscules, sans port ni "www.").
+    const host = (req.headers.get("host") || "").toLowerCase().split(":")[0].replace(/^www\./, "").slice(0, 64);
 
     await fetch(`${SB_URL}/rest/v1/rpc/track_view`, {
       method: "POST",
@@ -37,7 +40,7 @@ export async function POST(req: Request) {
         apikey: SB_ANON,
         authorization: `Bearer ${SB_ANON}`,
       },
-      body: JSON.stringify({ p_path: path, p_country: country, p_ref: ref }),
+      body: JSON.stringify({ p_path: path, p_country: country, p_ref: ref, p_host: host }),
     }).catch(() => {});
 
     return ok();

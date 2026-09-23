@@ -17,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         { url: `https://calorio.ch/${s}/en`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
       ]),
       { url: "https://calorio.ch/meilleure-app-calories", lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+      { url: "https://calorio.ch/confidentialite-calorio", lastModified: now, changeFrequency: "yearly", priority: 0.3 },
       { url: "https://calorio.ch/calories", lastModified: now, changeFrequency: "monthly", priority: 0.7 },
       ...ALIMENT_SLUGS.map((x) => ({ url: `https://calorio.ch/calories/${x.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 })),
       { url: "https://calorio.ch/recettes", lastModified: now, changeFrequency: "monthly", priority: 0.7 },

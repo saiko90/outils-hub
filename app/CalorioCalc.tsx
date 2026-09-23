@@ -331,6 +331,7 @@ const LX = {
       adjusted: "Cible affinée par ton activité", stepsAdj: "retirés (déjà dans ta séance)",
       srcMontre: "d'après ta montre", srcPas: "d'après tes pas", srcDeclare: "d'après ton profil", remove: "Retirer",
       connect: "Connecter mon activité (Health Connect)", connecting: "Connexion…",
+      sub: "Tes pas et séances ajustent ta cible du jour", today: "aujourd'hui", goal: "Objectif 10 000 pas", sectSeances: "Mes séances",
     },
     weightTitle: "Mon poids", goalLine: (v: string) => `Objectif : ${v} kg`,
     sinceStart: "depuis le début", tileStart: "Départ", tileNow: "Actuel", tileGoal: "Objectif", tileWeek: "Cette semaine",
@@ -405,6 +406,7 @@ const LX = {
       adjusted: "Ziel an deine Aktivität angepasst", stepsAdj: "abgezogen (schon in deiner Einheit)",
       srcMontre: "laut deiner Uhr", srcPas: "laut deinen Schritten", srcDeclare: "laut deinem Profil", remove: "Entfernen",
       connect: "Meine Aktivität verbinden (Health Connect)", connecting: "Verbinden…",
+      sub: "Deine Schritte und Einheiten passen dein Tagesziel an", today: "heute", goal: "Ziel 10 000 Schritte", sectSeances: "Meine Einheiten",
     },
     weightTitle: "Mein Gewicht", goalLine: (v: string) => `Ziel: ${v} kg`,
     sinceStart: "seit Beginn", tileStart: "Start", tileNow: "Aktuell", tileGoal: "Ziel", tileWeek: "Diese Woche",
@@ -479,6 +481,7 @@ const LX = {
       adjusted: "Target refined by your activity", stepsAdj: "removed (already in your session)",
       srcMontre: "from your watch", srcPas: "from your steps", srcDeclare: "from your profile", remove: "Remove",
       connect: "Connect my activity (Health Connect)", connecting: "Connecting…",
+      sub: "Your steps and sessions fine-tune your daily target", today: "today", goal: "Goal 10,000 steps", sectSeances: "My sessions",
     },
     weightTitle: "My weight", goalLine: (v: string) => `Goal: ${v} kg`,
     sinceStart: "since the start", tileStart: "Start", tileNow: "Current", tileGoal: "Goal", tileWeek: "This week",
@@ -1930,6 +1933,17 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                 </div>
               </div>
 
+              {hcPas !== undefined && (
+                <div className="cl-card cl-stepstat">
+                  <span className="cl-stepstat-emo" aria-hidden>👟</span>
+                  <div className="cl-stepstat-tx">
+                    <div className="cl-stepstat-n">{nf(lang).format(displaySteps)} <small>{x.act.steps}</small></div>
+                    <div className="cl-stepstat-prog" aria-hidden><span style={{ width: `${Math.min(100, Math.max(3, (hcPas / 10000) * 100))}%` }} /></div>
+                  </div>
+                  <div className="cl-stepstat-pct">{Math.min(100, Math.round((hcPas / 10000) * 100))}%</div>
+                </div>
+              )}
+
               <div className="cl-sectt"><span className="cl-dot" />{x.macrosDay}</div>
               <div className="cl-card cl-macros">
                 <MacroBar name={t.prot} color={C_PROT} val={total.prot} target={besoinsAffiche.macros.proteines} lang={lang} />
@@ -2048,27 +2062,37 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
           <div className="cl-screen play" key="journee">
             <div className="cl-head"><div><h1>{x.myDay}</h1><div className="cl-sub">{nf(lang).format(total.kcal)} kcal · {bil.pct}%</div></div></div>
 
-            {/* ===== Activité du jour (en tête) ===== */}
+            {/* ===== Activité du jour (rose = sport, séparé du vert nutrition) ===== */}
             <div className="cl-card cl-act">
-              <div className="cl-act-h">
+              <div className="cl-act-head">
                 <span className="cl-act-ic" aria-hidden>🏃</span>
-                <span className="cl-act-t">{x.act.title}</span>
-                {hcPas !== undefined && (
-                  <span className="cl-act-steps"><span aria-hidden>👟</span> <span className="cl-act-steps-n">{nf(lang).format(displaySteps)}</span> {x.act.steps}</span>
-                )}
+                <div className="cl-act-head-tx">
+                  <span className="cl-act-t">{x.act.title}</span>
+                  <span className="cl-act-sub">{x.act.sub}</span>
+                </div>
               </div>
 
-              {hcPas !== undefined && (
-                <div className="cl-act-prog" aria-hidden>
-                  <span style={{ width: `${Math.min(100, Math.max(3, (hcPas / 10000) * 100))}%` }} />
+              {hcPas !== undefined ? (
+                <div className="cl-act-hero">
+                  <div className="cl-act-hero-top">
+                    <span className="cl-act-hero-emo" aria-hidden>👟</span>
+                    <div className="cl-act-hero-nums">
+                      <span className="cl-act-steps-big">{nf(lang).format(displaySteps)}</span>
+                      <span className="cl-act-steps-lb">{x.act.steps} · {x.act.today}</span>
+                    </div>
+                  </div>
+                  <div className="cl-act-prog" aria-hidden>
+                    <span style={{ width: `${Math.min(100, Math.max(3, (hcPas / 10000) * 100))}%` }} />
+                  </div>
+                  <div className="cl-act-goal">{x.act.goal}</div>
                 </div>
-              )}
-
-              {hcAvailable && hcPas === undefined && (
+              ) : hcAvailable ? (
                 <button className="cl-act-connect" onClick={readHealthConnect} disabled={hcBusy}>
                   <span aria-hidden>⌚</span> {hcBusy ? x.act.connecting : x.act.connect}
                 </button>
-              )}
+              ) : null}
+
+              <div className="cl-act-sect">{x.act.sectSeances}</div>
 
               {seances.length === 0 ? (
                 <div className="cl-act-none">{x.act.none}</div>
@@ -2104,6 +2128,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
               {activiteActive && (
                 <div className="cl-act-adj">
+                  <span className="cl-act-adj-ic" aria-hidden>🎯</span>
                   <span className="cl-act-adj-l">{x.act.adjusted}</span>
                   <b className="cl-act-adj-v">{nf(lang).format(besoinsAffiche.cible)} kcal</b>
                 </div>
@@ -2904,6 +2929,15 @@ const CSS = `
 .cl-rk{font-family:var(--disp);font-weight:600;font-size:1.12rem;font-variant-numeric:tabular-nums}
 .cl-rl{font-size:.7rem;color:var(--soft);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
 .cl-rsep{flex:0 0 1px;background:var(--line);align-self:stretch;margin:3px 0}
+/* compteur de pas — carte stats (rose) */
+.cl-stepstat{display:flex;align-items:center;gap:13px;background:linear-gradient(155deg,#fff,var(--rosebg));border:1px solid var(--roseline)}
+.cl-stepstat-emo{font-size:1.6rem;flex:none;filter:drop-shadow(0 4px 8px rgba(239,74,106,.35));animation:clactstep 2.6s ease-in-out infinite;transform-origin:60% 90%}
+.cl-stepstat-tx{flex:1;min-width:0}
+.cl-stepstat-n{font-family:var(--disp);font-weight:700;font-size:1.55rem;line-height:1;font-variant-numeric:tabular-nums;background:linear-gradient(120deg,var(--rose),#ff7d9c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.cl-stepstat-n small{font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;-webkit-text-fill-color:var(--rose);opacity:.75}
+.cl-stepstat-prog{height:8px;border-radius:99px;background:#f7dbe3;overflow:hidden;margin-top:9px;box-shadow:inset 0 1px 2px rgba(140,30,55,.15)}
+.cl-stepstat-prog>span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ff9bb4,var(--rose));box-shadow:0 0 8px rgba(239,74,106,.5);transition:width .9s cubic-bezier(.3,.9,.3,1)}
+.cl-stepstat-pct{flex:none;font-family:var(--disp);font-weight:700;font-size:1.15rem;color:var(--rose);font-variant-numeric:tabular-nums}
 /* macros (barres) */
 .cl-macros{display:flex;flex-direction:column;gap:14px}
 .cl-mbar .cl-mbh,.cl-mbh{display:flex;justify-content:space-between;font-size:.86rem;font-weight:700;margin-bottom:6px;color:var(--muted)}
@@ -3290,44 +3324,54 @@ const CSS = `
 @keyframes clrise{from{opacity:0;transform:translateY(16px)}}
 .cl-card:active{transform:none}
 @media(prefers-reduced-motion:reduce){.cl *{animation:none!important;transition:none!important}}
-/* ===== Activité du jour ===== */
+/* ===== Activité du jour (rose = sport, distinct du vert nutrition) ===== */
 #clProgArc{transition:stroke-dashoffset .9s cubic-bezier(.3,.9,.3,1)}
-.cl-act{background:linear-gradient(180deg,#ffffff,#f6fbf9)}
-.cl-act-h{display:flex;align-items:center;gap:9px;margin-bottom:12px}
-.cl-act-ic{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex:none;background:var(--greenbg);box-shadow:inset 0 1px 2px rgba(255,255,255,.7),0 4px 10px -5px rgba(14,52,30,.3)}
-.cl-act-t{font-family:var(--disp);font-weight:600;font-size:1.02rem;flex:1}
-.cl-act-steps{font-weight:800;font-size:.82rem;color:var(--green);background:var(--greenbg);border:1px solid var(--greenline);border-radius:99px;padding:4px 10px;font-variant-numeric:tabular-nums;white-space:nowrap}
-.cl-act-none{font-size:.84rem;color:var(--muted);line-height:1.5;padding:2px 2px 4px}
-.cl-act-list{display:flex;flex-direction:column;gap:7px;margin-bottom:4px}
-.cl-act-item{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:9px 11px;box-shadow:0 6px 14px -12px rgba(14,52,30,.35)}
-.cl-act-emo{font-size:1.05rem;flex:none}
+.cl-act{position:relative;overflow:hidden;background:linear-gradient(180deg,#fff,var(--rosebg))}
+.cl-act::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--rose),#ff9bb4);opacity:.9}
+.cl-act-head{display:flex;align-items:center;gap:11px;margin-bottom:15px}
+.cl-act-ic{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex:none;background:linear-gradient(160deg,#fff,var(--rosebg));border:1px solid var(--roseline);box-shadow:inset 0 1px 2px rgba(255,255,255,.8),0 6px 14px -7px rgba(239,74,106,.4)}
+.cl-act-head-tx{display:flex;flex-direction:column;gap:2px;min-width:0}
+.cl-act-t{font-family:var(--disp);font-weight:600;font-size:1.06rem;line-height:1.15}
+.cl-act-sub{font-size:.76rem;color:var(--muted);line-height:1.35}
+/* hero pas — grand compteur animé */
+.cl-act-hero{background:linear-gradient(155deg,#fff,var(--rosebg));border:1px solid var(--roseline);border-radius:18px;padding:15px 16px 14px;margin-bottom:16px;box-shadow:0 12px 26px -18px rgba(239,74,106,.55),inset 0 1px 1px rgba(255,255,255,.6)}
+.cl-act-hero-top{display:flex;align-items:center;gap:13px}
+.cl-act-hero-emo{font-size:1.75rem;flex:none;filter:drop-shadow(0 4px 8px rgba(239,74,106,.35));animation:clactstep 2.6s ease-in-out infinite;transform-origin:60% 90%}
+@keyframes clactstep{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-3px) rotate(5deg)}}
+.cl-act-hero-nums{display:flex;flex-direction:column;line-height:1;min-width:0}
+.cl-act-steps-big{font-family:var(--disp);font-weight:700;font-size:2.7rem;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1;background:linear-gradient(120deg,var(--rose),#ff7d9c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.cl-act-steps-lb{font-size:.72rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--rose);opacity:.78;margin-top:5px}
+.cl-act-prog{height:10px;border-radius:99px;background:#f7dbe3;overflow:hidden;margin:14px 0 7px;box-shadow:inset 0 1px 2px rgba(140,30,55,.15)}
+.cl-act-prog>span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ff9bb4,var(--rose));box-shadow:0 0 10px rgba(239,74,106,.5);transition:width .9s cubic-bezier(.3,.9,.3,1);position:relative;overflow:hidden}
+.cl-act-prog>span::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.6),transparent 80%);transform:translateX(-120%);animation:clactshine 2.8s ease-in-out 1s infinite}
+@keyframes clactshine{0%{transform:translateX(-120%)}55%,100%{transform:translateX(320%)}}
+.cl-act-goal{font-size:.74rem;font-weight:700;color:var(--rose);opacity:.72;text-align:right}
+/* connexion */
+.cl-act-connect{width:100%;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:15px;background:linear-gradient(135deg,#ff7d9c,var(--rose));color:#fff;font-family:var(--disp);font-weight:600;font-size:.96rem;padding:14px;cursor:pointer;box-shadow:0 14px 26px -10px rgba(239,74,106,.6);animation:clactpulse 2.4s ease-in-out infinite}
+.cl-act-connect:active{transform:scale(.98)}
+.cl-act-connect:disabled{opacity:.6;animation:none}
+@keyframes clactpulse{0%,100%{box-shadow:0 14px 26px -12px rgba(239,74,106,.55)}50%{box-shadow:0 20px 38px -8px rgba(239,74,106,.85)}}
+/* section séances */
+.cl-act-sect{font-size:.72rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 2px 10px}
+.cl-act-none{font-size:.84rem;color:var(--muted);line-height:1.5;padding:0 2px 2px}
+.cl-act-list{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.cl-act-item{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--roseline);border-radius:14px;padding:10px 12px;box-shadow:0 6px 14px -12px rgba(239,74,106,.4);animation:clactchip .4s cubic-bezier(.2,.9,.3,1) both}
+@keyframes clactchip{from{opacity:0;transform:translateX(-10px)}}
+.cl-act-emo{font-size:1.1rem;flex:none}
 .cl-act-nm{flex:1;font-weight:700;font-size:.9rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cl-act-kc{font-weight:900;font-size:.9rem;color:var(--green);font-variant-numeric:tabular-nums;white-space:nowrap}
+.cl-act-kc{font-weight:900;font-size:.9rem;color:var(--rose);font-variant-numeric:tabular-nums;white-space:nowrap}
 .cl-act-x{flex:none;width:26px;height:26px;border-radius:8px;border:0;cursor:pointer;background:var(--rosebg);color:var(--rose);font-size:1.1rem;line-height:1;font-weight:800}
 .cl-act-x:active{transform:scale(.9)}
-.cl-act-add{display:flex;gap:8px;margin-top:11px}
-.cl-act-sel{flex:1;min-width:0;border:1.5px solid var(--line);background:#fff;border-radius:13px;padding:11px 12px;font-family:var(--body);font-weight:700;font-size:.9rem;color:var(--ink);appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235f6d62' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px}
-.cl-act-min{width:74px;flex:none;border:1.5px solid var(--line);background:#fff;border-radius:13px;padding:11px 10px;font-family:var(--body);font-weight:800;font-size:.9rem;color:var(--ink);text-align:center;font-variant-numeric:tabular-nums}
-.cl-act-sel:focus,.cl-act-min:focus{outline:none;border-color:var(--green2);box-shadow:0 0 0 3px var(--greenbg)}
-.cl-act-addbtn{flex:none;width:46px;border:0;border-radius:13px;background:var(--btn);color:#fff;font-size:1.3rem;font-weight:800;cursor:pointer;box-shadow:0 10px 20px -10px rgba(22,163,74,.6)}
+.cl-act-add{display:flex;gap:8px;margin-top:12px}
+.cl-act-sel{flex:1;min-width:0;border:1.5px solid var(--roseline);background:#fff;border-radius:13px;padding:11px 12px;font-family:var(--body);font-weight:700;font-size:.9rem;color:var(--ink);appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23ef4a6a' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px}
+.cl-act-min{width:74px;flex:none;border:1.5px solid var(--roseline);background:#fff;border-radius:13px;padding:11px 10px;font-family:var(--body);font-weight:800;font-size:.9rem;color:var(--ink);text-align:center;font-variant-numeric:tabular-nums}
+.cl-act-sel:focus,.cl-act-min:focus{outline:none;border-color:var(--rose);box-shadow:0 0 0 3px var(--rosebg)}
+.cl-act-addbtn{flex:none;width:46px;border:0;border-radius:13px;background:linear-gradient(135deg,#ff7d9c,var(--rose));color:#fff;font-size:1.3rem;font-weight:800;cursor:pointer;box-shadow:0 10px 20px -10px rgba(239,74,106,.65)}
 .cl-act-addbtn:active{transform:scale(.95)}
-.cl-act-connect{width:100%;margin-top:11px;display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:14px;background:var(--btn);color:#fff;font-family:var(--disp);font-weight:600;font-size:.95rem;padding:13px;cursor:pointer;box-shadow:0 12px 24px -10px rgba(22,163,74,.55)}
-.cl-act-connect:active{transform:scale(.98)}
-.cl-act-connect:disabled{opacity:.6}
-.cl-act-connect{animation:clactpulse 2.4s ease-in-out infinite}
-@keyframes clactpulse{0%,100%{box-shadow:0 12px 24px -10px rgba(22,163,74,.5)}50%{box-shadow:0 18px 36px -8px rgba(22,163,74,.85)}}
-.cl-act-steps{display:inline-flex;align-items:center;gap:5px}
-.cl-act-steps-n{font-variant-numeric:tabular-nums}
-.cl-act-prog{height:8px;border-radius:99px;background:#e9f3ec;overflow:hidden;margin:11px 0 2px;box-shadow:inset 0 1px 2px rgba(14,52,30,.12)}
-.cl-act-prog>span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#4bd489,#16a34a);box-shadow:0 0 10px rgba(52,209,127,.55);transition:width .9s cubic-bezier(.3,.9,.3,1);position:relative;overflow:hidden}
-.cl-act-prog>span::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.55),transparent 80%);transform:translateX(-120%);animation:clactshine 2.6s ease-in-out 1s infinite}
-@keyframes clactshine{0%{transform:translateX(-120%)}55%,100%{transform:translateX(320%)}}
-.cl-act-item{animation:clactchip .4s cubic-bezier(.2,.9,.3,1) both}
-@keyframes clactchip{from{opacity:0;transform:translateX(-10px)}}
-.cl-act-adj{animation:clactglow 3s ease-in-out infinite}
+/* pont vers la nutrition (vert = cible calorique) */
+.cl-act-adj{display:flex;align-items:center;gap:9px;margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--greenbg);border:1px solid var(--greenline);animation:clactglow 3s ease-in-out infinite}
 @keyframes clactglow{0%,100%{box-shadow:0 0 0 0 rgba(52,209,127,0)}50%{box-shadow:0 0 0 4px rgba(52,209,127,.13)}}
-.cl-act-dbg{margin-top:9px;padding:8px 10px;border-radius:10px;background:#f2f6f3;border:1px solid var(--line);font-family:ui-monospace,monospace;font-size:.7rem;line-height:1.4;color:var(--muted);word-break:break-word;cursor:pointer}
-.cl-act-adj{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:11px 13px;border-radius:14px;background:var(--greenbg);border:1px solid var(--greenline)}
-.cl-act-adj-l{font-size:.82rem;font-weight:700;color:#0f7a3d}
-.cl-act-adj-v{font-family:var(--disp);font-weight:600;font-size:1.05rem;color:var(--green);font-variant-numeric:tabular-nums}
+.cl-act-adj-ic{font-size:1.05rem;flex:none}
+.cl-act-adj-l{flex:1;font-size:.82rem;font-weight:700;color:#0f7a3d;line-height:1.3}
+.cl-act-adj-v{font-family:var(--disp);font-weight:600;font-size:1.08rem;color:var(--green);font-variant-numeric:tabular-nums;white-space:nowrap}
 `;

@@ -255,19 +255,50 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
     return t.hello;
   }, [ctx.aujourdhui, ctx.cible, t]);
 
-  const send = async (text: string) => {
-    const clean = text.trim();
-    if (!clean || busy) return;
-    if (readUsage().count >= DAILY_LIMIT) {
-      setMsgs((m) => [...m, { role: "user", text: clean }, { role: "model", text: t.limit }]);
-      setInput("");
-      return;
+  const finishTalking = (len: number) => {
+    setAvo("talking");
+    if (talkTimer.current) clearTimeout(talkTimer.current);
+    talkTimer.current = setTimeout(() => setAvo("idle"), Math.min(6000, 1500 + len * 35));
+  };
+
+  // Streaming : la réponse de Vito s'affiche en direct. Renvoie true si une réponse a été produite.
+  const streamReply = async (next: Msg[]): Promise<boolean> => {
+    let acc = "";
+    let started = false;
+    try {
+      const r = await fetch("/api/coach/stream", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ messages: next, context: ctx }),
+      });
+      if (!r.ok || !r.body) return false;
+      const reader = r.body.getReader();
+      const dec = new TextDecoder();
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const raw = dec.decode(value, { stream: true });
+        const chunk = raw.replace(/\u0000EMPTY/g, ""); // sentinelle « aucun token » du serveur
+        if (!chunk) continue;
+        acc += chunk;
+        if (!started) {
+          started = true;
+          setMsgs((m) => [...m, { role: "model", text: acc }]);
+        } else {
+          setMsgs((m) => { const c = [...m]; c[c.length - 1] = { role: "model", text: acc }; return c; });
+        }
+      }
+      if (!started || !acc.trim()) return false; // rien reçu → repli
+      finishTalking(acc.length);
+      setUsed(bumpUsage());
+      return true;
+    } catch {
+      return started; // coupure après des tokens : on garde ce qu'on a
     }
-    const next: Msg[] = [...msgs, { role: "user", text: clean }];
-    setMsgs(next);
-    setInput("");
-    setBusy(true);
-    setAvo("thinking");
+  };
+
+  // Repli non-streaming (robuste, avec réessais côté serveur).
+  const fallbackReply = async (next: Msg[]) => {
     try {
       const r = await fetch("/api/coach", {
         method: "POST",
@@ -283,16 +314,30 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
         const reply = data.reply || t.err;
         if (data.reply && !data.busy) setUsed(bumpUsage());
         setMsgs((m) => [...m, { role: "model", text: reply }]);
-        setAvo("talking");
-        if (talkTimer.current) clearTimeout(talkTimer.current);
-        talkTimer.current = setTimeout(() => setAvo("idle"), Math.min(6000, 1500 + reply.length * 35));
-        setBusy(false);
+        finishTalking(reply.length);
         return;
       }
     } catch {
       setMsgs((m) => [...m, { role: "model", text: t.err }]);
     }
     setAvo("idle");
+  };
+
+  const send = async (text: string) => {
+    const clean = text.trim();
+    if (!clean || busy) return;
+    if (readUsage().count >= DAILY_LIMIT) {
+      setMsgs((m) => [...m, { role: "user", text: clean }, { role: "model", text: t.limit }]);
+      setInput("");
+      return;
+    }
+    const next: Msg[] = [...msgs, { role: "user", text: clean }];
+    setMsgs(next);
+    setInput("");
+    setBusy(true);
+    setAvo("thinking");
+    const ok = await streamReply(next);
+    if (!ok) await fallbackReply(next);
     setBusy(false);
   };
 

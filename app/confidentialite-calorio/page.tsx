@@ -33,6 +33,15 @@ export default function Page() {
         <h2 className="pv-h2">Utilisation sans compte</h2>
         <p>Par défaut, tu peux utiliser calorio <b>sans créer de compte</b>. Dans ce cas, tes données (profil, journal alimentaire, poids, préférences) restent stockées <b>localement sur ton appareil</b> et ne sont pas transmises à nos serveurs.</p>
 
+        <h2 className="pv-h2">Health Connect et données d'activité (application Android)</h2>
+        <p>Sur l'application Android, calorio peut, <b>uniquement avec ton accord explicite</b>, lire certaines données depuis <b>Health Connect</b> (le hub de santé de Google) :</p>
+        <ul className="pv-ul">
+          <li><b>Nombre de pas</b> du jour ;</li>
+          <li><b>Calories dépensées</b> (actives et totales) mesurées par ton téléphone ou ta montre connectée.</li>
+        </ul>
+        <p>Ces données sont lues <b>en lecture seule</b> : calorio n'écrit jamais rien dans Health Connect. Elles servent <b>exclusivement</b> à affiner l'estimation de ta dépense énergétique quotidienne, et donc ta cible de calories et de macros — c'est le cœur du service que tu demandes. Elles sont traitées <b>sur ton appareil</b> pour ce calcul, ne sont <b>ni vendues ni partagées</b> avec des tiers, et ne sont <b>jamais utilisées à des fins publicitaires</b>. calorio n'accède à aucune autre catégorie de données de santé (fréquence cardiaque, sommeil, glycémie, etc.).</p>
+        <p>Tu peux <b>révoquer cet accès à tout moment</b> depuis Health Connect (Paramètres Android → Applications → Health Connect), ou en désinstallant l'application. L'usage de Health Connect par calorio respecte la <a href="https://developer.android.com/health-and-fitness/guides/health-connect" target="_blank" rel="noopener">politique de Google relative à Health Connect</a>.</p>
+
         <h2 className="pv-h2">Données traitées si tu crées un compte</h2>
         <p>Si tu crées un compte gratuit (pour synchroniser entre appareils), nous traitons :</p>
         <ul className="pv-ul">

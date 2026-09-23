@@ -330,6 +330,7 @@ const LX = {
       none: "Ajoute tes séances (vélo, course, muscu…) — ta cible calorique s'affine.",
       adjusted: "Cible affinée par ton activité", stepsAdj: "retirés (déjà dans ta séance)",
       srcMontre: "d'après ta montre", srcPas: "d'après tes pas", srcDeclare: "d'après ton profil", remove: "Retirer",
+      connect: "Connecter mon activité (Health Connect)", connecting: "Connexion…",
     },
     weightTitle: "Mon poids", goalLine: (v: string) => `Objectif : ${v} kg`,
     sinceStart: "depuis le début", tileStart: "Départ", tileNow: "Actuel", tileGoal: "Objectif", tileWeek: "Cette semaine",
@@ -403,6 +404,7 @@ const LX = {
       none: "Füge deine Einheiten hinzu (Rad, Laufen, Kraft…) — dein Kalorienziel wird genauer.",
       adjusted: "Ziel an deine Aktivität angepasst", stepsAdj: "abgezogen (schon in deiner Einheit)",
       srcMontre: "laut deiner Uhr", srcPas: "laut deinen Schritten", srcDeclare: "laut deinem Profil", remove: "Entfernen",
+      connect: "Meine Aktivität verbinden (Health Connect)", connecting: "Verbinden…",
     },
     weightTitle: "Mein Gewicht", goalLine: (v: string) => `Ziel: ${v} kg`,
     sinceStart: "seit Beginn", tileStart: "Start", tileNow: "Aktuell", tileGoal: "Ziel", tileWeek: "Diese Woche",
@@ -476,6 +478,7 @@ const LX = {
       none: "Add your sessions (cycling, running, weights…) — your calorie target gets sharper.",
       adjusted: "Target refined by your activity", stepsAdj: "removed (already in your session)",
       srcMontre: "from your watch", srcPas: "from your steps", srcDeclare: "from your profile", remove: "Remove",
+      connect: "Connect my activity (Health Connect)", connecting: "Connecting…",
     },
     weightTitle: "My weight", goalLine: (v: string) => `Goal: ${v} kg`,
     sinceStart: "since the start", tileStart: "Start", tileNow: "Current", tileGoal: "Goal", tileWeek: "This week",
@@ -744,6 +747,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [hcPas, setHcPas] = useState<number | undefined>(undefined);
   const [hcTotalKcal, setHcTotalKcal] = useState<number | undefined>(undefined);
   const [hcActiveKcal, setHcActiveKcal] = useState<number | undefined>(undefined);
+  const [hcAvailable, setHcAvailable] = useState(false);
+  const [hcBusy, setHcBusy] = useState(false);
   const [actSport, setActSport] = useState<string>("velo_modere");
   const [actMin, setActMin] = useState<number | "">(30);
 
@@ -915,46 +920,52 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     a[day] = seances;
     save("calorio.activites", a);
   }, [mounted, seances, day]);
-  // Lecture Health Connect (uniquement dans l'app native Capacitor)
-  useEffect(() => {
-    if (!mounted) return;
+  // Health Connect (app native Capacitor). La demande d'autorisation ouvre une
+  // fenêtre système : on la déclenche au tap sur le bouton (geste utilisateur = fiable).
+  // Au 2e lancement (déjà autorisé), la lecture se fait en silence au démarrage.
+  const readHealthConnect = async () => {
     const H = (window as unknown as { Capacitor?: { Plugins?: { Health?: {
       isAvailable: () => Promise<{ available?: boolean }>;
-      requestAuthorization: (o: unknown) => Promise<unknown>;
+      requestAuthorization: (o: unknown) => Promise<{ readAuthorized?: string[] }>;
       readSamples: (o: unknown) => Promise<{ samples?: { value?: number }[] }>;
     } } } }).Capacitor?.Plugins?.Health;
     if (!H) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const av = await H.isAvailable();
-        if (!av?.available) return;
-        await H.requestAuthorization({ read: ["steps", "calories", "totalCalories"], write: [] });
-        const now = new Date();
-        const start = new Date();
-        start.setHours(0, 0, 0, 0);
-        const sum = async (dataType: string) => {
-          try {
-            const r = await H.readSamples({ dataType, startDate: start.toISOString(), endDate: now.toISOString() });
-            const s = r?.samples || [];
-            let t = 0;
-            for (const x of s) t += Number(x?.value) || 0;
-            return { t, n: s.length };
-          } catch {
-            return { t: 0, n: 0 };
-          }
-        };
-        const st = await sum("steps");
-        if (!cancelled) setHcPas(st.t);
-        const tot = await sum("totalCalories");
-        if (!cancelled && tot.n > 0) setHcTotalKcal(tot.t);
-        const act = await sum("calories");
-        if (!cancelled && act.n > 0) setHcActiveKcal(act.t);
-      } catch {
-        /* ignore */
-      }
-    })();
-    return () => { cancelled = true; };
+    setHcBusy(true);
+    try {
+      const av = await H.isAvailable();
+      if (!av?.available) { setHcBusy(false); return; }
+      const auth = await H.requestAuthorization({ read: ["steps", "calories", "totalCalories"], write: [] });
+      if (!Array.isArray(auth?.readAuthorized) || !auth.readAuthorized.includes("steps")) { setHcBusy(false); return; }
+      const now = new Date();
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+      const sum = async (dataType: string) => {
+        try {
+          const r = await H.readSamples({ dataType, startDate: start.toISOString(), endDate: now.toISOString() });
+          const s = r?.samples || [];
+          let t = 0;
+          for (const x of s) t += Number(x?.value) || 0;
+          return { t, n: s.length };
+        } catch {
+          return { t: 0, n: 0 };
+        }
+      };
+      const st = await sum("steps");
+      setHcPas(st.t);
+      const tot = await sum("totalCalories");
+      if (tot.n > 0) setHcTotalKcal(tot.t);
+      const act = await sum("calories");
+      if (act.n > 0) setHcActiveKcal(act.t);
+    } catch {
+      /* ignore */
+    }
+    setHcBusy(false);
+  };
+  useEffect(() => {
+    if (!mounted) return;
+    const H = (window as unknown as { Capacitor?: { Plugins?: { Health?: unknown } } }).Capacitor?.Plugins?.Health;
+    if (H) { setHcAvailable(true); readHealthConnect(); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted]);
   useEffect(() => {
     if (!mounted) return;
@@ -2035,6 +2046,12 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                 <span className="cl-act-t">{x.act.title}</span>
                 {hcPas !== undefined && <span className="cl-act-steps">{nf(lang).format(hcPas)} {x.act.steps}</span>}
               </div>
+
+              {hcAvailable && hcPas === undefined && (
+                <button className="cl-act-connect" onClick={readHealthConnect} disabled={hcBusy}>
+                  <span aria-hidden>⌚</span> {hcBusy ? x.act.connecting : x.act.connect}
+                </button>
+              )}
 
               {seances.length === 0 ? (
                 <div className="cl-act-none">{x.act.none}</div>
@@ -3277,6 +3294,9 @@ const CSS = `
 .cl-act-sel:focus,.cl-act-min:focus{outline:none;border-color:var(--green2);box-shadow:0 0 0 3px var(--greenbg)}
 .cl-act-addbtn{flex:none;width:46px;border:0;border-radius:13px;background:var(--btn);color:#fff;font-size:1.3rem;font-weight:800;cursor:pointer;box-shadow:0 10px 20px -10px rgba(22,163,74,.6)}
 .cl-act-addbtn:active{transform:scale(.95)}
+.cl-act-connect{width:100%;margin-top:11px;display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:14px;background:var(--btn);color:#fff;font-family:var(--disp);font-weight:600;font-size:.95rem;padding:13px;cursor:pointer;box-shadow:0 12px 24px -10px rgba(22,163,74,.55)}
+.cl-act-connect:active{transform:scale(.98)}
+.cl-act-connect:disabled{opacity:.6}
 .cl-act-adj{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:11px 13px;border-radius:14px;background:var(--greenbg);border:1px solid var(--greenline)}
 .cl-act-adj-l{font-size:.82rem;font-weight:700;color:#0f7a3d}
 .cl-act-adj-v{font-family:var(--disp);font-weight:600;font-size:1.05rem;color:var(--green);font-variant-numeric:tabular-nums}

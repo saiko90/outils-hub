@@ -149,7 +149,7 @@ function Avo({ state, size = 120 }: { state: AvoState; size?: number }) {
 }
 
 /* ---------------- Coach ---------------- */
-export default function CoachNutri({ ctx, isPro: proProp, onGoPro }: { ctx: CoachCtx; isPro?: boolean; onGoPro?: () => void }) {
+export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsumeSeed }: { ctx: CoachCtx; isPro?: boolean; onGoPro?: () => void; seed?: string; onConsumeSeed?: () => void }) {
   const lang = ctx.lang;
   const t = L[lang] ?? L.fr;
   const [localPro, setLocalPro] = useState(false);
@@ -182,6 +182,17 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro }: { ctx: Coac
   useEffect(() => {
     if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight;
   }, [msgs, avo]);
+
+  // Question auto-envoyée (ex. « une idée de repas selon mes macros ») quand on ouvre Vito depuis un bouton.
+  const seedSent = useRef("");
+  useEffect(() => {
+    if (!ready || !isPro || !seed || busy) return;
+    if (seedSent.current === seed) return;
+    seedSent.current = seed;
+    onConsumeSeed?.();
+    send(seed);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, isPro, seed]);
 
   const send = async (text: string) => {
     const clean = text.trim();

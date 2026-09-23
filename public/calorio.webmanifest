@@ -15,5 +15,10 @@
     { "src": "/calorio-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "/calorio-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "/calorio-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Ajouter un repas", "short_name": "Ajouter", "url": "/?go=add", "icons": [{ "src": "/calorio-icon-192.png", "sizes": "192x192" }] },
+    { "name": "Noter mon poids", "short_name": "Poids", "url": "/?go=poids", "icons": [{ "src": "/calorio-icon-192.png", "sizes": "192x192" }] },
+    { "name": "Parler à Vito", "short_name": "Vito", "url": "/?go=coach", "icons": [{ "src": "/calorio-icon-192.png", "sizes": "192x192" }] }
   ]
 }

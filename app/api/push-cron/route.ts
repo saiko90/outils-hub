@@ -1,5 +1,6 @@
 import webpush from "web-push";
-import { pickPush, buildStreak, buildRecap, type PushType } from "@/lib/pushMessages";
+import { pickPush, buildStreak, buildRecap, buildRemaining, type PushType } from "@/lib/pushMessages";
+import { computeBesoins, type Profil } from "@/lib/calorio";
 import { VAPID_PUBLIC_KEY } from "@/lib/vapid";
 
 // Cron d'envoi des notifications calorio Pro (rappels repas + encouragements).
@@ -27,6 +28,17 @@ function dayKcal(rows: unknown): number {
     if (r && r.food && typeof r.food.kcal === "number" && typeof r.grammes === "number") k += (r.food.kcal * r.grammes) / 100;
   }
   return k;
+}
+// Cible calorique du jour à partir d'un profil stocké (validé), sinon null.
+function cibleFromProfil(p: unknown): number | null {
+  if (!p || typeof p !== "object") return null;
+  const o = p as Record<string, unknown>;
+  const okNum = (v: unknown) => typeof v === "number" && isFinite(v) && v > 0;
+  if ((o.sexe !== "homme" && o.sexe !== "femme") || !okNum(o.age) || !okNum(o.poids) || !okNum(o.taille) || typeof o.activite !== "string" || typeof o.objectif !== "string") return null;
+  try {
+    const c = computeBesoins(o as unknown as Profil).cible;
+    return isFinite(c) && c > 0 ? c : null;
+  } catch { return null; }
 }
 // Série en cours : nombre de jours consécutifs AVANT aujourd'hui avec au moins un aliment noté.
 function streakBefore(journal: Record<string, unknown[]> | null): number {
@@ -83,6 +95,7 @@ export async function GET(req: Request) {
   let targets = subs.filter((s) => proSet.has(s.user_id));
   const today = swissDay();
   const streakOf: Record<string, number> = {}; // user_id → série en cours (pour les rappels du soir)
+  const remainingOf: Record<string, number> = {}; // user_id → kcal restantes (rappel perso du soir)
 
   // ── Bilan hebdo (dimanche) : résumé chiffré de la semaine, aux utilisateurs actifs ──
   if (job === "recap") {
@@ -127,22 +140,44 @@ export async function GET(req: Request) {
     return Response.json({ job, day: today, sent: sentR, dropped: dropR.length });
   }
 
-  // 3) rappels repas : uniquement si rien n'a été noté aujourd'hui
+  // 3) rappels repas
   if (job === "lunch" || job === "dinner") {
     const ids = targets.map((s) => s.user_id);
     if (ids.length === 0) return Response.json({ job, sent: 0, note: "no pro subscribers" });
     const inList = `(${ids.map((i) => `"${i}"`).join(",")})`;
-    const uRes = await rest(`calorio_users?select=id,journal&id=in.${encodeURIComponent(inList)}`);
-    const users = uRes.ok ? ((await uRes.json()) as { id: string; journal: Record<string, unknown[]> | null }[]) : [];
+    // Le soir on lit aussi le profil pour un rappel personnalisé (calories restantes).
+    const cols = job === "dinner" ? "id,journal,profil" : "id,journal";
+    const uRes = await rest(`calorio_users?select=${cols}&id=in.${encodeURIComponent(inList)}`);
+    const users = uRes.ok ? ((await uRes.json()) as { id: string; journal: Record<string, unknown[]> | null; profil?: unknown }[]) : [];
     const jById = new Map(users.map((u) => [u.id, u.journal]));
+    const pById = new Map(users.map((u) => [u.id, u.profil]));
     const loggedToday = new Set(
       users
         .filter((u) => Array.isArray(u.journal?.[today]) && (u.journal![today] as unknown[]).length > 0)
         .map((u) => u.id)
     );
-    targets = targets.filter((s) => !loggedToday.has(s.user_id)); // rien noté → on rappelle
-    // Le soir : si une série est en cours, on passe un message « série en jeu » (bien plus motivant).
-    if (job === "dinner") for (const s of targets) streakOf[s.user_id] = streakBefore(jById.get(s.user_id) || null);
+    if (job === "lunch") {
+      // Midi : rappel uniquement si rien n'a été noté aujourd'hui.
+      targets = targets.filter((s) => !loggedToday.has(s.user_id));
+    } else {
+      // Soir : deux cas —
+      //  A) rien noté → rappel générique, ou « série en jeu » si une série est en cours ;
+      //  B) déjà noté mais il reste ≥ 400 kcal → rappel personnalisé « il te reste ~X kcal ».
+      const keep: typeof targets = [];
+      for (const s of targets) {
+        if (!loggedToday.has(s.user_id)) {
+          streakOf[s.user_id] = streakBefore(jById.get(s.user_id) || null);
+          keep.push(s);
+        } else {
+          const cible = cibleFromProfil(pById.get(s.user_id));
+          if (cible == null) continue; // pas de profil exploitable → on ne dérange pas
+          const consumed = dayKcal(jById.get(s.user_id)?.[today]);
+          const remaining = cible - consumed;
+          if (remaining >= 400) { remainingOf[s.user_id] = remaining; keep.push(s); }
+        }
+      }
+      targets = keep;
+    }
   } else {
     // 4) encouragement : au plus une fois tous les 3 jours
     targets = targets.filter((s) => !s.last_encour || daysBetween(s.last_encour, today) >= 3);
@@ -150,18 +185,23 @@ export async function GET(req: Request) {
 
   let sent = 0;
   let streaksSent = 0;
+  let remindersSent = 0;
   const toDrop: string[] = [];
   const encouraged: string[] = [];
   await Promise.all(
     targets.map(async (s) => {
       const n = streakOf[s.user_id] || 0;
-      const useStreak = job === "dinner" && n >= 2;
-      const v = useStreak ? buildStreak(s.lang, n) : pickPush(s.lang, job as PushType);
-      const payload = JSON.stringify({ title: v.title, body: v.body, url: "/", tag: useStreak ? "calorio-streak" : `calorio-${job}` });
+      const rem = remainingOf[s.user_id];
+      const usePerso = job === "dinner" && typeof rem === "number";
+      const useStreak = job === "dinner" && !usePerso && n >= 2;
+      const v = usePerso ? buildRemaining(s.lang, rem) : useStreak ? buildStreak(s.lang, n) : pickPush(s.lang, job as PushType);
+      const tag = usePerso ? "calorio-remaining" : useStreak ? "calorio-streak" : `calorio-${job}`;
+      const payload = JSON.stringify({ title: v.title, body: v.body, url: "/", tag });
       try {
         await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload);
         sent++;
         if (useStreak) streaksSent++;
+        if (usePerso) remindersSent++;
         if (job === "encourage") encouraged.push(s.user_id);
       } catch (e: unknown) {
         const code = (e as { statusCode?: number })?.statusCode;
@@ -180,5 +220,5 @@ export async function GET(req: Request) {
     await rest(`calorio_push?user_id=in.${encodeURIComponent(inList)}`, { method: "DELETE" });
   }
 
-  return Response.json({ job, day: today, candidates: targets.length, sent, streaks: streaksSent, dropped: toDrop.length });
+  return Response.json({ job, day: today, candidates: targets.length, sent, streaks: streaksSent, remaining: remindersSent, dropped: toDrop.length });
 }

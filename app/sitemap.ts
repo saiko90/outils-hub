@@ -9,13 +9,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // propres URLs, pas celles d'outils.ch.
   const host = (headers().get("host") || "outils.ch").toLowerCase();
   if (host === "calorio.ch" || host === "www.calorio.ch") {
-    const vs = ["calorio-vs-myfitnesspal", "calorio-vs-yazio", "calorio-vs-lifesum"];
+    const vs = ["calorio-vs-myfitnesspal", "calorio-vs-yazio", "calorio-vs-lifesum", "calorio-vs-cronometer"];
     return [
       { url: "https://calorio.ch/", lastModified: now, changeFrequency: "weekly", priority: 1 },
       ...vs.flatMap((s) => [
         { url: `https://calorio.ch/${s}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
         { url: `https://calorio.ch/${s}/en`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
       ]),
+      { url: "https://calorio.ch/meilleure-app-calories", lastModified: now, changeFrequency: "monthly", priority: 0.8 },
       { url: "https://calorio.ch/calories", lastModified: now, changeFrequency: "monthly", priority: 0.7 },
       ...ALIMENT_SLUGS.map((x) => ({ url: `https://calorio.ch/calories/${x.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 })),
       { url: "https://calorio.ch/recettes", lastModified: now, changeFrequency: "monthly", priority: 0.7 },

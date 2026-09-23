@@ -37,6 +37,16 @@ export function buildStreak(lang: string, n: number, seed?: number): PushVariant
   return pool[idx](n);
 }
 
+/* Rappel personnalisé du soir : l'utilisateur a déjà noté aujourd'hui mais il lui reste
+   des calories → on l'aide à finir sa journée. Bien plus utile qu'un rappel générique. */
+export function buildRemaining(lang: string, remainingKcal: number): PushVariant {
+  const l = toLang(lang);
+  const k = Math.round(remainingKcal).toLocaleString(l === "de" ? "de-CH" : l === "en" ? "en-CH" : "fr-CH");
+  if (l === "de") return { title: `Noch ~${k} kcal für heute 🍽️`, body: "Zeit fürs Abendessen? Trag es ein — Vito kann dir auch etwas passendes vorschlagen." };
+  if (l === "en") return { title: `~${k} kcal left for today 🍽️`, body: "Dinner time? Log it — Vito can even suggest a meal that fits your remaining macros." };
+  return { title: `Il te reste ~${k} kcal aujourd'hui 🍽️`, body: "C'est l'heure du dîner ? Note-le — Vito peut même te proposer un repas adapté à ce qu'il te reste." };
+}
+
 /* Bilan hebdo (dimanche soir) — construit à partir des chiffres réels de la semaine. */
 export function buildRecap(lang: string, days: number, avgKcal: number, weightDelta: number | null): PushVariant {
   const l = toLang(lang);

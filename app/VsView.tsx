@@ -3,7 +3,7 @@
 // Faits sourcés, présentés de façon factuelle et honnête (voir note de bas de page).
 
 type Lang = "fr" | "en";
-export type Comp = "myfitnesspal" | "yazio" | "lifesum";
+export type Comp = "myfitnesspal" | "yazio" | "lifesum" | "cronometer";
 type Row = { label: string; calorio: string; comp: string; good?: boolean };
 type Block = {
   crumbHere: string; h1: string; intro: string; colComp: string;
@@ -221,6 +221,71 @@ const DATA: Record<Comp, { slug: string; name: string; fr: Block; en: Block }> =
       ],
       disclaimer:
         "Lifesum is a trademark of its respective owner. Informational comparison based on publicly available information as of September 2026 (indicative USD prices); offers and prices may change.",
+    },
+  },
+  cronometer: {
+    slug: "calorio-vs-cronometer", name: "Cronometer",
+    fr: {
+      crumbHere: "vs Cronometer",
+      h1: "calorio vs Cronometer : plus simple, avec coach IA et produits suisses",
+      intro:
+        "Cronometer est excellent pour qui veut suivre des dizaines de micronutriments — c’est sa force. Mais son interface est dense, sa version gratuite affiche des pubs, et Gold coûte ~54,99 $/an. calorio vise l’inverse : simple et rapide au quotidien, sans pub, avec un coach nutrition IA et une base riche en produits suisses (Migros, Coop) — à prix juste.",
+      colComp: "Cronometer",
+      rows: [
+        { label: "Prise en main", calorio: "Simple, en 2 tapes", comp: "Dense, orienté data", good: true },
+        { label: "Publicités (gratuit)", calorio: "Aucune", comp: "Oui", good: true },
+        { label: "Prix par an", calorio: "CHF 39 (ou 4.90/mois)", comp: "≈ 54,99 $ (Gold)", good: true },
+        { label: "Coach nutrition IA", calorio: "Inclus en Pro", comp: "Non", good: true },
+        { label: "Analyse d’un repas en photo", calorio: "Oui (Pro)", comp: "Non", good: true },
+        { label: "Produits suisses (Migros/Coop)", calorio: "Oui, mis en avant", comp: "Limité", good: true },
+        { label: "Micronutriments détaillés", calorio: "Calories & macros", comp: "Très complet", good: false },
+        { label: "100 % dans le navigateur", calorio: "Oui, rien à installer", comp: "Application à installer", good: true },
+      ],
+      benefits: [
+        { t: "Rapide au quotidien", d: "calorio va à l’essentiel : calories, macros, poids et journal en quelques secondes, sans te noyer sous les chiffres." },
+        { t: "Un coach, pas juste des tableaux", d: "Vito, ton coach nutrition IA, te conseille et te propose des repas selon tes macros restantes — quelque chose que Cronometer ne fait pas." },
+        { t: "Pensé pour la Suisse", d: "Produits Migros et Coop, recettes et spécialités suisses, en français, allemand et anglais." },
+      ],
+      faq: [
+        { q: "Cronometer est plus précis sur les micronutriments, non ?", a: "Oui — si ton objectif est de suivre des dizaines de vitamines et minéraux, Cronometer est très complet, c’est sa spécialité. calorio se concentre sur les calories, les macros et un usage simple et rapide, avec un coach IA en plus." },
+        { q: "calorio affiche-t-il des pubs ?", a: "Non, aucune publicité, et tes données ne sont jamais revendues." },
+        { q: "Combien coûte la version Pro ?", a: "CHF 4.90/mois ou CHF 39/an, 7 jours d’essai gratuit sans engagement. Elle débloque Vito (coach IA) et l’analyse de tes repas en photo." },
+        { q: "Y a-t-il des produits suisses ?", a: "Oui. calorio met en avant les produits Migros et Coop et des recettes suisses, ce qui manque souvent aux applications internationales." },
+        { q: "Faut-il installer une application ?", a: "Non, calorio fonctionne directement dans ton navigateur ; tu peux aussi l’ajouter à ton écran d’accueil." },
+      ],
+      disclaimer:
+        "Cronometer est une marque de son propriétaire respectif. Cette comparaison est fournie à titre informatif et repose sur des informations publiquement disponibles en septembre 2026 (prix indicatifs en USD) ; les offres et prix peuvent changer.",
+    },
+    en: {
+      crumbHere: "vs Cronometer",
+      h1: "calorio vs Cronometer: simpler, with an AI coach and Swiss products",
+      intro:
+        "Cronometer is great if you want to track dozens of micronutrients — that’s its strength. But its interface is dense, the free version shows ads, and Gold costs ~$54.99/year. calorio aims for the opposite: simple and fast day to day, no ads, an AI nutrition coach, and a database rich in Swiss products (Migros, Coop) — at a fair price.",
+      colComp: "Cronometer",
+      rows: [
+        { label: "Ease of use", calorio: "Simple, two taps", comp: "Dense, data-first", good: true },
+        { label: "Ads (free tier)", calorio: "None", comp: "Yes", good: true },
+        { label: "Price per year", calorio: "CHF 39 (or 4.90/mo)", comp: "≈ $54.99 (Gold)", good: true },
+        { label: "AI nutrition coach", calorio: "Included in Pro", comp: "No", good: true },
+        { label: "Photo meal analysis", calorio: "Yes (Pro)", comp: "No", good: true },
+        { label: "Swiss products (Migros/Coop)", calorio: "Yes, featured", comp: "Limited", good: true },
+        { label: "Detailed micronutrients", calorio: "Calories & macros", comp: "Very complete", good: false },
+        { label: "100% in the browser", calorio: "Yes, nothing to install", comp: "App install required", good: true },
+      ],
+      benefits: [
+        { t: "Fast every day", d: "calorio keeps it essential: calories, macros, weight and log in seconds, without drowning you in numbers." },
+        { t: "A coach, not just tables", d: "Vito, your AI nutrition coach, advises you and suggests meals from your remaining macros — something Cronometer doesn’t do." },
+        { t: "Built for Switzerland", d: "Migros and Coop products, Swiss recipes and specialties, in French, German and English." },
+      ],
+      faq: [
+        { q: "Isn’t Cronometer more precise on micronutrients?", a: "Yes — if your goal is to track dozens of vitamins and minerals, Cronometer is very thorough, that’s its specialty. calorio focuses on calories, macros and a simple, fast experience, with an AI coach on top." },
+        { q: "Does calorio show ads?", a: "No ads at all, and your data is never sold." },
+        { q: "How much is Pro?", a: "CHF 4.90/month or CHF 39/year, 7-day free trial, no commitment. It unlocks Vito (AI coach) and photo meal analysis." },
+        { q: "Are there Swiss products?", a: "Yes. calorio features Migros and Coop products and Swiss recipes, which international apps often lack." },
+        { q: "Do I need to install an app?", a: "No, calorio runs right in your browser; you can also add it to your home screen." },
+      ],
+      disclaimer:
+        "Cronometer is a trademark of its respective owner. Informational comparison based on publicly available information as of September 2026 (indicative USD prices); offers and prices may change.",
     },
   },
 };

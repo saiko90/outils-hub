@@ -189,12 +189,12 @@ export function besoinsDynamiques(p: Profil, s: SignauxJour = {}): BesoinsDynami
   let source: SourceBase;
   let palUtilise: number | null = null;
 
-  if ((s.kcalTotalesMesurees ?? 0) > 0) {
+  // On n'utilise la dépense totale mesurée comme base QUE si elle est plausible pour
+  // une journée complète (>= métabolisme de base) : cela évite qu'une valeur partielle
+  // d'un téléphone sans montre 24/7 (ex. 119 kcal) n'écrase le calcul. Sinon → pas.
+  if ((s.kcalTotalesMesurees ?? 0) >= b) {
     base = r0(s.kcalTotalesMesurees as number);
     source = "mesure_totale";
-  } else if ((s.kcalActivesMesurees ?? 0) > 0) {
-    base = r0(b + (s.kcalActivesMesurees as number));
-    source = "mesure_active";
   } else if (aDesPas) {
     palUtilise = palDepuisPas(pasEffectifs);
     base = r0(b * palUtilise);

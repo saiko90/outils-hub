@@ -85,11 +85,11 @@ describe("activite — besoins dynamiques", () => {
     expect(r.tdee).toBe(2920); // 2500 + 420
   });
 
-  it("calories actives mesurées → base = BMR + actives", () => {
-    const r = besoinsDynamiques(P(), { pas: 5000, kcalActivesMesurees: 500 });
-    expect(r.source).toBe("mesure_active");
-    expect(r.base).toBe(2255); // 1755 + 500
-    expect(r.tdee).toBe(2255);
+  it("dépense totale mesurée trop faible (< BMR) ignorée → repli sur les pas", () => {
+    const r = besoinsDynamiques(P(), { pas: 5000, kcalTotalesMesurees: 119 });
+    expect(r.source).toBe("pas"); // 119 < BMR 1755 → ignorée
+    expect(r.base).toBe(2369); // 1755 × palDepuisPas(5000)=1.35
+    expect(r.tdee).toBe(2369);
   });
 
   it("web sans Health Connect : facteur déclaré comme base, séances par-dessus (jamais de baisse)", () => {

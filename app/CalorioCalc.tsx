@@ -749,7 +749,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [hcActiveKcal, setHcActiveKcal] = useState<number | undefined>(undefined);
   const [hcAvailable, setHcAvailable] = useState(false);
   const [hcBusy, setHcBusy] = useState(false);
-  const [hcStatus, setHcStatus] = useState("");
+  const [displaySteps, setDisplaySteps] = useState(0);
   const [actSport, setActSport] = useState<string>("velo_modere");
   const [actMin, setActMin] = useState<number | "">(30);
 
@@ -930,31 +930,29 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       requestAuthorization: (o: unknown) => Promise<{ readAuthorized?: string[] }>;
       readSamples: (o: unknown) => Promise<{ samples?: { value?: number }[] }>;
     } } } }).Capacitor?.Plugins?.Health;
-    if (!H) { setHcStatus("plugin absent (hors app native)"); return; }
+    if (!H) return;
     setHcBusy(true);
     try {
       const av = await H.isAvailable();
-      if (!av?.available) { setHcStatus("Health Connect indisponible sur cet appareil"); setHcBusy(false); return; }
-      const auth = await H.requestAuthorization({ read: ["steps", "calories", "totalCalories"], write: [] });
-      const authList = Array.isArray(auth?.readAuthorized) ? auth.readAuthorized : [];
+      if (!av?.available) { setHcBusy(false); return; }
+      await H.requestAuthorization({ read: ["steps", "calories", "totalCalories"], write: [] });
       const now = new Date();
       const start = new Date();
       start.setHours(0, 0, 0, 0);
       const sum = async (dataType: string) => {
-        const r = await H.readSamples({ dataType, startDate: start.toISOString(), endDate: now.toISOString() });
-        const s = r?.samples || [];
-        let t = 0;
-        for (const x of s) t += Number(x?.value) || 0;
-        return { t, n: s.length };
+        try {
+          const r = await H.readSamples({ dataType, startDate: start.toISOString(), endDate: now.toISOString() });
+          const s = r?.samples || [];
+          let t = 0;
+          for (const x of s) t += Number(x?.value) || 0;
+          return { t, n: s.length };
+        } catch { return { t: 0, n: 0 }; }
       };
       const st = await sum("steps");
       setHcPas(st.t);
-      try { const tot = await sum("totalCalories"); if (tot.n > 0) setHcTotalKcal(tot.t); } catch { /* ignore */ }
-      try { const act = await sum("calories"); if (act.n > 0) setHcActiveKcal(act.t); } catch { /* ignore */ }
-      setHcStatus(`OK · ${st.t} pas (${st.n} éch) · auth=[${authList.join(",")}]`);
-    } catch (e) {
-      setHcStatus("Erreur: " + ((e as { message?: string })?.message || String(e)));
-    }
+      const tot = await sum("totalCalories"); if (tot.n > 0) setHcTotalKcal(tot.t);
+      const act = await sum("calories"); if (act.n > 0) setHcActiveKcal(act.t);
+    } catch { /* ignore */ }
     setHcBusy(false);
   };
   useEffect(() => {
@@ -962,6 +960,22 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const H = (window as unknown as { Capacitor?: { Plugins?: { Health?: unknown } } }).Capacitor?.Plugins?.Health;
     if (H) setHcAvailable(true);
   }, [mounted]);
+  // Compteur de pas animé (count-up doux à l'apparition / au changement).
+  useEffect(() => {
+    if (hcPas === undefined) { setDisplaySteps(0); return; }
+    const target = hcPas;
+    const t0 = performance.now();
+    const dur = 900;
+    let raf = 0;
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setDisplaySteps(Math.round(target * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [hcPas]);
   useEffect(() => {
     if (!mounted) return;
     save("calorio.pesees", pesees);
@@ -2039,15 +2053,22 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               <div className="cl-act-h">
                 <span className="cl-act-ic" aria-hidden>🏃</span>
                 <span className="cl-act-t">{x.act.title}</span>
-                {hcPas !== undefined && <span className="cl-act-steps">{nf(lang).format(hcPas)} {x.act.steps}</span>}
+                {hcPas !== undefined && (
+                  <span className="cl-act-steps"><span aria-hidden>👟</span> <span className="cl-act-steps-n">{nf(lang).format(displaySteps)}</span> {x.act.steps}</span>
+                )}
               </div>
+
+              {hcPas !== undefined && (
+                <div className="cl-act-prog" aria-hidden>
+                  <span style={{ width: `${Math.min(100, Math.max(3, (hcPas / 10000) * 100))}%` }} />
+                </div>
+              )}
 
               {hcAvailable && hcPas === undefined && (
                 <button className="cl-act-connect" onClick={readHealthConnect} disabled={hcBusy}>
                   <span aria-hidden>⌚</span> {hcBusy ? x.act.connecting : x.act.connect}
                 </button>
               )}
-              {hcStatus && <div className="cl-act-dbg" onClick={readHealthConnect}>HC: {hcStatus}</div>}
 
               {seances.length === 0 ? (
                 <div className="cl-act-none">{x.act.none}</div>
@@ -3293,6 +3314,18 @@ const CSS = `
 .cl-act-connect{width:100%;margin-top:11px;display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:14px;background:var(--btn);color:#fff;font-family:var(--disp);font-weight:600;font-size:.95rem;padding:13px;cursor:pointer;box-shadow:0 12px 24px -10px rgba(22,163,74,.55)}
 .cl-act-connect:active{transform:scale(.98)}
 .cl-act-connect:disabled{opacity:.6}
+.cl-act-connect{animation:clactpulse 2.4s ease-in-out infinite}
+@keyframes clactpulse{0%,100%{box-shadow:0 12px 24px -10px rgba(22,163,74,.5)}50%{box-shadow:0 18px 36px -8px rgba(22,163,74,.85)}}
+.cl-act-steps{display:inline-flex;align-items:center;gap:5px}
+.cl-act-steps-n{font-variant-numeric:tabular-nums}
+.cl-act-prog{height:8px;border-radius:99px;background:#e9f3ec;overflow:hidden;margin:11px 0 2px;box-shadow:inset 0 1px 2px rgba(14,52,30,.12)}
+.cl-act-prog>span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#4bd489,#16a34a);box-shadow:0 0 10px rgba(52,209,127,.55);transition:width .9s cubic-bezier(.3,.9,.3,1);position:relative;overflow:hidden}
+.cl-act-prog>span::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.55),transparent 80%);transform:translateX(-120%);animation:clactshine 2.6s ease-in-out 1s infinite}
+@keyframes clactshine{0%{transform:translateX(-120%)}55%,100%{transform:translateX(320%)}}
+.cl-act-item{animation:clactchip .4s cubic-bezier(.2,.9,.3,1) both}
+@keyframes clactchip{from{opacity:0;transform:translateX(-10px)}}
+.cl-act-adj{animation:clactglow 3s ease-in-out infinite}
+@keyframes clactglow{0%,100%{box-shadow:0 0 0 0 rgba(52,209,127,0)}50%{box-shadow:0 0 0 4px rgba(52,209,127,.13)}}
 .cl-act-dbg{margin-top:9px;padding:8px 10px;border-radius:10px;background:#f2f6f3;border:1px solid var(--line);font-family:ui-monospace,monospace;font-size:.7rem;line-height:1.4;color:var(--muted);word-break:break-word;cursor:pointer}
 .cl-act-adj{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:11px 13px;border-radius:14px;background:var(--greenbg);border:1px solid var(--greenline)}
 .cl-act-adj-l{font-size:.82rem;font-weight:700;color:#0f7a3d}

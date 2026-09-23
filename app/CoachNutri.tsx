@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { type Lang } from "@/lib/i18n";
+import { detectFoods, type Detected } from "@/lib/coachDetect";
 
 export type CoachCtx = {
   lang: Lang;
@@ -95,6 +96,8 @@ const L = {
     cta: "Passer en Pro", soon: "Bientôt disponible",
     placeholder: "Écris à Vito…", send: "Envoyer",
     starters: ["Qu'est-ce que je mange ce soir ?", "Il me reste combien de calories ?", "Un snack sain à me conseiller ?"],
+    followups: ["Une autre idée 🔄", "Combien de calories ?", "Et pour le dessert ?"],
+    addTitle: "Ajouter au journal :", micTitle: "Dicter", speechLang: "fr-FR",
     hello: "Coucou, c'est Vito 🥕 Dis-moi ce que tu as mangé ou ce que tu prévois, et je t'aide à équilibrer ta journée !",
     openerLeft: (n: number) => `Coucou, c'est Vito 🥕 Il te reste ~${n} kcal aujourd'hui. Envie d'une idée pour équilibrer ta journée ?`,
     openerOver: (n: number) => `Coucou, c'est Vito 🥕 Tu as dépassé d'environ ${n} kcal aujourd'hui — pas de panique, on rééquilibre demain. Je t'aide ?`,
@@ -115,6 +118,8 @@ const L = {
     cta: "Auf Pro upgraden", soon: "Bald verfügbar",
     placeholder: "Schreib Vito…", send: "Senden",
     starters: ["Was esse ich heute Abend?", "Wie viele Kalorien bleiben mir?", "Ein gesunder Snack?"],
+    followups: ["Noch eine Idee 🔄", "Wie viele Kalorien?", "Und als Dessert?"],
+    addTitle: "Zum Journal hinzufügen:", micTitle: "Diktieren", speechLang: "de-DE",
     hello: "Hoi, ich bin Vito 🥕 Sag mir, was du gegessen oder geplant hast, und ich helfe dir, deinen Tag auszugleichen!",
     openerLeft: (n: number) => `Hoi, ich bin Vito 🥕 Dir bleiben heute noch ~${n} kcal. Lust auf eine Idee zum Ausgleichen?`,
     openerOver: (n: number) => `Hoi, ich bin Vito 🥕 Du bist heute etwa ${n} kcal drüber — kein Stress, morgen gleichen wir aus. Soll ich helfen?`,
@@ -135,6 +140,8 @@ const L = {
     cta: "Go Pro", soon: "Coming soon",
     placeholder: "Message Vito…", send: "Send",
     starters: ["What should I eat tonight?", "How many calories do I have left?", "A healthy snack idea?"],
+    followups: ["Another idea 🔄", "How many calories?", "And for dessert?"],
+    addTitle: "Add to your log:", micTitle: "Dictate", speechLang: "en-US",
     hello: "Hi, I'm Vito 🥕 Tell me what you ate or plan to eat, and I'll help you balance your day!",
     openerLeft: (n: number) => `Hi, I'm Vito 🥕 You have ~${n} kcal left today. Want an idea to balance your day?`,
     openerOver: (n: number) => `Hi, I'm Vito 🥕 You're about ${n} kcal over today — no worries, we'll balance tomorrow. Want a hand?`,
@@ -195,7 +202,7 @@ function Avo({ state, size = 120 }: { state: AvoState; size?: number }) {
 }
 
 /* ---------------- Coach ---------------- */
-export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsumeSeed }: { ctx: CoachCtx; isPro?: boolean; onGoPro?: () => void; seed?: string; onConsumeSeed?: () => void }) {
+export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsumeSeed, onAddDetected }: { ctx: CoachCtx; isPro?: boolean; onGoPro?: () => void; seed?: string; onConsumeSeed?: () => void; onAddDetected?: (d: Detected) => void }) {
   const lang = ctx.lang;
   const t = L[lang] ?? L.fr;
   const [localPro, setLocalPro] = useState(false);
@@ -210,8 +217,12 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
   const [avo, setAvo] = useState<AvoState>("idle");
   const [busy, setBusy] = useState(false);
   const [used, setUsed] = useState(0);
+  const [added, setAdded] = useState<Record<string, boolean>>({});
+  const [listening, setListening] = useState(false);
+  const [micOk, setMicOk] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   const talkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const recRef = useRef<{ stop: () => void } | null>(null);
 
   // Chargement initial : Pro + conversation active persistée + historique + favoris.
   useEffect(() => {
@@ -254,6 +265,48 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
     }
     return t.hello;
   }, [ctx.aujourdhui, ctx.cible, t]);
+
+  // Aliments/recettes cités dans la dernière réponse de Vito → boutons « Ajouter au journal ».
+  const lastModel = msgs.length && msgs[msgs.length - 1].role === "model" ? msgs[msgs.length - 1].text : "";
+  const detected = useMemo(() => (lastModel && onAddDetected ? detectFoods(lastModel, lang) : []), [lastModel, lang, onAddDetected]);
+  const addOne = (d: Detected) => {
+    setAdded((a) => ({ ...a, [`${d.kind}:${d.id}`]: true }));
+    onAddDetected?.(d);
+  };
+
+  // Entrée vocale (dicter à Vito) — Web Speech API, si disponible.
+  useEffect(() => {
+    try {
+      const w = window as unknown as { SpeechRecognition?: unknown; webkitSpeechRecognition?: unknown };
+      setMicOk(!!(w.SpeechRecognition || w.webkitSpeechRecognition));
+    } catch { /* ignore */ }
+  }, []);
+  const toggleMic = () => {
+    if (listening) { recRef.current?.stop(); setListening(false); return; }
+    try {
+      const w = window as unknown as { SpeechRecognition?: new () => unknown; webkitSpeechRecognition?: new () => unknown };
+      const Ctor = (w.SpeechRecognition || w.webkitSpeechRecognition) as (new () => {
+        lang: string; interimResults: boolean; continuous: boolean;
+        onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+        onend: (() => void) | null; onerror: (() => void) | null; start: () => void; stop: () => void;
+      }) | undefined;
+      if (!Ctor) return;
+      const rec = new Ctor();
+      rec.lang = t.speechLang; rec.interimResults = true; rec.continuous = false;
+      let finalText = "";
+      rec.onresult = (e) => {
+        let s = "";
+        for (let i = 0; i < e.results.length; i++) s += e.results[i][0].transcript;
+        finalText = s;
+        setInput(s);
+      };
+      rec.onend = () => { setListening(false); if (finalText.trim()) setInput(finalText); };
+      rec.onerror = () => setListening(false);
+      recRef.current = { stop: () => rec.stop() };
+      rec.start();
+      setListening(true);
+    } catch { setListening(false); }
+  };
 
   const finishTalking = (len: number) => {
     setAvo("talking");
@@ -425,18 +478,42 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
         {avo === "thinking" && <div className="cn-bubble model cn-typing"><span></span><span></span><span></span></div>}
       </div>
 
-      <div className="cn-starters">
-        {t.starters.map((s) => <button key={s} onClick={() => send(s)} disabled={busy || used >= DAILY_LIMIT}>{s}</button>)}
-      </div>
+      {msgs.length === 0 ? (
+        <div className="cn-starters">
+          {t.starters.map((s) => <button key={s} onClick={() => send(s)} disabled={busy || used >= DAILY_LIMIT}>{s}</button>)}
+        </div>
+      ) : lastModel ? (
+        <>
+          {detected.length > 0 && (
+            <div className="cn-addrow">
+              <span className="cn-addlbl">{t.addTitle}</span>
+              {detected.map((d) => {
+                const k = `${d.kind}:${d.id}`;
+                return (
+                  <button key={k} className={`cn-addchip ${added[k] ? "done" : ""}`} onClick={() => addOne(d)} disabled={!!added[k]}>
+                    {added[k] ? "✓" : "＋"} {d.emoji} {d.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          <div className="cn-starters">
+            {t.followups.map((s) => <button key={s} onClick={() => send(s)} disabled={busy || used >= DAILY_LIMIT}>{s}</button>)}
+          </div>
+        </>
+      ) : null}
 
       <div className="cn-input">
         <input
           value={input}
-          placeholder={used >= DAILY_LIMIT ? t.limit : t.placeholder}
+          placeholder={used >= DAILY_LIMIT ? t.limit : listening ? "🎤…" : t.placeholder}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") send(input); }}
           disabled={busy || used >= DAILY_LIMIT}
         />
+        {micOk && (
+          <button className={`cn-mic ${listening ? "on" : ""}`} onClick={toggleMic} title={t.micTitle} aria-label={t.micTitle} disabled={busy || used >= DAILY_LIMIT}>🎤</button>
+        )}
         <button onClick={() => send(input)} disabled={busy || !input.trim() || used >= DAILY_LIMIT} aria-label={t.send}>➤</button>
       </div>
       <p className="cn-disc">🥕 {t.disclaimer}</p>
@@ -551,6 +628,15 @@ const CSS = `
 .cn-starters button{background:#e9f8ee;border:1px solid #bfe6cd;color:#16a34a;border-radius:99px;padding:9px 14px;font-size:.84rem;font-weight:600;cursor:pointer}
 .cn-starters button:hover{background:#dcf3e4}
 .cn-starters button:disabled{opacity:.4;cursor:not-allowed}
+.cn-addrow{display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:2px 4px 8px}
+.cn-addlbl{font-size:.78rem;font-weight:800;color:#9aa2b4;width:100%}
+.cn-addchip{background:#fff7e8;border:1px solid #f6d38a;color:#a9772a;border-radius:99px;padding:8px 13px;font-size:.84rem;font-weight:700;cursor:pointer}
+.cn-addchip:hover{background:#fdefcf}
+.cn-addchip.done{background:#e9f8ee;border-color:#bfe6cd;color:#16a34a;cursor:default}
+.cn-mic{background:#f6f8fb;border:1.5px solid #e7ebf2;color:#4b5563;border-radius:13px;width:48px;font-size:1.05rem;cursor:pointer}
+.cn-mic.on{background:#fdeaec;border-color:#f3b0b8;color:#ef4457;animation:cnPulse 1s ease-in-out infinite}
+.cn-mic:disabled{opacity:.4;cursor:not-allowed}
+@keyframes cnPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
 .cn-input{display:flex;gap:8px;padding:8px 0}
 .cn-input input{flex:1;background:#f6f8fb;border:1.5px solid #e7ebf2;border-radius:13px;color:#232a37;padding:13px 15px;font-size:.94rem}
 .cn-input input:focus{outline:none;border-color:#8fdcac}

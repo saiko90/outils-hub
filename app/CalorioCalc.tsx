@@ -14,6 +14,7 @@ import {
   ALIMENTS,
   RECETTES,
   recetteNutri,
+  recette,
   aliment,
   computeBesoins,
   computeJournal,
@@ -23,6 +24,7 @@ import {
 } from "@/lib/calorio";
 import CoachNutri, { type CoachCtx } from "./CoachNutri";
 import { type DuoSummary } from "@/lib/duo";
+import { type Detected } from "@/lib/coachDetect";
 import { getSupabase } from "@/lib/supabaseClient";
 import { enablePush, disablePush, pushSupported } from "@/lib/push";
 import type { User } from "@supabase/supabase-js";
@@ -1369,6 +1371,11 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     () => RECETTES.filter((r) => recCat === "tous" || r.cat === recCat),
     [recCat]
   );
+  // Ajout au journal depuis le chat Vito (aliment ou recette détecté dans sa réponse).
+  const addFromCoach = (d: Detected) => {
+    if (d.kind === "recette") { const r = recette(d.id); if (r) addRecette(r); return; }
+    const al = aliment(d.id); if (al) addFood(toFood(al, lang));
+  };
 
   // Aliment personnalisé créé par l'utilisateur.
   const saveCustomFood = () => {
@@ -1939,7 +1946,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         {/* ========== 4. VITO (coach) ========== */}
         {tab === "coach" && (
           <div className="cl-screen play cl-coachwrap" key="coach">
-            <CoachNutri ctx={coachCtx} isPro={proActive} onGoPro={goPro} seed={coachSeed} onConsumeSeed={() => setCoachSeed("")} />
+            <CoachNutri ctx={coachCtx} isPro={proActive} onGoPro={goPro} seed={coachSeed} onConsumeSeed={() => setCoachSeed("")} onAddDetected={addFromCoach} />
           </div>
         )}
 

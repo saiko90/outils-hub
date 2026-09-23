@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { type Lang } from "@/lib/i18n";
 import { detectFoods, type Detected } from "@/lib/coachDetect";
+import { type CoachPrefs } from "@/lib/coachPrompt";
 
 export type CoachCtx = {
   lang: Lang;
@@ -13,6 +14,7 @@ export type CoachCtx = {
   macrosCible?: { proteines: number; glucides: number; lipides: number };
   aujourdhui?: { kcal: number; prot: number; gluc: number; lip: number; aliments: { nom: string; grammes: number; kcal: number }[] };
   poids?: { debut: number; actuel: number; delta: number } | null;
+  prefs?: CoachPrefs;
 };
 
 type Msg = { role: "user" | "model"; text: string };
@@ -109,6 +111,11 @@ const L = {
     newChat: "Nouvelle", histBtn: "Historique", panelTitle: "Tes conversations", favs: "⭐ Favoris", recent: "🕘 Récentes",
     noRecent: "Aucune conversation récente.", noFavs: "Touche l'étoile pour garder une conversation ici.",
     saveFav: "Garder en favori", unFav: "Retirer des favoris", del: "Supprimer", close: "Fermer", untitled: "Conversation",
+    prefsTitle: "Mes préférences", prefsSub: "Vito en tient compte pour ses conseils.",
+    prefsRegime: "Régime", prefsAllergies: "Allergies", prefsAllergiesPh: "ex. arachides, lactose…",
+    prefsLikes: "J'aime", prefsLikesPh: "ex. poulet, avocat, épicé…", prefsDislikes: "Je n'aime pas", prefsDislikesPh: "ex. brocoli, poisson…",
+    prefsDone: "Enregistré ✓",
+    regimes: { aucun: "Aucun", vegetarien: "Végétarien", vegan: "Végan", pescetarien: "Pescétarien", sans_gluten: "Sans gluten", sans_lactose: "Sans lactose" } as Record<string, string>,
   },
   de: {
     proBadge: "Pro", coach: "Vito, dein Ernährungscoach",
@@ -131,6 +138,11 @@ const L = {
     newChat: "Neu", histBtn: "Verlauf", panelTitle: "Deine Gespräche", favs: "⭐ Favoriten", recent: "🕘 Kürzlich",
     noRecent: "Keine kürzlichen Gespräche.", noFavs: "Tippe den Stern, um ein Gespräch hier zu behalten.",
     saveFav: "Als Favorit speichern", unFav: "Aus Favoriten entfernen", del: "Löschen", close: "Schliessen", untitled: "Gespräch",
+    prefsTitle: "Meine Vorlieben", prefsSub: "Vito berücksichtigt sie bei seinen Tipps.",
+    prefsRegime: "Ernährung", prefsAllergies: "Allergien", prefsAllergiesPh: "z. B. Erdnüsse, Laktose…",
+    prefsLikes: "Ich mag", prefsLikesPh: "z. B. Poulet, Avocado, scharf…", prefsDislikes: "Ich mag nicht", prefsDislikesPh: "z. B. Broccoli, Fisch…",
+    prefsDone: "Gespeichert ✓",
+    regimes: { aucun: "Keine", vegetarien: "Vegetarisch", vegan: "Vegan", pescetarien: "Pescetarisch", sans_gluten: "Glutenfrei", sans_lactose: "Laktosefrei" } as Record<string, string>,
   },
   en: {
     proBadge: "Pro", coach: "Vito, your nutrition coach",
@@ -153,6 +165,11 @@ const L = {
     newChat: "New", histBtn: "History", panelTitle: "Your conversations", favs: "⭐ Favorites", recent: "🕘 Recent",
     noRecent: "No recent conversations.", noFavs: "Tap the star to keep a conversation here.",
     saveFav: "Save to favorites", unFav: "Remove from favorites", del: "Delete", close: "Close", untitled: "Conversation",
+    prefsTitle: "My preferences", prefsSub: "Vito takes these into account for its tips.",
+    prefsRegime: "Diet", prefsAllergies: "Allergies", prefsAllergiesPh: "e.g. peanuts, lactose…",
+    prefsLikes: "I like", prefsLikesPh: "e.g. chicken, avocado, spicy…", prefsDislikes: "I dislike", prefsDislikesPh: "e.g. broccoli, fish…",
+    prefsDone: "Saved ✓",
+    regimes: { aucun: "None", vegetarien: "Vegetarian", vegan: "Vegan", pescetarien: "Pescatarian", sans_gluten: "Gluten-free", sans_lactose: "Lactose-free" } as Record<string, string>,
   },
 } as const;
 
@@ -202,7 +219,7 @@ function Avo({ state, size = 120 }: { state: AvoState; size?: number }) {
 }
 
 /* ---------------- Coach ---------------- */
-export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsumeSeed, onAddDetected }: { ctx: CoachCtx; isPro?: boolean; onGoPro?: () => void; seed?: string; onConsumeSeed?: () => void; onAddDetected?: (d: Detected) => void }) {
+export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsumeSeed, onAddDetected, onPrefsChange, onConvChange }: { ctx: CoachCtx; isPro?: boolean; onGoPro?: () => void; seed?: string; onConsumeSeed?: () => void; onAddDetected?: (d: Detected) => void; onPrefsChange?: (p: CoachPrefs) => void; onConvChange?: () => void }) {
   const lang = ctx.lang;
   const t = L[lang] ?? L.fr;
   const [localPro, setLocalPro] = useState(false);
@@ -213,6 +230,7 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
   const [recent, setRecent] = useState<Conversation[]>([]);
   const [favs, setFavs] = useState<Conversation[]>([]);
   const [panel, setPanel] = useState(false);
+  const [prefsOpen, setPrefsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [avo, setAvo] = useState<AvoState>("idle");
   const [busy, setBusy] = useState(false);
@@ -243,9 +261,10 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
   }, []);
 
   // Persistance (survit au démontage lors d'un changement d'onglet et au rechargement).
-  useEffect(() => { if (ready) saveJSON(AK, { id: activeId, msgs }); }, [ready, activeId, msgs]);
+  // onConvChange prévient le parent pour une synchro cloud (téléphone ↔ ordinateur).
+  useEffect(() => { if (ready) { saveJSON(AK, { id: activeId, msgs, updated: Date.now() }); onConvChange?.(); } }, [ready, activeId, msgs]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (ready) saveJSON(RK, recent); }, [ready, recent]);
-  useEffect(() => { if (ready) saveJSON(FK, favs); }, [ready, favs]);
+  useEffect(() => { if (ready) { saveJSON(FK, favs); onConvChange?.(); } }, [ready, favs]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight;
@@ -465,6 +484,7 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
         </div>
         <div className="cn-headact">
           <button className={`cn-hact ${isActiveFav ? "on" : ""}`} onClick={toggleFav} title={isActiveFav ? t.unFav : t.saveFav} aria-label={isActiveFav ? t.unFav : t.saveFav} disabled={!msgs.length}>{isActiveFav ? "★" : "☆"}</button>
+          {onPrefsChange && <button className="cn-hact" onClick={() => setPrefsOpen(true)} title={t.prefsTitle} aria-label={t.prefsTitle}>⚙️</button>}
           <button className="cn-hact" onClick={() => setPanel(true)} title={t.histBtn} aria-label={t.histBtn}>🕘</button>
           <button className="cn-hact" onClick={newConversation} title={t.newChat} aria-label={t.newChat}>✏️</button>
         </div>
@@ -555,6 +575,29 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
           </div>
         </div>
       )}
+
+      {prefsOpen && onPrefsChange && (() => {
+        const prefs = ctx.prefs || {};
+        const setP = (patch: Partial<CoachPrefs>) => onPrefsChange({ ...prefs, ...patch });
+        return (
+          <div className="cn-panelwrap" onClick={() => setPrefsOpen(false)}>
+            <div className="cn-panel" onClick={(e) => e.stopPropagation()}>
+              <div className="cn-panel-h"><b>⚙️ {t.prefsTitle}</b><button className="cn-panel-x" onClick={() => setPrefsOpen(false)} aria-label={t.close}>×</button></div>
+              <div className="cn-panel-body cn-prefs">
+                <p className="cn-prefs-sub">{t.prefsSub}</p>
+                <label className="cn-pf"><span>{t.prefsRegime}</span>
+                  <select value={prefs.regime || "aucun"} onChange={(e) => setP({ regime: e.target.value })}>
+                    {Object.keys(t.regimes).map((k) => <option key={k} value={k}>{t.regimes[k]}</option>)}
+                  </select>
+                </label>
+                <label className="cn-pf"><span>{t.prefsAllergies}</span><input value={prefs.allergies || ""} placeholder={t.prefsAllergiesPh} onChange={(e) => setP({ allergies: e.target.value })} maxLength={120} /></label>
+                <label className="cn-pf"><span>{t.prefsLikes}</span><input value={prefs.aime || ""} placeholder={t.prefsLikesPh} onChange={(e) => setP({ aime: e.target.value })} maxLength={120} /></label>
+                <label className="cn-pf"><span>{t.prefsDislikes}</span><input value={prefs.deteste || ""} placeholder={t.prefsDislikesPh} onChange={(e) => setP({ deteste: e.target.value })} maxLength={120} /></label>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </section>
   );
 }
@@ -661,4 +704,10 @@ const CSS = `
 .cn-conv-n{font-size:.72rem;color:#9aa2b4;font-weight:700;flex:none}
 .cn-conv-del{border:0;background:none;color:#b9c0cc;font-size:1.3rem;padding:0 12px;cursor:pointer;line-height:1}
 .cn-conv-del:hover{color:#ef4457}
+.cn-prefs{display:flex;flex-direction:column;gap:12px;padding-top:14px}
+.cn-prefs-sub{margin:0 0 2px;color:#9aa2b4;font-size:.86rem}
+.cn-pf{display:flex;flex-direction:column;gap:5px}
+.cn-pf>span{font-size:.8rem;font-weight:800;color:#4b5563}
+.cn-pf input,.cn-pf select{border:1.5px solid #e7ebf2;border-radius:11px;padding:11px 13px;font-size:.94rem;color:#232a37;background:#f6f8fb;font-family:inherit}
+.cn-pf input:focus,.cn-pf select:focus{outline:none;border-color:#8fdcac}
 `;

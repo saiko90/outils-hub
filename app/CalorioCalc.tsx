@@ -25,6 +25,7 @@ import {
 import CoachNutri, { type CoachCtx } from "./CoachNutri";
 import { type DuoSummary } from "@/lib/duo";
 import { type Detected } from "@/lib/coachDetect";
+import { type CoachPrefs } from "@/lib/coachPrompt";
 import { getSupabase } from "@/lib/supabaseClient";
 import { enablePush, disablePush, pushSupported } from "@/lib/push";
 import type { User } from "@supabase/supabase-js";
@@ -681,6 +682,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [savedMeals, setSavedMeals] = useState<SavedMeal[]>([]);
   const [mealMsg, setMealMsg] = useState("");
   const [coachSeed, setCoachSeed] = useState("");
+  const [coachPrefs, setCoachPrefs] = useState<CoachPrefs>({});
+  const [convTick, setConvTick] = useState(0); // bump quand une conversation Vito change → déclenche la synchro
   // aliments créés par l'utilisateur
   const [customFoods, setCustomFoods] = useState<Food[]>([]);
   const [cf, setCf] = useState({ nom: "", kcal: "", prot: "", gluc: "", lip: "", portion: "", emoji: "🍴" });
@@ -746,6 +749,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     setFast(load<{ start: number | null; hours: number }>("calorio.fast", { start: null, hours: 16 }));
     setSavedMeals(load<SavedMeal[]>("calorio.meals", []));
     setCustomFoods(load<Food[]>("calorio.customFoods", []));
+    setCoachPrefs(load<CoachPrefs>("calorio.coach.prefs", {}));
     setPoidsInput("");
     setPoidsDate(todayISO());
     try {
@@ -853,6 +857,26 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         save("calorio.customFoods", next);
         return next;
       });
+    }
+    // Préférences Vito : on applique le cloud si le local est vide (pas d'écrasement d'une saisie fraîche).
+    if (p.coachPrefs && typeof p.coachPrefs === "object") {
+      const local = load<CoachPrefs>("calorio.coach.prefs", {});
+      const localEmpty = !local.regime && !local.allergies && !local.aime && !local.deteste;
+      if (localEmpty) { const cloud = p.coachPrefs as CoachPrefs; setCoachPrefs(cloud); save("calorio.coach.prefs", cloud); }
+    }
+    // Conversation active Vito : on prend la version cloud si elle est plus récente.
+    if (p.coachActive && typeof p.coachActive === "object") {
+      const cloud = p.coachActive as { id?: string; msgs?: unknown[]; updated?: number };
+      const local = load<{ updated?: number } | null>("calorio.coach.active", null);
+      if (Array.isArray(cloud.msgs) && (cloud.updated || 0) > (local?.updated || 0)) save("calorio.coach.active", cloud);
+    }
+    // Favoris Vito : union par id (on ne perd jamais un favori déjà présent d'un côté).
+    if (Array.isArray(p.coachFavs)) {
+      const cloud = p.coachFavs as { id: string }[];
+      const local = load<{ id: string }[]>("calorio.coach.favs", []);
+      const byId = new Map(local.map((c) => [c.id, c] as const));
+      for (const c of cloud) if (c && c.id && !byId.has(c.id)) byId.set(c.id, c);
+      save("calorio.coach.favs", Array.from(byId.values()).slice(0, 50));
     }
   };
 
@@ -995,7 +1019,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const shareGrade = () => shareText(x.troShareGrade(x.gradeNames[grade.index], trophyCount));
 
   // Export / import des données (confiance + portabilité). Clés locales connues.
-  const CAL_KEYS = ["calorio.profil", "calorio.journal", "calorio.pesees", "calorio.recents", "calorio.trophies", "calorio.used", "calorio.streakBest", "calorio.lang", "calorio.pro", "calorio.water", "calorio.waterGoal", "calorio.fast", "calorio.meals", "calorio.customFoods"];
+  const CAL_KEYS = ["calorio.profil", "calorio.journal", "calorio.pesees", "calorio.recents", "calorio.trophies", "calorio.used", "calorio.streakBest", "calorio.lang", "calorio.pro", "calorio.water", "calorio.waterGoal", "calorio.fast", "calorio.meals", "calorio.customFoods", "calorio.coach.prefs", "calorio.coach.favs", "calorio.coach.active"];
   const exportData = () => {
     const out: Record<string, unknown> = { _app: "calorio", _v: 1, _date: new Date().toISOString() };
     for (const k of CAL_KEYS) {
@@ -1027,16 +1051,21 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const supa = getSupabase();
     if (!supa) return;
     const id = setTimeout(() => {
+      // Conversations Vito : on borne la taille (dernier échange + favoris) pour ne pas gonfler la ligne.
+      const ca = load<{ id?: string; msgs?: unknown[]; updated?: number } | null>("calorio.coach.active", null);
+      const coachActive = ca && Array.isArray(ca.msgs) ? { id: ca.id, msgs: ca.msgs.slice(-40), updated: ca.updated || 0 } : null;
+      const coachFavs = load<{ id: string; title: string; msgs: unknown[]; updated: number }[]>("calorio.coach.favs", [])
+        .slice(0, 20).map((c) => ({ ...c, msgs: (c.msgs || []).slice(-40) }));
       supa.from("calorio_users").upsert({
         id: user.id,
-        profil: { sexe, age, poids, taille, activite, objectif, poidsCible, trophies, used, savedMeals, customFoods, waterGoal },
+        profil: { sexe, age, poids, taille, activite, objectif, poidsCible, trophies, used, savedMeals, customFoods, waterGoal, coachPrefs, coachActive, coachFavs },
         journal: load("calorio.journal", {}),
         pesees,
         updated_at: new Date().toISOString(),
       }).then(() => {});
     }, 1400);
     return () => clearTimeout(id);
-  }, [mounted, user, sexe, age, poids, taille, activite, objectif, poidsCible, pesees, lines, trophies, used, savedMeals, customFoods, waterGoal]);
+  }, [mounted, user, sexe, age, poids, taille, activite, objectif, poidsCible, pesees, lines, trophies, used, savedMeals, customFoods, waterGoal, coachPrefs, convTick]);
 
   const signInGoogle = () => {
     getSupabase()?.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.href.split("?")[0] } });
@@ -1203,8 +1232,9 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         aliments: lignesMap.map(({ al, grammes }) => ({ nom: (al as Food).nom, grammes, kcal: calcAliment(al, grammes).kcal })),
       },
       poids: tend ? { debut: tend.debut, actuel: tend.actuel, delta: tend.delta } : null,
+      prefs: coachPrefs,
     }),
-    [lang, sexe, age, poids, taille, activite, objectif, besoins, total, lignesMap, tend]
+    [lang, sexe, age, poids, taille, activite, objectif, besoins, total, lignesMap, tend, coachPrefs]
   );
 
   // --- Données dérivées pour le tableau de bord (écran Stats) ---
@@ -1312,6 +1342,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   useEffect(() => { if (!mounted) return; save("calorio.waterGoal", waterGoal); }, [mounted, waterGoal]);
   useEffect(() => { if (!mounted) return; save("calorio.meals", savedMeals); }, [mounted, savedMeals]);
   useEffect(() => { if (!mounted) return; save("calorio.customFoods", customFoods); }, [mounted, customFoods]);
+  useEffect(() => { if (!mounted) return; save("calorio.coach.prefs", coachPrefs); }, [mounted, coachPrefs]);
+  const updateCoachPrefs = (p: CoachPrefs) => setCoachPrefs(p);
   // Minuteur du jeûne : tic toutes les 30 s tant qu'un jeûne est en cours.
   useEffect(() => {
     if (!fast.start) return;
@@ -1946,7 +1978,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         {/* ========== 4. VITO (coach) ========== */}
         {tab === "coach" && (
           <div className="cl-screen play cl-coachwrap" key="coach">
-            <CoachNutri ctx={coachCtx} isPro={proActive} onGoPro={goPro} seed={coachSeed} onConsumeSeed={() => setCoachSeed("")} onAddDetected={addFromCoach} />
+            <CoachNutri ctx={coachCtx} isPro={proActive} onGoPro={goPro} seed={coachSeed} onConsumeSeed={() => setCoachSeed("")} onAddDetected={addFromCoach} onPrefsChange={updateCoachPrefs} onConvChange={() => setConvTick((n) => n + 1)} />
           </div>
         )}
 

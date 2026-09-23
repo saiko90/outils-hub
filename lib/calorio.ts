@@ -262,6 +262,103 @@ export const ALIMENTS: Aliment[] = [
   a("ovomaltine", "Ovomaltine (boisson)", "Ovomaltine", "Ovaltine", "boissons", 79, 3, 13, 1.5, 200, "🍫"),
   a("energy_drink", "Boisson énergisante", "Energydrink", "Energy drink", "boissons", 45, 0, 11, 0, 250, "⚡"),
   a("kombucha", "Kombucha", "Kombucha", "Kombucha", "boissons", 20, 0, 5, 0, 250, "🫧"),
+
+  // ── Féculents, pains & céréales (suite) ──
+  a("baguette", "Baguette", "Baguette", "Baguette", "feculents", 271, 9, 55, 1.3, 50, "🥖"),
+  a("pain_seigle", "Pain de seigle", "Roggenbrot", "Rye bread", "feculents", 259, 8.5, 48, 3.3, 40, "🍞"),
+  a("cornflakes", "Corn flakes", "Cornflakes", "Corn flakes", "feculents", 378, 7, 84, 0.9, 40, "🥣"),
+  a("granola", "Granola", "Granola", "Granola", "feculents", 471, 10, 64, 20, 50, "🥣"),
+  a("gnocchi", "Gnocchi", "Gnocchi", "Gnocchi", "feculents", 133, 3.5, 27, 1, 200, "🥔"),
+  a("polenta", "Polenta", "Polenta", "Polenta", "feculents", 85, 2, 18, 0.5, 200, "🌽"),
+  a("couscous", "Couscous cuit", "Couscous", "Cooked couscous", "feculents", 112, 3.8, 23, 0.2, 150, "🌾"),
+  a("riz_complet", "Riz complet cuit", "Vollkornreis", "Brown rice", "feculents", 111, 2.6, 23, 0.9, 150, "🍚"),
+  a("tortilla", "Tortilla / wrap", "Tortilla / Wrap", "Tortilla wrap", "feculents", 310, 8, 50, 8, 60, "🫓"),
+  a("crackers", "Crackers", "Cracker", "Crackers", "feculents", 430, 9, 68, 13, 25, "🍘"),
+
+  // ── Viandes, poissons & œufs (suite) ──
+  a("porc", "Filet de porc", "Schweinsfilet", "Pork loin", "viandes", 143, 21, 0, 6, 150, "🥩"),
+  a("canard", "Magret de canard", "Entenbrust", "Duck breast", "viandes", 201, 20, 0, 13, 150, "🦆"),
+  a("saucisse", "Saucisse", "Bratwurst", "Sausage", "viandes", 290, 12, 2, 26, 100, "🌭"),
+  a("bacon", "Bacon", "Speck", "Bacon", "viandes", 541, 37, 1.4, 42, 30, "🥓"),
+  a("salami", "Salami", "Salami", "Salami", "viandes", 336, 21, 1, 28, 30, "🍖"),
+  a("cabillaud", "Cabillaud", "Kabeljau", "Cod", "viandes", 82, 18, 0, 0.7, 150, "🐟"),
+  a("truite", "Truite", "Forelle", "Trout", "viandes", 148, 21, 0, 7, 150, "🐟"),
+  a("sardines", "Sardines", "Sardinen", "Sardines", "viandes", 208, 25, 0, 11, 100, "🐟"),
+  a("moules", "Moules", "Muscheln", "Mussels", "viandes", 86, 12, 3.7, 2.2, 150, "🦪"),
+  a("omelette", "Omelette", "Omelett", "Omelette", "viandes", 154, 11, 1, 12, 150, "🍳"),
+
+  // ── Produits laitiers (suite) ──
+  a("emmental", "Emmental", "Emmentaler", "Emmental", "laitiers", 380, 28, 0, 30, 30, "🧀"),
+  a("cheddar", "Cheddar", "Cheddar", "Cheddar", "laitiers", 402, 25, 1.3, 33, 30, "🧀"),
+  a("feta", "Feta", "Feta", "Feta", "laitiers", 264, 14, 4, 21, 40, "🧀"),
+  a("chevre", "Fromage de chèvre", "Ziegenkäse", "Goat cheese", "laitiers", 364, 22, 2.5, 30, 30, "🧀"),
+  a("parmesan", "Parmesan", "Parmesan", "Parmesan", "laitiers", 431, 38, 4, 29, 15, "🧀"),
+  a("ricotta", "Ricotta", "Ricotta", "Ricotta", "laitiers", 174, 11, 3, 13, 50, "🧀"),
+  a("yaourt_grec", "Yaourt grec", "Griechischer Joghurt", "Greek yogurt", "laitiers", 97, 9, 4, 5, 150, "🍶"),
+  a("kefir", "Kéfir", "Kefir", "Kefir", "laitiers", 55, 3.3, 4.5, 2, 200, "🥛"),
+
+  // ── Fruits (suite) ──
+  a("abricot", "Abricot", "Aprikose", "Apricot", "fruits", 48, 1.4, 11, 0.4, 100, "🍑"),
+  a("prune", "Prune", "Pflaume", "Plum", "fruits", 46, 0.7, 11, 0.3, 80, "🟣"),
+  a("mandarine", "Mandarine", "Mandarine", "Mandarin", "fruits", 53, 0.8, 13, 0.3, 100, "🍊"),
+  a("pamplemousse", "Pamplemousse", "Grapefruit", "Grapefruit", "fruits", 42, 0.8, 11, 0.1, 150, "🍊"),
+  a("raisin_sec", "Raisins secs", "Rosinen", "Raisins", "fruits", 299, 3, 79, 0.5, 30, "🍇"),
+
+  // ── Légumes (suite) ──
+  a("courgette", "Courgette", "Zucchini", "Zucchini", "legumes", 17, 1.2, 3.1, 0.3, 150, "🥒"),
+  a("aubergine", "Aubergine", "Aubergine", "Eggplant", "legumes", 25, 1, 6, 0.2, 150, "🍆"),
+  a("poivron", "Poivron", "Paprika", "Bell pepper", "legumes", 31, 1, 6, 0.3, 120, "🫑"),
+  a("concombre", "Concombre", "Gurke", "Cucumber", "legumes", 15, 0.7, 3.6, 0.1, 100, "🥒"),
+  a("epinards", "Épinards", "Spinat", "Spinach", "legumes", 23, 2.9, 3.6, 0.4, 100, "🥬"),
+  a("chou_fleur", "Chou-fleur", "Blumenkohl", "Cauliflower", "legumes", 25, 1.9, 5, 0.3, 150, "🥦"),
+  a("champignons", "Champignons", "Champignons", "Mushrooms", "legumes", 22, 3.1, 3.3, 0.3, 100, "🍄"),
+  a("mais", "Maïs", "Mais", "Corn", "legumes", 86, 3.2, 19, 1.2, 100, "🌽"),
+  a("petit_pois", "Petits pois", "Erbsen", "Peas", "legumes", 81, 5, 14, 0.4, 100, "🟢"),
+  a("oignon", "Oignon", "Zwiebel", "Onion", "legumes", 40, 1.1, 9, 0.1, 60, "🧅"),
+  a("betterave", "Betterave", "Rande", "Beetroot", "legumes", 43, 1.6, 10, 0.2, 100, "🟣"),
+  a("olives", "Olives", "Oliven", "Olives", "legumes", 115, 0.8, 6, 11, 30, "🫒"),
+  a("asperges", "Asperges", "Spargeln", "Asparagus", "legumes", 20, 2.2, 3.9, 0.1, 150, "🥬"),
+
+  // ── Boissons (suite) ──
+  a("the_glace", "Thé glacé", "Eistee", "Iced tea", "boissons", 30, 0, 7.5, 0, 330, "🧋"),
+  a("chocolat_chaud", "Chocolat chaud", "Heisse Schokolade", "Hot chocolate", "boissons", 77, 3.2, 10, 2.5, 200, "☕"),
+  a("limonade", "Limonade", "Limonade", "Lemonade", "boissons", 41, 0, 10, 0, 330, "🍋"),
+  a("jus_pomme", "Jus de pomme", "Apfelsaft", "Apple juice", "boissons", 46, 0.1, 11, 0.1, 200, "🧃"),
+  a("lait_soja", "Lait de soja", "Sojamilch", "Soy milk", "boissons", 42, 3.3, 2.5, 1.8, 200, "🥛"),
+  a("vin_blanc", "Vin blanc", "Weisswein", "White wine", "boissons", 82, 0.1, 2.6, 0, 100, "🍷"),
+  a("prosecco", "Prosecco", "Prosecco", "Prosecco", "boissons", 80, 0.2, 3, 0, 100, "🥂"),
+  a("cidre", "Cidre", "Cidre", "Cider", "boissons", 49, 0, 5, 0, 330, "🍏"),
+
+  // ── Snacks, sucré & condiments (suite) ──
+  a("gaufre", "Gaufre", "Waffel", "Waffle", "snacks", 291, 6.5, 40, 11, 80, "🧇"),
+  a("crepe", "Crêpe", "Crêpe", "Crepe", "snacks", 200, 6, 26, 8, 70, "🥞"),
+  a("donut", "Donut", "Donut", "Donut", "snacks", 452, 5, 51, 25, 60, "🍩"),
+  a("muffin", "Muffin", "Muffin", "Muffin", "snacks", 377, 5, 50, 17, 70, "🧁"),
+  a("popcorn", "Pop-corn", "Popcorn", "Popcorn", "snacks", 387, 12, 78, 4.5, 30, "🍿"),
+  a("bonbons", "Bonbons", "Bonbons", "Candy", "snacks", 380, 0, 95, 0, 30, "🍬"),
+  a("pistaches", "Pistaches", "Pistazien", "Pistachios", "snacks", 562, 20, 28, 45, 30, "🥜"),
+  a("noisettes", "Noisettes", "Haselnüsse", "Hazelnuts", "snacks", 628, 15, 17, 61, 30, "🌰"),
+  a("cake", "Cake / quatre-quarts", "Kuchen", "Pound cake", "snacks", 390, 5, 50, 19, 80, "🍰"),
+  a("ketchup", "Ketchup", "Ketchup", "Ketchup", "snacks", 112, 1.2, 26, 0.1, 15, "🍅"),
+  a("mayonnaise", "Mayonnaise", "Mayonnaise", "Mayonnaise", "snacks", 680, 1, 1.5, 75, 15, "🥚"),
+  a("pesto", "Pesto", "Pesto", "Pesto", "snacks", 450, 5, 6, 45, 20, "🌿"),
+  a("huile_olive", "Huile d'olive", "Olivenöl", "Olive oil", "snacks", 884, 0, 0, 100, 10, "🫒"),
+  a("confiture", "Confiture", "Konfitüre", "Jam", "snacks", 250, 0.4, 60, 0.1, 20, "🍓"),
+  a("sirop_erable", "Sirop d'érable", "Ahornsirup", "Maple syrup", "snacks", 260, 0, 67, 0.1, 20, "🍁"),
+
+  // ── Plats & fast-food (suite) ──
+  a("hot_dog", "Hot-dog", "Hotdog", "Hot dog", "plats", 247, 10, 22, 13, 150, "🌭"),
+  a("nuggets", "Nuggets de poulet", "Chicken Nuggets", "Chicken nuggets", "plats", 296, 15, 16, 19, 100, "🍗"),
+  a("quiche", "Quiche lorraine", "Quiche", "Quiche", "plats", 260, 9, 20, 16, 150, "🥧"),
+  a("gratin", "Gratin dauphinois", "Kartoffelgratin", "Potato gratin", "plats", 160, 3.5, 15, 9, 200, "🥔"),
+  a("risotto", "Risotto", "Risotto", "Risotto", "plats", 166, 4, 24, 5, 250, "🍚"),
+  a("paella", "Paella", "Paella", "Paella", "plats", 156, 8, 18, 5, 300, "🥘"),
+  a("chili", "Chili con carne", "Chili con Carne", "Chili con carne", "plats", 130, 9, 12, 5, 300, "🌶️"),
+  a("dumplings", "Raviolis / dumplings", "Teigtaschen", "Dumplings", "plats", 200, 7, 27, 7, 150, "🥟"),
+  a("croque", "Croque-monsieur", "Croque Monsieur", "Croque-monsieur", "plats", 280, 14, 24, 14, 180, "🥪"),
+  a("cordon_bleu", "Cordon bleu", "Cordon bleu", "Cordon bleu", "plats", 260, 16, 14, 15, 180, "🍗"),
+  a("spaetzli", "Spätzli", "Spätzli", "Spaetzle", "plats", 172, 6, 30, 3, 200, "🍜"),
+  a("hamburger_veg", "Burger végétarien", "Veggie-Burger", "Veggie burger", "plats", 210, 12, 18, 10, 200, "🍔"),
 ];
 
 const BY_ID: Record<string, Aliment> = Object.fromEntries(ALIMENTS.map((x) => [x.id, x]));

@@ -2866,7 +2866,7 @@ const CSS = `
 .cl-ring-lb{font-size:.8rem;color:var(--muted);font-weight:700;margin-top:3px}
 #clProgArc{filter:drop-shadow(0 5px 10px rgba(22,163,74,.5))}
 .cl-ring-foot{display:flex;justify-content:space-around;margin-top:10px;text-align:center}
-.cl-ring-foot>div{flex:1}
+.cl-ring-foot>div:not(.cl-rsep){flex:1}
 .cl-rk{font-family:var(--disp);font-weight:600;font-size:1.12rem;font-variant-numeric:tabular-nums}
 .cl-rl{font-size:.7rem;color:var(--soft);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
 .cl-rsep{flex:0 0 1px;background:var(--line);align-self:stretch;margin:3px 0}

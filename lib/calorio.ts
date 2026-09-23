@@ -606,3 +606,136 @@ export function tendancePoids(entries: Pesee[]): TendancePoids | null {
     max: Math.max(...poids),
   };
 }
+
+/* ------------------------------------------------------------------ */
+/* Recettes — plats composés (journal en un tap + pages SEO)          */
+/* ------------------------------------------------------------------ */
+
+export type RecetteCat = "petitdej" | "plat" | "healthy" | "sucre";
+
+export type RecetteItem = { id: string; g: number };
+export type Recette = {
+  id: string;
+  nom: { fr: string; de: string; en: string };
+  emoji: string;
+  cat: RecetteCat;
+  portions: number; // nombre de parts
+  temps: number; // minutes (indicatif)
+  items: RecetteItem[];
+};
+
+const it = (id: string, g: number): RecetteItem => ({ id, g });
+const rc = (
+  id: string, fr: string, de: string, en: string,
+  emoji: string, cat: RecetteCat, portions: number, temps: number,
+  items: RecetteItem[]
+): Recette => ({ id, nom: { fr, de, en }, emoji, cat, portions, temps, items });
+
+/** Recettes composées à partir de la base d'aliments (valeurs indicatives). */
+export const RECETTES: Recette[] = [
+  // Petit-déjeuner
+  rc("bol_proteine", "Bowl protéiné du matin", "Protein-Bowl", "Protein breakfast bowl", "🥣", "petitdej", 1, 5,
+    [it("skyr", 150), it("flocons_avoine", 40), it("banane", 100), it("myrtilles", 60), it("beurre_cacahuete", 15)]),
+  rc("porridge_banane", "Porridge banane & miel", "Bananen-Porridge", "Banana porridge", "🥣", "petitdej", 1, 10,
+    [it("flocons_avoine", 50), it("lait_demi", 200), it("banane", 100), it("miel", 10)]),
+  rc("toast_oeuf_avocat", "Toast œuf & avocat", "Ei-Avocado-Toast", "Egg & avocado toast", "🥑", "petitdej", 1, 10,
+    [it("pain_complet", 60), it("oeuf", 100), it("avocat", 70)]),
+  rc("pancakes_fruits", "Pancakes & fruits rouges", "Pancakes mit Beeren", "Pancakes & berries", "🥞", "petitdej", 2, 15,
+    [it("pancakes", 150), it("myrtilles", 60), it("framboises", 40), it("sirop_erable", 30)]),
+  rc("smoothie_rouge", "Smoothie fruits rouges", "Beeren-Smoothie", "Berry smoothie", "🥤", "petitdej", 1, 5,
+    [it("banane", 100), it("fraises", 80), it("myrtilles", 50), it("yaourt_grec", 100), it("lait_amande", 120)]),
+  rc("bowl_skyr_granola", "Bowl skyr & granola", "Skyr-Bowl", "Skyr & granola bowl", "🥣", "healthy", 1, 5,
+    [it("skyr", 200), it("granola", 30), it("myrtilles", 60), it("miel", 10)]),
+  // Plats healthy / fitness
+  rc("poulet_riz_brocoli", "Poulet, riz & brocoli", "Poulet, Reis & Broccoli", "Chicken, rice & broccoli", "🍗", "healthy", 1, 20,
+    [it("poulet", 150), it("riz", 150), it("brocoli", 100), it("huile_olive", 10)]),
+  rc("poke_bowl_saumon", "Poke bowl saumon", "Lachs-Poke-Bowl", "Salmon poke bowl", "🍲", "healthy", 1, 15,
+    [it("riz", 150), it("saumon", 100), it("avocat", 50), it("edamame", 40), it("concombre", 40), it("sauce_soja", 10)]),
+  rc("buddha_bowl_vege", "Buddha bowl végé", "Buddha Bowl", "Veggie buddha bowl", "🥗", "healthy", 1, 20,
+    [it("quinoa", 120), it("pois_chiches", 80), it("avocat", 50), it("epinards", 40), it("carotte", 50), it("houmous", 40)]),
+  rc("salade_thon_oeuf", "Salade thon & œuf", "Thunfisch-Salat", "Tuna & egg salad", "🥗", "healthy", 1, 10,
+    [it("salade", 60), it("thon", 100), it("oeuf", 100), it("mais", 40), it("tomate", 50), it("huile_olive", 10)]),
+  rc("shake_proteine_banane", "Shake protéiné banane", "Protein-Shake", "Banana protein shake", "💪", "healthy", 1, 3,
+    [it("whey", 30), it("banane", 100), it("lait_amande", 250), it("beurre_cacahuete", 15)]),
+  // Plats du monde / classiques
+  rc("lasagnes_maison", "Lasagnes maison", "Hausgemachte Lasagne", "Homemade lasagna", "🍝", "plat", 4, 60,
+    [it("pates", 200), it("boeuf_hache", 300), it("sauce_tomate", 300), it("gruyere", 120), it("creme", 80)]),
+  rc("spaghetti_bolognaise", "Spaghetti bolognaise", "Spaghetti Bolognese", "Spaghetti bolognese", "🍝", "plat", 2, 30,
+    [it("pates", 200), it("boeuf_hache", 200), it("sauce_tomate", 200), it("oignon", 40), it("parmesan", 30)]),
+  rc("pates_carbonara", "Pâtes carbonara", "Spaghetti Carbonara", "Pasta carbonara", "🍝", "plat", 2, 20,
+    [it("pates", 200), it("bacon", 80), it("oeuf", 100), it("parmesan", 40)]),
+  rc("wrap_poulet", "Wrap poulet crudités", "Poulet-Wrap", "Chicken wrap", "🌯", "plat", 1, 10,
+    [it("tortilla", 60), it("poulet", 100), it("salade", 30), it("tomate", 40), it("mayonnaise", 15)]),
+  rc("omelette_fromage", "Omelette au fromage", "Käse-Omelette", "Cheese omelette", "🍳", "plat", 1, 10,
+    [it("oeuf", 150), it("gruyere", 40), it("beurre", 10)]),
+  rc("chili_con_carne", "Chili con carne", "Chili con Carne", "Chili con carne", "🌶️", "plat", 4, 40,
+    [it("boeuf_hache", 300), it("haricots_rouges", 240), it("sauce_tomate", 240), it("mais", 120), it("oignon", 60)]),
+  rc("curry_poulet_riz", "Curry de poulet & riz", "Poulet-Curry mit Reis", "Chicken curry & rice", "🍛", "plat", 2, 30,
+    [it("poulet", 200), it("lait_coco", 120), it("riz", 200), it("oignon", 40), it("sauce_tomate", 60)]),
+  rc("risotto_champignons", "Risotto aux champignons", "Pilzrisotto", "Mushroom risotto", "🍚", "plat", 2, 30,
+    [it("riz", 200), it("champignons", 100), it("parmesan", 30), it("creme", 40), it("oignon", 30)]),
+  rc("salade_cesar_maison", "Salade César maison", "Caesar-Salat", "Homemade Caesar salad", "🥗", "plat", 1, 15,
+    [it("salade", 80), it("poulet", 120), it("parmesan", 20), it("pain_blanc", 30), it("mayonnaise", 20)]),
+  // Spécialités suisses
+  rc("raclette_valais", "Raclette valaisanne", "Walliser Raclette", "Swiss raclette", "🧀", "plat", 2, 20,
+    [it("raclette", 200), it("pomme_terre", 300), it("jambon", 60)]),
+  rc("fondue_moitie", "Fondue moitié-moitié", "Fondue moitié-moitié", "Swiss cheese fondue", "🫕", "plat", 2, 25,
+    [it("gruyere", 120), it("emmental", 120), it("vin_blanc", 40), it("pain_blanc", 200)]),
+  rc("rosti_oeuf", "Rösti & œuf au plat", "Rösti mit Spiegelei", "Rösti with fried egg", "🥔", "plat", 1, 20,
+    [it("rosti", 200), it("oeuf", 100), it("bacon", 30)]),
+  // Sucré
+  rc("crepes_choco_banane", "Crêpes chocolat-banane", "Schoko-Bananen-Crêpes", "Chocolate-banana crêpes", "🥞", "sucre", 2, 20,
+    [it("crepe", 120), it("nutella", 40), it("banane", 80)]),
+];
+
+export type RecetteNutri = {
+  total: Total; // toute la recette
+  parPortion: Total; // total / portions
+  ingredients: { al: Aliment; g: number; kcal: number }[];
+  manquants: string[]; // ids introuvables (garde-fou dev)
+};
+
+/** Valeurs nutritionnelles d'une recette (somme des ingrédients). */
+export function recetteNutri(r: Recette): RecetteNutri {
+  const ingredients: { al: Aliment; g: number; kcal: number }[] = [];
+  const manquants: string[] = [];
+  let kcal = 0, prot = 0, gluc = 0, lip = 0;
+  for (const item of r.items) {
+    const al = aliment(item.id);
+    if (!al) { manquants.push(item.id); continue; }
+    const t = calcAliment(al, item.g);
+    kcal += t.kcal; prot += t.prot; gluc += t.gluc; lip += t.lip;
+    ingredients.push({ al, g: item.g, kcal: t.kcal });
+  }
+  const p = Math.max(1, r.portions);
+  return {
+    total: { kcal: r0(kcal), prot: r1(prot), gluc: r1(gluc), lip: r1(lip) },
+    parPortion: { kcal: r0(kcal / p), prot: r1(prot / p), gluc: r1(gluc / p), lip: r1(lip / p) },
+    ingredients,
+    manquants,
+  };
+}
+
+/* --- Slugs SEO recettes ("calories lasagnes maison"…) --- */
+export const RECETTE_SLUGS: { slug: string; r: Recette }[] = (() => {
+  const seen = new Set<string>();
+  const out: { slug: string; r: Recette }[] = [];
+  for (const r of RECETTES) {
+    let sl = slugify(r.nom.fr);
+    if (!sl || seen.has(sl)) sl = `${sl || "recette"}-${r.id}`;
+    seen.add(sl);
+    out.push({ slug: sl, r });
+  }
+  return out;
+})();
+const RBY_SLUG: Record<string, Recette> = Object.fromEntries(RECETTE_SLUGS.map((x) => [x.slug, x.r]));
+const RSLUG_BY_ID: Record<string, string> = Object.fromEntries(RECETTE_SLUGS.map((x) => [x.r.id, x.slug]));
+export function recetteBySlug(slug: string): Recette | undefined {
+  return RBY_SLUG[slug];
+}
+export function recetteSlug(r: Recette): string {
+  return RSLUG_BY_ID[r.id] || r.id;
+}
+export function recette(id: string): Recette | undefined {
+  return RECETTES.find((r) => r.id === id);
+}

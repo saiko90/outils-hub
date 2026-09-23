@@ -9,7 +9,11 @@ import {
   type Pesee,
   type AlimentCat,
   type Aliment,
+  type Recette,
+  type RecetteCat,
   ALIMENTS,
+  RECETTES,
+  recetteNutri,
   aliment,
   computeBesoins,
   computeJournal,
@@ -348,6 +352,9 @@ const LX = {
     vitoIdea: "🥕 Vito, une idée de repas ?",
     vitoMealPrompt: (kcal: string, p: string, g: string, l: string) => `Il me reste ${kcal} kcal aujourd'hui (dont environ ${p} g de protéines, ${g} g de glucides, ${l} g de lipides). Propose-moi 3 idées de repas simples et équilibrés qui rentrent dans ce budget.`,
     createFood: "Créer un aliment", createSub: "Ton propre aliment", myFoods: "Mes aliments",
+    recipes: "Recettes", recipesSub: "Plats prêts, en un tap", recPortionLbl: "/ portion",
+    recCats: { tous: "Toutes", petitdej: "Petit-déj", healthy: "Healthy", plat: "Plats", sucre: "Sucré" } as Record<RecetteCat | "tous", string>,
+    recIngr: (n: number) => `${n} ingrédient${n > 1 ? "s" : ""}`, recAdded: "Recette ajoutée ✓", waterGoalLbl: "Objectif",
     cfName: "Nom de l\u2019aliment", cfKcal: "Calories", cfProt: "Protéines", cfGluc: "Glucides", cfLip: "Lipides", cfPortion: "Portion", cfPer100: "pour 100 g", cfEmoji: "Icône", cfSave: "Créer et ajouter", cfErr: "Indique au moins un nom et des calories.", cfHint: "Valeurs pour 100 g. L\u2019aliment rejoint ta bibliothèque et est synchronisé sur ton compte.",
      objVal: (v: string) => v,
   },
@@ -405,6 +412,9 @@ const LX = {
     vitoIdea: "🥕 Vito, eine Idee?",
     vitoMealPrompt: (kcal: string, p: string, g: string, l: string) => `Mir bleiben heute ${kcal} kcal (davon etwa ${p} g Proteine, ${g} g Kohlenhydrate, ${l} g Fette). Schlag mir 3 einfache, ausgewogene Mahlzeiten vor, die in dieses Budget passen.`,
     createFood: "Lebensmittel erstellen", createSub: "Dein eigenes", myFoods: "Meine Lebensmittel",
+    recipes: "Rezepte", recipesSub: "Fertige Gerichte, ein Tipp", recPortionLbl: "/ Portion",
+    recCats: { tous: "Alle", petitdej: "Frühstück", healthy: "Healthy", plat: "Gerichte", sucre: "Süsses" } as Record<RecetteCat | "tous", string>,
+    recIngr: (n: number) => `${n} Zutat${n > 1 ? "en" : ""}`, recAdded: "Rezept hinzugefügt ✓", waterGoalLbl: "Ziel",
     cfName: "Name", cfKcal: "Kalorien", cfProt: "Proteine", cfGluc: "Kohlenhydrate", cfLip: "Fette", cfPortion: "Portion", cfPer100: "pro 100 g", cfEmoji: "Symbol", cfSave: "Erstellen und hinzufügen", cfErr: "Gib mindestens Name und Kalorien an.", cfHint: "Werte pro 100 g. Das Lebensmittel kommt in deine Bibliothek und wird synchronisiert.",
     objVal: (v: string) => v,
   },
@@ -462,6 +472,9 @@ const LX = {
     vitoIdea: "🥕 Vito, a meal idea?",
     vitoMealPrompt: (kcal: string, p: string, g: string, l: string) => `I have ${kcal} kcal left today (about ${p} g protein, ${g} g carbs, ${l} g fat). Suggest 3 simple, balanced meal ideas that fit this budget.`,
     createFood: "Create a food", createSub: "Your own food", myFoods: "My foods",
+    recipes: "Recipes", recipesSub: "Ready meals, one tap", recPortionLbl: "/ serving",
+    recCats: { tous: "All", petitdej: "Breakfast", healthy: "Healthy", plat: "Mains", sucre: "Sweet" } as Record<RecetteCat | "tous", string>,
+    recIngr: (n: number) => `${n} ingredient${n > 1 ? "s" : ""}`, recAdded: "Recipe added ✓", waterGoalLbl: "Goal",
     cfName: "Food name", cfKcal: "Calories", cfProt: "Protein", cfGluc: "Carbs", cfLip: "Fat", cfPortion: "Portion", cfPer100: "per 100 g", cfEmoji: "Icon", cfSave: "Create and add", cfErr: "Enter at least a name and calories.", cfHint: "Values per 100 g. The food joins your library and syncs to your account.",
     objVal: (v: string) => v,
   },
@@ -624,7 +637,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [lines, setLines] = useState<Line[]>([]);
   const [recents, setRecents] = useState<Food[]>([]);
   const [addOpen, setAddOpen] = useState(false);
-  const [addMode, setAddMode] = useState<"menu" | "library" | "online" | "meals" | "create">("menu");
+  const [addMode, setAddMode] = useState<"menu" | "library" | "online" | "meals" | "create" | "recettes">("menu");
+  const [recCat, setRecCat] = useState<RecetteCat | "tous">("tous");
   const [addMeal, setAddMeal] = useState<MealKey | null>(null);
   const [pesees, setPesees] = useState<Pesee[]>([]);
   const [poidsInput, setPoidsInput] = useState<number | "">("");
@@ -640,6 +654,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const importRef = useRef<HTMLInputElement>(null);
   // eau, jeûne, repas enregistrés, graine de conversation Vito
   const [water, setWater] = useState(0);
+  const [waterGoal, setWaterGoal] = useState(WATER_GOAL);
   const [fast, setFast] = useState<{ start: number | null; hours: number }>({ start: null, hours: 16 });
   const [nowTick, setNowTick] = useState(() => Date.now());
   const [savedMeals, setSavedMeals] = useState<SavedMeal[]>([]);
@@ -701,6 +716,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     setTrophies(load<Record<string, number>>("calorio.trophies", {}));
     setUsed(load("calorio.used", {}));
     setWater(load<Record<string, number>>("calorio.water", {})[day] || 0);
+    setWaterGoal(Math.max(2, Math.min(20, load<number>("calorio.waterGoal", WATER_GOAL))));
     setFast(load<{ start: number | null; hours: number }>("calorio.fast", { start: null, hours: 16 }));
     setSavedMeals(load<SavedMeal[]>("calorio.meals", []));
     setCustomFoods(load<Food[]>("calorio.customFoods", []));
@@ -782,6 +798,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     if (p.activite) setActivite(p.activite as Activite);
     if (p.objectif) setObjectif(p.objectif as Objectif);
     if (typeof p.poidsCible === "number") setPoidsCible(p.poidsCible);
+    if (typeof p.waterGoal === "number") { const g = Math.max(2, Math.min(20, p.waterGoal)); setWaterGoal(g); save("calorio.waterGoal", g); }
     // Union des trophées/actions (local + cloud), pour ne jamais perdre un trophée déjà gagné.
     if (p.trophies && typeof p.trophies === "object") {
       const cloud = p.trophies as Record<string, number>;
@@ -913,7 +930,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const shareGrade = () => shareText(x.troShareGrade(x.gradeNames[grade.index], trophyCount));
 
   // Export / import des données (confiance + portabilité). Clés locales connues.
-  const CAL_KEYS = ["calorio.profil", "calorio.journal", "calorio.pesees", "calorio.recents", "calorio.trophies", "calorio.used", "calorio.streakBest", "calorio.lang", "calorio.pro", "calorio.water", "calorio.fast", "calorio.meals", "calorio.customFoods"];
+  const CAL_KEYS = ["calorio.profil", "calorio.journal", "calorio.pesees", "calorio.recents", "calorio.trophies", "calorio.used", "calorio.streakBest", "calorio.lang", "calorio.pro", "calorio.water", "calorio.waterGoal", "calorio.fast", "calorio.meals", "calorio.customFoods"];
   const exportData = () => {
     const out: Record<string, unknown> = { _app: "calorio", _v: 1, _date: new Date().toISOString() };
     for (const k of CAL_KEYS) {
@@ -947,14 +964,14 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const id = setTimeout(() => {
       supa.from("calorio_users").upsert({
         id: user.id,
-        profil: { sexe, age, poids, taille, activite, objectif, poidsCible, trophies, used, savedMeals, customFoods },
+        profil: { sexe, age, poids, taille, activite, objectif, poidsCible, trophies, used, savedMeals, customFoods, waterGoal },
         journal: load("calorio.journal", {}),
         pesees,
         updated_at: new Date().toISOString(),
       }).then(() => {});
     }, 1400);
     return () => clearTimeout(id);
-  }, [mounted, user, sexe, age, poids, taille, activite, objectif, poidsCible, pesees, lines, trophies, used, savedMeals, customFoods]);
+  }, [mounted, user, sexe, age, poids, taille, activite, objectif, poidsCible, pesees, lines, trophies, used, savedMeals, customFoods, waterGoal]);
 
   const signInGoogle = () => {
     getSupabase()?.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.href.split("?")[0] } });
@@ -1108,7 +1125,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const coachCtx: CoachCtx = useMemo(
     () => ({
       lang,
-      profil: { sexe, age, poids, taille, activite, objectif, poidsCible, trophies, used, savedMeals, customFoods },
+      profil: { sexe, age, poids, taille, activite, objectif, poidsCible, trophies, used, savedMeals, customFoods, waterGoal },
       cible: besoins.cible,
       bmr: besoins.bmr,
       tdee: besoins.tdee,
@@ -1227,6 +1244,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // Persistance eau / jeûne / repas enregistrés.
   useEffect(() => { if (!mounted) return; const w = load<Record<string, number>>("calorio.water", {}); w[day] = water; save("calorio.water", w); }, [mounted, water, day]);
   useEffect(() => { if (!mounted) return; save("calorio.fast", fast); }, [mounted, fast]);
+  useEffect(() => { if (!mounted) return; save("calorio.waterGoal", waterGoal); }, [mounted, waterGoal]);
   useEffect(() => { if (!mounted) return; save("calorio.meals", savedMeals); }, [mounted, savedMeals]);
   useEffect(() => { if (!mounted) return; save("calorio.customFoods", customFoods); }, [mounted, customFoods]);
   // Minuteur du jeûne : tic toutes les 30 s tant qu'un jeûne est en cours.
@@ -1238,6 +1256,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   }, [fast.start]);
 
   const addWater = (d: number) => setWater((w) => Math.max(0, Math.min(20, w + d)));
+  const setWG = (d: number) => setWaterGoal((g) => Math.max(2, Math.min(20, g + d)));
   const startFast = (hours: number) => setFast({ start: Date.now(), hours });
   const endFast = () => setFast((fp) => ({ ...fp, start: null }));
 
@@ -1274,6 +1293,19 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     setLines((prev) => [...prev, ...sm.items.map((it) => ({ key: newKey(), food: it.food, grammes: it.grammes, meal: m }))]);
   };
   const deleteSavedMeal = (id: string) => setSavedMeals((prev) => prev.filter((s) => s.id !== id));
+  // Ajouter une recette entière (tous ses ingrédients) au journal, en un tap.
+  const addRecette = (rec: Recette, meal?: MealKey) => {
+    const m = meal ?? mealOfHour(new Date().getHours());
+    const rows = rec.items
+      .map((i) => { const al = aliment(i.id); return al ? { key: newKey(), food: toFood(al, lang), grammes: i.g, meal: m } : null; })
+      .filter(Boolean) as Line[];
+    if (!rows.length) return;
+    setLines((prev) => [...prev, ...rows]);
+  };
+  const recMatches = useMemo(
+    () => RECETTES.filter((r) => recCat === "tous" || r.cat === recCat),
+    [recCat]
+  );
 
   // Aliment personnalisé créé par l'utilisateur.
   const saveCustomFood = () => {
@@ -1613,15 +1645,21 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               <div className="cl-sectt"><span className="cl-dot" />💧 {x.waterTitle}</div>
               <div className="cl-card cl-water">
                 <div className="cl-water-top">
-                  <div className="cl-water-v">{x.waterGoalTxt(water, WATER_GOAL)} <small>{x.waterL(waterLtr)}</small></div>
+                  <div className="cl-water-v">{x.waterGoalTxt(water, waterGoal)} <small>{x.waterL(waterLtr)}</small></div>
                   <div className="cl-water-btns">
                     <button onClick={() => addWater(-1)} aria-label="−">−</button>
                     <button onClick={() => addWater(1)} aria-label="+">＋</button>
                   </div>
                 </div>
                 <div className="cl-glasses">
-                  {Array.from({ length: WATER_GOAL }).map((_, i) => <span key={i} className={`cl-glass ${i < water ? "on" : ""}`}>🥛</span>)}
-                  {water > WATER_GOAL && <span className="cl-water-extra">+{water - WATER_GOAL}</span>}
+                  {Array.from({ length: waterGoal }).map((_, i) => <span key={i} className={`cl-glass ${i < water ? "on" : ""}`}>🥛</span>)}
+                  {water > waterGoal && <span className="cl-water-extra">+{water - waterGoal}</span>}
+                </div>
+                <div className="cl-water-goal">
+                  <span>{x.waterGoalLbl}</span>
+                  <button onClick={() => setWG(-1)} aria-label="−">−</button>
+                  <b>{waterGoal} <small>{x.waterL((waterGoal * 0.25).toFixed(1).replace(".", lang === "en" ? "." : ","))}</small></b>
+                  <button onClick={() => setWG(1)} aria-label="+">＋</button>
                 </div>
               </div>
 
@@ -1960,7 +1998,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         <div className="cl-scanoverlay" onClick={() => setAddOpen(false)}>
           <div className="cl-chooser" onClick={(e) => e.stopPropagation()}>
             <div className="cl-chooser-h">
-              <b>{addMode === "menu" ? t.addFood : addMode === "library" ? `📚 ${t.mLib}` : addMode === "online" ? `🔍 ${t.mOnline}` : addMode === "meals" ? `⭐ ${x.myMeals}` : `➕ ${x.createFood}`}</b>
+              <b>{addMode === "menu" ? t.addFood : addMode === "library" ? `📚 ${t.mLib}` : addMode === "online" ? `🔍 ${t.mOnline}` : addMode === "meals" ? `⭐ ${x.myMeals}` : addMode === "recettes" ? `🍲 ${x.recipes}` : `➕ ${x.createFood}`}</b>
               <button className="cl-chooser-x" onClick={() => { if (addMode === "menu") setAddOpen(false); else { setAddMode("menu"); setQ(""); } }}>{addMode === "menu" ? "×" : "‹"}</button>
             </div>
 
@@ -1977,6 +2015,9 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                 </button>
                 <button className="cl-method pro" onClick={() => { setAddOpen(false); if (proActive) fileRef.current?.click(); else goPro(); }}>
                   <span className="cl-method-i">🍽️</span><b>{t.mPhoto}</b><small>{t.mPhotoSub}</small>{!proActive && <span className="cl-method-lock">Pro</span>}
+                </button>
+                <button className="cl-method" onClick={() => { setRecCat("tous"); setAddMode("recettes"); }}>
+                  <span className="cl-method-i">🍲</span><b>{x.recipes}</b><small>{x.recipesSub}</small>
                 </button>
                 <button className="cl-method" onClick={() => setAddMode("meals")}>
                   <span className="cl-method-i">⭐</span><b>{x.myMeals}</b><small>{savedMeals.length > 0 ? `${savedMeals.length} enregistré${savedMeals.length > 1 ? "s" : ""}` : "—"}</small>
@@ -2030,6 +2071,28 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+
+            {addMode === "recettes" && (
+              <div className="cl-picker">
+                <div className="cl-chips">
+                  {(["tous", "petitdej", "healthy", "plat", "sucre"] as const).map((c) => (
+                    <button key={c} className={recCat === c ? "on" : ""} onClick={() => setRecCat(c)}>{x.recCats[c]}</button>
+                  ))}
+                </div>
+                <div className="cl-foods">
+                  {recMatches.map((rec) => {
+                    const n = recetteNutri(rec);
+                    return (
+                      <button key={rec.id} className="cl-food2 cl-recitem" onClick={() => { addRecette(rec, addMeal ?? undefined); setMealMsg(x.recAdded); setTimeout(() => setMealMsg(""), 1800); setAddOpen(false); }}>
+                        <span className="cl-fem">{rec.emoji}</span>
+                        <span className="cl-f2n">{rec.nom[lang]}<small> · {x.recIngr(rec.items.length)}</small></span>
+                        <span className="cl-f2k">{n.parPortion.kcal} kcal<small>{x.recPortionLbl}</small></span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
@@ -2647,6 +2710,13 @@ const CSS = `
 .cl-glass{font-size:1.5rem;filter:grayscale(1);opacity:.3;transition:.15s}
 .cl-glass.on{filter:none;opacity:1}
 .cl-water-extra{font-weight:800;color:var(--green);font-size:.9rem;margin-left:2px}
+.cl-water-goal{display:flex;align-items:center;gap:9px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.cl-water-goal>span{font-size:.82rem;font-weight:700;color:var(--muted)}
+.cl-water-goal b{font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;min-width:70px;text-align:center}
+.cl-water-goal b small{font-weight:700;font-size:.72rem;color:var(--soft);margin-left:3px}
+.cl-water-goal button{width:30px;height:30px;border:1.5px solid var(--line);background:#f4f7f4;border-radius:9px;font-size:1.05rem;font-weight:800;color:var(--green);cursor:pointer;line-height:1}
+.cl-water-goal button:active{transform:scale(.92)}
+.cl-recitem .cl-f2k small{color:var(--soft)}
 /* jeûne */
 .cl-fast{text-align:center}
 .cl-fast-big{font-family:var(--disp);font-weight:700;font-size:2.6rem;letter-spacing:-1px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}

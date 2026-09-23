@@ -22,6 +22,7 @@ import {
   tendancePoids,
 } from "@/lib/calorio";
 import CoachNutri, { type CoachCtx } from "./CoachNutri";
+import { type DuoSummary } from "@/lib/duo";
 import { getSupabase } from "@/lib/supabaseClient";
 import { enablePush, disablePush, pushSupported } from "@/lib/push";
 import type { User } from "@supabase/supabase-js";
@@ -355,6 +356,12 @@ const LX = {
     recipes: "Recettes", recipesSub: "Plats prêts, en un tap", recPortionLbl: "/ portion",
     recCats: { tous: "Toutes", petitdej: "Petit-déj", healthy: "Healthy", plat: "Plats", sucre: "Sucré" } as Record<RecetteCat | "tous", string>,
     recIngr: (n: number) => `${n} ingrédient${n > 1 ? "s" : ""}`, recAdded: "Recette ajoutée ✓", waterGoalLbl: "Objectif",
+    duoTitle: "Mon binôme", duoSub: "Suivez vos objectifs à deux — en couple, entre amis.",
+    duoInviteHint: "Partage ton code, ou entre celui de ton binôme :", duoYourCode: "Ton code",
+    duoCodePh: "Code du binôme", duoLink: "Lier", duoUnlink: "Délier",
+    duoLinkedTitle: "Aujourd'hui, ton binôme", duoNoData: "Ton binôme n'a rien noté aujourd'hui.",
+    duoOfGoal: "de l'objectif", duoStreakLbl: "série", duoNeedAccount: "Crée un compte gratuit pour suivre ton binôme.",
+    duoBadCode: "Code trop court.", duoSelf: "C'est ton propre code 🙂", duoUnknown: "Code introuvable.", duoErr: "Réessaie dans un instant.",
     cfName: "Nom de l\u2019aliment", cfKcal: "Calories", cfProt: "Protéines", cfGluc: "Glucides", cfLip: "Lipides", cfPortion: "Portion", cfPer100: "pour 100 g", cfEmoji: "Icône", cfSave: "Créer et ajouter", cfErr: "Indique au moins un nom et des calories.", cfHint: "Valeurs pour 100 g. L\u2019aliment rejoint ta bibliothèque et est synchronisé sur ton compte.",
      objVal: (v: string) => v,
   },
@@ -415,6 +422,12 @@ const LX = {
     recipes: "Rezepte", recipesSub: "Fertige Gerichte, ein Tipp", recPortionLbl: "/ Portion",
     recCats: { tous: "Alle", petitdej: "Frühstück", healthy: "Healthy", plat: "Gerichte", sucre: "Süsses" } as Record<RecetteCat | "tous", string>,
     recIngr: (n: number) => `${n} Zutat${n > 1 ? "en" : ""}`, recAdded: "Rezept hinzugefügt ✓", waterGoalLbl: "Ziel",
+    duoTitle: "Mein Duo", duoSub: "Verfolgt eure Ziele zu zweit — als Paar oder mit Freunden.",
+    duoInviteHint: "Teile deinen Code oder gib den deines Duos ein:", duoYourCode: "Dein Code",
+    duoCodePh: "Duo-Code", duoLink: "Verbinden", duoUnlink: "Trennen",
+    duoLinkedTitle: "Heute, dein Duo", duoNoData: "Dein Duo hat heute noch nichts erfasst.",
+    duoOfGoal: "vom Ziel", duoStreakLbl: "Serie", duoNeedAccount: "Erstelle ein kostenloses Konto, um dein Duo zu verfolgen.",
+    duoBadCode: "Code zu kurz.", duoSelf: "Das ist dein eigener Code 🙂", duoUnknown: "Code nicht gefunden.", duoErr: "Versuch's gleich nochmal.",
     cfName: "Name", cfKcal: "Kalorien", cfProt: "Proteine", cfGluc: "Kohlenhydrate", cfLip: "Fette", cfPortion: "Portion", cfPer100: "pro 100 g", cfEmoji: "Symbol", cfSave: "Erstellen und hinzufügen", cfErr: "Gib mindestens Name und Kalorien an.", cfHint: "Werte pro 100 g. Das Lebensmittel kommt in deine Bibliothek und wird synchronisiert.",
     objVal: (v: string) => v,
   },
@@ -475,6 +488,12 @@ const LX = {
     recipes: "Recipes", recipesSub: "Ready meals, one tap", recPortionLbl: "/ serving",
     recCats: { tous: "All", petitdej: "Breakfast", healthy: "Healthy", plat: "Mains", sucre: "Sweet" } as Record<RecetteCat | "tous", string>,
     recIngr: (n: number) => `${n} ingredient${n > 1 ? "s" : ""}`, recAdded: "Recipe added ✓", waterGoalLbl: "Goal",
+    duoTitle: "My duo", duoSub: "Track your goals together — as a couple or with friends.",
+    duoInviteHint: "Share your code, or enter your duo's:", duoYourCode: "Your code",
+    duoCodePh: "Duo code", duoLink: "Link", duoUnlink: "Unlink",
+    duoLinkedTitle: "Today, your duo", duoNoData: "Your duo hasn't logged anything today.",
+    duoOfGoal: "of goal", duoStreakLbl: "streak", duoNeedAccount: "Create a free account to follow your duo.",
+    duoBadCode: "Code too short.", duoSelf: "That's your own code 🙂", duoUnknown: "Code not found.", duoErr: "Try again in a moment.",
     cfName: "Food name", cfKcal: "Calories", cfProt: "Protein", cfGluc: "Carbs", cfLip: "Fat", cfPortion: "Portion", cfPer100: "per 100 g", cfEmoji: "Icon", cfSave: "Create and add", cfErr: "Enter at least a name and calories.", cfHint: "Values per 100 g. The food joins your library and syncs to your account.",
     objVal: (v: string) => v,
   },
@@ -693,6 +712,11 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [refCount, setRefCount] = useState(0);
   const [refMsg, setRefMsg] = useState("");
   const [inviteCopied, setInviteCopied] = useState(false);
+  // Binôme / Duo (couple)
+  const [duo, setDuo] = useState<{ linked: boolean; partner?: DuoSummary | null }>({ linked: false });
+  const [duoCode, setDuoCode] = useState("");
+  const [duoMsg, setDuoMsg] = useState("");
+  const [duoBusy, setDuoBusy] = useState(false);
 
   const day = todayISO();
 
@@ -917,6 +941,45 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       try { await nav.share({ title: "calorio", text: t.shareText, url: inviteLink }); return; } catch { /* annulé */ }
     }
     copyInvite();
+  };
+
+  // Binôme / Duo (couple) : appelle /api/duo avec le jeton Supabase.
+  const duoCall = async (payload: { action: string; code?: string }) => {
+    const supa = getSupabase();
+    if (!supa) return null;
+    const { data } = await supa.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) return null;
+    const r = await fetch("/api/duo", { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify(payload) });
+    return (await r.json().catch(() => null)) as { linked?: boolean; partner?: DuoSummary | null; error?: string } | null;
+  };
+  // Statut du binôme au chargement (et rafraîchi quand on ouvre l'onglet stats).
+  useEffect(() => {
+    if (!mounted || !user) { setDuo({ linked: false }); return; }
+    let cancelled = false;
+    duoCall({ action: "status" }).then((d) => { if (!cancelled && d && !d.error) setDuo({ linked: !!d.linked, partner: d.partner ?? null }); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, user]);
+  const refreshDuo = async () => {
+    const d = await duoCall({ action: "status" });
+    if (d && !d.error) setDuo({ linked: !!d.linked, partner: d.partner ?? null });
+  };
+  const linkDuo = async () => {
+    const code = duoCode.trim().toUpperCase();
+    if (code.length < 4) { setDuoMsg(x.duoBadCode); return; }
+    setDuoBusy(true); setDuoMsg("");
+    const d = await duoCall({ action: "link", code });
+    setDuoBusy(false);
+    if (!d) { setDuoMsg(x.duoErr); return; }
+    if (d.error) { setDuoMsg(d.error === "self" ? x.duoSelf : d.error === "unknown_code" ? x.duoUnknown : x.duoErr); return; }
+    setDuo({ linked: !!d.linked, partner: d.partner ?? null }); setDuoCode(""); setDuoMsg("");
+  };
+  const unlinkDuo = async () => {
+    setDuoBusy(true);
+    const d = await duoCall({ action: "unlink" });
+    setDuoBusy(false);
+    if (d && !d.error) { setDuo({ linked: false }); setDuoMsg(""); }
   };
 
   // Partage d'un trophée / du grade — utilise le lien de parrainage si dispo (viralité).
@@ -1681,6 +1744,43 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                       ))}
                     </div>
                     <button className="cl-fast-start" onClick={() => startFast(fast.hours)}>{x.fastStartBtn} · {fast.hours} h</button>
+                  </>
+                )}
+              </div>
+
+              <div className="cl-sectt"><span className="cl-dot" />👫 {x.duoTitle}</div>
+              <div className="cl-card cl-duo">
+                {!user ? (
+                  <button className="cl-duo-signin" onClick={() => setAuthOpen(true)}>{x.duoNeedAccount}</button>
+                ) : duo.linked ? (
+                  <>
+                    <div className="cl-duo-h">{x.duoLinkedTitle}</div>
+                    {duo.partner ? (
+                      <div className="cl-duo-stats">
+                        <div className="cl-duo-tile">
+                          <div className="cl-duo-k">{nf(lang).format(duo.partner.kcal)}</div>
+                          <div className="cl-duo-l">kcal{duo.partner.cible ? ` · ${duo.partner.pct}% ${x.duoOfGoal}` : ""}</div>
+                        </div>
+                        <div className="cl-duo-tile">
+                          <div className="cl-duo-k">{duo.partner.streak} <span className="cl-flame">🔥</span></div>
+                          <div className="cl-duo-l">{x.duoStreakLbl}</div>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="cl-duo-empty">{x.duoNoData}</p>
+                    )}
+                    <button className="cl-duo-unlink" onClick={unlinkDuo} disabled={duoBusy}>{x.duoUnlink}</button>
+                  </>
+                ) : (
+                  <>
+                    <p className="cl-duo-sub">{x.duoSub}</p>
+                    <p className="cl-duo-hint">{x.duoInviteHint}</p>
+                    {refCode && <div className="cl-duo-mycode"><span>{x.duoYourCode}</span><b>{refCode}</b></div>}
+                    <div className="cl-duo-form">
+                      <input className="cl-duo-input" value={duoCode} onChange={(e) => setDuoCode(e.target.value.toUpperCase())} placeholder={x.duoCodePh} maxLength={12} />
+                      <button className="cl-duo-link" onClick={linkDuo} disabled={duoBusy}>{x.duoLink}</button>
+                    </div>
+                    {duoMsg && <p className="cl-duo-msg">{duoMsg}</p>}
                   </>
                 )}
               </div>
@@ -2717,6 +2817,26 @@ const CSS = `
 .cl-water-goal button{width:30px;height:30px;border:1.5px solid var(--line);background:#f4f7f4;border-radius:9px;font-size:1.05rem;font-weight:800;color:var(--green);cursor:pointer;line-height:1}
 .cl-water-goal button:active{transform:scale(.92)}
 .cl-recitem .cl-f2k small{color:var(--soft)}
+/* binôme / duo */
+.cl-duo-sub{margin:0 0 10px;font-size:.9rem;color:var(--muted);line-height:1.45}
+.cl-duo-hint{margin:0 0 8px;font-size:.85rem;font-weight:700;color:var(--ink)}
+.cl-duo-mycode{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f4f7f4;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:10px}
+.cl-duo-mycode span{font-size:.8rem;font-weight:700;color:var(--muted)}
+.cl-duo-mycode b{font-family:var(--disp);font-weight:700;font-size:1.15rem;letter-spacing:2px;color:var(--green)}
+.cl-duo-form{display:flex;gap:8px}
+.cl-duo-input{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font-size:1rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink);background:#fff;font-family:inherit}
+.cl-duo-link,.cl-duo-unlink,.cl-duo-signin{border:none;cursor:pointer;font-family:inherit;font-weight:800}
+.cl-duo-link{flex:none;background:linear-gradient(135deg,#34d17f,#16a34a);color:#fff;border-radius:12px;padding:0 20px;font-size:.95rem}
+.cl-duo-link:disabled{opacity:.6}
+.cl-duo-msg{margin:9px 2px 0;font-size:.85rem;font-weight:700;color:var(--rose)}
+.cl-duo-h{font-size:.82rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
+.cl-duo-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cl-duo-tile{background:#f4f7f4;border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+.cl-duo-k{font-family:var(--disp);font-weight:700;font-size:1.7rem;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums}
+.cl-duo-l{font-size:.74rem;font-weight:700;color:var(--muted);margin-top:5px}
+.cl-duo-empty{margin:0;padding:10px 0;text-align:center;color:var(--muted);font-size:.9rem}
+.cl-duo-unlink{background:none;color:var(--soft);margin-top:12px;font-size:.82rem;text-decoration:underline;padding:4px}
+.cl-duo-signin{background:#f4f7f4;color:var(--green);border:1px dashed #bfe6cd;border-radius:12px;padding:14px;width:100%;font-size:.92rem}
 /* jeûne */
 .cl-fast{text-align:center}
 .cl-fast-big{font-family:var(--disp);font-weight:700;font-size:2.6rem;letter-spacing:-1px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}

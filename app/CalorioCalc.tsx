@@ -308,6 +308,7 @@ const LX = {
     objectif: "Objectif", mange: "Mangé", reste: "Reste",
     macrosDay: "Macros du jour", weekTitle: "Cette semaine",
     streak: (n: number) => `${n} jour${n > 1 ? "s" : ""}`,
+    celebStreak: (n: number) => `${n} jours d'affilée ! 🔥`, celebGoal: "Objectif du jour atteint ! 🎯",
     myDay: "Ma journée", meals: { matin: "Petit-déjeuner", midi: "Déjeuner", snack: "Collations", soir: "Dîner" },
     addShort: "Ajouter", addMealSoir: "Ajouter ton repas du soir",
     weightTitle: "Mon poids", goalLine: (v: string) => `Objectif : ${v} kg`,
@@ -374,6 +375,7 @@ const LX = {
     objectif: "Ziel", mange: "Gegessen", reste: "Übrig",
     macrosDay: "Makros heute", weekTitle: "Diese Woche",
     streak: (n: number) => `${n} Tag${n > 1 ? "e" : ""}`,
+    celebStreak: (n: number) => `${n} Tage in Folge! 🔥`, celebGoal: "Tagesziel erreicht! 🎯",
     myDay: "Mein Tag", meals: { matin: "Frühstück", midi: "Mittagessen", snack: "Snacks", soir: "Abendessen" },
     addShort: "Hinzufügen", addMealSoir: "Abendessen hinzufügen",
     weightTitle: "Mein Gewicht", goalLine: (v: string) => `Ziel: ${v} kg`,
@@ -440,6 +442,7 @@ const LX = {
     objectif: "Goal", mange: "Eaten", reste: "Left",
     macrosDay: "Today's macros", weekTitle: "This week",
     streak: (n: number) => `${n} day${n > 1 ? "s" : ""}`,
+    celebStreak: (n: number) => `${n} days in a row! 🔥`, celebGoal: "Daily goal reached! 🎯",
     myDay: "My day", meals: { matin: "Breakfast", midi: "Lunch", snack: "Snacks", soir: "Dinner" },
     addShort: "Add", addMealSoir: "Add your dinner",
     weightTitle: "My weight", goalLine: (v: string) => `Goal: ${v} kg`,
@@ -627,6 +630,39 @@ function downscale(file: File, max: number): Promise<{ base64: string; mime: str
 }
 
 /* ---------------- component ---------------- */
+// Confettis de célébration (canvas, sans dépendance). S'auto-supprime, respecte reduced-motion.
+function Confetti({ onDone }: { onDone: () => void }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const reduce = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const cv = ref.current;
+    const ctx = cv?.getContext("2d");
+    if (!cv || !ctx || reduce) { const to = setTimeout(onDone, reduce ? 900 : 0); return () => clearTimeout(to); }
+    const W = (cv.width = window.innerWidth), H = (cv.height = window.innerHeight);
+    const cols = ["#34d17f", "#16a34a", "#f5a623", "#ef4457", "#4bd489", "#f6a8b6", "#ffd166"];
+    const parts = Array.from({ length: 150 }, () => ({
+      x: Math.random() * W, y: -20 - Math.random() * H * 0.5, r: 4 + Math.random() * 6,
+      c: cols[Math.floor(Math.random() * cols.length)], vy: 2 + Math.random() * 3.5,
+      vx: -1.5 + Math.random() * 3, rot: Math.random() * 6.28, vr: -0.2 + Math.random() * 0.4,
+    }));
+    let raf = 0; const start = performance.now(); const DUR = 2800;
+    const tick = (now: number) => {
+      const t = now - start;
+      ctx.clearRect(0, 0, W, H);
+      for (const p of parts) {
+        p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vy += 0.02;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+        ctx.fillStyle = p.c; ctx.globalAlpha = Math.max(0, 1 - t / DUR);
+        ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 0.6); ctx.restore();
+      }
+      if (t < DUR) raf = requestAnimationFrame(tick); else onDone();
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [onDone]);
+  return <canvas ref={ref} className="cl-confetti" aria-hidden />;
+}
+
 export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [langOv, setLangOv] = useState<Lang | null>(null);
   const lang: Lang = langOv ?? propLang;
@@ -684,6 +720,9 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [coachSeed, setCoachSeed] = useState("");
   const [coachPrefs, setCoachPrefs] = useState<CoachPrefs>({});
   const [convTick, setConvTick] = useState(0); // bump quand une conversation Vito change → déclenche la synchro
+  const [celebrate, setCelebrate] = useState(""); // message de célébration (confettis)
+  const prevStreakRef = useRef<number | null>(null);
+  const goalCelebRef = useRef(false);
   // aliments créés par l'utilisateur
   const [customFoods, setCustomFoods] = useState<Food[]>([]);
   const [cf, setCf] = useState({ nom: "", kcal: "", prot: "", gluc: "", lip: "", portion: "", emoji: "🍴" });
@@ -1258,6 +1297,35 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     for (let i = histoire.length - 1; i >= 0; i--) { if (histoire[i].kcal > 0) n++; else break; }
     return n;
   }, [histoire]);
+
+  // Célébrations : paliers de série (en direct) + objectif du jour atteint (1×/jour).
+  useEffect(() => {
+    if (!mounted) return;
+    const MS = [3, 7, 14, 30, 50, 100, 200, 365];
+    if (prevStreakRef.current === null) { prevStreakRef.current = streak; return; } // init : pas de confettis au chargement
+    if (streak > prevStreakRef.current) {
+      const crossed = MS.find((m) => prevStreakRef.current! < m && streak >= m);
+      if (crossed) setCelebrate(x.celebStreak(crossed));
+    }
+    prevStreakRef.current = streak;
+  }, [mounted, streak, x]);
+  useEffect(() => {
+    if (!mounted || !(besoins.cible > 0) || goalCelebRef.current) return;
+    const inBand = total.kcal >= besoins.cible * 0.9 && total.kcal <= besoins.cible * 1.1;
+    if (!inBand) return;
+    const flag = `calorio.celeb.goal.${todayISO()}`;
+    let done = false; try { done = localStorage.getItem(flag) === "1"; } catch { /* ignore */ }
+    if (done) { goalCelebRef.current = true; return; }
+    goalCelebRef.current = true;
+    try { localStorage.setItem(flag, "1"); } catch { /* ignore */ }
+    setCelebrate(x.celebGoal);
+  }, [mounted, total.kcal, besoins.cible, x]);
+  // Auto-effacement de la célébration.
+  useEffect(() => {
+    if (!celebrate) return;
+    const to = setTimeout(() => setCelebrate(""), 3200);
+    return () => clearTimeout(to);
+  }, [celebrate]);
   const mealGroups = useMemo(() => {
     const g: Record<MealKey, { line: Line; kcal: number }[]> = { matin: [], midi: [], snack: [], soir: [] };
     for (const l of lines) {
@@ -2133,6 +2201,14 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       </div>
 
       {/* ===== Overlays (chooser, scan, auth, pro) ===== */}
+      {celebrate && (
+        <>
+          <Confetti onDone={() => {}} />
+          <div className="cl-celebrate" onClick={() => setCelebrate("")}>
+            <div className="cl-celebrate-card"><span className="cl-celebrate-emo" aria-hidden>🎉</span><b>{celebrate}</b></div>
+          </div>
+        </>
+      )}
       {addOpen && (
         <div className="cl-scanoverlay" onClick={() => setAddOpen(false)}>
           <div className="cl-chooser" onClick={(e) => e.stopPropagation()}>
@@ -2964,6 +3040,13 @@ const CSS = `
 .cl-tro-d{font-size:.64rem;color:var(--soft);font-weight:600;line-height:1.2;overflow-wrap:anywhere}
 /* célébration */
 .cl-trofx{z-index:90}
+.cl-confetti{position:fixed;inset:0;z-index:95;pointer-events:none}
+.cl-celebrate{position:fixed;inset:0;z-index:96;display:flex;align-items:flex-start;justify-content:center;pointer-events:none;padding-top:22vh}
+.cl-celebrate-card{pointer-events:auto;display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #cdebd7;border-radius:18px;padding:16px 22px;box-shadow:0 18px 40px -14px rgba(20,80,44,.45);animation:clCeleb .5s cubic-bezier(.2,1.4,.4,1) both}
+.cl-celebrate-card b{font-family:var(--disp);font-weight:700;font-size:1.15rem;color:var(--ink);letter-spacing:-.3px}
+.cl-celebrate-emo{font-size:1.9rem}
+@keyframes clCeleb{0%{transform:scale(.6) translateY(-12px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
+@media(prefers-reduced-motion:reduce){.cl-celebrate-card{animation:none}}
 .cl-tromodal{position:relative;width:min(90vw,340px);background:#fff;border-radius:26px;padding:30px 24px 22px;text-align:center;box-shadow:0 30px 70px -20px rgba(14,40,24,.55);animation:cltropop .45s cubic-bezier(.2,1.4,.4,1) both}
 @keyframes cltropop{from{opacity:0;transform:scale(.7) translateY(20px)}}
 .cl-tromodal-emo{font-size:4rem;line-height:1;animation:cltrospin .7s cubic-bezier(.2,1.3,.4,1) both}

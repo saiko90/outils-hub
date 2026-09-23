@@ -17,6 +17,7 @@ import {
   recette,
   aliment,
   computeBesoins,
+  FACTEURS,
   computeJournal,
   calcAliment,
   bilan,
@@ -27,6 +28,13 @@ import { type DuoSummary } from "@/lib/duo";
 import { type Detected } from "@/lib/coachDetect";
 import { type CoachPrefs } from "@/lib/coachPrompt";
 import { getSupabase } from "@/lib/supabaseClient";
+import {
+  besoinsDynamiques,
+  SPORTS,
+  SPORT_BY_ID,
+  kcalSeanceBrut,
+  type Seance,
+} from "@/lib/activite";
 import { enablePush, disablePush, pushSupported } from "@/lib/push";
 import type { User } from "@supabase/supabase-js";
 
@@ -49,6 +57,8 @@ const L = {
     faq: [
       { q: "Comment calorio calcule mes besoins ?", a: "On utilise la formule Mifflin-St Jeor pour ton métabolisme de base, multipliée par ton niveau d'activité, puis ajustée selon ton objectif. C'est une estimation solide, pas une vérité absolue — écoute aussi ton corps." },
       { q: "Mes données sont-elles privées ?", a: "Oui. Sans compte, tout reste dans ton navigateur, sur ton appareil. Avec un compte, tes données sont synchronisées de façon sécurisée sur des serveurs en Europe pour te suivre sur téléphone et ordinateur. On ne vend jamais tes données." },
+      { q: "Comment ma cible s'ajuste à mon activité ?", a: "calorio part de ton métabolisme de base (Mifflin-St Jeor). Ta dépense quotidienne est ensuite affinée : si tu connectes Health Connect, on lit tes pas (et, avec une montre, ta dépense réelle) ; sinon on utilise le niveau d'activité de ton profil. Tes séances de sport ajoutent leurs calories par-dessus, sans double comptage — les pas d'une marche ou d'une course sont retirés du compteur pour ne pas être comptés deux fois." },
+      { q: "Health Connect, Samsung Health, montre connectée ?", a: "Sur Android, calorio peut lire ton activité via Health Connect, le hub santé du téléphone où écrivent Samsung Health, Google Fit, Fitbit et la plupart des montres. Tu gardes le contrôle : tu choisis les données autorisées (pas, calories) et tu peux tout révoquer quand tu veux. Sans montre, calorio estime ta dépense à partir de tes pas et des séances que tu saisis." },
       { q: "calorio est gratuit ?", a: "Oui : tes besoins, le journal, la base d'aliments, le scan de code-barres et le suivi du poids sont 100 % gratuits. La version Pro ajoute le coach IA Vito et l'analyse de tes repas en photo." },
       { q: "Qu'est-ce que la version Pro ?", a: "CHF 4.90/mois ou CHF 39/an, avec 7 jours d'essai gratuit sans engagement. Tu débloques Vito, ton coach nutrition, et l'analyse photo. Annulable à tout moment." },
       { q: "Comment marche l'analyse photo ?", a: "Tu prends ton assiette en photo, une IA identifie les aliments et estime les calories et macros. Tu peux ensuite ajuster les quantités : ça reste une estimation." },
@@ -139,6 +149,8 @@ const L = {
     faq: [
       { q: "Wie berechnet calorio meinen Bedarf?", a: "Wir nutzen die Mifflin-St-Jeor-Formel für deinen Grundumsatz, multipliziert mit deinem Aktivitätsniveau und an dein Ziel angepasst. Eine solide Schätzung, keine absolute Wahrheit — höre auch auf deinen Körper." },
       { q: "Sind meine Daten privat?", a: "Ja. Ohne Konto bleibt alles in deinem Browser, auf deinem Gerät. Mit Konto werden deine Daten sicher auf Servern in Europa synchronisiert, damit du sie auf Handy und Computer hast. Wir verkaufen deine Daten nie." },
+      { q: "Wie passt sich mein Ziel an meine Aktivität an?", a: "calorio startet mit deinem Grundumsatz (Mifflin-St Jeor). Dein Tagesverbrauch wird dann verfeinert: Wenn du Health Connect verbindest, lesen wir deine Schritte (und mit einer Uhr deinen echten Verbrauch); sonst nutzen wir das Aktivitätsniveau aus deinem Profil. Deine Sport-Einheiten kommen oben drauf, ohne Doppelzählung — die Schritte eines Spaziergangs oder Laufs werden vom Zähler abgezogen." },
+      { q: "Health Connect, Samsung Health, Smartwatch?", a: "Unter Android kann calorio deine Aktivität über Health Connect lesen, den Gesundheits-Hub des Telefons, in den Samsung Health, Google Fit, Fitbit und die meisten Uhren schreiben. Du behältst die Kontrolle: Du wählst, welche Daten (Schritte, Kalorien) freigegeben werden, und kannst alles jederzeit widerrufen. Ohne Uhr schätzt calorio deinen Verbrauch aus deinen Schritten und Einheiten." },
       { q: "Ist calorio gratis?", a: "Ja: Bedarf, Journal, Lebensmittel-Datenbank, Barcode-Scan und Gewichtsverlauf sind 100 % gratis. Pro ergänzt den KI-Coach Vito und die Foto-Analyse deiner Mahlzeiten." },
       { q: "Was ist die Pro-Version?", a: "CHF 4.90/Monat oder CHF 39/Jahr, mit 7 Tagen Gratis-Test ohne Verpflichtung. Du schaltest Vito, deinen Ernährungscoach, und die Foto-Analyse frei. Jederzeit kündbar." },
       { q: "Wie funktioniert die Foto-Analyse?", a: "Du fotografierst deinen Teller, eine KI erkennt die Lebensmittel und schätzt Kalorien und Makros. Danach kannst du die Mengen anpassen — es bleibt eine Schätzung." },
@@ -227,6 +239,8 @@ const L = {
     faq: [
       { q: "How does calorio work out my needs?", a: "We use the Mifflin-St Jeor formula for your basal metabolism, multiplied by your activity level and adjusted to your goal. It's a solid estimate, not an absolute truth — listen to your body too." },
       { q: "Is my data private?", a: "Yes. Without an account, everything stays in your browser, on your device. With an account, your data is securely synced on servers in Europe so you get it on phone and computer. We never sell your data." },
+      { q: "How does my target adjust to my activity?", a: "calorio starts from your basal metabolic rate (Mifflin-St Jeor). Your daily expenditure is then refined: if you connect Health Connect we read your steps (and, with a watch, your real burn); otherwise we use the activity level from your profile. Your workouts add their calories on top, with no double counting — the steps from a walk or run are removed from the counter so they aren't counted twice." },
+      { q: "Health Connect, Samsung Health, smartwatch?", a: "On Android, calorio can read your activity via Health Connect, the phone's health hub that Samsung Health, Google Fit, Fitbit and most watches write to. You stay in control: you choose which data (steps, calories) is shared and can revoke it anytime. Without a watch, calorio estimates your burn from your steps and the sessions you log." },
       { q: "Is calorio free?", a: "Yes: your needs, the log, the food database, barcode scanning and weight tracking are 100% free. Pro adds the AI coach Vito and photo analysis of your meals." },
       { q: "What is the Pro version?", a: "CHF 4.90/month or CHF 39/year, with a free 7-day trial and no commitment. You unlock Vito, your nutrition coach, and photo analysis. Cancel anytime." },
       { q: "How does photo analysis work?", a: "You snap a photo of your plate, an AI identifies the foods and estimates calories and macros. You can then adjust the amounts — it stays an estimate." },
@@ -311,6 +325,12 @@ const LX = {
     celebStreak: (n: number) => `${n} jours d'affilée ! 🔥`, celebGoal: "Objectif du jour atteint ! 🎯",
     myDay: "Ma journée", meals: { matin: "Petit-déjeuner", midi: "Déjeuner", snack: "Collations", soir: "Dîner" },
     addShort: "Ajouter", addMealSoir: "Ajouter ton repas du soir",
+    act: {
+      title: "Activité du jour", steps: "pas", add: "Ajouter une activité", sport: "Activité", min: "min", addBtn: "Ajouter",
+      none: "Ajoute tes séances (vélo, course, muscu…) — ta cible calorique s'affine.",
+      adjusted: "Cible affinée par ton activité", stepsAdj: "retirés (déjà dans ta séance)",
+      srcMontre: "d'après ta montre", srcPas: "d'après tes pas", srcDeclare: "d'après ton profil", remove: "Retirer",
+    },
     weightTitle: "Mon poids", goalLine: (v: string) => `Objectif : ${v} kg`,
     sinceStart: "depuis le début", tileStart: "Départ", tileNow: "Actuel", tileGoal: "Objectif", tileWeek: "Cette semaine",
     addPesee: "Ajouter une pesée",
@@ -378,6 +398,12 @@ const LX = {
     celebStreak: (n: number) => `${n} Tage in Folge! 🔥`, celebGoal: "Tagesziel erreicht! 🎯",
     myDay: "Mein Tag", meals: { matin: "Frühstück", midi: "Mittagessen", snack: "Snacks", soir: "Abendessen" },
     addShort: "Hinzufügen", addMealSoir: "Abendessen hinzufügen",
+    act: {
+      title: "Aktivität heute", steps: "Schritte", add: "Aktivität hinzufügen", sport: "Aktivität", min: "Min", addBtn: "Hinzufügen",
+      none: "Füge deine Einheiten hinzu (Rad, Laufen, Kraft…) — dein Kalorienziel wird genauer.",
+      adjusted: "Ziel an deine Aktivität angepasst", stepsAdj: "abgezogen (schon in deiner Einheit)",
+      srcMontre: "laut deiner Uhr", srcPas: "laut deinen Schritten", srcDeclare: "laut deinem Profil", remove: "Entfernen",
+    },
     weightTitle: "Mein Gewicht", goalLine: (v: string) => `Ziel: ${v} kg`,
     sinceStart: "seit Beginn", tileStart: "Start", tileNow: "Aktuell", tileGoal: "Ziel", tileWeek: "Diese Woche",
     addPesee: "Gewicht eintragen",
@@ -445,6 +471,12 @@ const LX = {
     celebStreak: (n: number) => `${n} days in a row! 🔥`, celebGoal: "Daily goal reached! 🎯",
     myDay: "My day", meals: { matin: "Breakfast", midi: "Lunch", snack: "Snacks", soir: "Dinner" },
     addShort: "Add", addMealSoir: "Add your dinner",
+    act: {
+      title: "Today's activity", steps: "steps", add: "Add an activity", sport: "Activity", min: "min", addBtn: "Add",
+      none: "Add your sessions (cycling, running, weights…) — your calorie target gets sharper.",
+      adjusted: "Target refined by your activity", stepsAdj: "removed (already in your session)",
+      srcMontre: "from your watch", srcPas: "from your steps", srcDeclare: "from your profile", remove: "Remove",
+    },
     weightTitle: "My weight", goalLine: (v: string) => `Goal: ${v} kg`,
     sinceStart: "since the start", tileStart: "Start", tileNow: "Current", tileGoal: "Goal", tileWeek: "This week",
     addPesee: "Add a weigh-in",
@@ -663,6 +695,23 @@ function Confetti({ onDone }: { onDone: () => void }) {
   return <canvas ref={ref} className="cl-confetti" aria-hidden />;
 }
 
+const ACT_GROUP_LABELS: Record<string, { fr: string; de: string; en: string }> = {
+  marche: { fr: "Marche & course", de: "Gehen & Laufen", en: "Walk & run" },
+  velo: { fr: "Vélo", de: "Rad", en: "Cycling" },
+  cardio: { fr: "Cardio & salle", de: "Cardio & Studio", en: "Cardio & gym" },
+  combat: { fr: "Combat", de: "Kampfsport", en: "Combat" },
+  collectif: { fr: "Sports collectifs", de: "Mannschaftssport", en: "Team sports" },
+  raquette: { fr: "Raquettes", de: "Schläger", en: "Racket" },
+  nautique: { fr: "Nautique", de: "Wassersport", en: "Water" },
+  pleinair: { fr: "Plein air", de: "Draußen", en: "Outdoor" },
+  quotidien: { fr: "Vie quotidienne", de: "Alltag", en: "Daily life" },
+};
+const ACT_GROUPS = Object.keys(ACT_GROUP_LABELS).map((key) => ({
+  key,
+  label: ACT_GROUP_LABELS[key],
+  items: SPORTS.filter((s) => s.groupe === key),
+}));
+
 export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [langOv, setLangOv] = useState<Lang | null>(null);
   const lang: Lang = langOv ?? propLang;
@@ -690,6 +739,13 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [activite, setActivite] = useState<Activite>("modere");
   const [objectif, setObjectif] = useState<Objectif>("maintien");
   const [poidsCible, setPoidsCible] = useState<number | "">("");
+  // Activité du jour + signaux Health Connect (natif)
+  const [seances, setSeances] = useState<Seance[]>([]);
+  const [hcPas, setHcPas] = useState<number | undefined>(undefined);
+  const [hcTotalKcal, setHcTotalKcal] = useState<number | undefined>(undefined);
+  const [hcActiveKcal, setHcActiveKcal] = useState<number | undefined>(undefined);
+  const [actSport, setActSport] = useState<string>("velo_modere");
+  const [actMin, setActMin] = useState<number | "">(30);
 
   // journal (par date) + poids
   const [lines, setLines] = useState<Line[]>([]);
@@ -778,6 +834,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     }
     const jour = load<Record<string, Line[]>>("calorio.journal", {});
     setLines(migrateLines(jour[day], lang));
+    setSeances(load<Record<string, Seance[]>>("calorio.activites", {})[day] || []);
     setPesees(load<Pesee[]>("calorio.pesees", []));
     setRecents(load<Food[]>("calorio.recents", []));
     setStreakBest(load<number>("calorio.streakBest", 0));
@@ -852,6 +909,53 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     jour[day] = lines;
     save("calorio.journal", jour);
   }, [mounted, lines, day]);
+  useEffect(() => {
+    if (!mounted) return;
+    const a = load<Record<string, Seance[]>>("calorio.activites", {});
+    a[day] = seances;
+    save("calorio.activites", a);
+  }, [mounted, seances, day]);
+  // Lecture Health Connect (uniquement dans l'app native Capacitor)
+  useEffect(() => {
+    if (!mounted) return;
+    const H = (window as unknown as { Capacitor?: { Plugins?: { Health?: {
+      isAvailable: () => Promise<{ available?: boolean }>;
+      requestAuthorization: (o: unknown) => Promise<unknown>;
+      readSamples: (o: unknown) => Promise<{ samples?: { value?: number }[] }>;
+    } } } }).Capacitor?.Plugins?.Health;
+    if (!H) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const av = await H.isAvailable();
+        if (!av?.available) return;
+        await H.requestAuthorization({ read: ["steps", "calories", "totalCalories"], write: [] });
+        const now = new Date();
+        const start = new Date();
+        start.setHours(0, 0, 0, 0);
+        const sum = async (dataType: string) => {
+          try {
+            const r = await H.readSamples({ dataType, startDate: start.toISOString(), endDate: now.toISOString() });
+            const s = r?.samples || [];
+            let t = 0;
+            for (const x of s) t += Number(x?.value) || 0;
+            return { t, n: s.length };
+          } catch {
+            return { t: 0, n: 0 };
+          }
+        };
+        const st = await sum("steps");
+        if (!cancelled) setHcPas(st.t);
+        const tot = await sum("totalCalories");
+        if (!cancelled && tot.n > 0) setHcTotalKcal(tot.t);
+        const act = await sum("calories");
+        if (!cancelled && act.n > 0) setHcActiveKcal(act.t);
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [mounted]);
   useEffect(() => {
     if (!mounted) return;
     save("calorio.pesees", pesees);
@@ -1212,10 +1316,27 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     () => computeBesoins({ sexe, age, poids, taille, activite, objectif }),
     [sexe, age, poids, taille, activite, objectif]
   );
+  const besoinsDyn = useMemo(
+    () =>
+      besoinsDynamiques(
+        { sexe, age, poids, taille, activite, objectif },
+        { pas: hcPas, kcalTotalesMesurees: hcTotalKcal, kcalActivesMesurees: hcActiveKcal, seances, palParDefaut: FACTEURS[activite] }
+      ),
+    [sexe, age, poids, taille, activite, objectif, hcPas, hcTotalKcal, hcActiveKcal, seances]
+  );
+  // Dynamique par défaut dès qu'on a un signal d'activité (pas mesurés ou séances saisies).
+  const activiteActive = hcPas !== undefined || hcTotalKcal !== undefined || hcActiveKcal !== undefined || seances.length > 0;
+  const besoinsAffiche = activiteActive ? besoinsDyn : besoins;
+  const addSeance = () => {
+    const min = Math.max(1, typeof actMin === "number" ? actMin : 0);
+    if (!SPORT_BY_ID[actSport]) return;
+    setSeances((s) => [...s, { sportId: actSport, minutes: min }]);
+  };
+  const removeSeance = (i: number) => setSeances((s) => s.filter((_, j) => j !== i));
 
   const lignesMap = useMemo(() => lines.map((l) => ({ al: l.food, grammes: l.grammes })), [lines]);
   const total = useMemo(() => computeJournal(lignesMap), [lignesMap]);
-  const bil = useMemo(() => bilan(total, besoins.cible), [total, besoins.cible]);
+  const bil = useMemo(() => bilan(total, besoinsAffiche.cible), [total, besoinsAffiche.cible]);
   const tend = useMemo(() => tendancePoids(pesees), [pesees]);
 
   // Historique 14 jours : kcal consommées par jour (aujourd'hui = état courant).
@@ -1248,21 +1369,21 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
   // Rappel doux (dans l'app) : as-tu noté ton repas ?
   const nudge = useMemo(() => {
-    if (!mounted || nudgeHidden || total.kcal >= besoins.cible * 0.5) return "";
+    if (!mounted || nudgeHidden || total.kcal >= besoinsAffiche.cible * 0.5) return "";
     const h = new Date().getHours();
     if (total.kcal === 0 && h >= 13 && h < 18) return t.nudgeMidi;
-    if (h >= 19 && total.kcal < besoins.cible * 0.5) return t.nudgeSoir;
+    if (h >= 19 && total.kcal < besoinsAffiche.cible * 0.5) return t.nudgeSoir;
     return "";
-  }, [mounted, nudgeHidden, total.kcal, besoins.cible, t]);
+  }, [mounted, nudgeHidden, total.kcal, besoinsAffiche.cible, t]);
 
   const coachCtx: CoachCtx = useMemo(
     () => ({
       lang,
       profil: { sexe, age, poids, taille, activite, objectif, poidsCible, trophies, used, savedMeals, customFoods, waterGoal },
-      cible: besoins.cible,
-      bmr: besoins.bmr,
-      tdee: besoins.tdee,
-      macrosCible: besoins.macros,
+      cible: besoinsAffiche.cible,
+      bmr: besoinsAffiche.bmr,
+      tdee: besoinsAffiche.tdee,
+      macrosCible: besoinsAffiche.macros,
       aujourdhui: {
         kcal: total.kcal,
         prot: total.prot,
@@ -1273,7 +1394,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       poids: tend ? { debut: tend.debut, actuel: tend.actuel, delta: tend.delta } : null,
       prefs: coachPrefs,
     }),
-    [lang, sexe, age, poids, taille, activite, objectif, besoins, total, lignesMap, tend, coachPrefs]
+    [lang, sexe, age, poids, taille, activite, objectif, besoinsAffiche, total, lignesMap, tend, coachPrefs]
   );
 
   // --- Données dérivées pour le tableau de bord (écran Stats) ---
@@ -1284,14 +1405,14 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     return s.charAt(0).toUpperCase() + s.slice(1);
   }, [mounted, locale]);
   const week = useMemo(() => {
-    const maxV = Math.max(besoins.cible * 1.1, ...histoire.map((d) => d.kcal), 1);
+    const maxV = Math.max(besoinsAffiche.cible * 1.1, ...histoire.map((d) => d.kcal), 1);
     return histoire.slice(-7).map((d) => ({
       ...d,
       pct: Math.round((d.kcal / maxV) * 100),
-      over: d.kcal > besoins.cible,
+      over: d.kcal > besoinsAffiche.cible,
       letter: new Date(d.date).toLocaleDateString(locale, { weekday: "narrow" }).toUpperCase(),
     }));
-  }, [histoire, besoins.cible, locale]);
+  }, [histoire, besoinsAffiche.cible, locale]);
   const streak = useMemo(() => {
     let n = 0;
     for (let i = histoire.length - 1; i >= 0; i--) { if (histoire[i].kcal > 0) n++; else break; }
@@ -1310,8 +1431,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     prevStreakRef.current = streak;
   }, [mounted, streak, x]);
   useEffect(() => {
-    if (!mounted || !(besoins.cible > 0) || goalCelebRef.current) return;
-    const inBand = total.kcal >= besoins.cible * 0.9 && total.kcal <= besoins.cible * 1.1;
+    if (!mounted || !(besoinsAffiche.cible > 0) || goalCelebRef.current) return;
+    const inBand = total.kcal >= besoinsAffiche.cible * 0.9 && total.kcal <= besoinsAffiche.cible * 1.1;
     if (!inBand) return;
     const flag = `calorio.celeb.goal.${todayISO()}`;
     let done = false; try { done = localStorage.getItem(flag) === "1"; } catch { /* ignore */ }
@@ -1319,7 +1440,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     goalCelebRef.current = true;
     try { localStorage.setItem(flag, "1"); } catch { /* ignore */ }
     setCelebrate(x.celebGoal);
-  }, [mounted, total.kcal, besoins.cible, x]);
+  }, [mounted, total.kcal, besoinsAffiche.cible, x]);
   // Auto-effacement de la célébration.
   useEffect(() => {
     if (!celebrate) return;
@@ -1353,7 +1474,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const jour = load<Record<string, unknown[]>>("calorio.journal", {});
     const loggedAny = lines.length > 0 || Object.values(jour).some((a) => Array.isArray(a) && a.length > 0);
     const mealsToday = MEALS.filter((m) => mealGroups[m].length > 0).length;
-    const inTarget = (k: number) => besoins.cible > 0 && k >= besoins.cible * 0.85 && k <= besoins.cible * 1.05;
+    const inTarget = (k: number) => besoinsAffiche.cible > 0 && k >= besoinsAffiche.cible * 0.85 && k <= besoinsAffiche.cible * 1.05;
     const vert = histoire.some((d) => inTarget(d.kcal)) || inTarget(total.kcal);
     const wantsGain = objectif === "prise" || objectif === "prise_rapide";
     const progress = tend ? (wantsGain ? tend.actuel - tend.debut : tend.debut - tend.actuel) : 0;
@@ -1372,7 +1493,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       photo: !!used.photo,
       objectif: goalReached,
     } as Record<TrophyId, boolean>;
-  }, [lines, mealGroups, pesees, histoire, total.kcal, besoins.cible, objectif, tend, poidsCible, used, streak, streakBest]);
+  }, [lines, mealGroups, pesees, histoire, total.kcal, besoinsAffiche.cible, objectif, tend, poidsCible, used, streak, streakBest]);
 
   // Débloque les trophées atteints, persiste, et fête le premier nouveau (hors chargement initial).
   useEffect(() => {
@@ -1428,7 +1549,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // Vito propose 3 repas à partir des macros restantes.
   const askVitoMeal = () => {
     if (!proActive) { goPro(); return; }
-    const rk = Math.max(0, besoins.cible - total.kcal);
+    const rk = Math.max(0, besoinsAffiche.cible - total.kcal);
     const rp = Math.max(0, besoins.macros.proteines - total.prot);
     const rg = Math.max(0, besoins.macros.glucides - total.gluc);
     const rl = Math.max(0, besoins.macros.lipides - total.lip);
@@ -1537,7 +1658,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       msg = pick(x.vitoHi);
     } else {
       const h = new Date().getHours();
-      const ratio = besoins.cible > 0 ? total.kcal / besoins.cible : 0;
+      const ratio = besoinsAffiche.cible > 0 ? total.kcal / besoinsAffiche.cible : 0;
       if (ratio > 1.05) msg = pick(x.vitoOver);
       else if (ratio < 0.05) msg = pick(h < 11 ? x.vitoMorning : h < 15 ? x.vitoLunch : h >= 19 ? x.vitoEvening : x.vitoBack);
       else if (ratio >= 0.8) msg = pick(x.vitoGood);
@@ -1748,7 +1869,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
         {/* ========== 1. STATS ========== */}
         {tab === "stats" && (() => {
-          const cibleK = besoins.cible, eaten = total.kcal, restK = cibleK - eaten;
+          const cibleK = besoinsAffiche.cible, eaten = total.kcal, restK = cibleK - eaten;
           const over = restK < 0;
           const ringPct = cibleK > 0 ? Math.round((eaten / cibleK) * 100) : 0;
           const R = 92, Ccirc = 2 * Math.PI * R;
@@ -1791,9 +1912,9 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
               <div className="cl-sectt"><span className="cl-dot" />{x.macrosDay}</div>
               <div className="cl-card cl-macros">
-                <MacroBar name={t.prot} color={C_PROT} val={total.prot} target={besoins.macros.proteines} lang={lang} />
-                <MacroBar name={t.gluc} color={C_GLUC} val={total.gluc} target={besoins.macros.glucides} lang={lang} />
-                <MacroBar name={t.lip} color={C_LIP} val={total.lip} target={besoins.macros.lipides} lang={lang} />
+                <MacroBar name={t.prot} color={C_PROT} val={total.prot} target={besoinsAffiche.macros.proteines} lang={lang} />
+                <MacroBar name={t.gluc} color={C_GLUC} val={total.gluc} target={besoinsAffiche.macros.glucides} lang={lang} />
+                <MacroBar name={t.lip} color={C_LIP} val={total.lip} target={besoinsAffiche.macros.lipides} lang={lang} />
               </div>
 
               <div className="cl-sectt"><span className="cl-dot" />{x.weekTitle}</div>
@@ -1906,6 +2027,54 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         {tab === "journee" && (
           <div className="cl-screen play" key="journee">
             <div className="cl-head"><div><h1>{x.myDay}</h1><div className="cl-sub">{nf(lang).format(total.kcal)} kcal · {bil.pct}%</div></div></div>
+
+            {/* ===== Activité du jour (en tête) ===== */}
+            <div className="cl-card cl-act">
+              <div className="cl-act-h">
+                <span className="cl-act-ic" aria-hidden>🏃</span>
+                <span className="cl-act-t">{x.act.title}</span>
+                {hcPas !== undefined && <span className="cl-act-steps">{nf(lang).format(hcPas)} {x.act.steps}</span>}
+              </div>
+
+              {seances.length === 0 ? (
+                <div className="cl-act-none">{x.act.none}</div>
+              ) : (
+                <div className="cl-act-list">
+                  {seances.map((s, i) => {
+                    const sp = SPORT_BY_ID[s.sportId];
+                    if (!sp) return null;
+                    return (
+                      <div className="cl-act-item" key={i}>
+                        <span className="cl-act-emo" aria-hidden>{sp.emoji}</span>
+                        <span className="cl-act-nm">{sp[lang]} · {s.minutes} {x.act.min}</span>
+                        <span className="cl-act-kc">{nf(lang).format(Math.round(kcalSeanceBrut(s, poids)))} kcal</span>
+                        <button className="cl-act-x" onClick={() => removeSeance(i)} aria-label={x.act.remove}>×</button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="cl-act-add">
+                <select className="cl-act-sel" value={actSport} onChange={(e) => setActSport(e.target.value)} aria-label={x.act.sport}>
+                  {ACT_GROUPS.map((g) => (
+                    <optgroup key={g.key} label={g.label[lang]}>
+                      {g.items.map((sp) => <option key={sp.id} value={sp.id}>{sp.emoji} {sp[lang]}</option>)}
+                    </optgroup>
+                  ))}
+                </select>
+                <input className="cl-act-min" type="number" min={1} inputMode="numeric" value={actMin}
+                  onChange={(e) => setActMin(e.target.value === "" ? "" : Number(e.target.value))} aria-label={x.act.min} />
+                <button className="cl-act-addbtn" onClick={addSeance} aria-label={x.act.addBtn}>＋</button>
+              </div>
+
+              {activiteActive && (
+                <div className="cl-act-adj">
+                  <span className="cl-act-adj-l">{x.act.adjusted}</span>
+                  <b className="cl-act-adj-v">{nf(lang).format(besoinsAffiche.cible)} kcal</b>
+                </div>
+              )}
+            </div>
 
             <div className="cl-dayactions">
               <button className="cl-dupbtn" onClick={duplicateYesterday}>{x.repeatYesterday}</button>
@@ -2130,7 +2299,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               <div className="cl-stats">
                 <Stat label={t.bmr} sub={t.bmrSub} val={nf(lang).format(besoins.bmr)} unit="kcal" />
                 <Stat label={t.tdee} sub={t.tdeeSub} val={nf(lang).format(besoins.tdee)} unit="kcal" />
-                <Stat label={t.cible} sub={t.cibleSub} val={nf(lang).format(besoins.cible)} unit="kcal" big />
+                <Stat label={t.cible} sub={t.cibleSub} val={nf(lang).format(besoinsAffiche.cible)} unit="kcal" big />
               </div>
               <div className="cl-macrorow">
                 <MacroDonut p={besoins.macros.proteines} g={besoins.macros.glucides} l={besoins.macros.lipides} />
@@ -3087,4 +3256,28 @@ const CSS = `
 @keyframes clrise{from{opacity:0;transform:translateY(16px)}}
 .cl-card:active{transform:none}
 @media(prefers-reduced-motion:reduce){.cl *{animation:none!important;transition:none!important}}
+/* ===== Activité du jour ===== */
+#clProgArc{transition:stroke-dashoffset .9s cubic-bezier(.3,.9,.3,1)}
+.cl-act{background:linear-gradient(180deg,#ffffff,#f6fbf9)}
+.cl-act-h{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.cl-act-ic{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex:none;background:var(--greenbg);box-shadow:inset 0 1px 2px rgba(255,255,255,.7),0 4px 10px -5px rgba(14,52,30,.3)}
+.cl-act-t{font-family:var(--disp);font-weight:600;font-size:1.02rem;flex:1}
+.cl-act-steps{font-weight:800;font-size:.82rem;color:var(--green);background:var(--greenbg);border:1px solid var(--greenline);border-radius:99px;padding:4px 10px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cl-act-none{font-size:.84rem;color:var(--muted);line-height:1.5;padding:2px 2px 4px}
+.cl-act-list{display:flex;flex-direction:column;gap:7px;margin-bottom:4px}
+.cl-act-item{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:9px 11px;box-shadow:0 6px 14px -12px rgba(14,52,30,.35)}
+.cl-act-emo{font-size:1.05rem;flex:none}
+.cl-act-nm{flex:1;font-weight:700;font-size:.9rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cl-act-kc{font-weight:900;font-size:.9rem;color:var(--green);font-variant-numeric:tabular-nums;white-space:nowrap}
+.cl-act-x{flex:none;width:26px;height:26px;border-radius:8px;border:0;cursor:pointer;background:var(--rosebg);color:var(--rose);font-size:1.1rem;line-height:1;font-weight:800}
+.cl-act-x:active{transform:scale(.9)}
+.cl-act-add{display:flex;gap:8px;margin-top:11px}
+.cl-act-sel{flex:1;min-width:0;border:1.5px solid var(--line);background:#fff;border-radius:13px;padding:11px 12px;font-family:var(--body);font-weight:700;font-size:.9rem;color:var(--ink);appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235f6d62' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px}
+.cl-act-min{width:74px;flex:none;border:1.5px solid var(--line);background:#fff;border-radius:13px;padding:11px 10px;font-family:var(--body);font-weight:800;font-size:.9rem;color:var(--ink);text-align:center;font-variant-numeric:tabular-nums}
+.cl-act-sel:focus,.cl-act-min:focus{outline:none;border-color:var(--green2);box-shadow:0 0 0 3px var(--greenbg)}
+.cl-act-addbtn{flex:none;width:46px;border:0;border-radius:13px;background:var(--btn);color:#fff;font-size:1.3rem;font-weight:800;cursor:pointer;box-shadow:0 10px 20px -10px rgba(22,163,74,.6)}
+.cl-act-addbtn:active{transform:scale(.95)}
+.cl-act-adj{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:11px 13px;border-radius:14px;background:var(--greenbg);border:1px solid var(--greenline)}
+.cl-act-adj-l{font-size:.82rem;font-weight:700;color:#0f7a3d}
+.cl-act-adj-v{font-family:var(--disp);font-weight:600;font-size:1.05rem;color:var(--green);font-variant-numeric:tabular-nums}
 `;

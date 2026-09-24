@@ -88,7 +88,7 @@ const L = {
     offTitle: "Produits trouvés en ligne", offLoading: "Recherche…", quickTitle: "Accès rapide", recentTitle: "Récents",
     addFood: "Ajouter un aliment", mLib: "Bibliothèque", mLibSub: "Aliments courants, par catégorie", mOnline: "Recherche en ligne", mOnlineSub: "Migros, Coop, marques…", mScan: "Code-barres", mScanSub: "Scanne le produit", mPhoto: "Photo de l'assiette", mPhotoSub: "L'IA estime les calories", rechercheLib: "Filtrer la bibliothèque…", onlineHint: "Tape le nom d'un produit ou d'une marque pour chercher dans la base mondiale.",
     scanUnsupported: "Le scan n'est pas supporté par ce navigateur — utilise la recherche.",
-    scanDenied: "Accès caméra refusé.", scanSearching: "Recherche du produit…", scanNotFound: "Produit introuvable dans la base.",
+    scanDenied: "Accès caméra refusé.", scanSearching: "Recherche du produit…", scanNotFound: "Produit introuvable dans la base.", scanAddManual: "Ajouter ce produit en 10 s",
     scanTitle: "Vise le code-barres", scanClose: "Fermer",
     photoTitle: "Vito a repéré ces aliments", photoAddAll: "Tout ajouter", photoAnalyzing: "Vito analyse ta photo…",
     photoNone: "Je n'ai pas reconnu d'aliment sur la photo. Réessaie avec une photo plus nette.",
@@ -179,7 +179,7 @@ const L = {
     offTitle: "Online gefundene Produkte", offLoading: "Suche…", quickTitle: "Schnellzugriff", recentTitle: "Kürzlich",
     addFood: "Lebensmittel hinzufügen", mLib: "Bibliothek", mLibSub: "Häufige Lebensmittel, nach Kategorie", mOnline: "Online-Suche", mOnlineSub: "Migros, Coop, Marken…", mScan: "Barcode", mScanSub: "Produkt scannen", mPhoto: "Foto vom Teller", mPhotoSub: "KI schätzt die Kalorien", rechercheLib: "Bibliothek filtern…", onlineHint: "Gib einen Produkt- oder Markennamen ein, um in der weltweiten Datenbank zu suchen.",
     scanUnsupported: "Scan wird von diesem Browser nicht unterstützt — nutze die Suche.",
-    scanDenied: "Kamerazugriff verweigert.", scanSearching: "Produkt wird gesucht…", scanNotFound: "Produkt nicht in der Datenbank gefunden.",
+    scanDenied: "Kamerazugriff verweigert.", scanSearching: "Produkt wird gesucht…", scanNotFound: "Produkt nicht in der Datenbank gefunden.", scanAddManual: "Produkt in 10 Sek. hinzufügen",
     scanTitle: "Barcode anvisieren", scanClose: "Schliessen",
     photoTitle: "Vito hat diese Lebensmittel erkannt", photoAddAll: "Alle hinzufügen", photoAnalyzing: "Vito analysiert dein Foto…",
     photoNone: "Kein Lebensmittel erkannt. Versuch ein schärferes Foto.",
@@ -269,7 +269,7 @@ const L = {
     offTitle: "Products found online", offLoading: "Searching…", quickTitle: "Quick access", recentTitle: "Recent",
     addFood: "Add a food", mLib: "Library", mLibSub: "Common foods, by category", mOnline: "Online search", mOnlineSub: "Migros, Coop, brands…", mScan: "Barcode", mScanSub: "Scan the product", mPhoto: "Photo of your plate", mPhotoSub: "AI estimates the calories", rechercheLib: "Filter the library…", onlineHint: "Type a product or brand name to search the global database.",
     scanUnsupported: "Scanning isn't supported by this browser — use search.",
-    scanDenied: "Camera access denied.", scanSearching: "Looking up product…", scanNotFound: "Product not found in the database.",
+    scanDenied: "Camera access denied.", scanSearching: "Looking up product…", scanNotFound: "Product not found in the database.", scanAddManual: "Add this product in 10s",
     scanTitle: "Aim at the barcode", scanClose: "Close",
     photoTitle: "Vito spotted these foods", photoAddAll: "Add all", photoAnalyzing: "Vito is analysing your photo…",
     photoNone: "I didn't recognise any food. Try a sharper photo.",
@@ -388,7 +388,7 @@ const LX = {
     duoLinkedTitle: "Aujourd'hui, ton binôme", duoNoData: "Ton binôme n'a rien noté aujourd'hui.",
     duoOfGoal: "de l'objectif", duoStreakLbl: "série", duoNeedAccount: "Crée un compte gratuit pour suivre ton binôme.",
     duoBadCode: "Code trop court.", duoSelf: "C'est ton propre code 🙂", duoUnknown: "Code introuvable.", duoErr: "Réessaie dans un instant.",
-    cfName: "Nom de l\u2019aliment", cfKcal: "Calories", cfProt: "Protéines", cfGluc: "Glucides", cfLip: "Lipides", cfPortion: "Portion", cfPer100: "pour 100 g", cfEmoji: "Icône", cfSave: "Créer et ajouter", cfErr: "Indique au moins un nom et des calories.", cfHint: "Valeurs pour 100 g. L\u2019aliment rejoint ta bibliothèque et est synchronisé sur ton compte.",
+    cfName: "Nom de l\u2019aliment", cfKcal: "Calories", cfProt: "Protéines", cfGluc: "Glucides", cfLip: "Lipides", cfPortion: "Portion", cfPer100: "pour 100 g", cfEmoji: "Icône", cfSave: "Créer et ajouter", cfErr: "Indique au moins un nom et des calories.", cfHint: "Valeurs pour 100 g. L\u2019aliment rejoint ta bibliothèque et est synchronisé sur ton compte.", cfRemembered: "Ce produit sera mémorisé : ton prochain scan le retrouvera instantanément.",
      objVal: (v: string) => v,
   },
   de: {
@@ -463,7 +463,7 @@ const LX = {
     duoLinkedTitle: "Heute, dein Duo", duoNoData: "Dein Duo hat heute noch nichts erfasst.",
     duoOfGoal: "vom Ziel", duoStreakLbl: "Serie", duoNeedAccount: "Erstelle ein kostenloses Konto, um dein Duo zu verfolgen.",
     duoBadCode: "Code zu kurz.", duoSelf: "Das ist dein eigener Code 🙂", duoUnknown: "Code nicht gefunden.", duoErr: "Versuch's gleich nochmal.",
-    cfName: "Name", cfKcal: "Kalorien", cfProt: "Proteine", cfGluc: "Kohlenhydrate", cfLip: "Fette", cfPortion: "Portion", cfPer100: "pro 100 g", cfEmoji: "Symbol", cfSave: "Erstellen und hinzufügen", cfErr: "Gib mindestens Name und Kalorien an.", cfHint: "Werte pro 100 g. Das Lebensmittel kommt in deine Bibliothek und wird synchronisiert.",
+    cfName: "Name", cfKcal: "Kalorien", cfProt: "Proteine", cfGluc: "Kohlenhydrate", cfLip: "Fette", cfPortion: "Portion", cfPer100: "pro 100 g", cfEmoji: "Symbol", cfSave: "Erstellen und hinzufügen", cfErr: "Gib mindestens Name und Kalorien an.", cfHint: "Werte pro 100 g. Das Lebensmittel kommt in deine Bibliothek und wird synchronisiert.", cfRemembered: "Dieses Produkt wird gemerkt: dein nächster Scan findet es sofort.",
     objVal: (v: string) => v,
   },
   en: {
@@ -538,7 +538,7 @@ const LX = {
     duoLinkedTitle: "Today, your duo", duoNoData: "Your duo hasn't logged anything today.",
     duoOfGoal: "of goal", duoStreakLbl: "streak", duoNeedAccount: "Create a free account to follow your duo.",
     duoBadCode: "Code too short.", duoSelf: "That's your own code 🙂", duoUnknown: "Code not found.", duoErr: "Try again in a moment.",
-    cfName: "Food name", cfKcal: "Calories", cfProt: "Protein", cfGluc: "Carbs", cfLip: "Fat", cfPortion: "Portion", cfPer100: "per 100 g", cfEmoji: "Icon", cfSave: "Create and add", cfErr: "Enter at least a name and calories.", cfHint: "Values per 100 g. The food joins your library and syncs to your account.",
+    cfName: "Food name", cfKcal: "Calories", cfProt: "Protein", cfGluc: "Carbs", cfLip: "Fat", cfPortion: "Portion", cfPer100: "per 100 g", cfEmoji: "Icon", cfSave: "Create and add", cfErr: "Enter at least a name and calories.", cfHint: "Values per 100 g. The food joins your library and syncs to your account.", cfRemembered: "This product will be remembered — your next scan finds it instantly.",
     objVal: (v: string) => v,
   },
 } as const;
@@ -603,7 +603,7 @@ const nf = (lang: Lang, d = 0) =>
 const noAccent = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 // Un aliment « à plat », quelle que soit sa source (base interne, Open Food Facts, photo).
-type Food = { id: string; nom: string; kcal: number; prot: number; gluc: number; lip: number; portion: number; emoji: string; brand?: string };
+type Food = { id: string; nom: string; kcal: number; prot: number; gluc: number; lip: number; portion: number; emoji: string; brand?: string; code?: string };
 type Line = { key: string; food: Food; grammes: number; meal?: MealKey };
 type SavedMeal = { id: string; name: string; emoji: string; items: { food: Food; grammes: number }[] };
 const WATER_GOAL = 8; // verres de 250 ml ≈ 2 L
@@ -790,8 +790,9 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const goalCelebRef = useRef(false);
   // aliments créés par l'utilisateur
   const [customFoods, setCustomFoods] = useState<Food[]>([]);
-  const [cf, setCf] = useState({ nom: "", kcal: "", prot: "", gluc: "", lip: "", portion: "", emoji: "🍴" });
+  const [cf, setCf] = useState({ nom: "", kcal: "", prot: "", gluc: "", lip: "", portion: "", emoji: "🍴", code: "" });
   const [cfMsg, setCfMsg] = useState("");
+  const [scanMissCode, setScanMissCode] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [catFilter, setCatFilter] = useState<AlimentCat | "tous">("tous");
   const [isPro, setIsPro] = useState(false);
@@ -1626,15 +1627,16 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const nom = cf.nom.trim();
     const kcal = Number(cf.kcal);
     if (!nom || cf.kcal === "" || !(kcal >= 0)) { setCfMsg(x.cfErr); return; }
+    const code = cf.code || undefined;
     const food: Food = {
       id: `custom:${newKey()}`, nom, kcal: Math.round(kcal),
       prot: Number(cf.prot) || 0, gluc: Number(cf.gluc) || 0, lip: Number(cf.lip) || 0,
-      portion: Number(cf.portion) || 100, emoji: cf.emoji || "🍴",
+      portion: Number(cf.portion) || 100, emoji: cf.emoji || "🍴", code,
     };
-    setCustomFoods((prev) => [food, ...prev.filter((c) => c.id !== food.id)].slice(0, 200));
+    setCustomFoods((prev) => [food, ...prev.filter((c) => c.id !== food.id && (!code || c.code !== code))].slice(0, 200));
     addFood(food, addMeal ?? undefined);
-    setCf({ nom: "", kcal: "", prot: "", gluc: "", lip: "", portion: "", emoji: "🍴" });
-    setCfMsg(""); setAddOpen(false);
+    setCf({ nom: "", kcal: "", prot: "", gluc: "", lip: "", portion: "", emoji: "🍴", code: "" });
+    setCfMsg(""); setAddOpen(false); setScanMissCode(null);
   };
   const deleteCustomFood = (id: string) => setCustomFoods((prev) => prev.filter((c) => c.id !== id));
   const customMatches = useMemo(() => {
@@ -1738,12 +1740,17 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // --- Scan code-barres ---
   const lookupBarcode = async (code: string) => {
     setScanMsg(t.scanSearching);
+    setScanMissCode(null);
+    // 1) Mémoire personnelle : produit déjà appris par l'utilisateur (instantané, hors-ligne, synchronisé sur le compte).
+    const mine = customFoods.find((c) => c.code && c.code === code);
+    if (mine) { addFood(mine, addMeal ?? undefined); markUsed("scan"); setScanMsg(`✓ ${mine.nom}`); return; }
+    // 2) Base ouverte Open Food Facts.
     try {
       const r = await fetch(`/api/foods?code=${encodeURIComponent(code)}`);
       const data = (await r.json()) as { foods?: Food[] };
-      if (data.foods && data.foods.length) { addFood(data.foods[0]); markUsed("scan"); setScanMsg(`✓ ${data.foods[0].nom}`); }
-      else setScanMsg(t.scanNotFound);
-    } catch { setScanMsg(t.scanNotFound); }
+      if (data.foods && data.foods.length) { addFood(data.foods[0], addMeal ?? undefined); markUsed("scan"); setScanMsg(`✓ ${data.foods[0].nom}`); }
+      else { setScanMsg(t.scanNotFound); setScanMissCode(code); }
+    } catch { setScanMsg(t.scanNotFound); setScanMissCode(code); }
   };
   const stopScan = () => { scanStop.current?.(); scanStop.current = null; setScanning(false); };
   const startScan = async () => {
@@ -2173,7 +2180,17 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
             <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden
               onChange={(e) => { const f = e.target.files?.[0]; if (f) onPhoto(f); e.target.value = ""; }} />
-            {(scanMsg || photoMsg) && <p className="cl-scanmsg">{scanMsg || photoMsg}</p>}
+            {(scanMsg || photoMsg) && (
+              <div className="cl-scanmsgwrap">
+                <p className="cl-scanmsg">{scanMsg || photoMsg}</p>
+                {scanMissCode && (
+                  <button className="cl-scanadd" onClick={() => {
+                    setCf({ nom: "", kcal: "", prot: "", gluc: "", lip: "", portion: "", emoji: "🏷️", code: scanMissCode });
+                    setCfMsg(""); setAddMode("create"); setAddOpen(true); setScanMissCode(null); setScanMsg("");
+                  }}>➕ {t.scanAddManual}</button>
+                )}
+              </div>
+            )}
 
             {photoItems && photoItems.length > 0 && (
               <div className="cl-card cl-photorev">
@@ -2465,7 +2482,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                 <button className="cl-method" onClick={() => setAddMode("meals")}>
                   <span className="cl-method-i">⭐</span><b>{x.myMeals}</b><small>{savedMeals.length > 0 ? `${savedMeals.length} enregistré${savedMeals.length > 1 ? "s" : ""}` : "—"}</small>
                 </button>
-                <button className="cl-method" onClick={() => { setCfMsg(""); setAddMode("create"); }}>
+                <button className="cl-method" onClick={() => { setCf({ nom: "", kcal: "", prot: "", gluc: "", lip: "", portion: "", emoji: "🍴", code: "" }); setCfMsg(""); setAddMode("create"); }}>
                   <span className="cl-method-i">➕</span><b>{x.createFood}</b><small>{x.createSub}</small>
                 </button>
               </div>
@@ -2491,6 +2508,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                   <label><span>{x.cfGluc} (g)</span><input type="number" inputMode="decimal" min={0} value={cf.gluc} onChange={(e) => setCf((c) => ({ ...c, gluc: e.target.value }))} /></label>
                   <label><span>{x.cfLip} (g)</span><input type="number" inputMode="decimal" min={0} value={cf.lip} onChange={(e) => setCf((c) => ({ ...c, lip: e.target.value }))} /></label>
                 </div>
+                {cf.code && <p className="cl-cf-remember">🏷️ {x.cfRemembered}</p>}
                 <p className="cl-cf-hint">{x.cfHint}</p>
                 {cfMsg && <p className="cl-scanmsg" style={{ color: "var(--rose)" }}>{cfMsg}</p>}
                 <button className="cl-cf-save" onClick={saveCustomFood}>{x.cfSave}</button>
@@ -3119,6 +3137,10 @@ const CSS = `
 .cl-f2k{flex:none;font-size:.76rem;color:var(--muted);text-align:right;line-height:1.15;font-weight:700}
 .cl-f2k small{display:block;font-size:.62rem;opacity:.75;font-weight:600}
 .cl-scanmsg{margin:8px 2px 0;font-size:.85rem;color:var(--green);font-weight:700}
+.cl-scanmsgwrap{display:flex;flex-direction:column;align-items:flex-start;gap:9px}
+.cl-scanadd{margin:2px 0 4px;display:inline-flex;align-items:center;gap:7px;border:0;border-radius:13px;background:var(--btn);color:#fff;font-family:var(--disp);font-weight:600;font-size:.9rem;padding:11px 16px;cursor:pointer;box-shadow:0 10px 22px -10px rgba(22,163,74,.6);animation:clactpulse 2.4s ease-in-out infinite}
+.cl-scanadd:active{transform:scale(.97)}
+.cl-cf-remember{margin:0 2px 6px;padding:9px 11px;border-radius:12px;background:var(--greenbg);border:1px solid var(--greenline);color:#0f7a3d;font-size:.8rem;font-weight:700;line-height:1.35}
 .cl-photorev{margin-top:13px}
 .cl-photoh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:.95rem;color:var(--ink)}
 .cl-addall{background:var(--btn);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:800;font-size:.82rem;cursor:pointer}

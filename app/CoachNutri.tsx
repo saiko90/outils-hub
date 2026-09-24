@@ -407,6 +407,8 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
       });
       if (r.status === 503) {
         setMsgs((m) => [...m, { role: "model", text: t.notReady }]);
+      } else if (r.status === 429) {
+        setMsgs((m) => [...m, { role: "model", text: t.limit }]);
       } else if (!r.ok) {
         setMsgs((m) => [...m, { role: "model", text: t.err }]);
       } else {

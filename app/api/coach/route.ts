@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { persona, contextBlock, trimMessages, geminiPayload, modelList, coachLang, type CoachMsg, type CoachApiCtx } from "@/lib/coachPrompt";
+import { coachGuard } from "@/lib/coachRate";
 
 // Relais serveur « Coach nutrition » (Pro), NON-streaming et robuste — sert aussi de
 // repli quand le streaming échoue. La clé Gemini reste côté serveur (GEMINI_API_KEY).
@@ -11,6 +12,11 @@ export async function POST(req: Request) {
   if (!key) {
     return NextResponse.json({ error: "not_configured", message: "Le coach n'est pas encore activé (clé API manquante côté serveur)." }, { status: 503 });
   }
+
+  // Garde-fou anti-abus (origine + limite par IP/jour). Fail-open.
+  const blocked = await coachGuard(req);
+  if (blocked === 429) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  if (blocked) return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   let body: { messages?: CoachMsg[]; context?: CoachApiCtx };
   try {

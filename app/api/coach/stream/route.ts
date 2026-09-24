@@ -1,4 +1,5 @@
 import { persona, contextBlock, trimMessages, geminiPayload, modelList, coachLang, sseTextDelta, type CoachMsg, type CoachApiCtx } from "@/lib/coachPrompt";
+import { coachGuard } from "@/lib/coachRate";
 
 // Relais « Coach nutrition » en STREAMING (réponse en direct, mot par mot).
 // Renvoie un flux texte brut (text/plain) : le client l'affiche au fil de l'eau.
@@ -10,6 +11,11 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) return new Response("not_configured", { status: 503 });
+
+  // Garde-fou anti-abus (origine + limite par IP/jour). Fail-open.
+  // Un statut != 200 fait simplement basculer le client sur /api/coach (qui applique le même garde-fou).
+  const blocked = await coachGuard(req);
+  if (blocked) return new Response(blocked === 429 ? "rate_limited" : "forbidden", { status: blocked });
 
   let body: { messages?: CoachMsg[]; context?: CoachApiCtx };
   try {

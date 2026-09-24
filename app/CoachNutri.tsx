@@ -59,6 +59,17 @@ function bumpUsage(): number {
   try { localStorage.setItem("calorio.coach.usage", JSON.stringify(u)); } catch { /* ignore */ }
   return u.count;
 }
+// Aperçu gratuit : les non-Pro peuvent goûter Vito quelques fois (à vie) avant le paywall.
+// « Show, don't tell » : on convertit mieux après avoir vécu la valeur qu'en la décrivant.
+const FREE_TASTE = 3;
+function readFreeUsed(): number {
+  try { return Math.max(0, parseInt(localStorage.getItem("calorio.coach.freeUsed") || "0", 10)) || 0; } catch { return 0; }
+}
+function bumpFreeUsed(): number {
+  const n = readFreeUsed() + 1;
+  try { localStorage.setItem("calorio.coach.freeUsed", String(n)); } catch { /* ignore */ }
+  return n;
+}
 
 /* Rendu léger et sûr des réponses de Vito : **gras**, listes à puces, paragraphes.
    Aucun HTML injecté (on construit des nœuds React) → pas de risque XSS. */
@@ -96,6 +107,10 @@ const L = {
     lockSub: "Il connaît tes calories, ce que tu as mangé et ton objectif — et te dit quoi manger ce soir, comment équilibrer, des idées de repas.",
     feats: ["Conseils personnalisés à partir de ton journal du jour", "Idées de repas et de snacks adaptés à ton objectif", "Réponses instantanées, 100 % nutrition, sans jugement"],
     cta: "Passer en Pro", soon: "Bientôt disponible",
+    freeBadge: "Aperçu gratuit", freeLeft: (n: number) => `${n} message${n > 1 ? "s" : ""} offert${n > 1 ? "s" : ""}`,
+    freeOver: "J'adorerais continuer avec toi 🥕 Passe en Pro et on discute autant que tu veux — 7 jours offerts, sans engagement.",
+    lockTitleUsed: "Tu as goûté à Vito 😊", lockSubUsed: "Continue avec ton coach : conseils illimités à partir de ta journée, idées de repas, réponses instantanées. 7 jours d'essai gratuits, sans engagement.",
+    ctaTrial: "Essayer 7 jours gratuits",
     placeholder: "Écris à Vito…", send: "Envoyer",
     starters: ["Qu'est-ce que je mange ce soir ?", "Il me reste combien de calories ?", "Un snack sain à me conseiller ?"],
     followups: ["Une autre idée 🔄", "Combien de calories ?", "Et pour le dessert ?"],
@@ -123,6 +138,10 @@ const L = {
     lockSub: "Er kennt deine Kalorien, dein Essen und dein Ziel — und sagt dir, was du heute Abend essen sollst und wie du ausgleichst.",
     feats: ["Persönliche Tipps aus deinem Tagesjournal", "Mahlzeiten- und Snack-Ideen für dein Ziel", "Sofortige Antworten, 100 % Ernährung, ohne Urteil"],
     cta: "Auf Pro upgraden", soon: "Bald verfügbar",
+    freeBadge: "Gratis-Vorschau", freeLeft: (n: number) => `${n} Nachricht${n > 1 ? "en" : ""} übrig`,
+    freeOver: "Ich würde gerne weitermachen 🥕 Hol dir Pro und wir chatten so viel du willst — 7 Tage gratis, ohne Verpflichtung.",
+    lockTitleUsed: "Du hast Vito ausprobiert 😊", lockSubUsed: "Mach weiter mit deinem Coach: unbegrenzte Tipps aus deinem Tag, Mahlzeiten-Ideen, sofortige Antworten. 7 Tage gratis, ohne Verpflichtung.",
+    ctaTrial: "7 Tage gratis testen",
     placeholder: "Schreib Vito…", send: "Senden",
     starters: ["Was esse ich heute Abend?", "Wie viele Kalorien bleiben mir?", "Ein gesunder Snack?"],
     followups: ["Noch eine Idee 🔄", "Wie viele Kalorien?", "Und als Dessert?"],
@@ -150,6 +169,10 @@ const L = {
     lockSub: "He knows your calories, what you ate and your goal — and tells you what to eat tonight and how to balance your day.",
     feats: ["Personalised tips from your daily log", "Meal and snack ideas for your goal", "Instant answers, 100% nutrition, no judgement"],
     cta: "Go Pro", soon: "Coming soon",
+    freeBadge: "Free preview", freeLeft: (n: number) => `${n} message${n > 1 ? "s" : ""} left`,
+    freeOver: "I'd love to keep going with you 🥕 Go Pro and we can chat as much as you like — 7 days free, no commitment.",
+    lockTitleUsed: "You've tried Vito 😊", lockSubUsed: "Keep going with your coach: unlimited tips from your day, meal ideas, instant answers. 7-day free trial, no commitment.",
+    ctaTrial: "Try 7 days free",
     placeholder: "Message Vito…", send: "Send",
     starters: ["What should I eat tonight?", "How many calories do I have left?", "A healthy snack idea?"],
     followups: ["Another idea 🔄", "How many calories?", "And for dessert?"],
@@ -235,12 +258,15 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
   const [avo, setAvo] = useState<AvoState>("idle");
   const [busy, setBusy] = useState(false);
   const [used, setUsed] = useState(0);
+  const [freeUsed, setFreeUsed] = useState(0);
   const [added, setAdded] = useState<Record<string, boolean>>({});
   const [listening, setListening] = useState(false);
   const [micOk, setMicOk] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   const talkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const recRef = useRef<{ stop: () => void } | null>(null);
+  const tastesLeft = isPro ? Infinity : Math.max(0, FREE_TASTE - freeUsed);
+  const canChat = isPro || tastesLeft > 0;
 
   // Chargement initial : Pro + conversation active persistée + historique + favoris.
   useEffect(() => {
@@ -252,6 +278,7 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
     } catch { /* ignore */ }
     setLocalPro(pro);
     setUsed(readUsage().count);
+    setFreeUsed(readFreeUsed());
     const a = loadJSON<{ id?: string; msgs?: Msg[] } | null>(AK, null);
     if (a && Array.isArray(a.msgs)) { setActiveId(a.id || newId()); setMsgs(a.msgs); }
     else setActiveId(newId());
@@ -363,6 +390,7 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
       if (!started || !acc.trim()) return false; // rien reçu → repli
       finishTalking(acc.length);
       setUsed(bumpUsage());
+      if (!isPro) setFreeUsed(bumpFreeUsed());
       return true;
     } catch {
       return started; // coupure après des tokens : on garde ce qu'on a
@@ -384,7 +412,7 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
       } else {
         const data = (await r.json()) as { reply?: string; busy?: boolean };
         const reply = data.reply || t.err;
-        if (data.reply && !data.busy) setUsed(bumpUsage());
+        if (data.reply && !data.busy) { setUsed(bumpUsage()); if (!isPro) setFreeUsed(bumpFreeUsed()); }
         setMsgs((m) => [...m, { role: "model", text: reply }]);
         finishTalking(reply.length);
         return;
@@ -398,6 +426,12 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
   const send = async (text: string) => {
     const clean = text.trim();
     if (!clean || busy) return;
+    // Non-Pro : aperçu gratuit épuisé → bulle chaleureuse + accès au paywall (pas d'appel API).
+    if (!isPro && tastesLeft <= 0) {
+      setMsgs((m) => [...m, { role: "user", text: clean }, { role: "model", text: t.freeOver }]);
+      setInput("");
+      return;
+    }
     if (readUsage().count >= DAILY_LIMIT) {
       setMsgs((m) => [...m, { role: "user", text: clean }, { role: "model", text: t.limit }]);
       setInput("");
@@ -416,13 +450,13 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
   // Question auto-envoyée (ex. « une idée de repas selon mes macros ») quand on ouvre Vito depuis un bouton.
   const seedSent = useRef("");
   useEffect(() => {
-    if (!ready || !isPro || !seed || busy) return;
+    if (!ready || !canChat || !seed || busy) return;
     if (seedSent.current === seed) return;
     seedSent.current = seed;
     onConsumeSeed?.();
     send(seed);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, isPro, seed]);
+  }, [ready, canChat, seed]);
 
   // Archive la conversation active (favori → mise à jour ; sinon → récentes).
   const archiveActive = () => {
@@ -453,20 +487,21 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
 
   if (!ready) return <div className="cn" style={{ minHeight: 200 }} />;
 
-  /* ---- Paywall (verrouillé) ---- */
-  if (!isPro) {
+  /* ---- Paywall : uniquement quand l'aperçu gratuit est épuisé et qu'il n'y a pas de conversation en cours ---- */
+  if (!isPro && tastesLeft <= 0 && msgs.length === 0) {
+    const tasted = freeUsed > 0;
     return (
       <section className="cn cn-lock">
         <style>{CSS}</style>
         <div className="cn-lockart"><Avo state="idle" size={130} /></div>
         <div className="cn-locktxt">
-          <span className="cn-pro">🔒 {t.proBadge}</span>
-          <h3>{t.lockTitle}</h3>
-          <p>{t.lockSub}</p>
+          <span className="cn-pro">{tasted ? "🥕" : "🔒"} {t.proBadge}</span>
+          <h3>{tasted ? t.lockTitleUsed : t.lockTitle}</h3>
+          <p>{tasted ? t.lockSubUsed : t.lockSub}</p>
           <ul className="cn-feats">
             {t.feats.map((f) => <li key={f}><span>✓</span>{f}</li>)}
           </ul>
-          <button className="cn-cta" onClick={onGoPro}>{t.cta}</button>
+          <button className="cn-cta" onClick={onGoPro}>{tasted ? t.ctaTrial : t.cta}</button>
         </div>
       </section>
     );
@@ -489,6 +524,14 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
           <button className="cn-hact" onClick={newConversation} title={t.newChat} aria-label={t.newChat}>✏️</button>
         </div>
       </div>
+
+      {!isPro && (
+        <button className="cn-freebar" onClick={onGoPro}>
+          <span className="cn-freebar-l">👋 {t.freeBadge}</span>
+          <span className="cn-freebar-m">{tastesLeft > 0 ? t.freeLeft(tastesLeft) : t.ctaTrial}</span>
+          <span className="cn-freebar-r">Pro ›</span>
+        </button>
+      )}
 
       <div className="cn-scroll" ref={scroller}>
         {msgs.length === 0 && <div className="cn-bubble model cn-hello">{opener}</div>}
@@ -523,19 +566,23 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
         </>
       ) : null}
 
-      <div className="cn-input">
-        <input
-          value={input}
-          placeholder={used >= DAILY_LIMIT ? t.limit : listening ? "🎤…" : t.placeholder}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter") send(input); }}
-          disabled={busy || used >= DAILY_LIMIT}
-        />
-        {micOk && (
-          <button className={`cn-mic ${listening ? "on" : ""}`} onClick={toggleMic} title={t.micTitle} aria-label={t.micTitle} disabled={busy || used >= DAILY_LIMIT}>🎤</button>
-        )}
-        <button onClick={() => send(input)} disabled={busy || !input.trim() || used >= DAILY_LIMIT} aria-label={t.send}>➤</button>
-      </div>
+      {!isPro && tastesLeft <= 0 ? (
+        <button className="cn-upsell" onClick={onGoPro}>🥕 {t.ctaTrial}</button>
+      ) : (
+        <div className="cn-input">
+          <input
+            value={input}
+            placeholder={used >= DAILY_LIMIT ? t.limit : listening ? "🎤…" : t.placeholder}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") send(input); }}
+            disabled={busy || used >= DAILY_LIMIT}
+          />
+          {micOk && (
+            <button className={`cn-mic ${listening ? "on" : ""}`} onClick={toggleMic} title={t.micTitle} aria-label={t.micTitle} disabled={busy || used >= DAILY_LIMIT}>🎤</button>
+          )}
+          <button onClick={() => send(input)} disabled={busy || !input.trim() || used >= DAILY_LIMIT} aria-label={t.send}>➤</button>
+        </div>
+      )}
       <p className="cn-disc">🥕 {t.disclaimer}</p>
 
       {panel && (
@@ -680,6 +727,14 @@ const CSS = `
 .cn-mic.on{background:#fdeaec;border-color:#f3b0b8;color:#ef4457;animation:cnPulse 1s ease-in-out infinite}
 .cn-mic:disabled{opacity:.4;cursor:not-allowed}
 @keyframes cnPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.cn-freebar{display:flex;align-items:center;gap:8px;width:100%;margin:0 0 8px;padding:9px 12px;border:1px solid var(--roseline,#f7cbd8);border-radius:13px;background:linear-gradient(120deg,#fff,var(--rosebg,#fdeaf0));cursor:pointer;text-align:left;font-family:inherit}
+.cn-freebar:active{transform:scale(.99)}
+.cn-freebar-l{font-size:.72rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--rose,#ef4a6a);white-space:nowrap}
+.cn-freebar-m{flex:1;font-size:.82rem;font-weight:700;color:#8a2540;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cn-freebar-r{font-size:.8rem;font-weight:900;color:var(--rose,#ef4a6a);white-space:nowrap}
+.cn-upsell{width:100%;margin:8px 0;border:0;border-radius:14px;padding:15px;background:linear-gradient(135deg,#34d17f,#16a34a);color:#fff;font-family:var(--disp,inherit);font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 14px 26px -10px rgba(22,163,74,.55);animation:cnpulse 2.4s ease-in-out infinite}
+.cn-upsell:active{transform:scale(.98)}
+@keyframes cnpulse{0%,100%{box-shadow:0 14px 26px -12px rgba(22,163,74,.5)}50%{box-shadow:0 20px 38px -8px rgba(22,163,74,.85)}}
 .cn-input{display:flex;gap:8px;padding:8px 0}
 .cn-input input{flex:1;background:#f6f8fb;border:1.5px solid #e7ebf2;border-radius:13px;color:#232a37;padding:13px 15px;font-size:.94rem}
 .cn-input input:focus{outline:none;border-color:#8fdcac}

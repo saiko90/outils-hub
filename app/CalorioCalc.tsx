@@ -378,7 +378,7 @@ const LX = {
     importOk: "✓ Données importées, rechargement…", importErr: "Fichier invalide. Choisis un export calorio.",
     waterTitle: "Hydratation", waterGoalTxt: (n: number, g: number) => `${n} / ${g} verres`, waterL: (l: string) => `≈ ${l} L`,
     fastTitle: "Jeûne intermittent", fastStartBtn: "Démarrer le jeûne", fastEndBtn: "Terminer", fastElapsed: "écoulé", fastRemaining: "restant", fastPick: "Choisis ta fenêtre", fastingLabel: "Jeûne en cours", fastDone: "Objectif atteint 🎉",
-    myMeals: "Mes repas", saveMeal: "💾 Enregistrer", saveMealDone: "Repas enregistré ✓", repeatYesterday: "↻ Répéter hier", noYesterday: "Rien de noté hier.", emptyMeals: "Enregistre un repas depuis ta journée pour le rajouter ici en un tap.", del: "Supprimer",
+    myMeals: "Mes repas", saveMeal: "💾 Enregistrer", saveMealDone: "Repas enregistré ✓", repeatYesterday: "↻ Répéter hier", quickLog: "⚡ Vite fait", noYesterday: "Rien de noté hier.", emptyMeals: "Enregistre un repas depuis ta journée pour le rajouter ici en un tap.", del: "Supprimer",
     vitoIdea: "🥕 Vito, une idée de repas ?",
     vitoMealPrompt: (kcal: string, p: string, g: string, l: string) => `Il me reste ${kcal} kcal aujourd'hui (dont environ ${p} g de protéines, ${g} g de glucides, ${l} g de lipides). Propose-moi 3 idées de repas simples et équilibrés qui rentrent dans ce budget.`,
     createFood: "Créer un aliment", createSub: "Ton propre aliment", myFoods: "Mes aliments",
@@ -453,7 +453,7 @@ const LX = {
     importOk: "✓ Daten importiert, wird neu geladen…", importErr: "Ungültige Datei. Wähle einen calorio-Export.",
     waterTitle: "Hydration", waterGoalTxt: (n: number, g: number) => `${n} / ${g} Gläser`, waterL: (l: string) => `≈ ${l} L`,
     fastTitle: "Intervallfasten", fastStartBtn: "Fasten starten", fastEndBtn: "Beenden", fastElapsed: "vergangen", fastRemaining: "übrig", fastPick: "Wähle dein Fenster", fastingLabel: "Fasten läuft", fastDone: "Ziel erreicht 🎉",
-    myMeals: "Meine Mahlzeiten", saveMeal: "💾 Speichern", saveMealDone: "Mahlzeit gespeichert ✓", repeatYesterday: "↻ Gestern wiederholen", noYesterday: "Gestern nichts notiert.", emptyMeals: "Speichere eine Mahlzeit aus deinem Tag, um sie hier mit einem Tipp hinzuzufügen.", del: "Löschen",
+    myMeals: "Meine Mahlzeiten", saveMeal: "💾 Speichern", saveMealDone: "Mahlzeit gespeichert ✓", repeatYesterday: "↻ Gestern wiederholen", quickLog: "⚡ Schnell", noYesterday: "Gestern nichts notiert.", emptyMeals: "Speichere eine Mahlzeit aus deinem Tag, um sie hier mit einem Tipp hinzuzufügen.", del: "Löschen",
     vitoIdea: "🥕 Vito, eine Idee?",
     vitoMealPrompt: (kcal: string, p: string, g: string, l: string) => `Mir bleiben heute ${kcal} kcal (davon etwa ${p} g Proteine, ${g} g Kohlenhydrate, ${l} g Fette). Schlag mir 3 einfache, ausgewogene Mahlzeiten vor, die in dieses Budget passen.`,
     createFood: "Lebensmittel erstellen", createSub: "Dein eigenes", myFoods: "Meine Lebensmittel",
@@ -528,7 +528,7 @@ const LX = {
     importOk: "✓ Data imported, reloading…", importErr: "Invalid file. Pick a calorio export.",
     waterTitle: "Hydration", waterGoalTxt: (n: number, g: number) => `${n} / ${g} glasses`, waterL: (l: string) => `≈ ${l} L`,
     fastTitle: "Intermittent fasting", fastStartBtn: "Start fasting", fastEndBtn: "End", fastElapsed: "elapsed", fastRemaining: "left", fastPick: "Pick your window", fastingLabel: "Fasting", fastDone: "Goal reached 🎉",
-    myMeals: "My meals", saveMeal: "💾 Save", saveMealDone: "Meal saved ✓", repeatYesterday: "↻ Repeat yesterday", noYesterday: "Nothing logged yesterday.", emptyMeals: "Save a meal from your day to add it here in one tap.", del: "Delete",
+    myMeals: "My meals", saveMeal: "💾 Save", saveMealDone: "Meal saved ✓", repeatYesterday: "↻ Repeat yesterday", quickLog: "⚡ Quick add", noYesterday: "Nothing logged yesterday.", emptyMeals: "Save a meal from your day to add it here in one tap.", del: "Delete",
     vitoIdea: "🥕 Vito, a meal idea?",
     vitoMealPrompt: (kcal: string, p: string, g: string, l: string) => `I have ${kcal} kcal left today (about ${p} g protein, ${g} g carbs, ${l} g fat). Suggest 3 simple, balanced meal ideas that fit this budget.`,
     createFood: "Create a food", createSub: "Your own food", myFoods: "My foods",
@@ -2160,6 +2160,19 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               {mealMsg && <span className="cl-mealmsg">{mealMsg}</span>}
             </div>
 
+            {recents.length > 0 && (
+              <div className="cl-quicklog">
+                <span className="cl-quicklog-l">{x.quickLog}</span>
+                <div className="cl-quicklog-row">
+                  {recents.slice(0, 10).map((f, i) => (
+                    <button key={`ql-${f.id}-${i}`} className="cl-qlchip" onClick={() => { addFood(f); setMealMsg(`✓ ${f.nom}`); setTimeout(() => setMealMsg(""), 1600); }}>
+                      <span aria-hidden>{f.emoji}</span> <span className="cl-qlchip-n">{f.nom}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {MEALS.map((m) => {
               const items = mealGroups[m];
               const sum = items.reduce((s, it) => s + it.kcal, 0);
@@ -3300,6 +3313,15 @@ const CSS = `
 .cl-dupbtn{background:#fff;border:1.5px solid var(--greenline);color:var(--green);border-radius:99px;padding:9px 15px;font-weight:800;font-size:.85rem;cursor:pointer}
 .cl-dupbtn:hover{background:var(--greenbg)}
 .cl-mealmsg{font-size:.84rem;font-weight:700;color:var(--green)}
+/* Journalisation express : re-log en un tap des aliments récents (rétention) */
+.cl-quicklog{margin:-4px 0 14px}
+.cl-quicklog-l{display:block;font-size:.72rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0 2px 7px}
+.cl-quicklog-row{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.cl-quicklog-row::-webkit-scrollbar{display:none}
+.cl-qlchip{flex:none;display:inline-flex;align-items:center;gap:6px;max-width:180px;background:#fff;border:1.5px solid var(--greenline);border-radius:99px;padding:9px 14px;font-family:var(--body);font-weight:700;font-size:.86rem;color:var(--ink);cursor:pointer;box-shadow:0 6px 14px -11px rgba(14,52,30,.4);transition:transform .12s,box-shadow .2s}
+.cl-qlchip:hover{border-color:var(--green2)}
+.cl-qlchip:active{transform:scale(.94);background:var(--greenbg)}
+.cl-qlchip-n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cl-meal-save{flex:none;background:none;border:0;cursor:pointer;font-size:1.05rem;opacity:.7;line-height:1;padding:2px}
 .cl-meal-save:hover{opacity:1}
 .cl-savedmeal{display:flex;align-items:center;gap:8px}

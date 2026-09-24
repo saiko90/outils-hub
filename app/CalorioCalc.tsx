@@ -53,6 +53,7 @@ const L = {
       coach: "Discute avec Vito, ton coach nutrition, quand tu veux.",
       aide: "Les réponses aux questions les plus fréquentes.",
     },
+    ob: { title: "Bienvenue sur calorio 🥕", sub: "Le compteur de calories suisse, sans pub. Règle ton profil en 30 s pour ta cible personnalisée.", target: "Ta cible du jour", start: "C'est parti", editLater: "Tu pourras tout modifier quand tu veux dans les réglages." },
     faqTitle: "Questions fréquentes",
     faq: [
       { q: "Comment calorio calcule mes besoins ?", a: "On utilise la formule Mifflin-St Jeor pour ton métabolisme de base, multipliée par ton niveau d'activité, puis ajustée selon ton objectif. C'est une estimation solide, pas une vérité absolue — écoute aussi ton corps." },
@@ -145,6 +146,7 @@ const L = {
       coach: "Chatte mit Vito, deinem Ernährungscoach, wann immer du willst.",
       aide: "Antworten auf die häufigsten Fragen.",
     },
+    ob: { title: "Willkommen bei calorio 🥕", sub: "Der Schweizer Kalorienzähler, ohne Werbung. Stell in 30 Sek. dein Profil ein für dein persönliches Ziel.", target: "Dein Tagesziel", start: "Los geht's", editLater: "Du kannst alles jederzeit in den Einstellungen ändern." },
     faqTitle: "Häufige Fragen",
     faq: [
       { q: "Wie berechnet calorio meinen Bedarf?", a: "Wir nutzen die Mifflin-St-Jeor-Formel für deinen Grundumsatz, multipliziert mit deinem Aktivitätsniveau und an dein Ziel angepasst. Eine solide Schätzung, keine absolute Wahrheit — höre auch auf deinen Körper." },
@@ -235,6 +237,7 @@ const L = {
       coach: "Chat with Vito, your nutrition coach, whenever you like.",
       aide: "Answers to the most common questions.",
     },
+    ob: { title: "Welcome to calorio 🥕", sub: "The Swiss calorie tracker, no ads. Set up your profile in 30s for your personalised target.", target: "Your daily target", start: "Let's go", editLater: "You can change everything later in Settings." },
     faqTitle: "Frequently asked questions",
     faq: [
       { q: "How does calorio work out my needs?", a: "We use the Mifflin-St Jeor formula for your basal metabolism, multiplied by your activity level and adjusted to your goal. It's a solid estimate, not an absolute truth — listen to your body too." },
@@ -724,6 +727,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const t = L[lang] ?? L.fr;
   const x = LX[lang] ?? LX.fr;
   const [tab, setTab] = useState<TabKey>("stats");
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
   const [mounted, setMounted] = useState(false);
   const [nudgeHidden, setNudgeHidden] = useState(false);
@@ -842,6 +846,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       if (p.objectif) setObjectif(p.objectif as Objectif);
       if (typeof p.poidsCible === "number") setPoidsCible(p.poidsCible);
     }
+    // Premier lancement : aucun profil enregistré et jamais onboardé → on propose le réglage initial.
+    try { if (!p && localStorage.getItem("calorio.onboarded") !== "1") setShowOnboarding(true); } catch { /* ignore */ }
     const jour = load<Record<string, Line[]>>("calorio.journal", {});
     setLines(migrateLines(jour[day], lang));
     setSeances(load<Record<string, Seance[]>>("calorio.activites", {})[day] || []);
@@ -986,8 +992,15 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   }, [mounted, pesees]);
 
   // --- Comptes + synchro cloud (Supabase) ---
+  const finishOnboarding = () => {
+    try { localStorage.setItem("calorio.onboarded", "1"); } catch { /* ignore */ }
+    setShowOnboarding(false);
+  };
   const applyProfil = (p: Record<string, unknown> | null) => {
     if (!p) return;
+    // Utilisateur qui revient (profil venu du cloud) → pas d'onboarding.
+    setShowOnboarding(false);
+    try { localStorage.setItem("calorio.onboarded", "1"); } catch { /* ignore */ }
     if (p.sexe) setSexe(p.sexe as Sexe);
     if (typeof p.age === "number") setAge(p.age);
     if (typeof p.poids === "number") setPoids(p.poids);
@@ -2454,6 +2467,47 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
           </div>
         </>
       )}
+      {mounted && showOnboarding && (
+        <div className="cl-obov">
+          <div className="cl-obcard">
+            <div className="cl-ob-h">
+              <span className="cl-ob-emo" aria-hidden>🥕</span>
+              <h2>{t.ob.title}</h2>
+              <p>{t.ob.sub}</p>
+            </div>
+            <div className="cl-ob-fields">
+              <div className="cl-field">
+                <span>{t.sexe}</span>
+                <div className="cl-seg">
+                  <button className={sexe === "homme" ? "on" : ""} onClick={() => setSexe("homme")}>{t.homme}</button>
+                  <button className={sexe === "femme" ? "on" : ""} onClick={() => setSexe("femme")}>{t.femme}</button>
+                </div>
+              </div>
+              <Slider label={t.age} value={age} min={14} max={99} onChange={setAge} />
+              <Slider label={t.poids} value={poids} min={35} max={200} onChange={setPoids} />
+              <Slider label={t.taille} value={taille} min={130} max={220} onChange={setTaille} />
+              <label className="cl-field">
+                <span>{t.activite}</span>
+                <select className="cl-select" value={activite} onChange={(e) => setActivite(e.target.value as Activite)}>
+                  {(Object.keys(t.act) as Activite[]).map((k) => <option key={k} value={k}>{t.act[k]}</option>)}
+                </select>
+              </label>
+              <label className="cl-field">
+                <span>{t.objectif}</span>
+                <select className="cl-select" value={objectif} onChange={(e) => setObjectif(e.target.value as Objectif)}>
+                  {(Object.keys(t.obj) as Objectif[]).map((k) => <option key={k} value={k}>{t.obj[k]}</option>)}
+                </select>
+              </label>
+            </div>
+            <div className="cl-ob-target">
+              <span className="cl-ob-target-l">{t.ob.target}</span>
+              <b className="cl-ob-target-v">{nf(lang).format(besoinsAffiche.cible)} kcal</b>
+            </div>
+            <button className="cl-ob-start" onClick={finishOnboarding}>{t.ob.start} 🥕</button>
+            <p className="cl-ob-later">{t.ob.editLater}</p>
+          </div>
+        </div>
+      )}
       {addOpen && (
         <div className="cl-scanoverlay" onClick={() => setAddOpen(false)}>
           <div className="cl-chooser" onClick={(e) => e.stopPropagation()}>
@@ -3103,6 +3157,21 @@ const CSS = `
 .cl-inv-msg{margin:11px 0 0;padding:10px 13px;background:var(--greenbg);border:1px solid var(--greenline);border-radius:11px;color:#0f7a3d;font-size:.85rem;font-weight:700}
 /* overlays */
 .cl-scanoverlay{position:fixed;inset:0;z-index:80;background:rgba(15,20,18,.72);display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(4px)}
+/* ===== Onboarding premier lancement ===== */
+.cl-obov{position:fixed;inset:0;z-index:120;background:rgba(15,20,18,.72);display:flex;align-items:center;justify-content:center;padding:16px;padding-top:max(16px,env(safe-area-inset-top));padding-bottom:max(16px,env(safe-area-inset-bottom));backdrop-filter:blur(5px);animation:clfade .3s ease both}
+@keyframes clfade{from{opacity:0}}
+.cl-obcard{width:min(94vw,440px);max-height:92vh;overflow:auto;background:linear-gradient(180deg,#fff,#f6fbf9);border-radius:26px;padding:22px 20px;box-shadow:0 30px 70px -20px rgba(14,40,24,.55);animation:clrise .5s cubic-bezier(.2,.75,.3,1) both}
+.cl-ob-h{text-align:center;margin-bottom:16px}
+.cl-ob-emo{font-size:2.6rem;display:inline-block;filter:drop-shadow(0 6px 12px rgba(22,163,74,.35));animation:clactstep 2.6s ease-in-out infinite;transform-origin:60% 90%}
+.cl-ob-h h2{font-family:var(--disp);font-weight:700;font-size:1.4rem;margin:8px 0 6px;letter-spacing:-.01em}
+.cl-ob-h p{font-size:.9rem;color:var(--muted);line-height:1.45;margin:0}
+.cl-ob-fields{display:flex;flex-direction:column;gap:2px}
+.cl-ob-target{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:15px 0 4px;padding:14px 16px;border-radius:16px;background:var(--greenbg);border:1px solid var(--greenline);box-shadow:0 0 0 4px rgba(52,209,127,.1)}
+.cl-ob-target-l{font-size:.9rem;font-weight:700;color:#0f7a3d}
+.cl-ob-target-v{font-family:var(--disp);font-weight:700;font-size:1.5rem;color:var(--green);font-variant-numeric:tabular-nums;line-height:1}
+.cl-ob-start{width:100%;margin-top:14px;border:0;border-radius:16px;background:var(--btn);color:#fff;font-family:var(--disp);font-weight:700;font-size:1.05rem;padding:16px;cursor:pointer;box-shadow:0 16px 30px -10px rgba(22,163,74,.6)}
+.cl-ob-start:active{transform:scale(.98)}
+.cl-ob-later{text-align:center;font-size:.76rem;color:var(--soft);margin:11px 0 2px}
 .cl-scanbox{position:relative;width:min(92vw,420px);display:flex;flex-direction:column;align-items:center;gap:14px}
 .cl-scanvid{width:100%;border-radius:18px;background:#000;aspect-ratio:4/3;object-fit:cover}
 .cl-scanframe{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:70%;height:120px;border:3px solid #34d17f;border-radius:14px;box-shadow:0 0 0 999px rgba(0,0,0,.25)}

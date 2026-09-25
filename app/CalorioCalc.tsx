@@ -108,6 +108,8 @@ const L = {
     proTitle: "Passe en calorio Pro", proSub: "Débloque Vito, ton coach nutrition IA, et l'analyse de tes repas en photo.",
     planMonthly: "Mensuel", planYearly: "Annuel", perMonth: "/mois", perYear: "/an",
     yearlySave: "2 mois offerts", trial: "7 jours d'essai gratuit, sans engagement — annulable à tout moment.",
+    proFeats: ["Vito, ton coach nutrition IA — conseils illimités", "Analyse de tes repas en photo", "Rappels du soir personnalisés selon tes calories restantes", "Ton bilan de la semaine, chaque dimanche"],
+    proPerMo: "≈ CHF 3.25/mois — économise 34 %", proSecure: "Paiement sécurisé par Stripe · résiliable en un clic",
     subscribe: "S'abonner", loginFirst: "Connecte-toi d'abord pour t'abonner 👇", checkoutErr: "Le paiement n'est pas encore disponible. Réessaie bientôt.",
     proSuccess: "🎉 Bienvenue en Pro ! Ton coach Vito et l'analyse photo sont débloqués.", close: "Fermer",
     // poids
@@ -200,6 +202,8 @@ const L = {
     proTitle: "Werde calorio Pro", proSub: "Schalte Vito frei, deinen KI-Ernährungscoach, und die Foto-Analyse deiner Mahlzeiten.",
     planMonthly: "Monatlich", planYearly: "Jährlich", perMonth: "/Monat", perYear: "/Jahr",
     yearlySave: "2 Monate gratis", trial: "7 Tage gratis testen, unverbindlich — jederzeit kündbar.",
+    proFeats: ["Vito, dein KI-Ernährungscoach — unbegrenzte Tipps", "Foto-Analyse deiner Mahlzeiten", "Personalisierte Abend-Erinnerungen nach deinen Restkalorien", "Deine Wochenbilanz, jeden Sonntag"],
+    proPerMo: "≈ CHF 3.25/Monat — spare 34 %", proSecure: "Sichere Zahlung über Stripe · jederzeit kündbar",
     subscribe: "Abonnieren", loginFirst: "Melde dich zuerst an, um zu abonnieren 👇", checkoutErr: "Zahlung noch nicht verfügbar. Bald wieder versuchen.",
     proSuccess: "🎉 Willkommen bei Pro! Coach Vito und die Foto-Analyse sind freigeschaltet.", close: "Schliessen",
     poidsAuj: "Dein Gewicht heute", enregistrer: "Speichern",
@@ -291,6 +295,8 @@ const L = {
     proTitle: "Go calorio Pro", proSub: "Unlock Vito, your AI nutrition coach, and photo analysis of your meals.",
     planMonthly: "Monthly", planYearly: "Yearly", perMonth: "/mo", perYear: "/yr",
     yearlySave: "2 months free", trial: "7-day free trial, no commitment — cancel anytime.",
+    proFeats: ["Vito, your AI nutrition coach — unlimited tips", "Photo analysis of your meals", "Personalised evening reminders based on your remaining calories", "Your weekly recap, every Sunday"],
+    proPerMo: "≈ CHF 3.25/mo — save 34%", proSecure: "Secure payment via Stripe · cancel in one click",
     subscribe: "Subscribe", loginFirst: "Sign in first to subscribe 👇", checkoutErr: "Payment isn't available yet. Try again soon.",
     proSuccess: "🎉 Welcome to Pro! Coach Vito and photo analysis are unlocked.", close: "Close",
     poidsAuj: "Your weight today", enregistrer: "Save",
@@ -2727,11 +2733,15 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
           <div className="cl-promodal" onClick={(e) => e.stopPropagation()}>
             <div className="cl-pro-h">🥕 {t.proTitle}</div>
             <p className="cl-pro-s">{t.proSub}</p>
+            <ul className="cl-pro-feats">
+              {t.proFeats.map((f) => <li key={f}><span aria-hidden>✓</span>{f}</li>)}
+            </ul>
             <div className="cl-plans">
               <button className="cl-plan best" onClick={() => startCheckout("yearly")}>
-                <span className="cl-plan-badge">{t.yearlySave}</span>
+                <span className="cl-plan-badge">★ {t.yearlySave}</span>
                 <span className="cl-plan-name">{t.planYearly}</span>
                 <span className="cl-plan-price">CHF 39<small>{t.perYear}</small></span>
+                <span className="cl-plan-eq">{t.proPerMo}</span>
               </button>
               <button className="cl-plan" onClick={() => startCheckout("monthly")}>
                 <span className="cl-plan-name">{t.planMonthly}</span>
@@ -2739,6 +2749,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               </button>
             </div>
             <p className="cl-pro-trial">🎁 {t.trial}</p>
+            <p className="cl-pro-secure">🔒 {t.proSecure}</p>
             <p className="cl-pro-compare">{t.proCompare}</p>
             {checkoutMsg && checkoutMsg !== "…" && <p className="cl-scanmsg">{checkoutMsg}</p>}
             <button className="cl-pro-close" onClick={() => setProOpen(false)}>{t.close}</button>
@@ -3241,14 +3252,19 @@ const CSS = `
 /* modale Pro */
 .cl-promodal{width:min(94vw,420px);background:#fff;border-radius:24px;padding:26px;text-align:center;box-shadow:0 30px 70px -20px rgba(14,40,24,.5)}
 .cl-pro-h{font-family:var(--disp);font-size:1.4rem;font-weight:600;color:var(--ink)}
-.cl-pro-s{margin:8px 0 18px;color:var(--muted);font-size:.92rem;line-height:1.55}
+.cl-pro-s{margin:8px 0 14px;color:var(--muted);font-size:.92rem;line-height:1.55}
+.cl-pro-feats{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-direction:column;gap:9px;text-align:left}
+.cl-pro-feats li{display:flex;align-items:flex-start;gap:9px;font-size:.88rem;line-height:1.4;color:var(--ink);font-weight:600}
+.cl-pro-feats li span{flex:none;width:20px;height:20px;border-radius:50%;background:var(--greenbg);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900;margin-top:1px}
+.cl-plan-eq{font-size:.66rem;font-weight:800;color:var(--green);margin-top:3px;line-height:1.2}
+.cl-pro-secure{margin:8px 0 0;font-size:.74rem;color:var(--soft);font-weight:600}
 .cl-plans{display:flex;gap:12px}
 .cl-plan{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;background:#f6faf6;border:2px solid var(--line);border-radius:18px;padding:22px 12px 16px;cursor:pointer;transition:.15s}
 .cl-plan:hover{border-color:var(--greenline);background:var(--greenbg)}
 .cl-plan.best{border-color:var(--green);background:var(--greenbg)}
 .cl-plan-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.64rem;font-weight:900;text-transform:uppercase;background:var(--btn);color:#fff;border-radius:99px;padding:3px 10px}
 .cl-plan-name{font-size:.82rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.03em}
-.cl-plan-price{font-family:var(--disp);font-size:1.5rem;font-weight:600;color:var(--ink)}
+.cl-plan-price{font-family:var(--disp);font-size:1.35rem;font-weight:600;color:var(--ink);white-space:nowrap}
 .cl-plan-price small{font-size:.78rem;font-weight:600;color:var(--muted)}
 .cl-pro-trial{margin:16px 0 0;font-size:.85rem;color:var(--green);font-weight:700}
 .cl-pro-compare{margin:12px 0 0;font-size:.8rem;line-height:1.5;color:var(--muted)}

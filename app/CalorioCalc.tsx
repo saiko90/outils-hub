@@ -772,6 +772,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [hcAvailable, setHcAvailable] = useState(false);
   const [hcBusy, setHcBusy] = useState(false);
   const [displaySteps, setDisplaySteps] = useState(0);
+  const [displayRest, setDisplayRest] = useState(0);
+  const displayRestRef = useRef(0);
   const [actSport, setActSport] = useState<string>("velo_modere");
   const [actMin, setActMin] = useState<number | "">(30);
 
@@ -1391,6 +1393,27 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const bil = useMemo(() => bilan(total, besoinsAffiche.cible), [total, besoinsAffiche.cible]);
   const tend = useMemo(() => tendancePoids(pesees), [pesees]);
 
+  // Compteur de l'anneau qui glisse en douceur vers sa nouvelle valeur (depuis la valeur affichée,
+  // donc jamais de saut ni de tremblement, même quand on ajuste les grammes).
+  useEffect(() => {
+    if (!mounted) return;
+    const target = besoinsAffiche.cible - total.kcal;
+    const from = displayRestRef.current;
+    const t0 = performance.now();
+    const dur = 520;
+    let raf = 0;
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const v = from + (target - from) * eased;
+      displayRestRef.current = v;
+      setDisplayRest(v);
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [mounted, besoinsAffiche.cible, total.kcal]);
+
   // Historique 14 jours : kcal consommées par jour (aujourd'hui = état courant).
   const histoire = useMemo(() => {
     if (!mounted) return [] as { date: string; kcal: number }[];
@@ -1958,7 +1981,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                 {streak > 0 && <span className="cl-chip"><span className="cl-flame">🔥</span> {x.streak(streak)}</span>}
               </div>
 
-              <div className="cl-card cl-ringcard">
+              <div className={`cl-card cl-ringcard ${ringPct >= 90 && ringPct <= 110 ? "glow" : ""}`}>
                 <div className="cl-ringwrap">
                   <svg width="210" height="210" viewBox="0 0 210 210">
                     <circle cx="105" cy="105" r={R} stroke="var(--ringtrack)" strokeWidth="19" fill="none" />
@@ -1967,7 +1990,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                       strokeLinecap="round" strokeDasharray={Ccirc} strokeDashoffset={ringOff} transform="rotate(-90 105 105)" />
                   </svg>
                   <div className="cl-ring-c">
-                    <div className="cl-ring-big">{nf(lang).format(Math.abs(restK))}</div>
+                    <div className="cl-ring-big">{nf(lang).format(Math.abs(Math.round(displayRest)))}</div>
                     <div className="cl-ring-lb">{over ? x.kcalOver : x.kcalLeft}</div>
                   </div>
                 </div>
@@ -3087,7 +3110,9 @@ const CSS = `
 .cl-card + .cl-card{margin-top:13px}
 /* anneau calories */
 .cl-ringcard{background:linear-gradient(180deg,var(--card),var(--card2));position:relative;overflow:hidden;
-  box-shadow:inset 0 2px 0 rgba(255,255,255,1),0 32px 62px -22px rgba(20,130,66,.5),0 10px 24px -10px rgba(14,52,30,.34)}
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.55),0 32px 62px -22px rgba(20,130,66,.5),0 10px 24px -10px rgba(14,52,30,.34)}
+.cl-ringcard.glow{animation:clringglow 2.6s ease-in-out infinite}
+@keyframes clringglow{0%,100%{box-shadow:inset 0 2px 0 rgba(255,255,255,.55),0 32px 62px -22px rgba(20,130,66,.5),0 0 0 0 rgba(52,209,127,0)}50%{box-shadow:inset 0 2px 0 rgba(255,255,255,.55),0 30px 58px -18px rgba(20,130,66,.7),0 0 36px 2px rgba(52,209,127,.42)}}
 .cl-ringwrap{position:relative;width:210px;height:210px;margin:6px auto 4px}
 .cl-ring-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .cl-ring-big{font-family:var(--disp);font-weight:700;font-size:3rem;line-height:.95;letter-spacing:-1px;font-variant-numeric:tabular-nums;color:var(--ink)}

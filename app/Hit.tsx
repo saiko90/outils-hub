@@ -15,7 +15,10 @@ export default function Hit() {
       try {
         if (document.referrer) {
           const h = new URL(document.referrer).hostname.replace(/^www\./, "");
-          if (h && h !== "outils.ch" && !h.endsWith(".outils.ch")) ref = h;
+          const self = window.location.hostname.replace(/^www\./, "");
+          // Pas de « source » pour les navigations internes ni les retours de connexion / paiement.
+          const flow = ["accounts.google.com", "checkout.stripe.com", "billing.stripe.com", "srcvnqfgtazupuzwznrr.supabase.co"];
+          if (h && h !== self && h !== "outils.ch" && !h.endsWith(".outils.ch") && h !== "calorio.ch" && !flow.includes(h)) ref = h;
         }
       } catch { /* no-op */ }
       const body = JSON.stringify(ref ? { p, ref } : { p });

@@ -705,7 +705,7 @@ const CSS = `
 .cn-feats{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:8px}
 .cn-feats li{display:flex;gap:9px;align-items:flex-start;font-size:.92rem;color:#3b4252}
 .cn-feats li span{color:#16a34a;font-weight:800;flex:none}
-.cn-cta{background:linear-gradient(135deg,#34d17f,#16a34a);color:#fff;border:0;border-radius:12px;padding:13px 22px;font-weight:800;font-size:.97rem;cursor:pointer;box-shadow:0 12px 24px -10px rgba(22,163,74,.5)}
+.cn-cta{background:linear-gradient(135deg,#1c9c55,#11743a);color:#fff;border:0;border-radius:12px;padding:13px 22px;font-weight:800;font-size:.97rem;cursor:pointer;box-shadow:0 12px 24px -10px rgba(22,163,74,.5)}
 .cn-head{display:flex;align-items:center;gap:12px;padding:10px 4px 14px;border-bottom:1px solid #e7ebf2}
 .cn-headmid{flex:1;min-width:0}
 .cn-name{font-weight:800;font-size:1.02rem;color:#232a37}
@@ -717,7 +717,7 @@ const CSS = `
 .cn-hact:disabled{opacity:.4;cursor:not-allowed}
 .cn-scroll{max-height:380px;overflow-y:auto;padding:16px 4px;display:flex;flex-direction:column;gap:10px}
 .cn-bubble{max-width:82%;padding:11px 14px;border-radius:16px;font-size:.94rem;line-height:1.5;white-space:pre-wrap;word-wrap:break-word}
-.cn-bubble.user{align-self:flex-end;background:linear-gradient(135deg,#34d17f,#16a34a);color:#fff;font-weight:600;border-bottom-right-radius:5px}
+.cn-bubble.user{align-self:flex-end;background:linear-gradient(135deg,#1c9c55,#11743a);color:#fff;font-weight:600;border-bottom-right-radius:5px}
 .cn-bubble.model{align-self:flex-start;background:#f4f6fa;border:1px solid #e7ebf2;color:#2b3243;border-bottom-left-radius:5px;white-space:normal}
 .cn-hello{color:#4b5563}
 .cn-p{margin:0 0 6px}
@@ -748,13 +748,13 @@ const CSS = `
 .cn-freebar-l{font-size:.72rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--rose,#ef4a6a);white-space:nowrap}
 .cn-freebar-m{flex:1;font-size:.82rem;font-weight:700;color:#8a2540;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cn-freebar-r{font-size:.8rem;font-weight:900;color:var(--rose,#ef4a6a);white-space:nowrap}
-.cn-upsell{width:100%;margin:8px 0;border:0;border-radius:14px;padding:15px;background:linear-gradient(135deg,#34d17f,#16a34a);color:#fff;font-family:var(--disp,inherit);font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 14px 26px -10px rgba(22,163,74,.55);animation:cnpulse 2.4s ease-in-out infinite}
+.cn-upsell{width:100%;margin:8px 0;border:0;border-radius:14px;padding:15px;background:linear-gradient(135deg,#1c9c55,#11743a);color:#fff;font-family:var(--disp,inherit);font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 14px 26px -10px rgba(22,163,74,.55);animation:cnpulse 2.4s ease-in-out infinite}
 .cn-upsell:active{transform:scale(.98)}
 @keyframes cnpulse{0%,100%{box-shadow:0 14px 26px -12px rgba(22,163,74,.5)}50%{box-shadow:0 20px 38px -8px rgba(22,163,74,.85)}}
 .cn-input{display:flex;gap:8px;padding:8px 0}
 .cn-input input{flex:1;background:#f6f8fb;border:1.5px solid #e7ebf2;border-radius:13px;color:#232a37;padding:13px 15px;font-size:.94rem}
 .cn-input input:focus{outline:none;border-color:#8fdcac}
-.cn-input button{background:linear-gradient(135deg,#34d17f,#16a34a);color:#fff;border:0;border-radius:13px;width:48px;font-size:1.15rem;font-weight:800;cursor:pointer}
+.cn-input button{background:linear-gradient(135deg,#1c9c55,#11743a);color:#fff;border:0;border-radius:13px;width:48px;font-size:1.15rem;font-weight:800;cursor:pointer}
 .cn-input button:disabled{opacity:.4;cursor:not-allowed}
 .cn-disc{margin:6px 0 0;font-size:.78rem;line-height:1.55;color:#9aa2b4;border-top:1px solid #e7ebf2;padding-top:10px}
 /* panneau historique / favoris */

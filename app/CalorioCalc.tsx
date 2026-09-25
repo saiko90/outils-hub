@@ -24,12 +24,18 @@ import {
   bilan,
   tendancePoids,
 } from "@/lib/calorio";
-import CoachNutri, { type CoachCtx } from "./CoachNutri";
+import dynamic from "next/dynamic";
+import type { CoachCtx } from "./CoachNutri";
+// Vito n'est chargé qu'à l'ouverture de son onglet : l'écran principal démarre plus vite.
+const CoachNutri = dynamic(() => import("./CoachNutri"), {
+  ssr: false,
+  loading: () => <div className="cl-coachload" role="status" aria-label="Vito…"><span className="cl-coachload-dot" /></div>,
+});
 import { type DuoSummary } from "@/lib/duo";
 import { type Detected } from "@/lib/coachDetect";
 import { type CoachPrefs } from "@/lib/coachPrompt";
 import { getSupabase, authHeader } from "@/lib/supabaseClient";
-import { localISO, addDaysISO, streakEndingAt } from "@/lib/dates";
+import { localISO, addDaysISO, diffDaysISO, streakEndingAt } from "@/lib/dates";
 import { mergeJournal, mergePesees, type Journal, type JournalMeta } from "@/lib/syncMerge";
 import {
   besoinsDynamiques,
@@ -342,6 +348,9 @@ const LX = {
     floorWarn: (n: number) => `Objectif ajusté pour ta sécurité : on ne descend pas sous ${n} kcal/jour (ou ta dépense si elle est plus basse). Pour aller plus loin, parles-en à un·e professionnel·le de santé.`,
     accountTitle: "Mon compte", billingTitle: "Mon abonnement", billingSub: "Carte, factures, résiliation en un clic.", billingBtn: "Gérer", billingErr: "Impossible d'ouvrir la gestion de l'abonnement. Réessaie ou écris-nous.", deleteTitle: "Supprimer mon compte", deleteSub: "Efface définitivement ton compte et toutes tes données. Un abonnement en cours est résilié.", deleteConfirmSub: "Sûr·e ? C'est irréversible : journal, pesées et abonnement seront supprimés.", deleteBtn: "Supprimer", deleteConfirmBtn: "Oui, tout supprimer", deleteErr: "La suppression a échoué. Réessaie ou écris-nous : on s'en occupe.", cancel: "Annuler",
     authConsent: "En te connectant, tu acceptes que tes données de suivi (poids, alimentation) soient enregistrées dans ton compte pour être synchronisées. Tu peux tout supprimer à tout moment.", privacyLink: "Confidentialité",
+    yesterday: "Hier", dayNavLabel: "Changer de jour", prevDay: "Jour précédent", nextDay: "Jour suivant", backToday: "Revenir à aujourd'hui", editingDay: (d: string) => `Tu modifies : ${d}`,
+    back: "Retour",
+    reached: "atteint",
     myDay: "Ma journée", meals: { matin: "Petit-déjeuner", midi: "Déjeuner", snack: "Collations", soir: "Dîner" },
     addShort: "Ajouter", addMealSoir: "Ajouter ton repas du soir",
     act: {
@@ -424,6 +433,9 @@ const LX = {
     floorWarn: (n: number) => `Ziel zu deiner Sicherheit angepasst: nicht unter ${n} kcal/Tag (oder deinem Verbrauch, falls tiefer). Für mehr sprich mit einer Gesundheitsfachperson.`,
     accountTitle: "Mein Konto", billingTitle: "Mein Abo", billingSub: "Karte, Rechnungen, Kündigung mit einem Klick.", billingBtn: "Verwalten", billingErr: "Abo-Verwaltung konnte nicht geöffnet werden. Versuch es nochmal oder schreib uns.", deleteTitle: "Konto löschen", deleteSub: "Löscht dein Konto und alle Daten endgültig. Ein laufendes Abo wird gekündigt.", deleteConfirmSub: "Sicher? Das ist endgültig: Tagebuch, Gewichte und Abo werden gelöscht.", deleteBtn: "Löschen", deleteConfirmBtn: "Ja, alles löschen", deleteErr: "Löschen fehlgeschlagen. Versuch es nochmal oder schreib uns.", cancel: "Abbrechen",
     authConsent: "Mit der Anmeldung stimmst du zu, dass deine Verlaufsdaten (Gewicht, Ernährung) zur Synchronisierung in deinem Konto gespeichert werden. Du kannst jederzeit alles löschen.", privacyLink: "Datenschutz",
+    yesterday: "Gestern", dayNavLabel: "Tag wechseln", prevDay: "Vorheriger Tag", nextDay: "Nächster Tag", backToday: "Zurück zu heute", editingDay: (d: string) => `Du bearbeitest: ${d}`,
+    back: "Zurück",
+    reached: "erreicht",
     myDay: "Mein Tag", meals: { matin: "Frühstück", midi: "Mittagessen", snack: "Snacks", soir: "Abendessen" },
     addShort: "Hinzufügen", addMealSoir: "Abendessen hinzufügen",
     act: {
@@ -506,6 +518,9 @@ const LX = {
     floorWarn: (n: number) => `Target adjusted for your safety: we don't go below ${n} kcal/day (or your expenditure if lower). To go further, talk to a health professional.`,
     accountTitle: "My account", billingTitle: "My subscription", billingSub: "Card, invoices, one-click cancellation.", billingBtn: "Manage", billingErr: "Couldn't open subscription management. Try again or write to us.", deleteTitle: "Delete my account", deleteSub: "Permanently deletes your account and all your data. Any active subscription is cancelled.", deleteConfirmSub: "Sure? This can't be undone: log, weigh-ins and subscription will be deleted.", deleteBtn: "Delete", deleteConfirmBtn: "Yes, delete everything", deleteErr: "Deletion failed. Try again or write to us.", cancel: "Cancel",
     authConsent: "By signing in, you agree that your tracking data (weight, food) is stored in your account to sync it. You can delete everything at any time.", privacyLink: "Privacy",
+    yesterday: "Yesterday", dayNavLabel: "Change day", prevDay: "Previous day", nextDay: "Next day", backToday: "Back to today", editingDay: (d: string) => `You're editing: ${d}`,
+    back: "Back",
+    reached: "reached",
     myDay: "My day", meals: { matin: "Breakfast", midi: "Lunch", snack: "Snacks", soir: "Dinner" },
     addShort: "Add", addMealSoir: "Add your dinner",
     act: {
@@ -894,7 +909,10 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // Jour courant, suivi en direct : si l'app reste ouverte après minuit (ou revient au premier plan),
   // on bascule proprement sur le nouveau jour au lieu d'y recopier le journal de la veille.
   const [today, setToday] = useState(() => todayISO());
-  const day = today;
+  // Jour consulté : null = aujourd'hui (suit minuit automatiquement), sinon un jour passé à corriger.
+  const [viewDay, setViewDay] = useState<string | null>(null);
+  const day = viewDay ?? today;
+  const isToday = day === today;
   const loadedDayRef = useRef("");
   useEffect(() => {
     const tick = () => { const t = todayISO(); setToday((p) => (p === t ? p : t)); };
@@ -942,8 +960,26 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       // Cache local du statut Pro (affichage hors-ligne uniquement). La source de vérité est la base :
       // les fonctions payantes sont vérifiées côté serveur.
       setIsPro(localStorage.getItem("calorio.pro") === "1");
-      const savedLang = localStorage.getItem("calorio.lang");
-      if (savedLang === "fr" || savedLang === "de" || savedLang === "en") setLangOv(savedLang);
+      // Langue : ?lang= (lien depuis la page d'accueil DE/EN) > choix mémorisé > langue du navigateur.
+      const urlLang = url.searchParams.get("lang");
+      const savedLang = urlLang === "fr" || urlLang === "de" || urlLang === "en" ? urlLang : localStorage.getItem("calorio.lang");
+      if (savedLang === "fr" || savedLang === "de" || savedLang === "en") {
+        setLangOv(savedLang);
+        if (urlLang) { localStorage.setItem("calorio.lang", savedLang); url.searchParams.delete("lang"); window.history.replaceState({}, "", url.toString()); }
+      } else {
+        const nl = (navigator.language || "").slice(0, 2).toLowerCase();
+        if (nl === "de" || nl === "en") setLangOv(nl);
+      }
+      // Raccourcis de l'app installée (?go=add|poids|coach) : on ouvre directement le bon écran.
+      const go = url.searchParams.get("go");
+      if (go === "add") { setTab("journee"); setAddMode("menu"); setAddOpen(true); }
+      else if (go === "poids") setTab("poids");
+      else if (go === "coach") setTab("coach");
+      if (go) { url.searchParams.delete("go"); window.history.replaceState({}, "", url.toString()); }
+      // Hors-ligne : le service worker met l'app en cache dès la 1re visite (pas seulement avec les notifications).
+      if ("serviceWorker" in navigator && /(^|\.)calorio\.ch$/.test(window.location.hostname)) {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      }
       // Capture d'un code de parrainage présent dans l'URL (?ref=CODE) pour le réclamer à la connexion.
       const ref = url.searchParams.get("ref");
       if (ref && /^[A-Za-z0-9]{4,10}$/.test(ref) && !localStorage.getItem("calorio.ref")) {
@@ -1546,12 +1582,13 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     () =>
       besoinsDynamiques(
         { sexe, age, poids, taille, activite, objectif },
-        { pas: hcPas, kcalTotalesMesurees: hcTotalKcal, kcalActivesMesurees: hcActiveKcal, seances, palParDefaut: FACTEURS[activite] }
+        // Les mesures Health Connect sont celles d'aujourd'hui : on ne les applique pas à un jour passé.
+        { pas: isToday ? hcPas : undefined, kcalTotalesMesurees: isToday ? hcTotalKcal : undefined, kcalActivesMesurees: isToday ? hcActiveKcal : undefined, seances, palParDefaut: FACTEURS[activite] }
       ),
-    [sexe, age, poids, taille, activite, objectif, hcPas, hcTotalKcal, hcActiveKcal, seances]
+    [sexe, age, poids, taille, activite, objectif, hcPas, hcTotalKcal, hcActiveKcal, seances, isToday]
   );
   // Dynamique par défaut dès qu'on a un signal d'activité (pas mesurés ou séances saisies).
-  const activiteActive = hcPas !== undefined || hcTotalKcal !== undefined || hcActiveKcal !== undefined || seances.length > 0;
+  const activiteActive = (isToday && (hcPas !== undefined || hcTotalKcal !== undefined || hcActiveKcal !== undefined)) || seances.length > 0;
   const besoinsAffiche = activiteActive ? besoinsDyn : besoins;
   const addSeance = () => {
     const min = Math.max(1, typeof actMin === "number" ? actMin : 0);
@@ -1601,12 +1638,12 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
   // Rappel doux (dans l'app) : as-tu noté ton repas ?
   const nudge = useMemo(() => {
-    if (!mounted || nudgeHidden || total.kcal >= besoinsAffiche.cible * 0.5) return "";
+    if (!mounted || !isToday || nudgeHidden || total.kcal >= besoinsAffiche.cible * 0.5) return "";
     const h = new Date().getHours();
     if (total.kcal === 0 && h >= 13 && h < 18) return t.nudgeMidi;
     if (h >= 19 && total.kcal < besoinsAffiche.cible * 0.5) return t.nudgeSoir;
     return "";
-  }, [mounted, nudgeHidden, total.kcal, besoinsAffiche.cible, t]);
+  }, [mounted, isToday, nudgeHidden, total.kcal, besoinsAffiche.cible, t]);
 
   const coachCtx: CoachCtx = useMemo(
     () => ({
@@ -1635,9 +1672,32 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const locale = lang === "de" ? "de-CH" : lang === "en" ? "en-CH" : "fr-CH";
   const dateLabel = useMemo(() => {
     if (!mounted) return "";
-    const s = new Date().toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" });
+    const s = new Date(`${day}T12:00:00`).toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" });
     return s.charAt(0).toUpperCase() + s.slice(1);
-  }, [mounted, locale]);
+  }, [mounted, locale, day]);
+  // Navigation entre les jours (corriger le dîner d'hier, compléter une journée oubliée) — 90 jours max.
+  const MAX_BACK = 90;
+  const goDay = (n: number) => {
+    const target = addDaysISO(day, n);
+    if (target >= today) setViewDay(null);
+    else if (diffDaysISO(target, today) <= MAX_BACK) setViewDay(target);
+  };
+  const dayShort = !mounted ? "" : isToday ? x.today : day === addDaysISO(today, -1) ? x.yesterday
+    : new Date(`${day}T12:00:00`).toLocaleDateString(locale, { weekday: "short", day: "numeric", month: "short" });
+  const dayNav = (
+    <div className="cl-daynav" role="group" aria-label={x.dayNavLabel}>
+      <button className="cl-daynav-b" onClick={() => goDay(-1)} disabled={diffDaysISO(day, today) >= MAX_BACK} aria-label={x.prevDay}>‹</button>
+      <button className={`cl-daynav-c ${isToday ? "" : "past"}`} onClick={() => setViewDay(null)} aria-label={isToday ? x.today : x.backToday}>{dayShort}</button>
+      <button className="cl-daynav-b" onClick={() => goDay(1)} disabled={isToday} aria-label={x.nextDay}>›</button>
+    </div>
+  );
+  const pastBanner = !isToday && mounted ? (
+    <div className="cl-pastbar" role="status">
+      <span>✏️ {x.editingDay(dateLabel)}</span>
+      <button onClick={() => setViewDay(null)}>{x.backToday}</button>
+    </div>
+  ) : null;
+
   const week = useMemo(() => {
     const maxV = Math.max(besoinsAffiche.cible * 1.1, ...histoire.map((d) => d.kcal), 1);
     return histoire.slice(-7).map((d) => ({
@@ -1675,7 +1735,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     prevStreakRef.current = streak;
   }, [mounted, streak, x]);
   useEffect(() => {
-    if (!mounted || !(besoinsAffiche.cible > 0) || goalCelebRef.current) return;
+    if (!mounted || !isToday || !(besoinsAffiche.cible > 0) || goalCelebRef.current) return;
     const inBand = total.kcal >= besoinsAffiche.cible * 0.9 && total.kcal <= besoinsAffiche.cible * 1.1;
     if (!inBand) return;
     const flag = `calorio.celeb.goal.${todayISO()}`;
@@ -1685,7 +1745,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     try { localStorage.setItem(flag, "1"); } catch { /* ignore */ }
     haptic("success");
     setCelebrate(x.celebGoal);
-  }, [mounted, total.kcal, besoinsAffiche.cible, x]);
+  }, [mounted, isToday, total.kcal, besoinsAffiche.cible, x]);
   // Auto-effacement de la célébration.
   useEffect(() => {
     if (!celebrate) return;
@@ -1760,6 +1820,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // Trophée « Confident » : ouvrir l'écran Vito compte comme un échange avec le coach.
   useEffect(() => {
     if (mounted && tab === "coach") markUsed("coach");
+    // Vito parle de la journée en cours : on revient à aujourd'hui en ouvrant le coach.
+    if (tab === "coach" && viewDay) setViewDay(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, tab]);
 
@@ -1981,6 +2043,19 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     } catch { setScanMsg(t.scanNotFound); setScanMissCode(code); }
   };
   const stopScan = () => { scanStop.current?.(); scanStop.current = null; setScanning(false); };
+  // Échap ferme la fenêtre ouverte (clavier, lecteurs d'écran), la plus « haute » d'abord.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (scanning) stopScan();
+      else if (proOpen) setProOpen(false);
+      else if (authOpen) setAuthOpen(false);
+      else if (addOpen) { if (addMode !== "menu") { setAddMode("menu"); setQ(""); } else setAddOpen(false); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scanning, proOpen, authOpen, addOpen, addMode]);
   const startScan = async () => {
     setScanMsg("");
     setScanning(true);
@@ -2150,9 +2225,10 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
           return (
             <div className="cl-screen play" key="stats">
               <div className="cl-head">
-                <div><h1>{x.today}</h1><div className="cl-sub">{dateLabel}</div></div>
-                {streak > 0 && <span className="cl-chip"><span className="cl-flame">🔥</span> {x.streak(streak)}</span>}
+                <div><h1>{isToday ? x.today : dayShort}</h1><div className="cl-sub">{dateLabel}</div></div>
+                {dayNav}
               </div>
+              {pastBanner}
 
               <div className={`cl-card cl-ringcard ${ringPct >= 90 && ringPct <= 110 ? "glow" : ""}`}>
                 <div className="cl-ringwrap">
@@ -2172,7 +2248,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                   <div className="cl-rsep" />
                   <div><div className="cl-rk" style={{ color: "var(--green)" }}>{nf(lang).format(eaten)}</div><div className="cl-rl">{x.mange}</div></div>
                   <div className="cl-rsep" />
-                  <div><div className="cl-rk" style={{ color: over ? "var(--rose)" : "var(--ink)" }}>{ringPct}%</div><div className="cl-rl">{x.objectif}</div></div>
+                  <div><div className="cl-rk" style={{ color: over ? "var(--rose)" : "var(--ink)" }}>{ringPct}%</div><div className="cl-rl">{x.reached}</div></div>
                 </div>
               </div>
 
@@ -2300,7 +2376,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                     <p className="cl-duo-hint">{x.duoInviteHint}</p>
                     {refCode && <div className="cl-duo-mycode"><span>{x.duoYourCode}</span><b>{refCode}</b></div>}
                     <div className="cl-duo-form">
-                      <input className="cl-duo-input" value={duoCode} onChange={(e) => setDuoCode(e.target.value.toUpperCase())} placeholder={x.duoCodePh} maxLength={12} />
+                      <input className="cl-duo-input" aria-label={x.duoCodePh} value={duoCode} onChange={(e) => setDuoCode(e.target.value.toUpperCase())} placeholder={x.duoCodePh} maxLength={12} />
                       <button className="cl-duo-link" onClick={linkDuo} disabled={duoBusy}>{x.duoLink}</button>
                     </div>
                     {duoMsg && <p className="cl-duo-msg">{duoMsg}</p>}
@@ -2321,7 +2397,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         {/* ========== 2. JOURNÉE ========== */}
         {tab === "journee" && (
           <div className="cl-screen play" key="journee">
-            <div className="cl-head"><div><h1>{x.myDay}</h1><div className="cl-sub">{nf(lang).format(total.kcal)} kcal · {bil.pct}%</div></div></div>
+            <div className="cl-head"><div><h1>{isToday ? x.myDay : dayShort}</h1><div className="cl-sub">{nf(lang).format(total.kcal)} kcal · {bil.pct}%</div></div>{dayNav}</div>
+            {pastBanner}
 
             {/* ===== Activité du jour (rose = sport, séparé du vert nutrition) ===== */}
             <div className="cl-card cl-act">
@@ -2431,7 +2508,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                       <div className="cl-fn">
                         <b>{line.food.nom}{line.food.brand ? <small> · {line.food.brand}</small> : null}</b>
                         <span className="cl-fg">
-                          <input type="number" min={0} step={10} value={line.grammes} onChange={(e) => setGrammes(line.key, Number(e.target.value))} /> g
+                          <input type="number" min={0} step={10} aria-label={`${line.food.nom} (g)`} value={line.grammes} onChange={(e) => setGrammes(line.key, Number(e.target.value))} /> g
                         </span>
                       </div>
                       <span className="cl-fk">{nf(lang).format(kcal)}</span>
@@ -2449,7 +2526,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               onChange={(e) => { const f = e.target.files?.[0]; if (f) onPhoto(f); e.target.value = ""; }} />
             {(scanMsg || photoMsg) && (
               <div className="cl-scanmsgwrap">
-                <p className="cl-scanmsg">{scanMsg || photoMsg}</p>
+                <p className="cl-scanmsg" role="status" aria-live="polite">{scanMsg || photoMsg}</p>
                 {scanMissCode && (
                   <button className="cl-scanadd" onClick={() => {
                     setCf({ nom: "", kcal: "", prot: "", gluc: "", lip: "", portion: "", emoji: "🏷️", code: scanMissCode });
@@ -2537,7 +2614,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               <label className="cl-pin cl-goalset">
                 <span>🎯 {x.goalWeight}</span>
                 <span className="cl-frow">
-                  <input type="number" min={0} step={0.1} value={poidsCible} placeholder="—" onChange={(e) => setPoidsCible(e.target.value === "" ? "" : Number(e.target.value))} className="cl-num" />
+                  <input type="number" min={0} step={0.1} aria-label={x.tileGoal} value={poidsCible} placeholder="—" onChange={(e) => setPoidsCible(e.target.value === "" ? "" : Number(e.target.value))} className="cl-num" />
                   <span className="cl-goalunit">kg</span>
                 </span>
               </label>
@@ -2754,10 +2831,10 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       )}
       {mounted && showOnboarding && (
         <div className="cl-obov">
-          <div className="cl-obcard">
+          <div className="cl-obcard" role="dialog" aria-modal="true" aria-labelledby="cl-ob-title">
             <div className="cl-ob-h">
               <span className="cl-ob-emo" aria-hidden>🥕</span>
-              <h2>{t.ob.title}</h2>
+              <h2 id="cl-ob-title">{t.ob.title}</h2>
               <p>{t.ob.sub}</p>
             </div>
             <div className="cl-ob-fields">
@@ -2796,10 +2873,10 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       )}
       {addOpen && (
         <div className="cl-scanoverlay" onClick={() => setAddOpen(false)}>
-          <div className="cl-chooser" onClick={(e) => e.stopPropagation()}>
+          <div className="cl-chooser" role="dialog" aria-modal="true" aria-label={t.addFood} onClick={(e) => e.stopPropagation()}>
             <div className="cl-chooser-h">
               <b>{addMode === "menu" ? t.addFood : addMode === "library" ? `📚 ${t.mLib}` : addMode === "online" ? `🔍 ${t.mOnline}` : addMode === "meals" ? `⭐ ${x.myMeals}` : addMode === "recettes" ? `🍲 ${x.recipes}` : `➕ ${x.createFood}`}</b>
-              <button className="cl-chooser-x" onClick={() => { if (addMode === "menu") setAddOpen(false); else { setAddMode("menu"); setQ(""); } }}>{addMode === "menu" ? "×" : "‹"}</button>
+              <button className="cl-chooser-x" aria-label={addMode === "menu" ? t.close : x.back} onClick={() => { if (addMode === "menu") setAddOpen(false); else { setAddMode("menu"); setQ(""); } }}>{addMode === "menu" ? "×" : "‹"}</button>
             </div>
 
             {addMode === "menu" && (
@@ -2899,7 +2976,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
             {addMode === "library" && (
               <div className="cl-picker">
-                <input className="cl-search" placeholder={t.rechercheLib} value={q} onChange={(e) => setQ(e.target.value)} />
+                <input className="cl-search" aria-label={t.rechercheLib} placeholder={t.rechercheLib} value={q} onChange={(e) => setQ(e.target.value)} />
                 {customMatches.length > 0 && (
                   <>
                     <div className="cl-secth">🍴 {x.myFoods}</div>
@@ -2947,7 +3024,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
             {addMode === "online" && (
               <div className="cl-picker">
-                <input className="cl-search" placeholder={t.rechercherBig} value={q} onChange={(e) => setQ(e.target.value)} />
+                <input className="cl-search" aria-label={t.rechercherBig} placeholder={t.rechercherBig} value={q} onChange={(e) => setQ(e.target.value)} />
                 {q.trim().length >= 2 ? (
                   <>
                     <div className="cl-secth">🌍 {t.offTitle}{offLoading && <span className="cl-offload"> · {t.offLoading}</span>}</div>
@@ -2970,7 +3047,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
       {scanning && (
         <div className="cl-scanoverlay">
-          <div className="cl-scanbox">
+          <div className="cl-scanbox" role="dialog" aria-modal="true" aria-label={t.scanTitle}>
             <video ref={videoRef} className="cl-scanvid" playsInline muted />
             <div className="cl-scanframe" aria-hidden />
             <div className="cl-scanttl">{t.scanTitle}</div>
@@ -2981,7 +3058,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
       {authOpen && !user && (
         <div className="cl-scanoverlay" onClick={() => setAuthOpen(false)}>
-          <div className="cl-authpanel" onClick={(e) => e.stopPropagation()}>
+          <div className="cl-authpanel" role="dialog" aria-modal="true" aria-label={t.authTitle} onClick={(e) => e.stopPropagation()}>
             <button className="cl-chooser-x cl-auth-close" onClick={() => setAuthOpen(false)} aria-label={t.close}>×</button>
             <div className="cl-auth-h">{t.authTitle}</div>
             <p className="cl-auth-s">{t.authSub}</p>
@@ -3002,7 +3079,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
       {proOpen && (
         <div className="cl-scanoverlay" onClick={() => setProOpen(false)}>
-          <div className="cl-promodal" onClick={(e) => e.stopPropagation()}>
+          <div className="cl-promodal" role="dialog" aria-modal="true" aria-label={t.proTitle} onClick={(e) => e.stopPropagation()}>
             <div className="cl-pro-h">🥕 {t.proTitle}</div>
             <p className="cl-pro-s">{t.proSub}</p>
             <ul className="cl-pro-feats">
@@ -3095,8 +3172,8 @@ function Slider({ label, value, min, max, onChange }: { label: string; value: nu
     <label className="cl-field">
       <span>{label}</span>
       <span className="cl-frow">
-        <input type="range" min={min} max={max} step={1} value={value} onChange={(e) => onChange(Number(e.target.value))} className="cl-range" />
-        <input type="number" min={min} max={max} value={value} onChange={(e) => onChange(Number(e.target.value))} className="cl-num" />
+        <input type="range" aria-label={label} min={min} max={max} step={1} value={value} onChange={(e) => onChange(Number(e.target.value))} className="cl-range" />
+        <input type="number" aria-label={label} min={min} max={max} value={value} onChange={(e) => onChange(Number(e.target.value))} className="cl-num" />
       </span>
     </label>
   );
@@ -3222,17 +3299,16 @@ function deltaColor(delta: number, objectif: Objectif): string {
 
 /* ---------------- styles ---------------- */
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap');
 .cl{position:fixed;inset:0;max-width:480px;margin:0 auto;z-index:1;display:flex;flex-direction:column;overflow:hidden;
   background:radial-gradient(115% 65% at 88% 106%, #fbdbe7 0%, transparent 52%), radial-gradient(90% 55% at 6% -6%, #eafaf0 0%, transparent 55%), linear-gradient(180deg,#e4efe6 0%,#dde9e1 52%,#ece6ec 100%);
-  --ink:#18231b;--muted:#5f6d62;--soft:#96a29a;--line:#e7ece7;
+  --ink:#18231b;--muted:#5f6d62;--soft:#67766b;--line:#e7ece7;
   --card:#ffffff;--card2:#f4f7f4;--input:#ffffff;--ringtrack:#eaf1ea;--shadowc:20,50,30;
   --green:#16a34a;--green2:#34d17f;--greenbg:#e6f7ee;--greenline:#c7ecd4;
   --rose:#ef4a6a;--rosebg:#fdeaf0;--roseline:#f7cbd8;
   --gold:#b57e07;--goldbg:linear-gradient(135deg,#fcd34d,#f59e0b);--goldline:#f6d789;
   --prot:#12b3a3;--gluc:#f4a52e;--lip:#ef4a6a;--red:#ef4457;--redbg:#fdeef1;
-  --btn:linear-gradient(135deg,#34d17f,#16a34a);
-  --disp:"Fredoka","Nunito",system-ui,sans-serif;--body:"Nunito",system-ui,-apple-system,sans-serif;
+  --btn:linear-gradient(135deg,#1c9c55,#11743a); /* blanc lisible (AA) sur tout le dégradé */
+  --disp:var(--font-fredoka),"Fredoka",system-ui,sans-serif;--body:var(--font-nunito),"Nunito",system-ui,-apple-system,sans-serif;
   font-family:var(--body);color:var(--ink);-webkit-font-smoothing:antialiased}
 .cl *{box-sizing:border-box}
 .cl h1,.cl h3,.cl b{color:var(--ink)}
@@ -3316,11 +3392,24 @@ const CSS = `
 .cl-databtn.danger{background:#c0283f;color:#fff;border-color:#c0283f}
 .cl-auth-legal{margin:12px 2px 0;font-size:.72rem;line-height:1.45;color:var(--muted);text-align:center}
 .cl-auth-legal a{color:var(--green);font-weight:700}
+.cl-coachload{display:grid;place-items:center;min-height:50vh}
+.cl-coachload-dot{width:34px;height:34px;border-radius:50%;border:3px solid var(--greenline);border-top-color:var(--green);animation:clspin .8s linear infinite}
+@keyframes clspin{to{transform:rotate(360deg)}}
+.cl-daynav{display:flex;align-items:center;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:3px;box-shadow:0 4px 12px -8px rgba(var(--shadowc),.35)}
+.cl-daynav-b{width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:var(--ink);font-size:1.35rem;line-height:1;cursor:pointer;display:grid;place-items:center}
+.cl-daynav-b:disabled{opacity:.3;cursor:default}
+.cl-daynav-b:not(:disabled):active{background:var(--card2)}
+.cl-daynav-c{border:0;background:transparent;color:var(--green);font-family:var(--disp);font-weight:700;font-size:.88rem;padding:6px 8px;border-radius:99px;cursor:pointer;min-width:74px;white-space:nowrap}
+.cl-daynav-c.past{background:var(--greenbg);color:var(--ink)}
+.cl-pastbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:14px;background:#fff6dd;border:1px solid #f1d98a;color:#5a4410;font-size:.84rem;font-weight:700}
+.cl[data-theme="dark"] .cl-pastbar{background:#3a3114;border-color:#6b5a1f;color:#f5e3a8}
+.cl-pastbar button{border:0;background:#5a4410;color:#fff;border-radius:99px;padding:6px 12px;font-weight:800;font-size:.78rem;cursor:pointer;white-space:nowrap}
 .cl-kcalpop{position:fixed;left:50%;top:20%;transform:translateX(-50%);z-index:130;pointer-events:none;white-space:nowrap;font-family:var(--disp);font-weight:800;font-size:1.15rem;color:#fff;background:linear-gradient(180deg,#43d488,#16a34a);padding:9px 18px;border-radius:99px;box-shadow:0 14px 32px -8px rgba(20,140,70,.6),inset 0 1px 0 rgba(255,255,255,.45);animation:clkcalpop 1.15s cubic-bezier(.22,1,.36,1) forwards}
 @keyframes clkcalpop{0%{opacity:0;transform:translateX(-50%) translateY(16px) scale(.8)}18%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.04)}30%{transform:translateX(-50%) translateY(0) scale(1)}72%{opacity:1;transform:translateX(-50%) translateY(-8px) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-46px) scale(.95)}}
 .cl-ringcard.glow{animation:clringglow 2.6s ease-in-out infinite}
 @keyframes clringglow{0%,100%{box-shadow:inset 0 2px 0 rgba(255,255,255,.55),0 32px 62px -22px rgba(20,130,66,.5),0 0 0 0 rgba(52,209,127,0)}50%{box-shadow:inset 0 2px 0 rgba(255,255,255,.55),0 30px 58px -18px rgba(20,130,66,.7),0 0 36px 2px rgba(52,209,127,.42)}}
 .cl-ringwrap{position:relative;width:210px;height:210px;margin:6px auto 4px}
+.cl-ringwrap svg{overflow:visible} /* le halo de l'arc ne doit pas être coupé en carré */
 .cl-ring-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .cl-ring-big{font-family:var(--disp);font-weight:700;font-size:3rem;line-height:.95;letter-spacing:-1px;font-variant-numeric:tabular-nums;color:var(--ink)}
 .cl-ring-lb{font-size:.8rem;color:var(--muted);font-weight:700;margin-top:3px}
@@ -3607,7 +3696,7 @@ const CSS = `
 .cl-duo-form{display:flex;gap:8px}
 .cl-duo-input{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font-size:1rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink);background:var(--card);font-family:inherit}
 .cl-duo-link,.cl-duo-unlink,.cl-duo-signin{border:none;cursor:pointer;font-family:inherit;font-weight:800}
-.cl-duo-link{flex:none;background:linear-gradient(135deg,#34d17f,#16a34a);color:#fff;border-radius:12px;padding:0 20px;font-size:.95rem}
+.cl-duo-link{flex:none;background:linear-gradient(135deg,#1c9c55,#11743a);color:#fff;border-radius:12px;padding:0 20px;font-size:.95rem}
 .cl-duo-link:disabled{opacity:.6}
 .cl-duo-msg{margin:9px 2px 0;font-size:.85rem;font-weight:700;color:var(--rose)}
 .cl-duo-h{font-size:.82rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}

@@ -7,11 +7,17 @@ export function middleware(req: NextRequest) {
   const host = (req.headers.get("host") || "").split(":")[0];
   const { pathname } = req.nextUrl;
   const onCalorio = host === "calorio.ch" || host === "www.calorio.ch";
-  // App autonome calorio sur son propre domaine calorio.ch → sert la page /calorio.
-  if (onCalorio && pathname === "/") {
+  // calorio.ch : page d'accueil indexable (FR / DE / EN) ; l'application vit sur /calorio.
+  if (onCalorio && (pathname === "/" || pathname === "/de" || pathname === "/en")) {
     const url = req.nextUrl.clone();
-    url.pathname = "/calorio";
+    url.pathname = pathname === "/" ? "/calorio-accueil" : `/calorio-accueil${pathname}`;
     return NextResponse.rewrite(url);
+  }
+  // La page d'accueil n'existe que sous calorio.ch/ (évite le contenu dupliqué).
+  const local = host === "localhost" || host === "127.0.0.1";
+  if (!local && pathname.startsWith("/calorio-accueil")) {
+    const rest = pathname.replace(/^\/calorio-accueil/, "") || "/";
+    return NextResponse.redirect(`https://calorio.ch${rest}`, 308);
   }
   // Depuis outils.ch (ou ailleurs), toute page /o/calorio (FR/DE/EN) renvoie vers l'app calorio.ch
   // → l'utilisateur arrive sur le vrai site de calorio (installation PWA proposée, connexion sur le bon domaine).

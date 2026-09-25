@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { RECETTES, RECETTE_SLUGS, recetteBySlug, recetteSlug, recetteNutri, alimentSlug, type Recette, type RecetteCat } from "@/lib/calorio";
+import { RECETTE_ETAPES } from "@/lib/recetteEtapes";
 
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -22,7 +23,9 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
     title: `${rec.nom.fr} : calories et recette (${n.parPortion.kcal} kcal / portion)`,
     description: `${rec.nom.fr} : ${n.parPortion.kcal} kcal par portion (${n.parPortion.prot} g de protéines, ${n.parPortion.gluc} g de glucides, ${n.parPortion.lip} g de lipides). Ingrédients, valeurs nutritionnelles et suivi gratuit avec calorio.`,
     alternates: { canonical: canon },
-    openGraph: { title: `${rec.nom.fr} — ${n.parPortion.kcal} kcal/portion`, description: `Calories, macros et ingrédients de ${rec.nom.fr}. Suis tes repas gratuitement avec calorio.`, url: canon, type: "article", siteName: "calorio" },
+    openGraph: { title: `${rec.nom.fr} — ${n.parPortion.kcal} kcal/portion`, description: `Calories, macros et ingrédients de ${rec.nom.fr}. Suis tes repas gratuitement avec calorio.`, url: canon, type: "article", siteName: "calorio", locale: "fr_CH" },
+    twitter: { card: "summary_large_image", title: `${rec.nom.fr} — ${n.parPortion.kcal} kcal/portion`, description: `Calories, macros et ingrédients de ${rec.nom.fr}.` },
+    keywords: [rec.nom.fr, `${rec.nom.fr} calories`, "recette healthy", "calories recette", "macros"],
   };
 }
 
@@ -45,10 +48,19 @@ export default function Page({ params }: { params: { slug: string } }) {
     { q: `Combien de temps pour préparer ${rec.nom.fr.toLowerCase()} ?`, a: `Compte environ ${rec.temps} minutes pour ${rec.portions} portion${rec.portions > 1 ? "s" : ""}.` },
   ];
 
+  const etapes = RECETTE_ETAPES[rec.id] || [];
+  const url = `https://calorio.ch/recettes/${params.slug}`;
   const recipeLd = {
     "@context": "https://schema.org", "@type": "Recipe",
     name: rec.nom.fr, recipeYield: `${rec.portions} portion${rec.portions > 1 ? "s" : ""}`,
+    description: `${rec.nom.fr} : ${n.parPortion.kcal} kcal par portion, ${n.parPortion.prot} g de protéines. Recette simple avec calories et macros détaillées.`,
+    image: [`${url}/opengraph-image`],
+    author: { "@type": "Organization", name: "calorio", url: "https://calorio.ch/" },
+    recipeCategory: CAT_FR[rec.cat],
+    recipeCuisine: rec.id === "raclette_valais" || rec.id === "fondue_moitie" || rec.id === "rosti_oeuf" ? "Suisse" : "Maison",
+    keywords: `${rec.nom.fr}, calories, macros, recette ${CAT_FR[rec.cat].toLowerCase()}`,
     totalTime: `PT${rec.temps}M`,
+    recipeInstructions: etapes.map((t, i) => ({ "@type": "HowToStep", position: i + 1, text: t })),
     recipeIngredient: n.ingredients.map((i) => `${i.g} g ${i.al.nom.fr.toLowerCase()}`),
     nutrition: { "@type": "NutritionInformation", calories: `${n.parPortion.kcal} kcal`, proteinContent: `${n.parPortion.prot} g`, carbohydrateContent: `${n.parPortion.gluc} g`, fatContent: `${n.parPortion.lip} g` },
   };
@@ -93,6 +105,15 @@ export default function Page({ params }: { params: { slug: string } }) {
         </div>
         <p className="ca-note">Quantités pour {rec.portions} portion{rec.portions > 1 ? "s" : ""}. Clique un ingrédient pour ses calories détaillées.</p>
 
+        {etapes.length > 0 && (
+          <>
+            <h2 className="ca-h2">Préparation</h2>
+            <ol className="ca-steps">
+              {etapes.map((t) => <li key={t}>{t}</li>)}
+            </ol>
+          </>
+        )}
+
         <h2 className="ca-h2">Valeurs nutritionnelles</h2>
         <div className="ca-tablewrap">
           <table className="ca-table">
@@ -110,7 +131,7 @@ export default function Page({ params }: { params: { slug: string } }) {
         <div className="ca-final">
           <div className="ca-final-t">Ajoute {rec.nom.fr.toLowerCase()} à ton journal</div>
           <p>Dans calorio, cette recette s'ajoute en un tap et compte tes calories et macros du jour. Gratuit, sans pub.</p>
-          <a className="ca-cta" href="https://calorio.ch/">Ouvrir calorio <span aria-hidden>→</span></a>
+          <a className="ca-cta" href="https://calorio.ch/calorio">Ouvrir calorio <span aria-hidden>→</span></a>
         </div>
 
         {related.length > 0 && (
@@ -145,6 +166,9 @@ export default function Page({ params }: { params: { slug: string } }) {
 }
 
 const RE_CSS = `
+.ca-steps{margin:0 0 8px;padding:0;list-style:none;counter-reset:st;display:grid;gap:10px}
+.ca-steps li{counter-increment:st;position:relative;padding:12px 14px 12px 50px;background:#fff;border:1px solid #dcebe0;border-radius:14px;line-height:1.5}
+.ca-steps li::before{content:counter(st);position:absolute;left:14px;top:11px;width:26px;height:26px;border-radius:50%;background:#16a34a;color:#fff;font-weight:800;font-size:.85rem;display:grid;place-items:center}
 body{background:#f3f7f2 !important}
 .ca-bg{position:fixed;inset:0;z-index:-5;background:radial-gradient(1100px 560px at 50% -8%, #e9faf0, #f3f7f2 62%)}
 .ca{max-width:760px;margin:0 auto;padding:16px 18px 70px;color:#2b3243;font-family:inherit}

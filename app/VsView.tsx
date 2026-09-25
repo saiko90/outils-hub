@@ -315,7 +315,7 @@ export default function VsView({ lang, comp = "myfitnesspal" }: { lang: Lang; co
 
         <h1 className="vs-h1">{d.h1}</h1>
         <p className="vs-intro">{d.intro}</p>
-        <a className="vs-cta vs-cta-top" href="https://calorio.ch/">{c.ctaBtn} <span aria-hidden>→</span></a>
+        <a className="vs-cta vs-cta-top" href="https://calorio.ch/calorio">{c.ctaBtn} <span aria-hidden>→</span></a>
 
         <h2 className="vs-h2">{c.tableTitle}</h2>
         <div className="vs-tablewrap">
@@ -358,7 +358,7 @@ export default function VsView({ lang, comp = "myfitnesspal" }: { lang: Lang; co
         <div className="vs-final">
           <div className="vs-final-t">{c.ctaTitle}</div>
           <p>{c.ctaSub}</p>
-          <a className="vs-cta" href="https://calorio.ch/">{c.ctaBtn} <span aria-hidden>→</span></a>
+          <a className="vs-cta" href="https://calorio.ch/calorio">{c.ctaBtn} <span aria-hidden>→</span></a>
         </div>
 
         <p className="vs-disc">{d.disclaimer}</p>

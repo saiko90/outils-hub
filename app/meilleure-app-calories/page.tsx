@@ -47,7 +47,7 @@ export default function Page() {
 
         <h1 className="ml-h1">Meilleure app de calories gratuite en Suisse</h1>
         <p className="ml-intro">Tu cherches une application simple pour compter tes calories, sans pub et sans te ruiner ? Voici ce qui compte vraiment, et pourquoi calorio coche les bonnes cases — gratuit, avec coach nutrition IA, scan de code-barres inclus et produits suisses.</p>
-        <a className="ml-cta" href="https://calorio.ch/">Ouvrir calorio gratuitement <span aria-hidden>→</span></a>
+        <a className="ml-cta" href="https://calorio.ch/calorio">Ouvrir calorio gratuitement <span aria-hidden>→</span></a>
 
         <h2 className="ml-h2">Ce qu'une bonne app de calories doit avoir</h2>
         <div className="ml-tablewrap">
@@ -85,7 +85,7 @@ export default function Page() {
         <div className="ml-final">
           <div className="ml-final-t">Prêt à compter tes calories, simplement ?</div>
           <p>Gratuit, sans pub, sans installation. Ouvre calorio dans ton navigateur en un clic.</p>
-          <a className="ml-cta" href="https://calorio.ch/">Ouvrir calorio <span aria-hidden>→</span></a>
+          <a className="ml-cta" href="https://calorio.ch/calorio">Ouvrir calorio <span aria-hidden>→</span></a>
         </div>
         <p className="ml-disc">Comparaison indicative basée sur des informations publiques en septembre 2026 ; les offres et prix des autres applications peuvent changer. Les marques citées appartiennent à leurs propriétaires respectifs.</p>
       </main>

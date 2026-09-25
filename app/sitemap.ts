@@ -3,6 +3,10 @@ import { headers } from "next/headers";
 import { TOOLS, REAL_CATEGORIES, CAT_SLUG } from "@/lib/catalog";
 import { ALIMENT_SLUGS, RECETTE_SLUGS } from "@/lib/calorio";
 
+// Dates réelles de dernière modification (et non « maintenant » à chaque requête, ce qui n'apprend rien aux moteurs).
+const CALORIO_UPDATED = new Date("2026-09-25");
+const CALORIO_CONTENT = new Date("2026-09-25");
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   // calorio.ch est un domaine/app distinct : son sitemap ne doit lister que ses
@@ -11,17 +15,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
   if (host === "calorio.ch" || host === "www.calorio.ch") {
     const vs = ["calorio-vs-myfitnesspal", "calorio-vs-yazio", "calorio-vs-lifesum", "calorio-vs-cronometer"];
     return [
-      { url: "https://calorio.ch/", lastModified: now, changeFrequency: "weekly", priority: 1 },
+      { url: "https://calorio.ch/", lastModified: CALORIO_UPDATED, changeFrequency: "weekly", priority: 1, alternates: { languages: { fr: "https://calorio.ch/", de: "https://calorio.ch/de", en: "https://calorio.ch/en" } } },
+      { url: "https://calorio.ch/de", lastModified: CALORIO_UPDATED, changeFrequency: "weekly", priority: 0.95, alternates: { languages: { fr: "https://calorio.ch/", de: "https://calorio.ch/de", en: "https://calorio.ch/en" } } },
+      { url: "https://calorio.ch/en", lastModified: CALORIO_UPDATED, changeFrequency: "weekly", priority: 0.95, alternates: { languages: { fr: "https://calorio.ch/", de: "https://calorio.ch/de", en: "https://calorio.ch/en" } } },
       ...vs.flatMap((s) => [
-        { url: `https://calorio.ch/${s}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
-        { url: `https://calorio.ch/${s}/en`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
+        { url: `https://calorio.ch/${s}`, lastModified: CALORIO_CONTENT, changeFrequency: "monthly" as const, priority: 0.8 },
+        { url: `https://calorio.ch/${s}/en`, lastModified: CALORIO_CONTENT, changeFrequency: "monthly" as const, priority: 0.75 },
       ]),
-      { url: "https://calorio.ch/meilleure-app-calories", lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-      { url: "https://calorio.ch/confidentialite-calorio", lastModified: now, changeFrequency: "yearly", priority: 0.3 },
-      { url: "https://calorio.ch/calories", lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-      ...ALIMENT_SLUGS.map((x) => ({ url: `https://calorio.ch/calories/${x.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 })),
-      { url: "https://calorio.ch/recettes", lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-      ...RECETTE_SLUGS.map((x) => ({ url: `https://calorio.ch/recettes/${x.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 })),
+      { url: "https://calorio.ch/meilleure-app-calories", lastModified: CALORIO_CONTENT, changeFrequency: "monthly", priority: 0.8 },
+      { url: "https://calorio.ch/confidentialite-calorio", lastModified: CALORIO_CONTENT, changeFrequency: "yearly", priority: 0.3 },
+      { url: "https://calorio.ch/calories", lastModified: CALORIO_CONTENT, changeFrequency: "monthly", priority: 0.7 },
+      ...ALIMENT_SLUGS.map((x) => ({ url: `https://calorio.ch/calories/${x.slug}`, lastModified: CALORIO_CONTENT, changeFrequency: "monthly" as const, priority: 0.6 })),
+      { url: "https://calorio.ch/recettes", lastModified: CALORIO_CONTENT, changeFrequency: "monthly", priority: 0.7 },
+      ...RECETTE_SLUGS.map((x) => ({ url: `https://calorio.ch/recettes/${x.slug}`, lastModified: CALORIO_CONTENT, changeFrequency: "monthly" as const, priority: 0.6 })),
     ];
   }
   const B = "https://outils.ch";

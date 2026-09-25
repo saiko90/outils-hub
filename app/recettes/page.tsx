@@ -31,7 +31,7 @@ export default function Page() {
 
         <h1 className="ci-h1">Recettes équilibrées & calories</h1>
         <p className="ci-intro">Des recettes simples avec leurs calories et macros par portion. Clique pour le détail — et dans calorio, ajoute une recette entière à ton journal en un seul tap. Gratuit, sans pub.</p>
-        <a className="ci-cta" href="https://calorio.ch/">Ouvrir calorio <span aria-hidden>→</span></a>
+        <a className="ci-cta" href="https://calorio.ch/calorio">Ouvrir calorio <span aria-hidden>→</span></a>
 
         {CAT_ORDER.map((cat) => {
           const items = RECETTES.filter((r) => r.cat === cat);

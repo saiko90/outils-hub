@@ -82,7 +82,7 @@ export default function Page({ params }: { params: { slug: string } }) {
         <div className="ca-final">
           <div className="ca-final-t">Suis {al.nom.fr.toLowerCase()} dans ton journal</div>
           <p>Ajoute cet aliment en deux tapes, calorio calcule tes calories et tes macros du jour. Gratuit, sans pub.</p>
-          <a className="ca-cta" href="https://calorio.ch/">Ouvrir calorio <span aria-hidden>→</span></a>
+          <a className="ca-cta" href="https://calorio.ch/calorio">Ouvrir calorio <span aria-hidden>→</span></a>
         </div>
 
         {related.length > 0 && (

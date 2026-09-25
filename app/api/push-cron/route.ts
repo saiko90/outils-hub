@@ -154,7 +154,7 @@ export async function GET(req: Request) {
         }
         const v = buildRecap(s.lang, days, avg, wDelta);
         try {
-          await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, JSON.stringify({ title: v.title, body: v.body, url: "/", tag: "calorio-recap" }));
+          await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, JSON.stringify({ title: v.title, body: v.body, url: "/calorio", tag: "calorio-recap" }));
           sentR++;
         } catch (e: unknown) {
           const code = (e as { statusCode?: number })?.statusCode;
@@ -221,7 +221,7 @@ export async function GET(req: Request) {
       const useStreak = job === "dinner" && !usePerso && n >= 2;
       const v = usePerso ? buildRemaining(s.lang, rem) : useStreak ? buildStreak(s.lang, n) : pickPush(s.lang, job as PushType);
       const tag = usePerso ? "calorio-remaining" : useStreak ? "calorio-streak" : `calorio-${job}`;
-      const payload = JSON.stringify({ title: v.title, body: v.body, url: "/", tag });
+      const payload = JSON.stringify({ title: v.title, body: v.body, url: "/calorio", tag });
       try {
         await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload);
         sent++;

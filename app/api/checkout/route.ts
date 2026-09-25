@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     if (activeStripe) return NextResponse.json({ error: "already_subscribed" }, { status: 409 });
     existingCustomer = p?.stripe_customer_id || "";
   } catch { /* on continue : Stripe reste la source de vérité */ }
-  const returnPath = base === SITE ? "/o/calorio" : "/";
+  const returnPath = base === SITE ? "/o/calorio" : "/calorio";
 
   // 3) Créer la session Checkout (abonnement, essai 7 jours)
   const form = new URLSearchParams();

@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   let body: { origin?: string; lang?: string } = {};
   try { body = (await req.json()) as typeof body; } catch { /* défauts */ }
   const base = safeBase(body.origin);
-  const returnUrl = `${base}${base.includes("outils.ch") ? "/o/calorio" : "/"}`;
+  const returnUrl = `${base}${base.includes("outils.ch") ? "/o/calorio" : "/calorio"}`;
 
   const r = await fetch(`${SB_URL}/rest/v1/calorio_pro?id=eq.${uid}&select=stripe_customer_id`, { headers: svcHeaders() });
   const rows = r.ok ? ((await r.json()) as { stripe_customer_id?: string | null }[]) : [];

@@ -13,7 +13,7 @@ self.addEventListener("push", (event) => {
     badge: "/calorio-badge.png",
     tag: data.tag || "calorio",
     renotify: true,
-    data: { url: data.url || "/" },
+    data: { url: data.url || "/calorio" },
     vibrate: [70, 40, 70],
   };
   event.waitUntil(self.registration.showNotification(title, options));
@@ -21,7 +21,7 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const target = (event.notification.data && event.notification.data.url) || "/";
+  const target = (event.notification.data && event.notification.data.url) || "/calorio";
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
       for (const c of list) {
@@ -36,8 +36,8 @@ self.addEventListener("notificationclick", (event) => {
 });
 
 /* ---- Cache hors-ligne (app-shell) ---- */
-const CACHE = "calorio-cache-v1";
-const PRECACHE = ["/", "/calorio-icon-192.png", "/calorio-icon-180.png", "/manifest.webmanifest"];
+const CACHE = "calorio-cache-v2"; // changer de version purge l'ancien cache à l'activation
+const PRECACHE = ["/calorio", "/calorio-icon-192.png", "/calorio-icon-180.png", "/calorio.webmanifest"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -67,7 +67,7 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       fetch(req)
         .then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {}); return res; })
-        .catch(() => caches.match(req).then((m) => m || caches.match("/")))
+        .catch(() => caches.match(req).then((m) => m || caches.match("/calorio")))
     );
     return;
   }

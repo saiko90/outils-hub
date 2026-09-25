@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { authUser, isProServer, dailyQuota } from "@/lib/serverAuth";
 
 // Analyse photo d'un repas → estimation des aliments et calories (Gemini Vision).
 // La clé reste côté serveur (GEMINI_API_KEY). Fonction Pro.
@@ -17,9 +18,18 @@ Réponds UNIQUEMENT avec un objet JSON valide, sans texte autour, au format exac
 Si la photo ne contient pas de nourriture identifiable, renvoie {"items":[]}.
 Sois réaliste et prudent dans les estimations. Maximum 8 aliments.`;
 
+const VISION_DAILY_MAX = 30;
+const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+
 export async function POST(req: Request) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+
+  // Fonction Pro : compte connecté + Pro vérifié en base + quota journalier par utilisateur.
+  const user = await authUser(req);
+  if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+  if (!(await isProServer(user.id))) return NextResponse.json({ error: "pro_required" }, { status: 402 });
+  if (!(await dailyQuota(`vision:u:${user.id}`, VISION_DAILY_MAX))) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
 
   let body: { image?: string; mime?: string; lang?: string };
   try {
@@ -28,7 +38,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "bad_request" }, { status: 400 });
   }
   const image = body.image || "";
-  const mime = body.mime || "image/jpeg";
+  const mime = ALLOWED_MIME.includes(body.mime || "") ? (body.mime as string) : "image/jpeg";
   const lang = body.lang === "de" ? "allemand" : body.lang === "en" ? "anglais" : "français";
   if (!image || image.length < 100) return NextResponse.json({ error: "no_image" }, { status: 400 });
   if (image.length > 8_000_000) return NextResponse.json({ error: "too_large" }, { status: 413 });

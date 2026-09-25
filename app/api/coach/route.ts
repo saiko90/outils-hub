@@ -13,11 +13,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "not_configured", message: "Le coach n'est pas encore activé (clé API manquante côté serveur)." }, { status: 503 });
   }
 
-  // Garde-fou anti-abus (origine + limite par IP/jour). Fail-open.
-  const blocked = await coachGuard(req);
-  if (blocked === 429) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
-  if (blocked) return NextResponse.json({ error: "forbidden" }, { status: 403 });
-
   let body: { messages?: CoachMsg[]; context?: CoachApiCtx };
   try {
     body = (await req.json()) as { messages?: CoachMsg[]; context?: CoachApiCtx };
@@ -29,6 +24,12 @@ export async function POST(req: Request) {
   const lang = coachLang(ctx);
   const msgs = trimMessages(body.messages);
   if (msgs.length === 0) return NextResponse.json({ error: "empty" }, { status: 400 });
+
+  // Garde-fou serveur (origine, Pro vérifié en base, essais gratuits, quotas).
+  const blocked = await coachGuard(req);
+  if (blocked === 402) return NextResponse.json({ error: "pro_required" }, { status: 402 });
+  if (blocked === 429) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  if (blocked) return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   const sys = persona(lang) + "\n\n" + contextBlock(ctx);
   const payload = geminiPayload(sys, msgs);

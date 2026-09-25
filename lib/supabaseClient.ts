@@ -20,3 +20,14 @@ export function getSupabase(): SupabaseClient | null {
   }
   return client;
 }
+
+/** En-tête Authorization avec le jeton de session courant (vide si non connecté). */
+export async function authHeader(): Promise<Record<string, string>> {
+  try {
+    const { data } = (await getSupabase()?.auth.getSession()) || { data: { session: null } };
+    const tok = data.session?.access_token;
+    return tok ? { authorization: `Bearer ${tok}` } : {};
+  } catch {
+    return {};
+  }
+}

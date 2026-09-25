@@ -27,7 +27,9 @@ import CoachNutri, { type CoachCtx } from "./CoachNutri";
 import { type DuoSummary } from "@/lib/duo";
 import { type Detected } from "@/lib/coachDetect";
 import { type CoachPrefs } from "@/lib/coachPrompt";
-import { getSupabase } from "@/lib/supabaseClient";
+import { getSupabase, authHeader } from "@/lib/supabaseClient";
+import { localISO, addDaysISO, streakEndingAt } from "@/lib/dates";
+import { mergeJournal, mergePesees, type Journal, type JournalMeta } from "@/lib/syncMerge";
 import {
   besoinsDynamiques,
   SPORTS,
@@ -334,6 +336,8 @@ const LX = {
     streak: (n: number) => `${n} jour${n > 1 ? "s" : ""}`,
     celebStreak: (n: number) => `${n} jours d'affilée ! 🔥`, celebGoal: "Objectif du jour atteint ! 🎯",
     streakTitle: "Ta série", streakUnit: (n: number) => `jour${n > 1 ? "s" : ""} d'affilée`, streakSecured: "Sécurisée aujourd'hui ✓", streakAtRisk: "Note un repas pour la garder 🔥", streakNext: (r: number, m: number) => `Plus que ${r} jour${r > 1 ? "s" : ""} → palier ${m}`, streakRecord: "À ton record — continue ! 🔥",
+    photoLogin: "Connecte-toi pour analyser tes repas en photo 👇", photoLimit: "Limite d'analyses photo atteinte pour aujourd'hui — reviens demain 📷",
+    syncing: "Synchronisation…", syncErr: "Pas encore synchronisé — nouvel essai automatique", logoutWarn: "Tes données seront retirées de cet appareil (elles restent dans ton compte).",
     myDay: "Ma journée", meals: { matin: "Petit-déjeuner", midi: "Déjeuner", snack: "Collations", soir: "Dîner" },
     addShort: "Ajouter", addMealSoir: "Ajouter ton repas du soir",
     act: {
@@ -411,6 +415,8 @@ const LX = {
     streak: (n: number) => `${n} Tag${n > 1 ? "e" : ""}`,
     celebStreak: (n: number) => `${n} Tage in Folge! 🔥`, celebGoal: "Tagesziel erreicht! 🎯",
     streakTitle: "Deine Serie", streakUnit: (n: number) => `Tag${n > 1 ? "e" : ""} in Folge`, streakSecured: "Heute gesichert ✓", streakAtRisk: "Trag eine Mahlzeit ein, um sie zu halten 🔥", streakNext: (r: number, m: number) => `Noch ${r} Tag${r > 1 ? "e" : ""} → Stufe ${m}`, streakRecord: "Auf deinem Rekord — weiter so! 🔥",
+    photoLogin: "Melde dich an, um Mahlzeiten per Foto zu analysieren 👇", photoLimit: "Tageslimit für Fotoanalysen erreicht — morgen wieder 📷",
+    syncing: "Synchronisiere…", syncErr: "Noch nicht synchronisiert — neuer Versuch automatisch", logoutWarn: "Deine Daten werden von diesem Gerät entfernt (sie bleiben in deinem Konto).",
     myDay: "Mein Tag", meals: { matin: "Frühstück", midi: "Mittagessen", snack: "Snacks", soir: "Abendessen" },
     addShort: "Hinzufügen", addMealSoir: "Abendessen hinzufügen",
     act: {
@@ -488,6 +494,8 @@ const LX = {
     streak: (n: number) => `${n} day${n > 1 ? "s" : ""}`,
     celebStreak: (n: number) => `${n} days in a row! 🔥`, celebGoal: "Daily goal reached! 🎯",
     streakTitle: "Your streak", streakUnit: (n: number) => `day${n > 1 ? "s" : ""} in a row`, streakSecured: "Secured today ✓", streakAtRisk: "Log a meal to keep it 🔥", streakNext: (r: number, m: number) => `${r} day${r > 1 ? "s" : ""} to reach ${m}`, streakRecord: "At your record — keep going! 🔥",
+    photoLogin: "Sign in to analyse your meals from a photo 👇", photoLimit: "Daily photo analysis limit reached — come back tomorrow 📷",
+    syncing: "Syncing…", syncErr: "Not synced yet — retrying automatically", logoutWarn: "Your data will be removed from this device (it stays in your account).",
     myDay: "My day", meals: { matin: "Breakfast", midi: "Lunch", snack: "Snacks", soir: "Dinner" },
     addShort: "Add", addMealSoir: "Add your dinner",
     act: {
@@ -613,7 +621,18 @@ const TAB_SVG: Record<TabKey, string> = {
   aide: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.1 1-1.1 1.8M12 17h.01",
 };
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
+const todayISO = () => localISO(); // date LOCALE (pas UTC) : 00h30 à Sion = le nouveau jour
+// kcal d'une journée stockée (lignes du journal).
+function rowsKcal(rows: unknown): number {
+  if (!Array.isArray(rows)) return 0;
+  let k = 0;
+  for (const r of rows as { food?: Food; grammes?: number }[]) {
+    if (r && r.food && typeof r.grammes === "number") {
+      try { k += calcAliment(r.food, r.grammes).kcal; } catch { /* ignore */ }
+    }
+  }
+  return k;
+}
 const nf = (lang: Lang, d = 0) =>
   new Intl.NumberFormat(lang === "de" ? "de-CH" : lang === "en" ? "en-CH" : "fr-CH", { maximumFractionDigits: d });
 const noAccent = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -808,6 +827,13 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [coachSeed, setCoachSeed] = useState("");
   const [coachPrefs, setCoachPrefs] = useState<CoachPrefs>({});
   const [convTick, setConvTick] = useState(0); // bump quand une conversation Vito change → déclenche la synchro
+  // Synchro cloud : on n'envoie RIEN tant que le cloud n'a pas été lu et fusionné (sinon un appareil
+  // vierge pourrait écraser l'historique). État affiché honnêtement à l'utilisateur.
+  const [syncState, setSyncState] = useState<"idle" | "syncing" | "ok" | "error">("idle");
+  const [syncTick, setSyncTick] = useState(0);
+  const syncReadyRef = useRef(false);
+  const pulledUidRef = useRef("");
+  const pullingRef = useRef(false);
   const [celebrate, setCelebrate] = useState(""); // message de célébration (confettis)
   const prevStreakRef = useRef<number | null>(null);
   const goalCelebRef = useRef(false);
@@ -851,7 +877,19 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [duoMsg, setDuoMsg] = useState("");
   const [duoBusy, setDuoBusy] = useState(false);
 
-  const day = todayISO();
+  // Jour courant, suivi en direct : si l'app reste ouverte après minuit (ou revient au premier plan),
+  // on bascule proprement sur le nouveau jour au lieu d'y recopier le journal de la veille.
+  const [today, setToday] = useState(() => todayISO());
+  const day = today;
+  const loadedDayRef = useRef("");
+  useEffect(() => {
+    const tick = () => { const t = todayISO(); setToday((p) => (p === t ? p : t)); };
+    const id = setInterval(tick, 30000);
+    const onVis = () => { if (document.visibilityState === "visible") tick(); };
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("focus", tick);
+    return () => { clearInterval(id); document.removeEventListener("visibilitychange", onVis); window.removeEventListener("focus", tick); };
+  }, []);
 
   // chargement mémoire
   useEffect(() => {
@@ -869,6 +907,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     try { if (!p && localStorage.getItem("calorio.onboarded") !== "1") setShowOnboarding(true); } catch { /* ignore */ }
     try { const th = localStorage.getItem("calorio.theme"); if (th === "dark" || th === "auto" || th === "light") setTheme(th); } catch { /* ignore */ }
     const jour = load<Record<string, Line[]>>("calorio.journal", {});
+    loadedDayRef.current = day; // les sauvegardes écrivent dans le jour réellement chargé
     setLines(migrateLines(jour[day], lang));
     setSeances(load<Record<string, Seance[]>>("calorio.activites", {})[day] || []);
     setPesees(load<Pesee[]>("calorio.pesees", []));
@@ -886,7 +925,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     setPoidsDate(todayISO());
     try {
       const url = new URL(window.location.href);
-      if (url.searchParams.get("pro") === "preview") localStorage.setItem("calorio.pro", "1");
+      // Cache local du statut Pro (affichage hors-ligne uniquement). La source de vérité est la base :
+      // les fonctions payantes sont vérifiées côté serveur.
       setIsPro(localStorage.getItem("calorio.pro") === "1");
       const savedLang = localStorage.getItem("calorio.lang");
       if (savedLang === "fr" || savedLang === "de" || savedLang === "en") setLangOv(savedLang);
@@ -934,6 +974,17 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     }
   };
 
+  // Changement de jour (minuit, retour au premier plan) : on charge les données du nouveau jour
+  // AVANT toute sauvegarde. Les sauvegardes ne dépendent pas de `day` mais du jour chargé.
+  useEffect(() => {
+    if (!mounted || loadedDayRef.current === day) return;
+    loadedDayRef.current = day;
+    setLines(migrateLines(load<Record<string, Line[]>>("calorio.journal", {})[day], lang));
+    setSeances(load<Record<string, Seance[]>>("calorio.activites", {})[day] || []);
+    setWater(load<Record<string, number>>("calorio.water", {})[day] || 0);
+    setPoidsDate(day);
+  }, [mounted, day]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // sauvegardes
   useEffect(() => {
     if (!mounted) return;
@@ -941,16 +992,24 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   }, [mounted, sexe, age, poids, taille, activite, objectif, poidsCible]);
   useEffect(() => {
     if (!mounted) return;
+    const k = loadedDayRef.current;
+    if (!k) return;
     const jour = load<Record<string, Line[]>>("calorio.journal", {});
-    jour[day] = lines;
+    if (JSON.stringify(jour[k] || []) === JSON.stringify(lines)) return; // rien de neuf (ex. simple chargement)
+    jour[k] = lines;
     save("calorio.journal", jour);
-  }, [mounted, lines, day]);
+    // Horodatage par jour : permet une fusion fiable entre appareils.
+    const meta = load<JournalMeta>("calorio.journalMeta", {});
+    meta[k] = Date.now();
+    save("calorio.journalMeta", meta);
+  }, [mounted, lines]);
   useEffect(() => {
     if (!mounted) return;
+    if (!loadedDayRef.current) return;
     const a = load<Record<string, Seance[]>>("calorio.activites", {});
-    a[day] = seances;
+    a[loadedDayRef.current] = seances;
     save("calorio.activites", a);
-  }, [mounted, seances, day]);
+  }, [mounted, seances]);
   // Health Connect (app native Capacitor). La demande d'autorisation ouvre une
   // fenêtre système : on la déclenche au tap sur le bouton (geste utilisateur = fiable).
   // Au 2e lancement (déjà autorisé), la lecture se fait en silence au démarrage.
@@ -1082,29 +1141,42 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
   const pullFromCloud = async (uid: string) => {
     const supa = getSupabase();
-    if (!supa) return;
+    if (!supa || pullingRef.current) return;
+    if (pulledUidRef.current === uid && syncReadyRef.current) return; // déjà fusionné (ex. rafraîchissement du jeton)
+    pullingRef.current = true;
+    syncReadyRef.current = false;
+    setSyncState("syncing");
     try {
-      const { data } = await supa.from("calorio_users").select("profil,journal,pesees").eq("id", uid).maybeSingle();
+      const { data, error } = await supa.from("calorio_users").select("profil,journal,pesees").eq("id", uid).maybeSingle();
+      if (error) throw error;
       if (data) {
-        applyProfil((data.profil as Record<string, unknown>) || null);
-        if (data.journal) { save("calorio.journal", data.journal); setLines(migrateLines((data.journal as Record<string, unknown[]>)[todayISO()], lang)); }
-        if (Array.isArray(data.pesees)) setPesees(data.pesees as Pesee[]);
+        const prof = (data.profil as Record<string, unknown>) || null;
+        applyProfil(prof);
+        const cloudMeta = prof && prof.journalMeta && typeof prof.journalMeta === "object" ? (prof.journalMeta as JournalMeta) : {};
+        const merged = mergeJournal(
+          load<Journal>("calorio.journal", {}), load<JournalMeta>("calorio.journalMeta", {}),
+          (data.journal as Journal) || {}, cloudMeta
+        );
+        save("calorio.journal", merged.journal);
+        save("calorio.journalMeta", merged.meta);
+        if (loadedDayRef.current) setLines(migrateLines(merged.journal[loadedDayRef.current], lang));
+        const mp = mergePesees(load<Pesee[]>("calorio.pesees", []), Array.isArray(data.pesees) ? (data.pesees as Pesee[]) : []);
+        save("calorio.pesees", mp);
+        setPesees(mp);
         setAuthMsg("");
-      } else {
-        // Première connexion : on pousse les données locales vers le cloud.
-        await supa.from("calorio_users").upsert({
-          id: uid,
-          profil: load("calorio.profil", {}),
-          journal: load("calorio.journal", {}),
-          pesees: load<Pesee[]>("calorio.pesees", []),
-          updated_at: new Date().toISOString(),
-        });
       }
       const { data: pro } = await supa.from("calorio_pro").select("is_pro,pro_until").eq("id", uid).maybeSingle();
       const active = !!pro?.is_pro && (!pro.pro_until || new Date(pro.pro_until as string) > new Date());
       setProDb(active);
+      setIsPro(active);
+      try { if (active) localStorage.setItem("calorio.pro", "1"); else localStorage.removeItem("calorio.pro"); } catch { /* ignore */ }
+      pulledUidRef.current = uid;
+      syncReadyRef.current = true;
+      setSyncTick((n) => n + 1); // envoie aussitôt l'état fusionné (ou les données locales à la 1re connexion)
     } catch {
-      /* réseau : on reste en local */
+      setSyncState("error"); // réseau : on reste en local, nouvel essai au retour en ligne
+    } finally {
+      pullingRef.current = false;
     }
   };
 
@@ -1116,7 +1188,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     });
     const { data: sub } = supa.auth.onAuthStateChange((_e, session) => {
       if (session?.user) { setUser(session.user); setAuthOpen(false); pullFromCloud(session.user.id); }
-      else { setUser(null); setProDb(false); }
+      else { setUser(null); setProDb(false); syncReadyRef.current = false; pulledUidRef.current = ""; setSyncState("idle"); }
     });
     return () => sub.subscription.unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1219,7 +1291,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const shareGrade = () => shareText(x.troShareGrade(x.gradeNames[grade.index], trophyCount));
 
   // Export / import des données (confiance + portabilité). Clés locales connues.
-  const CAL_KEYS = ["calorio.profil", "calorio.journal", "calorio.pesees", "calorio.recents", "calorio.trophies", "calorio.used", "calorio.streakBest", "calorio.lang", "calorio.pro", "calorio.water", "calorio.waterGoal", "calorio.fast", "calorio.meals", "calorio.customFoods", "calorio.coach.prefs", "calorio.coach.favs", "calorio.coach.active"];
+  const CAL_KEYS = ["calorio.profil", "calorio.journal", "calorio.pesees", "calorio.recents", "calorio.trophies", "calorio.used", "calorio.streakBest", "calorio.lang", "calorio.water", "calorio.waterGoal", "calorio.fast", "calorio.meals", "calorio.customFoods", "calorio.coach.prefs", "calorio.coach.favs", "calorio.coach.active", "calorio.journalMeta", "calorio.activites"];
   const exportData = () => {
     const out: Record<string, unknown> = { _app: "calorio", _v: 1, _date: new Date().toISOString() };
     for (const k of CAL_KEYS) {
@@ -1245,27 +1317,55 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     } catch { setDataMsg(x.importErr); }
   };
 
-  // Push cloud (debounce) quand connecté et que les données changent.
-  useEffect(() => {
-    if (!mounted || !user) return;
+  // Ligne cloud complète à partir de l'état courant.
+  const cloudRow = (uid: string) => {
+    // Conversations Vito : on borne la taille (dernier échange + favoris) pour ne pas gonfler la ligne.
+    const ca = load<{ id?: string; msgs?: unknown[]; updated?: number } | null>("calorio.coach.active", null);
+    const coachActive = ca && Array.isArray(ca.msgs) ? { id: ca.id, msgs: ca.msgs.slice(-40), updated: ca.updated || 0 } : null;
+    const coachFavs = load<{ id: string; title: string; msgs: unknown[]; updated: number }[]>("calorio.coach.favs", [])
+      .slice(0, 20).map((c) => ({ ...c, msgs: (c.msgs || []).slice(-40) }));
+    return {
+      id: uid,
+      profil: { sexe, age, poids, taille, activite, objectif, poidsCible, trophies, used, savedMeals, customFoods, waterGoal, coachPrefs, coachActive, coachFavs, journalMeta: load<JournalMeta>("calorio.journalMeta", {}) },
+      journal: load("calorio.journal", {}),
+      pesees,
+      updated_at: new Date().toISOString(),
+    };
+  };
+  const pushNow = async (uid: string): Promise<boolean> => {
     const supa = getSupabase();
-    if (!supa) return;
-    const id = setTimeout(() => {
-      // Conversations Vito : on borne la taille (dernier échange + favoris) pour ne pas gonfler la ligne.
-      const ca = load<{ id?: string; msgs?: unknown[]; updated?: number } | null>("calorio.coach.active", null);
-      const coachActive = ca && Array.isArray(ca.msgs) ? { id: ca.id, msgs: ca.msgs.slice(-40), updated: ca.updated || 0 } : null;
-      const coachFavs = load<{ id: string; title: string; msgs: unknown[]; updated: number }[]>("calorio.coach.favs", [])
-        .slice(0, 20).map((c) => ({ ...c, msgs: (c.msgs || []).slice(-40) }));
-      supa.from("calorio_users").upsert({
-        id: user.id,
-        profil: { sexe, age, poids, taille, activite, objectif, poidsCible, trophies, used, savedMeals, customFoods, waterGoal, coachPrefs, coachActive, coachFavs },
-        journal: load("calorio.journal", {}),
-        pesees,
-        updated_at: new Date().toISOString(),
-      }).then(() => {});
-    }, 1400);
+    if (!supa || !syncReadyRef.current) return false;
+    setSyncState("syncing");
+    try {
+      const { error } = await supa.from("calorio_users").upsert(cloudRow(uid));
+      setSyncState(error ? "error" : "ok");
+      return !error;
+    } catch {
+      setSyncState("error");
+      return false;
+    }
+  };
+
+  // Push cloud (debounce) quand connecté, APRÈS la fusion initiale, et que les données changent.
+  useEffect(() => {
+    if (!mounted || !user || !syncReadyRef.current) return;
+    const uid = user.id;
+    const id = setTimeout(() => { pushNow(uid); }, 1400);
     return () => clearTimeout(id);
-  }, [mounted, user, sexe, age, poids, taille, activite, objectif, poidsCible, pesees, lines, trophies, used, savedMeals, customFoods, waterGoal, coachPrefs, convTick]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, user, sexe, age, poids, taille, activite, objectif, poidsCible, pesees, lines, trophies, used, savedMeals, customFoods, waterGoal, coachPrefs, convTick, syncTick]);
+
+  // Retour du réseau : on retente la lecture/fusion ou l'envoi.
+  useEffect(() => {
+    const onOnline = () => {
+      if (!user) return;
+      if (!syncReadyRef.current) pullFromCloud(user.id);
+      else setSyncTick((n) => n + 1);
+    };
+    window.addEventListener("online", onOnline);
+    return () => window.removeEventListener("online", onOnline);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const signInGoogle = () => {
     getSupabase()?.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.href.split("?")[0] } });
@@ -1278,7 +1378,19 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const { error } = await supa.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href.split("?")[0] } });
     setAuthMsg(error ? t.authErr : t.authSent);
   };
-  const signOut = async () => { await getSupabase()?.auth.signOut(); setUser(null); setProDb(false); };
+  // Déconnexion : dernier envoi, puis on efface les données de santé locales (appareil éventuellement
+  // partagé : le compte suivant ne doit jamais hériter du journal du précédent).
+  const signOut = async () => {
+    if (user) await pushNow(user.id);
+    await getSupabase()?.auth.signOut();
+    try {
+      const keep = new Set(["calorio.lang", "calorio.theme"]);
+      const keys: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith("calorio.") && !keep.has(k)) keys.push(k); }
+      keys.forEach((k) => localStorage.removeItem(k));
+    } catch { /* ignore */ }
+    window.location.reload();
+  };
 
   const goPro = () => {
     if (!user) { setAuthOpen(true); setAuthMsg(t.loginFirst); return; }
@@ -1420,29 +1532,14 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const histoire = useMemo(() => {
     if (!mounted) return [] as { date: string; kcal: number }[];
     const jour = load<Record<string, unknown[]>>("calorio.journal", {});
-    const today = todayISO();
     const days: { date: string; kcal: number }[] = [];
     for (let i = 13; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const key = d.toISOString().slice(0, 10);
-      let kcal = 0;
-      if (key === today) {
-        kcal = total.kcal;
-      } else {
-        const rows = jour[key];
-        if (Array.isArray(rows)) {
-          for (const r of rows as { food?: Food; grammes?: number }[]) {
-            if (r && r.food && typeof r.grammes === "number") {
-              try { kcal += calcAliment(r.food, r.grammes).kcal; } catch { /* ignore */ }
-            }
-          }
-        }
-      }
+      const key = addDaysISO(today, -i);
+      const kcal = key === day ? total.kcal : rowsKcal(jour[key]);
       days.push({ date: key, kcal: Math.round(kcal) });
     }
     return days;
-  }, [mounted, lines, total.kcal]);
+  }, [mounted, lines, total.kcal, today, day]);
 
   // Rappel doux (dans l'app) : as-tu noté ton repas ?
   const nudge = useMemo(() => {
@@ -1490,20 +1587,20 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       letter: new Date(d.date).toLocaleDateString(locale, { weekday: "narrow" }).toUpperCase(),
     }));
   }, [histoire, besoinsAffiche.cible, locale]);
-  const streak = useMemo(() => {
-    let n = 0;
-    for (let i = histoire.length - 1; i >= 0; i--) { if (histoire[i].kcal > 0) n++; else break; }
-    return n;
-  }, [histoire]);
+  // Séries calculées sur tout l'historique (plus limitées aux 14 jours du graphique : les paliers 30, 100, 365 sont atteignables).
+  const dayActive = useMemo(() => {
+    if (!mounted) return () => false;
+    const jour = load<Record<string, unknown[]>>("calorio.journal", {});
+    return (iso: string) => (iso === day ? total.kcal > 0 : rowsKcal(jour[iso]) > 0);
+  }, [mounted, lines, total.kcal, day]); // eslint-disable-line react-hooks/exhaustive-deps
+  const streak = useMemo(() => streakEndingAt(dayActive, today), [dayActive, today]);
   // Série « vivante » : reste affichée le matin même si rien n'est encore noté aujourd'hui
   // (elle ne se brise qu'à minuit). Transforme le « j'ai perdu ma série » en « garde-la ! ».
   const loggedToday = (histoire[histoire.length - 1]?.kcal || 0) > 0;
-  const streakAlive = useMemo(() => {
-    let n = 0;
-    const start = loggedToday ? histoire.length - 1 : histoire.length - 2;
-    for (let i = start; i >= 0; i--) { if ((histoire[i]?.kcal || 0) > 0) n++; else break; }
-    return n;
-  }, [histoire, loggedToday]);
+  const streakAlive = useMemo(
+    () => streakEndingAt(dayActive, loggedToday ? today : addDaysISO(today, -1)),
+    [dayActive, loggedToday, today]
+  );
   const streakNextMs = useMemo(() => { const MS = [3, 7, 14, 30, 50, 100, 200, 365]; return MS.find((m) => m > streakAlive) ?? null; }, [streakAlive]);
 
   // Célébrations : paliers de série (en direct) + objectif du jour atteint (1×/jour).
@@ -1548,7 +1645,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     if (pesees.length < 2) return 0;
     const tri = [...pesees].sort((a, b) => a.date.localeCompare(b.date));
     const last = tri[tri.length - 1];
-    const limit = new Date(new Date(last.date).getTime() - 7 * 864e5).toISOString().slice(0, 10);
+    const limit = addDaysISO(last.date, -7);
     const base = tri.filter((p) => p.date >= limit)[0] ?? tri[0];
     return Math.round((last.poids - base.poids) * 10) / 10;
   }, [pesees]);
@@ -1614,7 +1711,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   }, [trophyCount]);
 
   // Persistance eau / jeûne / repas enregistrés.
-  useEffect(() => { if (!mounted) return; const w = load<Record<string, number>>("calorio.water", {}); w[day] = water; save("calorio.water", w); }, [mounted, water, day]);
+  useEffect(() => { if (!mounted || !loadedDayRef.current) return; const w = load<Record<string, number>>("calorio.water", {}); w[loadedDayRef.current] = water; save("calorio.water", w); }, [mounted, water]);
   useEffect(() => { if (!mounted) return; save("calorio.fast", fast); }, [mounted, fast]);
   useEffect(() => { if (!mounted) return; save("calorio.waterGoal", waterGoal); }, [mounted, waterGoal]);
   useEffect(() => { if (!mounted) return; save("calorio.meals", savedMeals); }, [mounted, savedMeals]);
@@ -1648,8 +1745,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // Répéter le journal d'hier dans aujourd'hui.
   const duplicateYesterday = () => {
     const jour = load<Record<string, Line[]>>("calorio.journal", {});
-    const y = new Date(); y.setDate(y.getDate() - 1);
-    const rows = migrateLines(jour[y.toISOString().slice(0, 10)], lang);
+    const rows = migrateLines(jour[addDaysISO(day, -1)], lang);
     if (!rows.length) { setMealMsg(x.noYesterday); setTimeout(() => setMealMsg(""), 2500); return; }
     setLines((prev) => [...prev, ...rows.map((l) => ({ ...l, key: newKey() }))]);
     setMealMsg("");
@@ -1878,12 +1974,16 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
   // --- Photo → calories (Pro) ---
   const onPhoto = async (file: File) => {
-    if (!proActive) return;
+    if (!proActive || photoBusy) return;
+    if (!user) { setPhotoMsg(x.photoLogin); return; }
     setPhotoMsg(t.photoAnalyzing); setPhotoItems(null); setPhotoBusy(true);
     try {
       const { base64, mime } = await downscale(file, 1024);
-      const r = await fetch("/api/vision", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ image: base64, mime, lang }) });
+      const r = await fetch("/api/vision", { method: "POST", headers: { "content-type": "application/json", ...(await authHeader()) }, body: JSON.stringify({ image: base64, mime, lang }) });
       if (r.status === 503) { setPhotoMsg(t.notReadyShort); }
+      else if (r.status === 401) { setPhotoMsg(x.photoLogin); }
+      else if (r.status === 402) { setPhotoMsg(""); goPro(); }
+      else if (r.status === 429) { setPhotoMsg(x.photoLimit); }
       else if (!r.ok) { setPhotoMsg(t.photoErr); }
       else {
         const data = (await r.json()) as { items?: { nom: string; grammes: number; kcal: number; prot: number; gluc: number; lip: number }[] };
@@ -1944,10 +2044,10 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         {user ? (
           <>
             <div className="cl-login-tx">
-              <b>☁️ {t.synced}{proDb && <span className="cl-acc-pro">Pro</span>}</b>
+              <b>{syncState === "error" ? `⚠️ ${x.syncErr}` : syncState === "syncing" ? `☁️ ${x.syncing}` : `☁️ ${t.synced}`}{proDb && <span className="cl-acc-pro">Pro</span>}</b>
               <span>{user.email}</span>
             </div>
-            <button className="cl-login-out" onClick={signOut}>{t.logout}</button>
+            <button className="cl-login-out" onClick={signOut} title={x.logoutWarn}>{t.logout}</button>
           </>
         ) : (
           <>

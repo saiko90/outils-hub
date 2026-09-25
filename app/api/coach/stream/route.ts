@@ -12,11 +12,6 @@ export async function POST(req: Request) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) return new Response("not_configured", { status: 503 });
 
-  // Garde-fou anti-abus (origine + limite par IP/jour). Fail-open.
-  // Un statut != 200 fait simplement basculer le client sur /api/coach (qui applique le même garde-fou).
-  const blocked = await coachGuard(req);
-  if (blocked) return new Response(blocked === 429 ? "rate_limited" : "forbidden", { status: blocked });
-
   let body: { messages?: CoachMsg[]; context?: CoachApiCtx };
   try {
     body = (await req.json()) as { messages?: CoachMsg[]; context?: CoachApiCtx };
@@ -28,6 +23,11 @@ export async function POST(req: Request) {
   const lang = coachLang(ctx);
   const msgs = trimMessages(body.messages);
   if (msgs.length === 0) return new Response("empty", { status: 400 });
+
+  // Garde-fou serveur (origine, Pro vérifié en base, essais gratuits, quotas) — après validation,
+  // pour qu'une requête malformée ne consomme pas d'essai. 402 = Pro requis, 429 = quota atteint.
+  const blocked = await coachGuard(req);
+  if (blocked) return new Response(blocked === 402 ? "pro_required" : blocked === 429 ? "rate_limited" : "forbidden", { status: blocked });
 
   const sys = persona(lang) + "\n\n" + contextBlock(ctx);
   const payload = geminiPayload(sys, msgs);

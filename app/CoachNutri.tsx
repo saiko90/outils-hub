@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { type Lang } from "@/lib/i18n";
 import { detectFoods, type Detected } from "@/lib/coachDetect";
 import { type CoachPrefs } from "@/lib/coachPrompt";
+import { authHeader } from "@/lib/supabaseClient";
+import { localISO } from "@/lib/dates";
 
 export type CoachCtx = {
   lang: Lang;
@@ -30,7 +32,7 @@ const FK = "calorio.coach.favs";
 const MAX_RECENT = 5;
 
 function todayKey() {
-  return new Date().toISOString().slice(0, 10);
+  return localISO();
 }
 function loadJSON<T>(k: string, d: T): T {
   try { const r = localStorage.getItem(k); return r ? (JSON.parse(r) as T) : d; } catch { return d; }
@@ -273,8 +275,7 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
     let pro = false;
     try {
       const url = new URL(window.location.href);
-      if (url.searchParams.get("pro") === "preview") localStorage.setItem("calorio.pro", "1");
-      pro = localStorage.getItem("calorio.pro") === "1";
+      pro = localStorage.getItem("calorio.pro") === "1"; // cache d'affichage ; le serveur vérifie
     } catch { /* ignore */ }
     setLocalPro(pro);
     setUsed(readUsage().count);
@@ -361,15 +362,16 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
   };
 
   // Streaming : la réponse de Vito s'affiche en direct. Renvoie true si une réponse a été produite.
-  const streamReply = async (next: Msg[]): Promise<boolean> => {
+  const streamReply = async (next: Msg[]): Promise<boolean | 402 | 429> => {
     let acc = "";
     let started = false;
     try {
       const r = await fetch("/api/coach/stream", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", ...(await authHeader()) },
         body: JSON.stringify({ messages: next, context: ctx }),
       });
+      if (r.status === 402 || r.status === 429) return r.status;
       if (!r.ok || !r.body) return false;
       const reader = r.body.getReader();
       const dec = new TextDecoder();
@@ -402,13 +404,15 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
     try {
       const r = await fetch("/api/coach", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", ...(await authHeader()) },
         body: JSON.stringify({ messages: next, context: ctx }),
       });
       if (r.status === 503) {
         setMsgs((m) => [...m, { role: "model", text: t.notReady }]);
       } else if (r.status === 429) {
         setMsgs((m) => [...m, { role: "model", text: t.limit }]);
+      } else if (r.status === 402) {
+        proRequired();
       } else if (!r.ok) {
         setMsgs((m) => [...m, { role: "model", text: t.err }]);
       } else {
@@ -444,10 +448,20 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
     setInput("");
     setBusy(true);
     setAvo("thinking");
-    const ok = await streamReply(next);
-    if (!ok) await fallbackReply(next);
+    const res = await streamReply(next);
+    if (res === 402) proRequired();
+    else if (res === 429) { setMsgs((m) => [...m, { role: "model", text: t.limit }]); setAvo("idle"); }
+    else if (!res) await fallbackReply(next);
     setBusy(false);
   };
+
+  // Le serveur a refusé (essais gratuits épuisés côté serveur) : on aligne l'affichage et on propose Pro.
+  function proRequired() {
+    try { localStorage.setItem("calorio.coach.freeUsed", String(FREE_TASTE)); } catch { /* ignore */ }
+    setFreeUsed(FREE_TASTE);
+    setMsgs((m) => [...m, { role: "model", text: t.freeOver }]);
+    setAvo("idle");
+  }
 
   // Question auto-envoyée (ex. « une idée de repas selon mes macros ») quand on ouvre Vito depuis un bouton.
   const seedSent = useRef("");

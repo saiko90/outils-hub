@@ -40,7 +40,22 @@ export type Besoins = {
   tdee: number; // dépense énergétique totale (kcal/j)
   cible: number; // calories cible selon l'objectif (kcal/j)
   macros: Macros; // répartition sur la cible
+  plancher?: boolean; // true si la cible a été relevée au minimum de sécurité
 };
+
+/** Apport minimum de sécurité (recommandations usuelles) : jamais de cible en dessous sans suivi médical. */
+export const KCAL_MIN: Record<Sexe, number> = { femme: 1200, homme: 1500 };
+
+/**
+ * Cible sûre : dépense + ajustement de l'objectif, mais jamais sous le plancher de sécurité.
+ * Si la dépense elle-même est sous le plancher (petits gabarits), on ne descend pas sous la dépense
+ * (pas de déficit) plutôt que d'imposer une prise de poids.
+ */
+export function cibleSure(sexe: Sexe, tdee: number, objectif: Objectif): { cible: number; plancher: boolean } {
+  const brute = tdee + AJUST_OBJECTIF[objectif];
+  const mini = Math.min(KCAL_MIN[sexe], tdee);
+  return brute < mini ? { cible: mini, plancher: true } : { cible: brute, plancher: false };
+}
 
 const r0 = (n: number) => Math.round(n);
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -64,8 +79,8 @@ export function macrosFromCalories(kcal: number, pProt = 0.3, pGluc = 0.4, pLip 
 export function computeBesoins(p: Profil): Besoins {
   const b = bmr(p);
   const tdee = r0(b * FACTEURS[p.activite]);
-  const cible = tdee + AJUST_OBJECTIF[p.objectif];
-  return { bmr: b, tdee, cible, macros: macrosFromCalories(cible) };
+  const { cible, plancher } = cibleSure(p.sexe, tdee, p.objectif);
+  return { bmr: b, tdee, cible, macros: macrosFromCalories(cible), plancher };
 }
 
 /* ------------------------------------------------------------------ */

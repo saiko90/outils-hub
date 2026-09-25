@@ -49,7 +49,7 @@ export async function enablePush(userId: string, lang: string): Promise<PushResu
         lang,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: "user_id" }
+      { onConflict: "user_id,endpoint" } // un abonnement par appareil (téléphone + ordinateur)
     );
     if (error) return { ok: false, reason: "save_failed" };
     return { ok: true };
@@ -58,19 +58,24 @@ export async function enablePush(userId: string, lang: string): Promise<PushResu
   }
 }
 
+// Désactive les notifications de CET appareil (les autres appareils du compte restent abonnés).
 export async function disablePush(userId: string): Promise<PushResult> {
+  let endpoint = "";
   try {
     if (pushSupported()) {
       const reg = await navigator.serviceWorker.getRegistration();
       const sub = await reg?.pushManager.getSubscription();
-      if (sub) await sub.unsubscribe();
+      if (sub) { endpoint = sub.endpoint; await sub.unsubscribe(); }
     }
   } catch {
     /* ignore */
   }
   try {
     const supa = getSupabase();
-    if (supa) await supa.from("calorio_push").delete().eq("user_id", userId);
+    if (supa) {
+      const q = supa.from("calorio_push").delete().eq("user_id", userId);
+      await (endpoint ? q.eq("endpoint", endpoint) : q);
+    }
   } catch {
     /* ignore */
   }

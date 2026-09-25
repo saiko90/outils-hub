@@ -17,6 +17,7 @@ import {
   recette,
   aliment,
   computeBesoins,
+  KCAL_MIN,
   FACTEURS,
   computeJournal,
   calcAliment,
@@ -66,7 +67,7 @@ const L = {
       { q: "calorio est gratuit ?", a: "Oui : tes besoins, le journal, la base d'aliments, le scan de code-barres et le suivi du poids sont 100 % gratuits. La version Pro ajoute le coach IA Vito et l'analyse de tes repas en photo." },
       { q: "Qu'est-ce que la version Pro ?", a: "CHF 4.90/mois ou CHF 39/an, avec 7 jours d'essai gratuit sans engagement. Tu débloques Vito, ton coach nutrition, et l'analyse photo. Annulable à tout moment." },
       { q: "Comment marche l'analyse photo ?", a: "Tu prends ton assiette en photo, une IA identifie les aliments et estime les calories et macros. Tu peux ensuite ajuster les quantités : ça reste une estimation." },
-      { q: "Comment annuler mon abonnement Pro ?", a: "Depuis le lien de gestion Stripe reçu par e-mail après ton inscription, ou en nous écrivant. Pendant les 7 jours d'essai, aucun engagement." },
+      { q: "Comment annuler mon abonnement Pro ?", a: "Dans l'app : Aide → Mon compte → Mon abonnement → Gérer. La résiliation prend effet à la fin de la période payée. Pendant les 7 jours d'essai, aucun engagement." },
       { q: "Le scan de code-barres ne marche pas ?", a: "Autorise l'accès à la caméra. Sur iPhone, ouvre le site dans Safari. Si le produit n'est pas trouvé, cherche-le simplement par son nom." },
     ] as { q: string; a: string }[],
     sexe: "Sexe", homme: "Homme", femme: "Femme",
@@ -101,11 +102,11 @@ const L = {
     estim: "estimé",
     syncBtn: "Synchroniser mes données", synced: "Synchronisé", logout: "Déconnexion",
     authTitle: "Retrouve tes données sur tous tes appareils", authSub: "Crée un compte gratuit — ton journal, ton poids et ton profil te suivent sur téléphone et ordinateur.",
-    inviteTitle: "Invite un ami, gagnez 1 mois Pro chacun", inviteSub: "Partage ton lien : dès qu'un ami crée son compte calorio avec, vous recevez tous les deux 1 mois de Pro offert (coach IA + photo).",
+    inviteTitle: "Invite un ami, 1 mois Pro chacun", inviteSub: "Partage ton lien : ton ami reçoit 1 mois de Pro offert dès son inscription, et toi aussi dès qu'il a noté 3 jours (coach IA + photo, jusqu'à 6 mois).",
     copyLink: "Copier", copied2: "Copié ✓", shareInvite: "Partager mon lien",
     inviteCount: (n: number) => (n === 0 ? "Aucun ami parrainé pour l'instant" : `${n} ami${n > 1 ? "s" : ""} parrainé${n > 1 ? "s" : ""} 🎉`),
     shareText: "J'utilise calorio pour suivre mes calories — simple et suisse. Rejoins-moi, on gagne chacun 1 mois Pro 🥕",
-    refClaimed: "🎉 1 mois Pro offert à toi et à ton ami ! Bienvenue.",
+    refClaimed: "🎉 1 mois Pro offert ! Bienvenue. Ton ami recevra le sien quand tu auras noté 3 jours.",
     google: "Continuer avec Google", or: "ou", emailPh: "ton@email.ch", magic: "Recevoir un lien de connexion",
     authSent: "📩 Regarde tes e-mails : clique sur le lien pour te connecter.", authErr: "Souci de connexion, réessaie.", cloudOn: "☁️ Données synchronisées sur ton compte.",
     proTitle: "Passe en calorio Pro", proSub: "Débloque Vito, ton coach nutrition IA, et l'analyse de tes repas en photo.",
@@ -161,7 +162,7 @@ const L = {
       { q: "Ist calorio gratis?", a: "Ja: Bedarf, Journal, Lebensmittel-Datenbank, Barcode-Scan und Gewichtsverlauf sind 100 % gratis. Pro ergänzt den KI-Coach Vito und die Foto-Analyse deiner Mahlzeiten." },
       { q: "Was ist die Pro-Version?", a: "CHF 4.90/Monat oder CHF 39/Jahr, mit 7 Tagen Gratis-Test ohne Verpflichtung. Du schaltest Vito, deinen Ernährungscoach, und die Foto-Analyse frei. Jederzeit kündbar." },
       { q: "Wie funktioniert die Foto-Analyse?", a: "Du fotografierst deinen Teller, eine KI erkennt die Lebensmittel und schätzt Kalorien und Makros. Danach kannst du die Mengen anpassen — es bleibt eine Schätzung." },
-      { q: "Wie kündige ich mein Pro-Abo?", a: "Über den Stripe-Verwaltungslink, den du nach der Anmeldung per E-Mail erhältst, oder schreib uns. Während der 7 Testtage keine Verpflichtung." },
+      { q: "Wie kündige ich mein Pro-Abo?", a: "In der App: Hilfe → Mein Konto → Mein Abo → Verwalten. Die Kündigung gilt ab Ende der bezahlten Periode. Während der 7 Testtage keine Verpflichtung." },
       { q: "Der Barcode-Scan funktioniert nicht?", a: "Erlaube den Kamerazugriff. Auf dem iPhone öffne die Seite in Safari. Wird das Produkt nicht gefunden, suche es einfach über den Namen." },
     ] as { q: string; a: string }[],
     sexe: "Geschlecht", homme: "Mann", femme: "Frau",
@@ -195,11 +196,11 @@ const L = {
     estim: "geschätzt",
     syncBtn: "Daten synchronisieren", synced: "Synchronisiert", logout: "Abmelden",
     authTitle: "Deine Daten auf allen Geräten", authSub: "Erstelle ein kostenloses Konto — Journal, Gewicht und Profil folgen dir auf Handy und Computer.",
-    inviteTitle: "Lade eine Freundin ein, je 1 Monat Pro gratis", inviteSub: "Teile deinen Link: Sobald jemand mit ihm ein calorio-Konto erstellt, erhaltet ihr beide 1 Monat Pro gratis (KI-Coach + Foto).",
+    inviteTitle: "Lade eine Freundin ein, je 1 Monat Pro gratis", inviteSub: "Teile deinen Link: deine Freundin erhält 1 Monat Pro sofort, du ebenfalls, sobald sie 3 Tage erfasst hat (KI-Coach + Foto, bis zu 6 Monate).",
     copyLink: "Kopieren", copied2: "Kopiert ✓", shareInvite: "Link teilen",
     inviteCount: (n: number) => (n === 0 ? "Noch niemand geworben" : `${n} Freund${n > 1 ? "e" : ""} geworben 🎉`),
     shareText: "Ich tracke meine Kalorien mit calorio — einfach und schweizerisch. Mach mit, wir bekommen je 1 Monat Pro 🥕",
-    refClaimed: "🎉 1 Monat Pro gratis für dich und deine Freundin! Willkommen.",
+    refClaimed: "🎉 1 Monat Pro gratis! Willkommen. Deine Freundin erhält ihren, sobald du 3 Tage erfasst hast.",
     google: "Mit Google fortfahren", or: "oder", emailPh: "dein@email.ch", magic: "Login-Link erhalten",
     authSent: "📩 Schau in deine E-Mails: klicke auf den Link zum Anmelden.", authErr: "Verbindungsproblem, nochmal versuchen.", cloudOn: "☁️ Daten mit deinem Konto synchronisiert.",
     proTitle: "Werde calorio Pro", proSub: "Schalte Vito frei, deinen KI-Ernährungscoach, und die Foto-Analyse deiner Mahlzeiten.",
@@ -254,7 +255,7 @@ const L = {
       { q: "Is calorio free?", a: "Yes: your needs, the log, the food database, barcode scanning and weight tracking are 100% free. Pro adds the AI coach Vito and photo analysis of your meals." },
       { q: "What is the Pro version?", a: "CHF 4.90/month or CHF 39/year, with a free 7-day trial and no commitment. You unlock Vito, your nutrition coach, and photo analysis. Cancel anytime." },
       { q: "How does photo analysis work?", a: "You snap a photo of your plate, an AI identifies the foods and estimates calories and macros. You can then adjust the amounts — it stays an estimate." },
-      { q: "How do I cancel my Pro subscription?", a: "From the Stripe management link e-mailed to you after signing up, or by writing to us. During the 7-day trial there's no commitment." },
+      { q: "How do I cancel my Pro subscription?", a: "In the app: Help → My account → My subscription → Manage. Cancellation takes effect at the end of the paid period. During the 7-day trial there's no commitment." },
       { q: "Barcode scanning isn't working?", a: "Allow camera access. On iPhone, open the site in Safari. If the product isn't found, just search it by name." },
     ] as { q: string; a: string }[],
     sexe: "Sex", homme: "Male", femme: "Female",
@@ -288,11 +289,11 @@ const L = {
     estim: "est.",
     syncBtn: "Sync my data", synced: "Synced", logout: "Sign out",
     authTitle: "Your data on every device", authSub: "Create a free account — your log, weight and profile follow you on phone and computer.",
-    inviteTitle: "Invite a friend, get 1 month Pro each", inviteSub: "Share your link: as soon as a friend creates a calorio account with it, you both get 1 month of Pro free (AI coach + photo).",
+    inviteTitle: "Invite a friend, get 1 month Pro each", inviteSub: "Share your link: your friend gets 1 month of Pro right away, and so do you once they've logged 3 days (AI coach + photo, up to 6 months).",
     copyLink: "Copy", copied2: "Copied ✓", shareInvite: "Share my link",
     inviteCount: (n: number) => (n === 0 ? "No friends referred yet" : `${n} friend${n > 1 ? "s" : ""} referred 🎉`),
     shareText: "I use calorio to track my calories — simple and Swiss. Join me and we each get 1 month Pro 🥕",
-    refClaimed: "🎉 1 month of Pro for you and your friend! Welcome.",
+    refClaimed: "🎉 1 month of Pro free! Welcome. Your friend gets theirs once you've logged 3 days.",
     google: "Continue with Google", or: "or", emailPh: "you@email.com", magic: "Get a sign-in link",
     authSent: "📩 Check your inbox: click the link to sign in.", authErr: "Connection issue, try again.", cloudOn: "☁️ Data synced to your account.",
     proTitle: "Go calorio Pro", proSub: "Unlock Vito, your AI nutrition coach, and photo analysis of your meals.",
@@ -338,6 +339,9 @@ const LX = {
     streakTitle: "Ta série", streakUnit: (n: number) => `jour${n > 1 ? "s" : ""} d'affilée`, streakSecured: "Sécurisée aujourd'hui ✓", streakAtRisk: "Note un repas pour la garder 🔥", streakNext: (r: number, m: number) => `Plus que ${r} jour${r > 1 ? "s" : ""} → palier ${m}`, streakRecord: "À ton record — continue ! 🔥",
     photoLogin: "Connecte-toi pour analyser tes repas en photo 👇", photoLimit: "Limite d'analyses photo atteinte pour aujourd'hui — reviens demain 📷",
     syncing: "Synchronisation…", syncErr: "Pas encore synchronisé — nouvel essai automatique", logoutWarn: "Tes données seront retirées de cet appareil (elles restent dans ton compte).",
+    floorWarn: (n: number) => `Objectif ajusté pour ta sécurité : on ne descend pas sous ${n} kcal/jour (ou ta dépense si elle est plus basse). Pour aller plus loin, parles-en à un·e professionnel·le de santé.`,
+    accountTitle: "Mon compte", billingTitle: "Mon abonnement", billingSub: "Carte, factures, résiliation en un clic.", billingBtn: "Gérer", billingErr: "Impossible d'ouvrir la gestion de l'abonnement. Réessaie ou écris-nous.", deleteTitle: "Supprimer mon compte", deleteSub: "Efface définitivement ton compte et toutes tes données. Un abonnement en cours est résilié.", deleteConfirmSub: "Sûr·e ? C'est irréversible : journal, pesées et abonnement seront supprimés.", deleteBtn: "Supprimer", deleteConfirmBtn: "Oui, tout supprimer", deleteErr: "La suppression a échoué. Réessaie ou écris-nous : on s'en occupe.", cancel: "Annuler",
+    authConsent: "En te connectant, tu acceptes que tes données de suivi (poids, alimentation) soient enregistrées dans ton compte pour être synchronisées. Tu peux tout supprimer à tout moment.", privacyLink: "Confidentialité",
     myDay: "Ma journée", meals: { matin: "Petit-déjeuner", midi: "Déjeuner", snack: "Collations", soir: "Dîner" },
     addShort: "Ajouter", addMealSoir: "Ajouter ton repas du soir",
     act: {
@@ -399,7 +403,7 @@ const LX = {
     recCats: { tous: "Toutes", petitdej: "Petit-déj", healthy: "Healthy", plat: "Plats", sucre: "Sucré" } as Record<RecetteCat | "tous", string>,
     recIngr: (n: number) => `${n} ingrédient${n > 1 ? "s" : ""}`, recAdded: "Recette ajoutée ✓", waterGoalLbl: "Objectif",
     duoTitle: "Mon binôme", duoSub: "Suivez vos objectifs à deux — en couple, entre amis.",
-    duoInviteHint: "Partage ton code, ou entre celui de ton binôme :", duoYourCode: "Ton code",
+    duoInviteHint: "Échangez vos codes : le duo s'active quand chacun a saisi le code de l'autre.", duoPending: "Demande envoyée ✓ Le duo s'active dès que ton binôme saisit ton code.", duoIncoming: "Quelqu'un t'a invité en duo : entre son code pour accepter.", duoYourCode: "Ton code",
     duoCodePh: "Code du binôme", duoLink: "Lier", duoUnlink: "Délier",
     duoLinkedTitle: "Aujourd'hui, ton binôme", duoNoData: "Ton binôme n'a rien noté aujourd'hui.",
     duoOfGoal: "de l'objectif", duoStreakLbl: "série", duoNeedAccount: "Crée un compte gratuit pour suivre ton binôme.",
@@ -417,6 +421,9 @@ const LX = {
     streakTitle: "Deine Serie", streakUnit: (n: number) => `Tag${n > 1 ? "e" : ""} in Folge`, streakSecured: "Heute gesichert ✓", streakAtRisk: "Trag eine Mahlzeit ein, um sie zu halten 🔥", streakNext: (r: number, m: number) => `Noch ${r} Tag${r > 1 ? "e" : ""} → Stufe ${m}`, streakRecord: "Auf deinem Rekord — weiter so! 🔥",
     photoLogin: "Melde dich an, um Mahlzeiten per Foto zu analysieren 👇", photoLimit: "Tageslimit für Fotoanalysen erreicht — morgen wieder 📷",
     syncing: "Synchronisiere…", syncErr: "Noch nicht synchronisiert — neuer Versuch automatisch", logoutWarn: "Deine Daten werden von diesem Gerät entfernt (sie bleiben in deinem Konto).",
+    floorWarn: (n: number) => `Ziel zu deiner Sicherheit angepasst: nicht unter ${n} kcal/Tag (oder deinem Verbrauch, falls tiefer). Für mehr sprich mit einer Gesundheitsfachperson.`,
+    accountTitle: "Mein Konto", billingTitle: "Mein Abo", billingSub: "Karte, Rechnungen, Kündigung mit einem Klick.", billingBtn: "Verwalten", billingErr: "Abo-Verwaltung konnte nicht geöffnet werden. Versuch es nochmal oder schreib uns.", deleteTitle: "Konto löschen", deleteSub: "Löscht dein Konto und alle Daten endgültig. Ein laufendes Abo wird gekündigt.", deleteConfirmSub: "Sicher? Das ist endgültig: Tagebuch, Gewichte und Abo werden gelöscht.", deleteBtn: "Löschen", deleteConfirmBtn: "Ja, alles löschen", deleteErr: "Löschen fehlgeschlagen. Versuch es nochmal oder schreib uns.", cancel: "Abbrechen",
+    authConsent: "Mit der Anmeldung stimmst du zu, dass deine Verlaufsdaten (Gewicht, Ernährung) zur Synchronisierung in deinem Konto gespeichert werden. Du kannst jederzeit alles löschen.", privacyLink: "Datenschutz",
     myDay: "Mein Tag", meals: { matin: "Frühstück", midi: "Mittagessen", snack: "Snacks", soir: "Abendessen" },
     addShort: "Hinzufügen", addMealSoir: "Abendessen hinzufügen",
     act: {
@@ -478,7 +485,7 @@ const LX = {
     recCats: { tous: "Alle", petitdej: "Frühstück", healthy: "Healthy", plat: "Gerichte", sucre: "Süsses" } as Record<RecetteCat | "tous", string>,
     recIngr: (n: number) => `${n} Zutat${n > 1 ? "en" : ""}`, recAdded: "Rezept hinzugefügt ✓", waterGoalLbl: "Ziel",
     duoTitle: "Mein Duo", duoSub: "Verfolgt eure Ziele zu zweit — als Paar oder mit Freunden.",
-    duoInviteHint: "Teile deinen Code oder gib den deines Duos ein:", duoYourCode: "Dein Code",
+    duoInviteHint: "Tauscht eure Codes aus: das Duo wird aktiv, wenn beide den Code des anderen eingegeben haben.", duoPending: "Anfrage gesendet ✓ Das Duo wird aktiv, sobald dein Duo deinen Code eingibt.", duoIncoming: "Jemand hat dich als Duo eingeladen: gib den Code ein, um anzunehmen.", duoYourCode: "Dein Code",
     duoCodePh: "Duo-Code", duoLink: "Verbinden", duoUnlink: "Trennen",
     duoLinkedTitle: "Heute, dein Duo", duoNoData: "Dein Duo hat heute noch nichts erfasst.",
     duoOfGoal: "vom Ziel", duoStreakLbl: "Serie", duoNeedAccount: "Erstelle ein kostenloses Konto, um dein Duo zu verfolgen.",
@@ -496,6 +503,9 @@ const LX = {
     streakTitle: "Your streak", streakUnit: (n: number) => `day${n > 1 ? "s" : ""} in a row`, streakSecured: "Secured today ✓", streakAtRisk: "Log a meal to keep it 🔥", streakNext: (r: number, m: number) => `${r} day${r > 1 ? "s" : ""} to reach ${m}`, streakRecord: "At your record — keep going! 🔥",
     photoLogin: "Sign in to analyse your meals from a photo 👇", photoLimit: "Daily photo analysis limit reached — come back tomorrow 📷",
     syncing: "Syncing…", syncErr: "Not synced yet — retrying automatically", logoutWarn: "Your data will be removed from this device (it stays in your account).",
+    floorWarn: (n: number) => `Target adjusted for your safety: we don't go below ${n} kcal/day (or your expenditure if lower). To go further, talk to a health professional.`,
+    accountTitle: "My account", billingTitle: "My subscription", billingSub: "Card, invoices, one-click cancellation.", billingBtn: "Manage", billingErr: "Couldn't open subscription management. Try again or write to us.", deleteTitle: "Delete my account", deleteSub: "Permanently deletes your account and all your data. Any active subscription is cancelled.", deleteConfirmSub: "Sure? This can't be undone: log, weigh-ins and subscription will be deleted.", deleteBtn: "Delete", deleteConfirmBtn: "Yes, delete everything", deleteErr: "Deletion failed. Try again or write to us.", cancel: "Cancel",
+    authConsent: "By signing in, you agree that your tracking data (weight, food) is stored in your account to sync it. You can delete everything at any time.", privacyLink: "Privacy",
     myDay: "My day", meals: { matin: "Breakfast", midi: "Lunch", snack: "Snacks", soir: "Dinner" },
     addShort: "Add", addMealSoir: "Add your dinner",
     act: {
@@ -557,7 +567,7 @@ const LX = {
     recCats: { tous: "All", petitdej: "Breakfast", healthy: "Healthy", plat: "Mains", sucre: "Sweet" } as Record<RecetteCat | "tous", string>,
     recIngr: (n: number) => `${n} ingredient${n > 1 ? "s" : ""}`, recAdded: "Recipe added ✓", waterGoalLbl: "Goal",
     duoTitle: "My duo", duoSub: "Track your goals together — as a couple or with friends.",
-    duoInviteHint: "Share your code, or enter your duo's:", duoYourCode: "Your code",
+    duoInviteHint: "Swap codes: the duo activates once each of you has entered the other's code.", duoPending: "Request sent ✓ The duo activates as soon as your partner enters your code.", duoIncoming: "Someone invited you to a duo: enter their code to accept.", duoYourCode: "Your code",
     duoCodePh: "Duo code", duoLink: "Link", duoUnlink: "Unlink",
     duoLinkedTitle: "Today, your duo", duoNoData: "Your duo hasn't logged anything today.",
     duoOfGoal: "of goal", duoStreakLbl: "streak", duoNeedAccount: "Create a free account to follow your duo.",
@@ -861,6 +871,10 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // Comptes + synchro
   const [user, setUser] = useState<User | null>(null);
   const [proDb, setProDb] = useState(false);
+  const [hasBilling, setHasBilling] = useState(false); // client Stripe existant → portail de gestion
+  const [accountMsg, setAccountMsg] = useState("");
+  const [accountBusy, setAccountBusy] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [authEmail, setAuthEmail] = useState("");
   const [authMsg, setAuthMsg] = useState("");
@@ -1139,6 +1153,18 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     }
   };
 
+  // Statut Pro depuis la base (source de vérité) → état + cache d'affichage local.
+  const refreshPro = async (uid: string) => {
+    const supa = getSupabase();
+    if (!supa) return;
+    const { data: pro } = await supa.from("calorio_pro").select("is_pro,pro_until,stripe_customer_id").eq("id", uid).maybeSingle();
+    const active = !!pro?.is_pro && (!pro.pro_until || new Date(pro.pro_until as string) > new Date());
+    setProDb(active);
+    setIsPro(active);
+    setHasBilling(!!pro?.stripe_customer_id);
+    try { if (active) localStorage.setItem("calorio.pro", "1"); else localStorage.removeItem("calorio.pro"); } catch { /* ignore */ }
+  };
+
   const pullFromCloud = async (uid: string) => {
     const supa = getSupabase();
     if (!supa || pullingRef.current) return;
@@ -1165,11 +1191,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         setPesees(mp);
         setAuthMsg("");
       }
-      const { data: pro } = await supa.from("calorio_pro").select("is_pro,pro_until").eq("id", uid).maybeSingle();
-      const active = !!pro?.is_pro && (!pro.pro_until || new Date(pro.pro_until as string) > new Date());
-      setProDb(active);
-      setIsPro(active);
-      try { if (active) localStorage.setItem("calorio.pro", "1"); else localStorage.removeItem("calorio.pro"); } catch { /* ignore */ }
+      await refreshPro(uid);
       pulledUidRef.current = uid;
       syncReadyRef.current = true;
       setSyncTick((n) => n + 1); // envoie aussitôt l'état fusionné (ou les données locales à la 1re connexion)
@@ -1249,19 +1271,23 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const token = data.session?.access_token;
     if (!token) return null;
     const r = await fetch("/api/duo", { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify(payload) });
-    return (await r.json().catch(() => null)) as { linked?: boolean; partner?: DuoSummary | null; error?: string } | null;
+    return (await r.json().catch(() => null)) as { linked?: boolean; partner?: DuoSummary | null; pending?: boolean; incoming?: boolean; error?: string } | null;
   };
   // Statut du binôme au chargement (et rafraîchi quand on ouvre l'onglet stats).
   useEffect(() => {
     if (!mounted || !user) { setDuo({ linked: false }); return; }
     let cancelled = false;
-    duoCall({ action: "status" }).then((d) => { if (!cancelled && d && !d.error) setDuo({ linked: !!d.linked, partner: d.partner ?? null }); });
+    duoCall({ action: "status" }).then((d) => {
+      if (cancelled || !d || d.error) return;
+      setDuo({ linked: !!d.linked, partner: d.partner ?? null });
+      if (!d.linked) setDuoMsg(d.pending ? x.duoPending : d.incoming ? x.duoIncoming : "");
+    });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, user]);
   const refreshDuo = async () => {
     const d = await duoCall({ action: "status" });
-    if (d && !d.error) setDuo({ linked: !!d.linked, partner: d.partner ?? null });
+    if (d && !d.error) { setDuo({ linked: !!d.linked, partner: d.partner ?? null }); if (!d.linked) setDuoMsg(d.pending ? x.duoPending : d.incoming ? x.duoIncoming : ""); }
   };
   const linkDuo = async () => {
     const code = duoCode.trim().toUpperCase();
@@ -1271,7 +1297,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     setDuoBusy(false);
     if (!d) { setDuoMsg(x.duoErr); return; }
     if (d.error) { setDuoMsg(d.error === "self" ? x.duoSelf : d.error === "unknown_code" ? x.duoUnknown : x.duoErr); return; }
-    setDuo({ linked: !!d.linked, partner: d.partner ?? null }); setDuoCode(""); setDuoMsg("");
+    setDuo({ linked: !!d.linked, partner: d.partner ?? null }); setDuoCode(""); setDuoMsg(d.linked ? "" : x.duoPending);
   };
   const unlinkDuo = async () => {
     setDuoBusy(true);
@@ -1375,6 +1401,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { setAuthMsg(t.authErr); return; }
     const supa = getSupabase();
     if (!supa) return;
+    if (authMsg === "…") return; // envoi déjà en cours
+    setAuthMsg("…");
     const { error } = await supa.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href.split("?")[0] } });
     setAuthMsg(error ? t.authErr : t.authSent);
   };
@@ -1403,17 +1431,47 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const { data } = await supa.auth.getSession();
     const token = data.session?.access_token;
     if (!token) { setProOpen(false); setAuthOpen(true); return; }
+    if (checkoutMsg === "…") return; // déjà en cours : pas de double session de paiement
     setCheckoutMsg("…");
     try {
       const r = await fetch("/api/checkout", {
         method: "POST",
         headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
-        body: JSON.stringify({ plan, origin: window.location.origin }),
+        body: JSON.stringify({ plan, origin: window.location.origin, lang }),
       });
-      const j = (await r.json()) as { url?: string };
+      const j = (await r.json()) as { url?: string; error?: string };
       if (j.url) { window.location.href = j.url; return; }
+      if (r.status === 409) { setProOpen(false); openBilling(); return; } // déjà abonné → gestion
       setCheckoutMsg(t.checkoutErr);
     } catch { setCheckoutMsg(t.checkoutErr); }
+  };
+
+  // Portail Stripe : changer de carte, factures, résilier.
+  const openBilling = async () => {
+    setAccountBusy(true); setAccountMsg("");
+    try {
+      const r = await fetch("/api/billing", { method: "POST", headers: { "content-type": "application/json", ...(await authHeader()) }, body: JSON.stringify({ origin: window.location.origin, lang }) });
+      const j = (await r.json().catch(() => ({}))) as { url?: string };
+      if (j.url) { window.location.href = j.url; return; }
+      setAccountMsg(x.billingErr);
+    } catch { setAccountMsg(x.billingErr); }
+    setAccountBusy(false);
+  };
+  // Suppression définitive du compte (2 étapes).
+  const deleteAccount = async () => {
+    if (!confirmDelete) { setConfirmDelete(true); return; }
+    setAccountBusy(true); setAccountMsg("");
+    try {
+      const r = await fetch("/api/account", { method: "POST", headers: { "content-type": "application/json", ...(await authHeader()) }, body: JSON.stringify({ confirm: "DELETE" }) });
+      if (!r.ok) { setAccountMsg(x.deleteErr); setAccountBusy(false); return; }
+      await getSupabase()?.auth.signOut().catch(() => {});
+      try {
+        const keys: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith("calorio.") && k !== "calorio.lang" && k !== "calorio.theme") keys.push(k); }
+        keys.forEach((k) => localStorage.removeItem(k));
+      } catch { /* ignore */ }
+      window.location.reload();
+    } catch { setAccountMsg(x.deleteErr); setAccountBusy(false); }
   };
 
   // Retour de paiement réussi : on re-vérifie le statut Pro (le webhook a activé).
@@ -1424,8 +1482,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       if (url.searchParams.get("pro") === "success") {
         setProOpen(false);
         setCheckoutMsg(t.proSuccess);
-        const t1 = setTimeout(() => pullFromCloud(user.id), 2500);
-        const t2 = setTimeout(() => pullFromCloud(user.id), 6000);
+        const t1 = setTimeout(() => refreshPro(user.id), 2500);
+        const t2 = setTimeout(() => refreshPro(user.id), 6000);
         url.searchParams.delete("pro");
         window.history.replaceState({}, "", url.toString());
         return () => { clearTimeout(t1); clearTimeout(t2); };
@@ -1553,7 +1611,9 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const coachCtx: CoachCtx = useMemo(
     () => ({
       lang,
-      profil: { sexe, age, poids, taille, activite, objectif, poidsCible, trophies, used, savedMeals, customFoods, waterGoal },
+      // Minimum utile au coach (pas de repas enregistrés, aliments perso ni trophées) : moins de données
+      // envoyées à l'IA, moins de coût, et conforme à la politique de confidentialité.
+      profil: { sexe, age, poids, taille, activite, objectif, poidsCible },
       cible: besoinsAffiche.cible,
       bmr: besoinsAffiche.bmr,
       tdee: besoinsAffiche.tdee,
@@ -1568,7 +1628,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       poids: tend ? { debut: tend.debut, actuel: tend.actuel, delta: tend.delta } : null,
       prefs: coachPrefs,
     }),
-    [lang, sexe, age, poids, taille, activite, objectif, besoinsAffiche, total, lignesMap, tend, coachPrefs]
+    [lang, sexe, age, poids, taille, activite, objectif, poidsCible, besoinsAffiche, total, lignesMap, tend, coachPrefs]
   );
 
   // --- Données dérivées pour le tableau de bord (écran Stats) ---
@@ -2580,6 +2640,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                   {(Object.keys(t.obj) as Objectif[]).map((k) => <option key={k} value={k}>{t.obj[k]}</option>)}
                 </select>
               </label>
+              {besoinsAffiche.plancher && <p className="cl-floorwarn" role="note">🛡️ {x.floorWarn(KCAL_MIN[sexe])}</p>}
             </div>
             <div className="cl-card">
               <div className="cl-stats">
@@ -2644,6 +2705,28 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               {dataMsg && <p className="cl-setmsg">{dataMsg}</p>}
             </div>
 
+            {user && (
+              <>
+                <div className="cl-sectt"><span className="cl-dot" />{x.accountTitle}</div>
+                <div className="cl-card cl-account">
+                  {hasBilling && (
+                    <div className="cl-field">
+                      <div className="cl-fl">💳 {x.billingTitle}<small>{x.billingSub}</small></div>
+                      <button className="cl-databtn" onClick={openBilling} disabled={accountBusy}>{x.billingBtn}</button>
+                    </div>
+                  )}
+                  <div className="cl-field">
+                    <div className="cl-fl">🗑️ {x.deleteTitle}<small>{confirmDelete ? x.deleteConfirmSub : x.deleteSub}</small></div>
+                    <div className="cl-datarow">
+                      {confirmDelete && <button className="cl-databtn" onClick={() => setConfirmDelete(false)} disabled={accountBusy}>{x.cancel}</button>}
+                      <button className={`cl-databtn ${confirmDelete ? "danger" : ""}`} onClick={deleteAccount} disabled={accountBusy}>{confirmDelete ? x.deleteConfirmBtn : x.deleteBtn}</button>
+                    </div>
+                  </div>
+                  {accountMsg && <p className="cl-setmsg" role="status">{accountMsg}</p>}
+                </div>
+              </>
+            )}
+
             <div className="cl-sectt"><span className="cl-dot" />{t.faqTitle}</div>
             <div className="cl-card cl-faq">
               {t.faq.map((f, i) => (
@@ -2700,6 +2783,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                   {(Object.keys(t.obj) as Objectif[]).map((k) => <option key={k} value={k}>{t.obj[k]}</option>)}
                 </select>
               </label>
+              {besoinsAffiche.plancher && <p className="cl-floorwarn" role="note">🛡️ {x.floorWarn(KCAL_MIN[sexe])}</p>}
             </div>
             <div className="cl-ob-target">
               <span className="cl-ob-target-l">{t.ob.target}</span>
@@ -2907,10 +2991,11 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
             </button>
             <div className="cl-auth-or"><span>{t.or}</span></div>
             <div className="cl-auth-email">
-              <input type="email" placeholder={t.emailPh} value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") signInEmail(); }} />
+              <input type="email" aria-label={t.emailPh} placeholder={t.emailPh} value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") signInEmail(); }} />
               <button onClick={signInEmail}>{t.magic}</button>
             </div>
-            {authMsg && <p className="cl-auth-msg">{authMsg}</p>}
+            {authMsg && <p className="cl-auth-msg" role="status">{authMsg}</p>}
+            <p className="cl-auth-legal">{x.authConsent} <a href="/confidentialite-calorio" target="_blank" rel="noopener">{x.privacyLink}</a></p>
           </div>
         </div>
       )}
@@ -3227,6 +3312,10 @@ const CSS = `
 /* anneau calories */
 .cl-ringcard{background:linear-gradient(180deg,var(--card),var(--card2));position:relative;overflow:hidden;
   box-shadow:inset 0 2px 0 rgba(255,255,255,.55),0 32px 62px -22px rgba(20,130,66,.5),0 10px 24px -10px rgba(14,52,30,.34)}
+.cl-floorwarn{margin:8px 0 0;padding:10px 12px;border-radius:14px;background:var(--card2);border:1px solid var(--greenline);color:var(--ink);font-size:.8rem;line-height:1.45}
+.cl-databtn.danger{background:#c0283f;color:#fff;border-color:#c0283f}
+.cl-auth-legal{margin:12px 2px 0;font-size:.72rem;line-height:1.45;color:var(--muted);text-align:center}
+.cl-auth-legal a{color:var(--green);font-weight:700}
 .cl-kcalpop{position:fixed;left:50%;top:20%;transform:translateX(-50%);z-index:130;pointer-events:none;white-space:nowrap;font-family:var(--disp);font-weight:800;font-size:1.15rem;color:#fff;background:linear-gradient(180deg,#43d488,#16a34a);padding:9px 18px;border-radius:99px;box-shadow:0 14px 32px -8px rgba(20,140,70,.6),inset 0 1px 0 rgba(255,255,255,.45);animation:clkcalpop 1.15s cubic-bezier(.22,1,.36,1) forwards}
 @keyframes clkcalpop{0%{opacity:0;transform:translateX(-50%) translateY(16px) scale(.8)}18%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.04)}30%{transform:translateX(-50%) translateY(0) scale(1)}72%{opacity:1;transform:translateX(-50%) translateY(-8px) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-46px) scale(.95)}}
 .cl-ringcard.glow{animation:clringglow 2.6s ease-in-out infinite}

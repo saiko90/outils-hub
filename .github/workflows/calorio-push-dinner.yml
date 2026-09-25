@@ -1,8 +1,10 @@
 name: calorio push soir
-# Rappel du soir (~19:30 heure suisse en ete). N'envoie que si rien n'est note aujourd'hui (gere cote serveur).
+# Rappel du soir (19h30 heure suisse). N envoie que si rien n est note, ou le rappel perso Pro.
+# Deux horaires UTC (ete + hiver) : le serveur n'envoie que si l'heure de Zurich vaut 19h.
 on:
   schedule:
     - cron: "30 17 * * *"
+    - cron: "30 18 * * *"
   workflow_dispatch:
 jobs:
   ping:
@@ -10,4 +12,4 @@ jobs:
     steps:
       - name: Declencher le rappel soir
         run: |
-          curl -fsS -X GET -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "https://outils.ch/api/push-cron?job=dinner"
+          curl -fsS -X GET -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "https://outils.ch/api/push-cron?job=dinner&hour=19"

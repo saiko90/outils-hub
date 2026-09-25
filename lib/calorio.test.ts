@@ -83,3 +83,29 @@ describe("calorio — suivi de poids", () => {
     expect(tendancePoids([])).toBeNull();
   });
 });
+
+describe("plancher calorique de sécurité", () => {
+  it("relève une cible trop basse (femme, perte rapide)", () => {
+    const b = computeBesoins({ sexe: "femme", age: 60, poids: 45, taille: 155, activite: "sedentaire", objectif: "perte_rapide" });
+    // BMR 958, TDEE 1150 < 1200 → pas de déficit : cible = TDEE
+    expect(b.tdee).toBe(1150);
+    expect(b.cible).toBe(1150);
+    expect(b.plancher).toBe(true);
+  });
+  it("plancher 1200 kcal pour une femme dont la dépense le permet", () => {
+    const b = computeBesoins({ sexe: "femme", age: 40, poids: 55, taille: 160, activite: "sedentaire", objectif: "perte_rapide" });
+    // BMR 1189, TDEE 1427 → 927 brut → relevé à 1200
+    expect(b.cible).toBe(1200);
+    expect(b.plancher).toBe(true);
+  });
+  it("plancher 1500 kcal pour un homme", () => {
+    const b = computeBesoins({ sexe: "homme", age: 50, poids: 60, taille: 165, activite: "sedentaire", objectif: "perte_rapide" });
+    expect(b.cible).toBe(1500);
+    expect(b.plancher).toBe(true);
+  });
+  it("ne touche pas une cible normale", () => {
+    const b = computeBesoins({ sexe: "homme", age: 30, poids: 80, taille: 180, activite: "modere", objectif: "perte" });
+    expect(b.cible).toBe(2759 - 300);
+    expect(b.plancher).toBe(false);
+  });
+});

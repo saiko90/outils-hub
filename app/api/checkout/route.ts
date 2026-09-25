@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { SB_URL, SB_ANON, svcHeaders } from "@/lib/serverAuth";
+import { stripeLocale } from "@/lib/stripeServer";
 
 // Crée une session Stripe Checkout (abonnement Pro) pour l'utilisateur connecté.
 // La clé secrète Stripe reste côté serveur (env). L'utilisateur est identifié via
@@ -6,8 +8,6 @@ import { NextResponse } from "next/server";
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-const SB_URL = "https://srcvnqfgtazupuzwznrr.supabase.co";
-const SB_ANON = "sb_publishable_YUwom0kvnMbpn8Rpug1FaA_1H35zkY_";
 const SITE = "https://outils.ch";
 
 export async function POST(req: Request) {
@@ -37,13 +37,26 @@ export async function POST(req: Request) {
   // 2) Choix du plan + domaine de retour (calorio.ch reste sur calorio.ch)
   let plan = "yearly";
   let base = SITE;
+  let locale = "fr";
   try {
-    const body = (await req.json()) as { plan?: string; origin?: string };
+    const body = (await req.json()) as { plan?: string; origin?: string; lang?: string };
     if (body.plan === "monthly" || body.plan === "yearly") plan = body.plan;
+    locale = stripeLocale(body.lang);
     const allowed = ["https://calorio.ch", "https://www.calorio.ch", "https://outils.ch"];
     if (body.origin && allowed.includes(body.origin)) base = body.origin;
   } catch { /* défaut yearly */ }
   const price = plan === "monthly" ? priceMonthly : priceYearly;
+
+  // Déjà abonné (Stripe) ? → pas de second abonnement : le client ouvre le portail à la place.
+  let existingCustomer = "";
+  try {
+    const pr = await fetch(`${SB_URL}/rest/v1/calorio_pro?id=eq.${uid}&select=is_pro,pro_until,stripe_customer_id,stripe_subscription_id`, { headers: svcHeaders() });
+    const rows = pr.ok ? ((await pr.json()) as { is_pro?: boolean; pro_until?: string | null; stripe_customer_id?: string | null; stripe_subscription_id?: string | null }[]) : [];
+    const p = rows[0];
+    const activeStripe = !!p?.is_pro && !!p?.stripe_subscription_id && (!p.pro_until || new Date(p.pro_until) > new Date());
+    if (activeStripe) return NextResponse.json({ error: "already_subscribed" }, { status: 409 });
+    existingCustomer = p?.stripe_customer_id || "";
+  } catch { /* on continue : Stripe reste la source de vérité */ }
   const returnPath = base === SITE ? "/o/calorio" : "/";
 
   // 3) Créer la session Checkout (abonnement, essai 7 jours)
@@ -54,11 +67,12 @@ export async function POST(req: Request) {
   form.set("success_url", `${base}${returnPath}?pro=success`);
   form.set("cancel_url", `${base}${returnPath}`);
   form.set("client_reference_id", uid);
-  form.set("customer_email", email);
+  if (existingCustomer) form.set("customer", existingCustomer); // réutilise le client Stripe (historique, carte)
+  else form.set("customer_email", email);
   form.set("subscription_data[trial_period_days]", "7");
   form.set("subscription_data[metadata][supabase_uid]", uid);
   form.set("allow_promotion_codes", "true");
-  form.set("locale", "fr");
+  form.set("locale", locale);
 
   try {
     const r = await fetch("https://api.stripe.com/v1/checkout/sessions", {

@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
+import { SB_URL, authUid } from "@/lib/serverAuth";
 import { duoSummary, type DuoSummary } from "@/lib/duo";
 
 // calorio — « Duo » (binôme/couple). Trois actions :
 //  - "status" : renvoie si l'utilisateur est lié, et le résumé du jour de son binôme.
-//  - "link"   : lie l'utilisateur au binôme dont il saisit le code (liaison symétrique).
+//  - "link"   : demande de liaison vers le binôme dont on saisit le code. La liaison n'est ACTIVE que
+//               quand les deux ont saisi le code de l'autre (accord mutuel) : un inconnu qui connaît
+//               ton code public ne peut ni voir tes calories ni casser ton duo.
 //  - "unlink" : supprime la liaison des deux côtés.
 // Toute écriture passe par la clé service_role. L'utilisateur est identifié par son jeton
 // Supabase → on ne peut pas lier/délier à la place d'autrui. On ne partage jamais le journal
@@ -11,8 +14,6 @@ import { duoSummary, type DuoSummary } from "@/lib/duo";
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-const SB_URL = "https://srcvnqfgtazupuzwznrr.supabase.co";
-const SB_ANON = "sb_publishable_YUwom0kvnMbpn8Rpug1FaA_1H35zkY_";
 
 const svc = () => process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 function sh(): Record<string, string> {
@@ -20,28 +21,28 @@ function sh(): Record<string, string> {
   return { apikey: k, authorization: `Bearer ${k}`, "content-type": "application/json" };
 }
 
-async function authUid(req: Request): Promise<string> {
-  const auth = req.headers.get("authorization") || "";
-  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-  if (!token) return "";
-  try {
-    const u = await fetch(`${SB_URL}/auth/v1/user`, { headers: { apikey: SB_ANON, authorization: `Bearer ${token}` } });
-    if (!u.ok) return "";
-    const d = (await u.json()) as { id?: string };
-    return d.id || "";
-  } catch {
-    return "";
-  }
-}
 
 function swissDay(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Zurich" }).format(new Date());
 }
 
-async function partnerOf(uid: string): Promise<string> {
+// Demande sortante de uid (vers qui il veut se lier), ou "".
+async function outgoingOf(uid: string): Promise<string> {
   const r = await fetch(`${SB_URL}/rest/v1/calorio_duo?user_id=eq.${uid}&select=partner_id`, { headers: sh() });
   const rows = (await r.json().catch(() => [])) as { partner_id?: string }[];
   return Array.isArray(rows) && rows[0]?.partner_id ? rows[0].partner_id : "";
+}
+// Quelqu'un a-t-il demandé uid ? (sans révéler qui)
+async function hasIncoming(uid: string, except: string): Promise<boolean> {
+  const r = await fetch(`${SB_URL}/rest/v1/calorio_duo?partner_id=eq.${uid}&select=user_id`, { headers: sh() });
+  const rows = (await r.json().catch(() => [])) as { user_id?: string }[];
+  return Array.isArray(rows) && rows.some((x) => x.user_id && x.user_id !== except);
+}
+// Binôme ACTIF = demandes dans les deux sens.
+async function partnerOf(uid: string): Promise<string> {
+  const p = await outgoingOf(uid);
+  if (!p) return "";
+  return (await outgoingOf(p)) === uid ? p : "";
 }
 
 async function summaryOf(partnerId: string): Promise<DuoSummary | null> {
@@ -53,12 +54,11 @@ async function summaryOf(partnerId: string): Promise<DuoSummary | null> {
   return duoSummary(u.journal, u.profil, swissDay());
 }
 
-// Supprime toute liaison impliquant l'un ou l'autre (dans les deux sens).
+// Délie a et b : supprime la demande de a, et celle de b seulement si elle visait a.
 async function purgeLinks(a: string, b: string): Promise<void> {
-  const ids = `(${a},${b})`;
   await Promise.all([
-    fetch(`${SB_URL}/rest/v1/calorio_duo?user_id=in.${encodeURIComponent(ids)}`, { method: "DELETE", headers: sh() }),
-    fetch(`${SB_URL}/rest/v1/calorio_duo?partner_id=in.${encodeURIComponent(ids)}`, { method: "DELETE", headers: sh() }),
+    fetch(`${SB_URL}/rest/v1/calorio_duo?user_id=eq.${a}`, { method: "DELETE", headers: sh() }),
+    fetch(`${SB_URL}/rest/v1/calorio_duo?user_id=eq.${b}&partner_id=eq.${a}`, { method: "DELETE", headers: sh() }),
   ]);
 }
 
@@ -73,8 +73,9 @@ export async function POST(req: Request) {
 
   // --- UNLINK ---
   if (action === "unlink") {
-    const partner = await partnerOf(uid);
+    const partner = await outgoingOf(uid);
     if (partner) await purgeLinks(uid, partner);
+    else await fetch(`${SB_URL}/rest/v1/calorio_duo?user_id=eq.${uid}`, { method: "DELETE", headers: sh() });
     return NextResponse.json({ linked: false });
   }
 
@@ -88,24 +89,24 @@ export async function POST(req: Request) {
     const partner = crows[0]?.user_id;
     if (!partner) return NextResponse.json({ error: "unknown_code" }, { status: 404 });
     if (partner === uid) return NextResponse.json({ error: "self" }, { status: 400 });
-    // liaison propre : on repart de zéro pour les deux, puis on insère les deux sens
-    await purgeLinks(uid, partner);
+    // On remplace uniquement NOTRE demande (jamais les liens de l'autre personne).
+    await fetch(`${SB_URL}/rest/v1/calorio_duo?user_id=eq.${uid}`, { method: "DELETE", headers: sh() });
     const ins = await fetch(`${SB_URL}/rest/v1/calorio_duo`, {
       method: "POST",
       headers: { ...sh(), Prefer: "resolution=merge-duplicates,return=minimal" },
-      body: JSON.stringify([
-        { user_id: uid, partner_id: partner },
-        { user_id: partner, partner_id: uid },
-      ]),
+      body: JSON.stringify({ user_id: uid, partner_id: partner }),
     });
     if (!ins.ok) return NextResponse.json({ error: "link_failed", detail: (await ins.text()).slice(0, 200) }, { status: 502 });
+    const mutual = (await outgoingOf(partner)) === uid;
+    if (!mutual) return NextResponse.json({ linked: false, pending: true });
     const summary = await summaryOf(partner);
     return NextResponse.json({ linked: true, partner: summary });
   }
 
   // --- STATUS (défaut) ---
-  const partner = await partnerOf(uid);
-  if (!partner) return NextResponse.json({ linked: false });
+  const out = await outgoingOf(uid);
+  const partner = out && (await outgoingOf(out)) === uid ? out : "";
+  if (!partner) return NextResponse.json({ linked: false, pending: !!out, incoming: await hasIncoming(uid, out) });
   const summary = await summaryOf(partner);
   return NextResponse.json({ linked: true, partner: summary });
 }

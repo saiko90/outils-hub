@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 // Recherche d'aliments et lecture par code-barres via Open Food Facts (base ouverte,
 // gratuite, ~3 M de produits dont beaucoup de références suisses). On passe par le
-// serveur pour la mise en cache, le User-Agent requis et éviter les soucis CORS.
+// serveur pour la mise en cache CDN, le User-Agent requis, un délai maximal et éviter les soucis CORS.
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
@@ -29,6 +29,13 @@ type Food = {
   emoji: string;
   brand?: string;
 };
+
+// Réponse mise en cache par le CDN (Open Food Facts limite le débit par IP : tous nos utilisateurs
+// sortent par les mêmes IP Vercel, donc on évite de redemander la même chose).
+function cached(body: unknown, seconds: number) {
+  return NextResponse.json(body, { headers: { "cache-control": `public, s-maxage=${seconds}, stale-while-revalidate=${seconds * 7}` } });
+}
+const TIMEOUT_MS = 6000;
 
 function num(v: unknown): number {
   const n = typeof v === "number" ? v : parseFloat(String(v ?? ""));
@@ -68,18 +75,20 @@ export async function GET(req: Request) {
     if (code) {
       const r = await fetch(`${OFF}/api/v2/product/${code}?fields=${fields}`, {
         headers: { "user-agent": UA },
+        signal: AbortSignal.timeout(TIMEOUT_MS),
       });
+      if (r.status === 404) return cached({ foods: [], notFound: true }, 3600);
       if (!r.ok) return NextResponse.json({ foods: [] });
       const data = (await r.json()) as { status?: number; product?: OffProduct };
-      if (data.status !== 1 || !data.product) return NextResponse.json({ foods: [], notFound: true });
+      if (data.status !== 1 || !data.product) return cached({ foods: [], notFound: true }, 3600);
       const f = toFood(data.product);
-      return NextResponse.json({ foods: f ? [f] : [], notFound: !f });
+      return cached({ foods: f ? [f] : [], notFound: !f }, 86400);
     }
 
     // Recherche texte
     if (q.length < 2) return NextResponse.json({ foods: [] });
     const search = `${SEARCH}/search?q=${encodeURIComponent(q)}&page_size=24&fields=${fields}`;
-    const r = await fetch(search, { headers: { "user-agent": UA } });
+    const r = await fetch(search, { headers: { "user-agent": UA }, signal: AbortSignal.timeout(TIMEOUT_MS) });
     if (!r.ok) return NextResponse.json({ foods: [] });
     const data = (await r.json()) as { hits?: OffProduct[] };
     const seen = new Set<string>();
@@ -93,7 +102,7 @@ export async function GET(req: Request) {
         return true;
       })
       .slice(0, 18);
-    return NextResponse.json({ foods });
+    return cached({ foods }, 3600);
   } catch {
     return NextResponse.json({ foods: [] });
   }

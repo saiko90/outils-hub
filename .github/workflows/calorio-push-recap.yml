@@ -1,0 +1,15 @@
+name: calorio bilan hebdo
+# Bilan de la semaine (Pro), le dimanche a 18h heure suisse.
+# Deux horaires UTC (ete + hiver) : le serveur n'envoie que si l'heure de Zurich vaut 18h.
+on:
+  schedule:
+    - cron: "0 16 * * 0"
+    - cron: "0 17 * * 0"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Declencher le bilan hebdo
+        run: |
+          curl -fsS -X GET -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "https://outils.ch/api/push-cron?job=recap&hour=18"

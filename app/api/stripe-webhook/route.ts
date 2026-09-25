@@ -16,21 +16,40 @@ async function hmacHex(secret: string, msg: string): Promise<string> {
 }
 
 async function verify(raw: string, header: string, secret: string): Promise<boolean> {
-  const parts = Object.fromEntries(header.split(",").map((p) => p.split("=")) as [string, string][]);
-  const t = parts["t"];
-  const v1 = parts["v1"];
-  if (!t || !v1) return false;
+  // En-tête : t=…,v1=…[,v1=…] (plusieurs v1 pendant une rotation du secret).
+  let t = "";
+  const v1s: string[] = [];
+  for (const part of header.split(",")) {
+    const [k, v] = part.split("=");
+    if (k === "t") t = v;
+    else if (k === "v1" && v) v1s.push(v);
+  }
+  if (!t || v1s.length === 0) return false;
   // Tolérance 5 min pour éviter le rejeu
   if (Math.abs(Date.now() / 1000 - Number(t)) > 300) return false;
   const expected = await hmacHex(secret, `${t}.${raw}`);
-  if (expected.length !== v1.length) return false;
-  let diff = 0;
-  for (let i = 0; i < expected.length; i++) diff |= expected.charCodeAt(i) ^ v1.charCodeAt(i);
-  return diff === 0;
+  return v1s.some((v1) => {
+    if (expected.length !== v1.length) return false;
+    let diff = 0;
+    for (let i = 0; i < expected.length; i++) diff |= expected.charCodeAt(i) ^ v1.charCodeAt(i);
+    return diff === 0;
+  });
 }
 
+type ProRow = { is_pro?: boolean; plan?: string | null; stripe_event_at?: string | null; stripe_subscription_id?: string | null };
+
+async function getPro(service: string, uid: string): Promise<ProRow | null> {
+  const r = await fetch(`${SB_URL}/rest/v1/calorio_pro?id=eq.${encodeURIComponent(uid)}&select=is_pro,plan,stripe_event_at,stripe_subscription_id`, {
+    headers: { apikey: service, authorization: `Bearer ${service}` },
+  });
+  if (!r.ok) throw new Error("pro_read_failed");
+  const rows = (await r.json()) as ProRow[];
+  return rows[0] || null;
+}
+
+// Écrit le statut Pro ; lève une erreur si la base refuse → réponse 500 → Stripe réessaie.
 async function setPro(service: string, row: Record<string, unknown>) {
-  await fetch(`${SB_URL}/rest/v1/calorio_pro`, {
+  const r = await fetch(`${SB_URL}/rest/v1/calorio_pro`, {
     method: "POST",
     headers: {
       apikey: service,
@@ -40,6 +59,16 @@ async function setPro(service: string, row: Record<string, unknown>) {
     },
     body: JSON.stringify(row),
   });
+  if (!r.ok) throw new Error(`pro_write_failed_${r.status}`);
+}
+
+// Ignore un événement plus ancien que le dernier appliqué (Stripe ne garantit pas l'ordre),
+// et ne retire jamais un Pro offert (plan « comp ») sur la foi d'un événement Stripe.
+function shouldApply(prev: ProRow | null, eventAt: string, turnsOff: boolean): boolean {
+  if (!prev) return true;
+  if (prev.stripe_event_at && new Date(prev.stripe_event_at) > new Date(eventAt)) return false;
+  if (turnsOff && prev.plan === "comp") return false;
+  return true;
 }
 
 export async function POST(req: Request) {
@@ -52,7 +81,7 @@ export async function POST(req: Request) {
   const ok = await verify(raw, sigHeader, secret);
   if (!ok) return NextResponse.json({ error: "bad_signature" }, { status: 400 });
 
-  let event: { type?: string; data?: { object?: Record<string, unknown> } };
+  let event: { type?: string; created?: number; data?: { object?: Record<string, unknown> } };
   try {
     event = JSON.parse(raw);
   } catch {
@@ -61,6 +90,7 @@ export async function POST(req: Request) {
 
   const type = event.type || "";
   const obj = event.data?.object || {};
+  const eventAt = new Date((event.created || Date.now() / 1000) * 1000).toISOString();
 
   try {
     if (type.startsWith("customer.subscription.")) {
@@ -73,8 +103,12 @@ export async function POST(req: Request) {
         items?: { data?: { current_period_end?: number; price?: { id?: string } }[] };
       };
       const uid = sub.metadata?.supabase_uid;
-      if (uid) {
-        const active = sub.status === "active" || sub.status === "trialing";
+      const active = sub.status === "active" || sub.status === "trialing";
+      const turnsOff = type === "customer.subscription.deleted" || !active;
+      const prev = uid ? await getPro(service, uid) : null;
+      // Un ancien abonnement qui s'arrête ne doit pas couper un abonnement plus récent encore actif.
+      const otherSubActive = !!(turnsOff && prev?.is_pro && prev.stripe_subscription_id && sub.id && prev.stripe_subscription_id !== sub.id);
+      if (uid && !otherSubActive && shouldApply(prev, eventAt, turnsOff)) {
         const end = sub.current_period_end || sub.items?.data?.[0]?.current_period_end;
         await setPro(service, {
           id: uid,
@@ -83,6 +117,7 @@ export async function POST(req: Request) {
           stripe_customer_id: sub.customer || null,
           stripe_subscription_id: sub.id || null,
           plan: sub.items?.data?.[0]?.price?.id || null,
+          stripe_event_at: eventAt,
           updated_at: new Date().toISOString(),
         });
       }
@@ -90,17 +125,23 @@ export async function POST(req: Request) {
       // Filet de sécurité : active dès la fin du paiement, même avant l'event subscription.
       const s = obj as { client_reference_id?: string; customer?: string; subscription?: string };
       if (s.client_reference_id) {
-        await setPro(service, {
-          id: s.client_reference_id,
-          is_pro: true,
-          stripe_customer_id: s.customer || null,
-          stripe_subscription_id: s.subscription || null,
-          updated_at: new Date().toISOString(),
-        });
+        const prev = await getPro(service, s.client_reference_id);
+        if (shouldApply(prev, eventAt, false)) {
+          await setPro(service, {
+            id: s.client_reference_id,
+            is_pro: true,
+            stripe_customer_id: s.customer || null,
+            stripe_subscription_id: s.subscription || null,
+            stripe_event_at: eventAt,
+            updated_at: new Date().toISOString(),
+          });
+        }
       }
     }
-  } catch {
-    return NextResponse.json({ received: true, warn: "handler_error" });
+  } catch (e) {
+    // Échec d'écriture : 500 → Stripe renverra l'événement (jusqu'à 3 jours). Un client qui a payé
+    // ne reste jamais sans Pro à cause d'un incident passager.
+    return NextResponse.json({ error: "handler_error", detail: String((e as Error)?.message || e).slice(0, 120) }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });

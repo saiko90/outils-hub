@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { SB_URL, authUid } from "@/lib/serverAuth";
 
 // Parrainage calorio. Deux actions :
 //  - "mine"  : renvoie (et crée si besoin) le code d'invitation de l'utilisateur + ses stats.
@@ -9,9 +10,11 @@ import { NextResponse } from "next/server";
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-const SB_URL = "https://srcvnqfgtazupuzwznrr.supabase.co";
-const SB_ANON = "sb_publishable_YUwom0kvnMbpn8Rpug1FaA_1H35zkY_";
 const REWARD_DAYS = 30;
+// Anti-abus : le parrain n'est récompensé que pour des filleuls réellement actifs (≥ ACTIVE_DAYS jours
+// notés), et au plus MAX_REWARDS fois. Le filleul, lui, reçoit son mois tout de suite.
+const ACTIVE_DAYS = 3;
+const MAX_REWARDS = 6;
 
 const svc = () => process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
@@ -20,19 +23,6 @@ function sh(): Record<string, string> {
   return { apikey: k, authorization: `Bearer ${k}`, "content-type": "application/json" };
 }
 
-async function authUid(req: Request): Promise<string> {
-  const auth = req.headers.get("authorization") || "";
-  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-  if (!token) return "";
-  try {
-    const u = await fetch(`${SB_URL}/auth/v1/user`, { headers: { apikey: SB_ANON, authorization: `Bearer ${token}` } });
-    if (!u.ok) return "";
-    const d = (await u.json()) as { id?: string };
-    return d.id || "";
-  } catch {
-    return "";
-  }
-}
 
 // Code court sans caractères ambigus.
 const ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
@@ -88,6 +78,15 @@ async function grantBonus(uid: string): Promise<void> {
   });
 }
 
+// Filleul « réel » : au moins ACTIVE_DAYS jours différents avec des aliments notés.
+async function isActive(uid: string): Promise<boolean> {
+  const r = await fetch(`${SB_URL}/rest/v1/calorio_users?id=eq.${uid}&select=journal`, { headers: sh() });
+  if (!r.ok) return false;
+  const rows = (await r.json().catch(() => [])) as { journal?: Record<string, unknown[]> | null }[];
+  const j = rows[0]?.journal || {};
+  return Object.values(j).filter((v) => Array.isArray(v) && v.length > 0).length >= ACTIVE_DAYS;
+}
+
 export async function POST(req: Request) {
   if (!svc()) return NextResponse.json({ error: "not_configured" }, { status: 503 });
   const uid = await authUid(req);
@@ -104,10 +103,23 @@ export async function POST(req: Request) {
   // --- MINE : code + stats ---
   if (action === "mine") {
     const code = await getOrCreateCode(uid);
-    const r = await fetch(`${SB_URL}/rest/v1/calorio_referrals?referrer_id=eq.${uid}&select=id`, { headers: sh() });
-    const refs = (await r.json()) as unknown[];
-    const count = Array.isArray(refs) ? refs.length : 0;
-    return NextResponse.json({ code, count, rewardDays: REWARD_DAYS });
+    const r = await fetch(`${SB_URL}/rest/v1/calorio_referrals?referrer_id=eq.${uid}&select=id,referee_id,reward_granted`, { headers: sh() });
+    const refs = ((await r.json().catch(() => [])) as { id: string; referee_id: string; reward_granted: boolean }[]) || [];
+    const list = Array.isArray(refs) ? refs : [];
+    let rewarded = list.filter((x) => x.reward_granted).length;
+    // Récompenses en attente : accordées dès que le filleul est actif (évaluation paresseuse).
+    for (const ref of list.filter((x) => !x.reward_granted).slice(0, 20)) {
+      if (rewarded >= MAX_REWARDS) break;
+      if (!(await isActive(ref.referee_id))) continue;
+      const upd = await fetch(`${SB_URL}/rest/v1/calorio_referrals?id=eq.${ref.id}&reward_granted=eq.false`, {
+        method: "PATCH",
+        headers: { ...sh(), Prefer: "return=representation" },
+        body: JSON.stringify({ reward_granted: true }),
+      });
+      const done = upd.ok ? ((await upd.json()) as unknown[]) : [];
+      if (done.length) { await grantBonus(uid); rewarded++; } // PATCH conditionnel : jamais deux fois
+    }
+    return NextResponse.json({ code, count: list.length, rewarded, pending: list.length - rewarded, rewardDays: REWARD_DAYS, maxRewards: MAX_REWARDS });
   }
 
   // --- CLAIM : le filleul réclame via un code ---
@@ -130,15 +142,14 @@ export async function POST(req: Request) {
   const ins = await fetch(`${SB_URL}/rest/v1/calorio_referrals`, {
     method: "POST",
     headers: { ...sh(), Prefer: "return=minimal" },
-    body: JSON.stringify({ referrer_id: referrer, referee_id: uid, code, reward_granted: true }),
+    body: JSON.stringify({ referrer_id: referrer, referee_id: uid, code, reward_granted: false }),
   });
   if (!ins.ok) {
     // 23505 → course : quelqu'un a déjà inséré ; on considère comme déjà parrainé
     return NextResponse.json({ error: "already_referred" }, { status: 409 });
   }
 
-  // Récompense pour les deux
-  await grantBonus(referrer);
+  // Le filleul reçoit son mois tout de suite ; le parrain dès que le filleul est actif.
   await grantBonus(uid);
 
   return NextResponse.json({ ok: true, rewardDays: REWARD_DAYS });

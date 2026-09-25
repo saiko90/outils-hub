@@ -1,13 +1,15 @@
 name: calorio push encouragement
-# Message d'encouragement (~09:00 heure suisse en ete). Limite a 1x/3 jours par utilisateur cote serveur.
+# Encouragement du matin (9h heure suisse), au plus tous les 3 jours par utilisateur.
+# Deux horaires UTC (ete + hiver) : le serveur n'envoie que si l'heure de Zurich vaut 9h.
 on:
   schedule:
     - cron: "0 7 * * *"
+    - cron: "0 8 * * *"
   workflow_dispatch:
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Declencher l'encouragement
+      - name: Declencher l encouragement
         run: |
-          curl -fsS -X GET -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "https://outils.ch/api/push-cron?job=encourage"
+          curl -fsS -X GET -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "https://outils.ch/api/push-cron?job=encourage&hour=9"

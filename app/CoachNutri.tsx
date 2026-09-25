@@ -124,7 +124,7 @@ const L = {
     notReady: "Le coach sera activé très bientôt. Reviens dans un instant !",
     err: "Oups, petit souci de connexion. Réessaie dans un moment.",
     limit: "Tu as atteint ta limite de messages pour aujourd'hui — on garde Vito léger et rapide 🥕 Reviens demain !",
-    disclaimer: "Vito donne des conseils généraux de nutrition, pas un avis médical. Pour un suivi personnalisé (pathologie, trouble alimentaire, sport de haut niveau), consulte un·e professionnel·le de santé.",
+    disclaimer: "Vito donne des conseils généraux de nutrition, pas un avis médical. Pour un suivi personnalisé (pathologie, trouble alimentaire, sport de haut niveau), consulte un·e professionnel·le de santé. Tes messages et le résumé de ta journée sont traités par Google Gemini pour répondre.",
     newChat: "Nouvelle", histBtn: "Historique", panelTitle: "Tes conversations", favs: "⭐ Favoris", recent: "🕘 Récentes",
     noRecent: "Aucune conversation récente.", noFavs: "Touche l'étoile pour garder une conversation ici.",
     saveFav: "Garder en favori", unFav: "Retirer des favoris", del: "Supprimer", close: "Fermer", untitled: "Conversation",
@@ -155,7 +155,7 @@ const L = {
     notReady: "Der Coach wird ganz bald aktiviert. Schau gleich nochmal vorbei!",
     err: "Ups, kleines Verbindungsproblem. Versuch es gleich nochmal.",
     limit: "Du hast dein heutiges Nachrichtenlimit erreicht 🥕 Komm morgen wieder!",
-    disclaimer: "Vito gibt allgemeine Ernährungstipps, keine medizinische Beratung. Für persönliche Begleitung eine Fachperson beiziehen.",
+    disclaimer: "Vito gibt allgemeine Ernährungstipps, keine medizinische Beratung. Für persönliche Begleitung eine Fachperson beiziehen. Deine Nachrichten und die Tageszusammenfassung werden von Google Gemini verarbeitet.",
     newChat: "Neu", histBtn: "Verlauf", panelTitle: "Deine Gespräche", favs: "⭐ Favoriten", recent: "🕘 Kürzlich",
     noRecent: "Keine kürzlichen Gespräche.", noFavs: "Tippe den Stern, um ein Gespräch hier zu behalten.",
     saveFav: "Als Favorit speichern", unFav: "Aus Favoriten entfernen", del: "Löschen", close: "Schliessen", untitled: "Gespräch",
@@ -186,7 +186,7 @@ const L = {
     notReady: "The coach will be activated very soon. Check back in a moment!",
     err: "Oops, small connection hiccup. Try again in a moment.",
     limit: "You've reached today's message limit 🥕 Come back tomorrow!",
-    disclaimer: "Vito gives general nutrition tips, not medical advice. For personalised guidance, see a health professional.",
+    disclaimer: "Vito gives general nutrition tips, not medical advice. For personalised guidance, see a health professional. Your messages and day summary are processed by Google Gemini to reply.",
     newChat: "New", histBtn: "History", panelTitle: "Your conversations", favs: "⭐ Favorites", recent: "🕘 Recent",
     noRecent: "No recent conversations.", noFavs: "Tap the star to keep a conversation here.",
     saveFav: "Save to favorites", unFav: "Remove from favorites", del: "Delete", close: "Close", untitled: "Conversation",
@@ -599,7 +599,7 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
           <button onClick={() => send(input)} disabled={busy || !input.trim() || used >= DAILY_LIMIT} aria-label={t.send}>➤</button>
         </div>
       )}
-      <p className="cn-disc">🥕 {t.disclaimer}</p>
+      <p className="cn-disc">🥕 {t.disclaimer} <a href="/confidentialite-calorio" target="_blank" rel="noopener">↗</a></p>
 
       {panel && (
         <div className="cn-panelwrap" onClick={() => setPanel(false)}>

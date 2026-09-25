@@ -4,14 +4,14 @@ const CANON = "https://calorio.ch/confidentialite-calorio";
 
 export const metadata: Metadata = {
   title: "Politique de confidentialité — calorio",
-  description: "Comment calorio traite tes données : compte, journal, poids, coach IA, analytics, paiements. Aucune revente de données.",
+  description: "Comment calorio traite tes données : compte, journal, poids, coach IA, photo, duo, paiements. Suppression du compte en un clic. Aucune revente de données.",
   alternates: { canonical: CANON },
   robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = { themeColor: "#f3f7f2" };
 
-const MAJ = "23 septembre 2026";
+const MAJ = "25 septembre 2026";
 
 export default function Page() {
   return (
@@ -45,33 +45,45 @@ export default function Page() {
         <h2 className="pv-h2">Données traitées si tu crées un compte</h2>
         <p>Si tu crées un compte gratuit (pour synchroniser entre appareils), nous traitons :</p>
         <ul className="pv-ul">
-          <li><b>Adresse e-mail</b> — pour créer et sécuriser ton compte (authentification).</li>
-          <li><b>Données de suivi</b> — profil (âge, sexe, taille, poids, objectif), journal alimentaire, historique de poids, préférences alimentaires, série et hydratation — afin de synchroniser ton compte entre téléphone et ordinateur.</li>
-          <li><b>Statut d'abonnement</b> (gratuit / Pro) et, pour les notifications, ton abonnement push si tu l'actives.</li>
+          <li><b>Adresse e-mail</b> — pour créer et sécuriser ton compte (connexion par lien e-mail ou Google).</li>
+          <li><b>Données de suivi</b> — profil (âge, sexe, taille, poids, niveau d'activité, objectif), journal alimentaire, historique de poids, repas et aliments enregistrés, préférences alimentaires (dont allergies), trophées et conversations favorites avec Vito — afin de synchroniser ton compte entre tes appareils.</li>
+          <li><b>Statut d'abonnement</b> (gratuit / Pro) et, si tu actives les notifications, l'adresse technique d'abonnement push de chacun de tes appareils.</li>
+          <li><b>Parrainage</b> — ton code d'invitation et les liens de parrainage (qui a invité qui), pour attribuer les mois offerts.</li>
         </ul>
-        <p>Base légale : l'exécution du service que tu demandes (art. 31 nLPD / art. 6(1)(b) RGPD).</p>
+        <p><b>Base légale.</b> Tes données de poids et d'alimentation sont des données sur la santé, donc des données sensibles. Nous les traitons parce que tu le demandes expressément : en créant un compte, en activant la synchronisation ou en utilisant une fonction (coach, photo, duo), tu consens à ce traitement pour cette finalité (art. 6 al. 6-7 nLPD ; art. 6(1)(a) et 9(2)(a) RGPD). Tu peux retirer ce consentement à tout moment en supprimant ton compte.</p>
 
         <h2 className="pv-h2">Coach IA « Vito »</h2>
-        <p>Si tu utilises le coach Vito (option Pro), tes messages et un résumé de ta journée nutritionnelle (calories, macros) sont envoyés à l'API <b>Google Gemini</b> uniquement pour générer une réponse. Nous n'y joignons pas ton identité. N'y saisis pas d'informations sensibles que tu ne souhaites pas transmettre.</p>
+        <p>Quand tu écris à Vito (quelques messages d'essai gratuits, puis illimité avec Pro), nous transmettons à l'API <b>Google Gemini</b>, uniquement pour générer la réponse : tes messages, ton profil de base (sexe, âge, poids, taille, activité, objectif, poids visé), ta cible calorique, les aliments et quantités notés aujourd'hui, ta tendance de poids et tes préférences alimentaires (régime, allergies, aliments aimés ou non). Nous n'y joignons ni ton nom ni ton e-mail. N'y saisis pas d'informations que tu ne souhaites pas transmettre.</p>
+
+        <h2 className="pv-h2">Analyse de repas en photo (Pro)</h2>
+        <p>La photo de ton assiette est envoyée à <b>Google Gemini</b> pour identifier les aliments et estimer les quantités. calorio ne conserve pas la photo : seul le résultat que tu choisis d'ajouter entre dans ton journal.</p>
+
+        <h2 className="pv-h2">Duo (binôme)</h2>
+        <p>Le duo ne s'active que lorsque <b>chacun a saisi le code de l'autre</b>. Ton binôme voit alors uniquement un résumé du jour : calories consommées, cible, pourcentage atteint et série. Jamais le détail de ton journal ni ton poids. Tu peux délier le duo à tout moment.</p>
+
+        <h2 className="pv-h2">Recherche d'aliments</h2>
+        <p>Les recherches d'aliments et les codes-barres scannés sont transmis, via notre serveur et sans donnée personnelle, à la base ouverte <b>Open Food Facts</b>.</p>
 
         <h2 className="pv-h2">Paiements (Pro)</h2>
-        <p>Les paiements de l'abonnement Pro sont traités par <b>Stripe</b>. calorio ne voit ni ne stocke tes données de carte : elles sont gérées directement par Stripe, prestataire de paiement certifié.</p>
+        <p>Les paiements de l'abonnement Pro sont traités par <b>Stripe</b>. calorio ne voit ni ne stocke tes données de carte : elles sont gérées directement par Stripe, prestataire de paiement certifié. Tu gères ton abonnement (carte, factures, résiliation) depuis l'app : Aide → Mon compte → Mon abonnement.</p>
 
-        <h2 className="pv-h2">Mesure d'audience</h2>
-        <p>calorio utilise une mesure d'audience <b>sans cookie</b> et respectueuse de la vie privée : nous comptons des pages vues de façon <b>agrégée</b>, sans stocker ton adresse IP ni créer d'identifiant publicitaire. Aucun traceur tiers à des fins publicitaires.</p>
+        <h2 className="pv-h2">Mesure d'audience et protection contre les abus</h2>
+        <p>calorio utilise une mesure d'audience <b>sans cookie</b> : nous comptons des pages vues de façon <b>agrégée</b>, sans stocker ton adresse IP ni créer d'identifiant publicitaire. Pour empêcher l'usage abusif du coach IA, nous conservons un compteur journalier associé à une <b>empreinte irréversible</b> de l'adresse IP (jamais l'adresse elle-même), effacé après quelques jours. Aucun traceur publicitaire.</p>
 
         <h2 className="pv-h2">Hébergement et sous-traitants</h2>
-        <p>Les données de compte sont hébergées via <b>Supabase</b> (base de données) et l'application est servie par <b>Vercel</b>. Le coach utilise <b>Google Gemini</b> et les paiements <b>Stripe</b>. Ces prestataires agissent comme sous-traitants et peuvent traiter des données hors de Suisse/UE avec des garanties appropriées.</p>
+        <p>Les données de compte sont hébergées via <b>Supabase</b> (base de données) et l'application est servie par <b>Vercel</b>. Le coach et l'analyse photo utilisent <b>Google Gemini</b>, les paiements <b>Stripe</b>, la recherche d'aliments <b>Open Food Facts</b>, et les polices de caractères sont chargées depuis <b>Google Fonts</b> (ce qui transmet ton adresse IP à Google). Ces prestataires peuvent traiter des données hors de Suisse/UE avec des garanties appropriées (clauses contractuelles types).</p>
 
         <h2 className="pv-h2">Durée de conservation</h2>
-        <p>Tes données de compte sont conservées tant que ton compte existe. Tu peux les exporter ou les supprimer à tout moment (voir ci-dessous).</p>
+        <p>Tes données de compte sont conservées tant que ton compte existe, puis effacées immédiatement à sa suppression. Sans compte, elles restent sur ton appareil jusqu'à ce que tu les effaces.</p>
 
         <h2 className="pv-h2">Tes droits</h2>
-        <p>Tu disposes des droits d'accès, de rectification, d'effacement, de portabilité et d'opposition. Concrètement :</p>
+        <p>Tu disposes des droits d'accès, de rectification, d'effacement, de portabilité et d'opposition. Concrètement, dans l'application :</p>
         <ul className="pv-ul">
-          <li><b>Exporter</b> tes données depuis l'application (écran Aide → export).</li>
-          <li><b>Supprimer</b> tes données locales depuis l'application, ou demander la suppression de ton compte par e-mail à <a href="mailto:m.kaeser90@gmail.com">m.kaeser90@gmail.com</a>.</li>
+          <li><b>Exporter</b> toutes tes données : Aide → Mes données → Télécharger.</li>
+          <li><b>Supprimer ton compte</b> et toutes les données associées, immédiatement et définitivement : Aide → Mon compte → Supprimer mon compte. Un abonnement en cours est résilié.</li>
+          <li>À la <b>déconnexion</b>, tes données sont retirées de l'appareil (elles restent dans ton compte).</li>
         </ul>
+        <p>Pour toute question ou demande : <a href="mailto:m.kaeser90@gmail.com">m.kaeser90@gmail.com</a>. Tu peux aussi t'adresser au Préposé fédéral à la protection des données et à la transparence (PFPDT).</p>
 
         <h2 className="pv-h2">Enfants</h2>
         <p>calorio n'est pas destiné aux enfants de moins de 13 ans et ne leur est pas spécifiquement adressé.</p>

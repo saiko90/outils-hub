@@ -74,3 +74,15 @@ export function clientIp(req: Request): string {
   if (xff) return xff.split(",")[0].trim();
   return req.headers.get("x-real-ip") || "unknown";
 }
+
+/** Empreinte (SHA-256 tronqué) de l'adresse IP : sert aux quotas anti-abus sans conserver l'IP en clair. */
+export async function ipFingerprint(req: Request): Promise<string> {
+  const ip = clientIp(req);
+  if (ip === "unknown") return "unknown";
+  try {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`calorio:${ip}`));
+    return Array.from(new Uint8Array(buf)).slice(0, 12).map((b) => b.toString(16).padStart(2, "0")).join("");
+  } catch {
+    return "unknown";
+  }
+}

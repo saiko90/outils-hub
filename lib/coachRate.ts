@@ -3,7 +3,7 @@
 // - Pro vérifié en base (jamais sur la foi du client) : quota journalier par utilisateur.
 // - Non-Pro : quelques messages d'essai, comptés côté serveur (à vie par compte, par jour et par IP sans compte).
 // - Filet global par IP et par jour.
-import { authUser, isProServer, dailyQuota, lifetimeQuota, clientIp } from "@/lib/serverAuth";
+import { authUser, isProServer, dailyQuota, lifetimeQuota, clientIp, ipFingerprint } from "@/lib/serverAuth";
 
 const ALLOWED_HOSTS = ["calorio.ch", "outils.ch", "localhost", "127.0.0.1"];
 export const IP_DAILY_MAX = 60; // filet anti-script (plusieurs appareils derrière une même box)
@@ -27,7 +27,7 @@ export { clientIp };
 /** null = autorisé ; sinon statut HTTP à renvoyer (403 origine, 429 quota, 402 Pro requis). */
 export async function coachGuard(req: Request): Promise<number | null> {
   if (!originAllowed(req)) return 403;
-  const ip = clientIp(req);
+  const ip = await ipFingerprint(req); // jamais l'IP en clair en base
   if (ip !== "unknown" && !(await dailyQuota(`coach:ip:${ip}`, IP_DAILY_MAX))) return 429;
 
   const user = await authUser(req);

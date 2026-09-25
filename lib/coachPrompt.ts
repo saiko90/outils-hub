@@ -36,7 +36,13 @@ export function persona(lang: string): string {
 
 export function contextBlock(ctx: CoachApiCtx): string {
   const lines: string[] = [];
-  if (ctx.profil) lines.push(`Profil: ${JSON.stringify(ctx.profil)}`);
+  if (ctx.profil && typeof ctx.profil === "object") {
+    // Liste blanche : seules ces informations partent vers le modèle, quoi qu'envoie le client.
+    const src = ctx.profil as Record<string, unknown>;
+    const keep: Record<string, unknown> = {};
+    for (const k of ["sexe", "age", "poids", "taille", "activite", "objectif", "poidsCible"]) if (k in src) keep[k] = src[k];
+    lines.push(`Profil: ${JSON.stringify(keep)}`);
+  }
   if (typeof ctx.cible === "number") lines.push(`Calories cible/jour: ${ctx.cible} kcal (BMR ${ctx.bmr}, dépense ${ctx.tdee}).`);
   if (ctx.macrosCible) lines.push(`Macros cible: ${ctx.macrosCible.proteines}g prot / ${ctx.macrosCible.glucides}g gluc / ${ctx.macrosCible.lipides}g lip.`);
   if (ctx.aujourdhui) {

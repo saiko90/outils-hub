@@ -1,6 +1,6 @@
 import webpush from "web-push";
 import { pickPush, buildStreak, buildRecap, buildRemaining, type PushType } from "@/lib/pushMessages";
-import { computeBesoins, type Profil } from "@/lib/calorio";
+import { cibleFromProfil } from "@/lib/duo";
 import { VAPID_PUBLIC_KEY } from "@/lib/vapid";
 
 // Cron d'envoi des notifications calorio Pro (rappels repas + encouragements).
@@ -29,17 +29,6 @@ function dayKcal(rows: unknown): number {
   }
   return k;
 }
-// Cible calorique du jour à partir d'un profil stocké (validé), sinon null.
-function cibleFromProfil(p: unknown): number | null {
-  if (!p || typeof p !== "object") return null;
-  const o = p as Record<string, unknown>;
-  const okNum = (v: unknown) => typeof v === "number" && isFinite(v) && v > 0;
-  if ((o.sexe !== "homme" && o.sexe !== "femme") || !okNum(o.age) || !okNum(o.poids) || !okNum(o.taille) || typeof o.activite !== "string" || typeof o.objectif !== "string") return null;
-  try {
-    const c = computeBesoins(o as unknown as Profil).cible;
-    return isFinite(c) && c > 0 ? c : null;
-  } catch { return null; }
-}
 // Série en cours : nombre de jours consécutifs AVANT aujourd'hui avec au moins un aliment noté.
 function streakBefore(journal: Record<string, unknown[]> | null): number {
   if (!journal) return 0;
@@ -53,11 +42,23 @@ function streakBefore(journal: Record<string, unknown[]> | null): number {
 }
 
 export async function GET(req: Request) {
+  // Fermé par défaut : sans secret configuré, personne ne déclenche d'envoi. Secret uniquement en en-tête
+  // (jamais dans l'URL, qui finit dans les journaux).
   const secret = process.env.CRON_SECRET;
   const url = new URL(req.url);
   const auth = req.headers.get("authorization");
-  const ok = (secret && auth === `Bearer ${secret}`) || (secret && url.searchParams.get("secret") === secret);
-  if (secret && !ok) return new Response("unauthorized", { status: 401 });
+  if (!secret) return new Response("not_configured", { status: 503 });
+  if (auth !== `Bearer ${secret}`) return new Response("unauthorized", { status: 401 });
+
+  // Heure suisse garantie malgré les changements d'heure : le planificateur (UTC) appelle deux fois
+  // (été + hiver) avec ?hour=HH et seul l'appel qui tombe à HH heure de Zurich envoie.
+  // Fenêtre de 2 h pour absorber les retards du planificateur ; le doublon est évité par push_runs.
+  const wantHour = url.searchParams.get("hour");
+  if (wantHour !== null) {
+    const zh = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Zurich", hour: "2-digit", hourCycle: "h23" }).format(new Date()));
+    const w = Number(wantHour);
+    if (!(zh >= w && zh < w + 2)) return Response.json({ skipped: "hour", zurichHour: zh, wanted: w });
+  }
 
   const job = (url.searchParams.get("job") || "lunch") as PushType | "recap";
   if (job !== "lunch" && job !== "dinner" && job !== "encourage" && job !== "recap") {
@@ -79,6 +80,33 @@ export async function GET(req: Request) {
 
   const h = { apikey: KEY, authorization: `Bearer ${KEY}`, "content-type": "application/json" };
   const rest = async (path: string, init?: RequestInit) => fetch(`${SB}/rest/v1/${path}`, { ...init, headers: { ...h, ...(init?.headers || {}) } });
+
+  // Une seule exécution par tâche et par jour (heure suisse), même si le cron est appelé deux fois.
+  if (wantHour !== null) {
+    const claim = await rest("push_runs?on_conflict=job,day", {
+      method: "POST",
+      headers: { Prefer: "resolution=ignore-duplicates,return=representation" },
+      body: JSON.stringify({ job, day: swissDay() }),
+    });
+    const rows = claim.ok ? ((await claim.json()) as unknown[]) : [];
+    if (claim.ok && rows.length === 0) return Response.json({ job, skipped: "already_ran", day: swissDay() });
+  }
+  // Lecture des comptes par lots de 100 (évite des URL géantes quand les abonnés se comptent en milliers).
+  const usersByIds = async <T,>(cols: string, ids: string[]): Promise<T[]> => {
+    const uniq = Array.from(new Set(ids));
+    const out: T[] = [];
+    for (let i = 0; i < uniq.length; i += 100) {
+      const part = uniq.slice(i, i + 100);
+      const inList = `(${part.map((x) => `"${x}"`).join(",")})`;
+      const r = await rest(`calorio_users?select=${cols}&id=in.${encodeURIComponent(inList)}`);
+      if (r.ok) out.push(...((await r.json()) as T[]));
+    }
+    return out;
+  };
+  // Suppression des abonnements expirés (par appareil).
+  const dropEndpoints = async (endpoints: string[]) => {
+    for (const e of Array.from(new Set(endpoints))) await rest(`calorio_push?endpoint=eq.${encodeURIComponent(e)}`, { method: "DELETE" });
+  };
 
   // 1) abonnements actifs
   const subsRes = await rest("calorio_push?enabled=eq.true&select=user_id,endpoint,p256dh,auth,lang,last_encour");
@@ -104,9 +132,7 @@ export async function GET(req: Request) {
     targets = targets.filter((s) => proSet.has(s.user_id)); // bilan hebdo = Pro
     const ids = targets.map((s) => s.user_id);
     if (ids.length === 0) return Response.json({ job, sent: 0, note: "no pro subscribers" });
-    const inList = `(${ids.map((i) => `"${i}"`).join(",")})`;
-    const uRes = await rest(`calorio_users?select=id,journal,pesees&id=in.${encodeURIComponent(inList)}`);
-    const users = uRes.ok ? ((await uRes.json()) as { id: string; journal: Record<string, unknown[]> | null; pesees: { date: string; poids: number }[] | null }[]) : [];
+    const users = await usersByIds<{ id: string; journal: Record<string, unknown[]> | null; pesees: { date: string; poids: number }[] | null }>("id,journal,pesees", ids);
     const stats = new Map(users.map((u) => [u.id, u]));
     let sentR = 0;
     const dropR: string[] = [];
@@ -132,14 +158,11 @@ export async function GET(req: Request) {
           sentR++;
         } catch (e: unknown) {
           const code = (e as { statusCode?: number })?.statusCode;
-          if (code === 404 || code === 410) dropR.push(s.user_id);
+          if (code === 404 || code === 410) dropR.push(s.endpoint);
         }
       })
     );
-    if (dropR.length) {
-      const dl = `(${dropR.map((i) => `"${i}"`).join(",")})`;
-      await rest(`calorio_push?user_id=in.${encodeURIComponent(dl)}`, { method: "DELETE" });
-    }
+    if (dropR.length) await dropEndpoints(dropR);
     return Response.json({ job, day: today, sent: sentR, dropped: dropR.length });
   }
 
@@ -147,11 +170,9 @@ export async function GET(req: Request) {
   if (job === "lunch" || job === "dinner") {
     const ids = targets.map((s) => s.user_id);
     if (ids.length === 0) return Response.json({ job, sent: 0, note: "no subscribers" });
-    const inList = `(${ids.map((i) => `"${i}"`).join(",")})`;
     // Le soir on lit aussi le profil pour un rappel personnalisé (calories restantes).
     const cols = job === "dinner" ? "id,journal,profil" : "id,journal";
-    const uRes = await rest(`calorio_users?select=${cols}&id=in.${encodeURIComponent(inList)}`);
-    const users = uRes.ok ? ((await uRes.json()) as { id: string; journal: Record<string, unknown[]> | null; profil?: unknown }[]) : [];
+    const users = await usersByIds<{ id: string; journal: Record<string, unknown[]> | null; profil?: unknown }>(cols, ids);
     const jById = new Map(users.map((u) => [u.id, u.journal]));
     const pById = new Map(users.map((u) => [u.id, u.profil]));
     const loggedToday = new Set(
@@ -209,20 +230,17 @@ export async function GET(req: Request) {
         if (job === "encourage") encouraged.push(s.user_id);
       } catch (e: unknown) {
         const code = (e as { statusCode?: number })?.statusCode;
-        if (code === 404 || code === 410) toDrop.push(s.user_id); // abonnement expiré
+        if (code === 404 || code === 410) toDrop.push(s.endpoint); // abonnement expiré (cet appareil)
       }
     })
   );
 
   // maj / nettoyage
   if (encouraged.length) {
-    const inList = `(${encouraged.map((i) => `"${i}"`).join(",")})`;
+    const inList = `(${Array.from(new Set(encouraged)).map((i) => `"${i}"`).join(",")})`;
     await rest(`calorio_push?user_id=in.${encodeURIComponent(inList)}`, { method: "PATCH", body: JSON.stringify({ last_encour: today }) });
   }
-  if (toDrop.length) {
-    const inList = `(${toDrop.map((i) => `"${i}"`).join(",")})`;
-    await rest(`calorio_push?user_id=in.${encodeURIComponent(inList)}`, { method: "DELETE" });
-  }
+  if (toDrop.length) await dropEndpoints(toDrop);
 
   return Response.json({ job, day: today, candidates: targets.length, sent, streaks: streaksSent, remaining: remindersSent, dropped: toDrop.length });
 }

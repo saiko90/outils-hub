@@ -15,7 +15,7 @@
 import {
   bmr,
   macrosFromCalories,
-  AJUST_OBJECTIF,
+  cibleSure,
   type Profil,
   type Besoins,
 } from "./calorio";
@@ -208,13 +208,14 @@ export function besoinsDynamiques(p: Profil, s: SignauxJour = {}): BesoinsDynami
   }
 
   const tdee = r0(base + seancesKcalNet);
-  const cible = tdee + AJUST_OBJECTIF[p.objectif];
+  const { cible, plancher } = cibleSure(p.sexe, tdee, p.objectif);
 
   return {
     bmr: b,
     tdee,
     cible,
     macros: macrosFromCalories(cible),
+    plancher,
     base,
     source,
     pasEffectifs,

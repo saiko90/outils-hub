@@ -36,6 +36,7 @@ import {
   type Seance,
 } from "@/lib/activite";
 import { enablePush, disablePush, pushSupported } from "@/lib/push";
+import { haptic } from "@/lib/haptic";
 import type { User } from "@supabase/supabase-js";
 
 /* ---------------- i18n ---------------- */
@@ -1481,7 +1482,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     if (prevStreakRef.current === null) { prevStreakRef.current = streak; return; } // init : pas de confettis au chargement
     if (streak > prevStreakRef.current) {
       const crossed = MS.find((m) => prevStreakRef.current! < m && streak >= m);
-      if (crossed) setCelebrate(x.celebStreak(crossed));
+      if (crossed) { haptic("success"); setCelebrate(x.celebStreak(crossed)); }
     }
     prevStreakRef.current = streak;
   }, [mounted, streak, x]);
@@ -1494,6 +1495,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     if (done) { goalCelebRef.current = true; return; }
     goalCelebRef.current = true;
     try { localStorage.setItem(flag, "1"); } catch { /* ignore */ }
+    haptic("success");
     setCelebrate(x.celebGoal);
   }, [mounted, total.kcal, besoinsAffiche.cible, x]);
   // Auto-effacement de la célébration.
@@ -1561,7 +1563,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         save("calorio.trophies", next);
         return next;
       });
-      if (trophyInit.current) setNewTrophy(toUnlock[0]);
+      if (trophyInit.current) { haptic("success"); setNewTrophy(toUnlock[0]); }
     }
     trophyInit.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1596,7 +1598,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     return () => clearInterval(id);
   }, [fast.start]);
 
-  const addWater = (d: number) => setWater((w) => Math.max(0, Math.min(20, w + d)));
+  const addWater = (d: number) => { haptic("tap"); setWater((w) => Math.max(0, Math.min(20, w + d))); };
   const setWG = (d: number) => setWaterGoal((g) => Math.max(2, Math.min(20, g + d)));
   const startFast = (hours: number) => setFast({ start: Date.now(), hours });
   const endFast = () => setFast((fp) => ({ ...fp, start: null }));
@@ -1737,6 +1739,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   }, [q, catFilter, lang]);
 
   const addFood = (food: Food, meal?: MealKey) => {
+    haptic("tap");
     const m = meal ?? mealOfHour(new Date().getHours());
     setLines((prev) => [...prev, { key: newKey(), food, grammes: food.portion || 100, meal: m }]);
     // Mémorise l'aliment dans les récents (dédup nom+marque, 12 max) pour un ré-ajout en un tap.
@@ -1749,7 +1752,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   };
   const setGrammes = (key: string, g: number) =>
     setLines((prev) => prev.map((l) => (l.key === key ? { ...l, grammes: Math.max(0, g) } : l)));
-  const removeLine = (key: string) => setLines((prev) => prev.filter((l) => l.key !== key));
+  const removeLine = (key: string) => { haptic("tap"); setLines((prev) => prev.filter((l) => l.key !== key)); };
 
   // --- Recherche Open Food Facts (base géante), debounce ---
   useEffect(() => {

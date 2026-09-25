@@ -127,7 +127,7 @@ const L = {
     settingsTitle: "Paramètres", langLabel: "Langue de l'app",
     notifTitle: "Rappels & encouragements", notifSub: "Vito te rappelle de noter tes repas — seulement si tu n'as rien noté — et t'envoie un petit mot d'encouragement de temps en temps.",
     notifWhat: "Midi & soir (si ton journal est vide) + un encouragement tous les 3 jours. Textes variés, jamais deux fois les mêmes.",
-    notifBtnOn: "Activer les notifications", notifBtnOff: "Désactiver", notifPro: "Pro", notifProLock: "Passe en Pro pour activer les notifications.",
+    notifBtnOn: "Activer les notifications", notifBtnOff: "Désactiver", notifPro: "Pro", notifProLock: "Passe en Pro pour activer les notifications.", notifProPlus: "En Pro : Vito personnalise ton rappel du soir selon tes calories restantes, et t'envoie ton bilan de la semaine.",
     notifOnMsg: "🔔 C'est activé ! Vito veillera sur toi 🥕", notifOffMsg: "Notifications désactivées.",
     notifDenied: "Les notifications sont bloquées. Autorise-les dans les réglages de ton navigateur, puis réessaie.",
     notifUnsupported: "Ton navigateur ne gère pas les notifications. Sur iPhone : installe d'abord calorio sur l'écran d'accueil, puis réessaie.",
@@ -218,7 +218,7 @@ const L = {
     settingsTitle: "Einstellungen", langLabel: "App-Sprache",
     notifTitle: "Erinnerungen & Ermutigung", notifSub: "Vito erinnert dich ans Eintragen deiner Mahlzeiten — nur wenn du nichts notiert hast — und schickt dir ab und zu ein aufmunterndes Wort.",
     notifWhat: "Mittag & Abend (wenn dein Journal leer ist) + alle 3 Tage eine Ermutigung. Abwechslungsreiche Texte, nie zweimal gleich.",
-    notifBtnOn: "Benachrichtigungen aktivieren", notifBtnOff: "Deaktivieren", notifPro: "Pro", notifProLock: "Werde Pro, um Benachrichtigungen zu aktivieren.",
+    notifBtnOn: "Benachrichtigungen aktivieren", notifBtnOff: "Deaktivieren", notifPro: "Pro", notifProLock: "Werde Pro, um Benachrichtigungen zu aktivieren.", notifProPlus: "Mit Pro: Vito personalisiert deine Abend-Erinnerung nach deinen Restkalorien und schickt dir deine Wochenbilanz.",
     notifOnMsg: "🔔 Aktiviert! Vito passt auf dich auf 🥕", notifOffMsg: "Benachrichtigungen deaktiviert.",
     notifDenied: "Benachrichtigungen sind blockiert. Erlaube sie in den Browser-Einstellungen und versuch es erneut.",
     notifUnsupported: "Dein Browser unterstützt keine Benachrichtigungen. Auf dem iPhone: installiere calorio zuerst auf dem Startbildschirm.",
@@ -309,7 +309,7 @@ const L = {
     settingsTitle: "Settings", langLabel: "App language",
     notifTitle: "Reminders & encouragement", notifSub: "Vito reminds you to log your meals — only if you haven't logged anything — and sends a little word of encouragement now and then.",
     notifWhat: "Lunch & evening (if your log is empty) + an encouragement every 3 days. Varied texts, never the same twice.",
-    notifBtnOn: "Enable notifications", notifBtnOff: "Disable", notifPro: "Pro", notifProLock: "Go Pro to enable notifications.",
+    notifBtnOn: "Enable notifications", notifBtnOff: "Disable", notifPro: "Pro", notifProLock: "Go Pro to enable notifications.", notifProPlus: "With Pro: Vito personalises your evening reminder based on your remaining calories, and sends your weekly recap.",
     notifOnMsg: "🔔 Enabled! Vito's got your back 🥕", notifOffMsg: "Notifications disabled.",
     notifDenied: "Notifications are blocked. Allow them in your browser settings, then try again.",
     notifUnsupported: "Your browser doesn't support notifications. On iPhone: install calorio to your home screen first, then try again.",
@@ -1326,7 +1326,6 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
   const toggleNotif = async () => {
     if (notifBusy) return;
-    if (!proActive) { goPro(); return; }
     if (!user) { setAuthOpen(true); setAuthMsg(t.loginFirst); return; }
     setNotifBusy(true); setNotifMsg("");
     if (notifOn) {
@@ -2424,15 +2423,12 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                 </div>
               </div>
               <div className="cl-field col">
-                <div className="cl-fl">🔔 {t.notifTitle} {!proActive && <span className="cl-setpro">{t.notifPro}</span>}</div>
+                <div className="cl-fl">🔔 {t.notifTitle}</div>
                 <p className="cl-setsub">{t.notifSub}</p>
-                {proActive ? (
-                  <button className={`cl-notifbtn ${notifOn ? "on" : ""}`} onClick={toggleNotif} disabled={notifBusy}>
-                    {notifBusy ? "…" : notifOn ? `✓ ${t.notifBtnOff}` : t.notifBtnOn}
-                  </button>
-                ) : (
-                  <button className="cl-notifbtn lock" onClick={goPro}>🔒 {t.notifProLock}</button>
-                )}
+                <button className={`cl-notifbtn ${notifOn ? "on" : ""}`} onClick={toggleNotif} disabled={notifBusy}>
+                  {notifBusy ? "…" : notifOn ? `✓ ${t.notifBtnOff}` : t.notifBtnOn}
+                </button>
+                {!proActive && <button className="cl-notifpro" onClick={goPro}>✨ {t.notifProPlus}</button>}
                 {notifMsg && <p className="cl-setmsg">{notifMsg}</p>}
               </div>
               {!proActive && (
@@ -3144,6 +3140,8 @@ const CSS = `
 .cl-notifbtn.on{background:var(--greenbg);color:var(--green);border:1px solid var(--greenline)}
 .cl-notifbtn.lock{background:#fff5f6;color:var(--red);border:1.5px dashed #f5b6c0}
 .cl-notifbtn:disabled{opacity:.6;cursor:wait}
+.cl-notifpro{display:block;width:100%;text-align:left;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--goldbg);border:1px solid var(--goldline);color:#5a3d00;font-family:inherit;font-size:.78rem;font-weight:700;line-height:1.4;cursor:pointer}
+.cl-notifpro:active{transform:scale(.99)}
 .cl-setmsg{margin:9px 0 0;font-size:.84rem;color:var(--green);line-height:1.5;font-weight:700}
 /* FAQ (details) */
 .cl-faq{padding:4px 18px}

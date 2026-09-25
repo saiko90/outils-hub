@@ -92,13 +92,16 @@ export async function GET(req: Request) {
   const now = Date.now();
   const proSet = new Set(proRows.filter((p) => !p.pro_until || Date.parse(p.pro_until) > now).map((p) => p.id));
 
-  let targets = subs.filter((s) => proSet.has(s.user_id));
+  // Rappels de base (midi, soir, encouragement) → TOUS les abonnés (rétention des gratuits).
+  // Le rappel personnalisé « calories restantes » (avec Vito) et le bilan hebdo restent réservés au Pro.
+  let targets = subs;
   const today = swissDay();
   const streakOf: Record<string, number> = {}; // user_id → série en cours (pour les rappels du soir)
   const remainingOf: Record<string, number> = {}; // user_id → kcal restantes (rappel perso du soir)
 
   // ── Bilan hebdo (dimanche) : résumé chiffré de la semaine, aux utilisateurs actifs ──
   if (job === "recap") {
+    targets = targets.filter((s) => proSet.has(s.user_id)); // bilan hebdo = Pro
     const ids = targets.map((s) => s.user_id);
     if (ids.length === 0) return Response.json({ job, sent: 0, note: "no pro subscribers" });
     const inList = `(${ids.map((i) => `"${i}"`).join(",")})`;
@@ -143,7 +146,7 @@ export async function GET(req: Request) {
   // 3) rappels repas
   if (job === "lunch" || job === "dinner") {
     const ids = targets.map((s) => s.user_id);
-    if (ids.length === 0) return Response.json({ job, sent: 0, note: "no pro subscribers" });
+    if (ids.length === 0) return Response.json({ job, sent: 0, note: "no subscribers" });
     const inList = `(${ids.map((i) => `"${i}"`).join(",")})`;
     // Le soir on lit aussi le profil pour un rappel personnalisé (calories restantes).
     const cols = job === "dinner" ? "id,journal,profil" : "id,journal";
@@ -169,6 +172,7 @@ export async function GET(req: Request) {
           streakOf[s.user_id] = streakBefore(jById.get(s.user_id) || null);
           keep.push(s);
         } else {
+          if (!proSet.has(s.user_id)) continue; // rappel « calories restantes » (suggestion Vito) = Pro
           const cible = cibleFromProfil(pById.get(s.user_id));
           if (cible == null) continue; // pas de profil exploitable → on ne dérange pas
           const consumed = dayKcal(jById.get(s.user_id)?.[today]);

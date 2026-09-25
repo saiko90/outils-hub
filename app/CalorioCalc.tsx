@@ -2345,7 +2345,10 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                 </div>
               </>
             ) : (
-              <p className="cl-empty">{t.pasPesee}</p>
+              <div className="cl-empty">
+                <div className="cl-empty-emo" aria-hidden>⚖️</div>
+                <p>{t.pasPesee}</p>
+              </div>
             )}
 
             <div className="cl-card cl-pesee">
@@ -3137,7 +3140,7 @@ const CSS = `
 .cl-mbar .cl-mbh,.cl-mbh{display:flex;justify-content:space-between;font-size:.86rem;font-weight:700;margin-bottom:6px;color:var(--muted)}
 .cl-mbh span:first-child{font-weight:800}
 .cl-mbt{height:9px;border-radius:99px;background:var(--card2);overflow:hidden}
-.cl-mbt span{display:block;height:100%;border-radius:99px;position:relative;overflow:hidden}
+.cl-mbt span{display:block;height:100%;border-radius:99px;position:relative;overflow:hidden;transition:width .55s cubic-bezier(.22,1,.36,1)}
 .cl-mbt span::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.6),transparent 80%);transform:translateX(-120%)}
 .cl-screen.play .cl-mbt span::after{animation:clsheen 3s ease-in-out 1.1s infinite}
 @keyframes clsheen{to{transform:translateX(320%)}}
@@ -3213,7 +3216,9 @@ const CSS = `
 .cl-prow:first-of-type{border-top:0}
 .cl-prow span{flex:1;font-size:.9rem;color:var(--muted);font-weight:600}
 .cl-prow b{font-size:.97rem;font-variant-numeric:tabular-nums}
-.cl-empty{color:var(--muted);font-size:.9rem;text-align:center;padding:26px 16px;background:rgba(255,255,255,.55);border:1.5px dashed var(--greenline);border-radius:20px}
+.cl-empty{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted);font-size:.92rem;line-height:1.5;text-align:center;padding:30px 22px;background:var(--card2);border:1.5px dashed var(--greenline);border-radius:20px}
+.cl-empty p{margin:0;max-width:34ch}
+.cl-empty-emo{width:52px;height:52px;display:grid;place-items:center;font-size:1.7rem;border-radius:50%;background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.7),transparent 60%),var(--card);box-shadow:0 6px 16px -8px rgba(20,80,45,.4),inset 0 1px 0 rgba(255,255,255,.5)}
 /* coach */
 .cl-protag,.cl-setpro{display:inline-flex;align-items:center;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#5a3d00;background:var(--goldbg);border:1px solid var(--goldline);border-radius:99px;padding:3px 9px;margin-left:6px;vertical-align:middle}
 /* aide : champs profil + réglages */
@@ -3554,7 +3559,7 @@ const CSS = `
 .cl-card:active{transform:none}
 @media(prefers-reduced-motion:reduce){.cl *{animation:none!important;transition:none!important}}
 /* ===== Activité du jour (rose = sport, distinct du vert nutrition) ===== */
-#clProgArc{transition:stroke-dashoffset .9s cubic-bezier(.3,.9,.3,1)}
+#clProgArc{transition:stroke-dashoffset .6s cubic-bezier(.22,1,.36,1)}
 .cl-act{position:relative;overflow:hidden;background:linear-gradient(180deg,var(--card),var(--rosebg))}
 .cl-act::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--rose),#ff9bb4);opacity:.9}
 .cl-act-head{display:flex;align-items:center;gap:11px;margin-bottom:15px}

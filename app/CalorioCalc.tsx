@@ -774,6 +774,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [displaySteps, setDisplaySteps] = useState(0);
   const [displayRest, setDisplayRest] = useState(0);
   const displayRestRef = useRef(0);
+  const [kcalPop, setKcalPop] = useState<{ id: number; v: number } | null>(null);
+  const kcalPopTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [actSport, setActSport] = useState<string>("velo_modere");
   const [actMin, setActMin] = useState<number | "">(30);
 
@@ -1771,6 +1773,13 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     haptic("tap");
     const m = meal ?? mealOfHour(new Date().getHours());
     setLines((prev) => [...prev, { key: newKey(), food, grammes: food.portion || 100, meal: m }]);
+    // Petit « +X kcal » qui s'envole : chaque ajout devient une micro-récompense.
+    const added = Math.round(calcAliment(food, food.portion || 100).kcal);
+    if (added > 0) {
+      setKcalPop({ id: Date.now(), v: added });
+      if (kcalPopTimer.current) clearTimeout(kcalPopTimer.current);
+      kcalPopTimer.current = setTimeout(() => setKcalPop(null), 1200);
+    }
     // Mémorise l'aliment dans les récents (dédup nom+marque, 12 max) pour un ré-ajout en un tap.
     setRecents((prev) => {
       const sig = (f: Food) => `${f.nom}|${f.brand || ""}`.toLowerCase();
@@ -1922,6 +1931,10 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   return (
     <section className="cl" id="calorio" data-theme={theme}>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
+
+      {kcalPop && (
+        <div className="cl-kcalpop" key={kcalPop.id} aria-hidden>+{nf(lang).format(kcalPop.v)} kcal</div>
+      )}
 
       <div className="cl-amb" aria-hidden />
 
@@ -3114,6 +3127,8 @@ const CSS = `
 /* anneau calories */
 .cl-ringcard{background:linear-gradient(180deg,var(--card),var(--card2));position:relative;overflow:hidden;
   box-shadow:inset 0 2px 0 rgba(255,255,255,.55),0 32px 62px -22px rgba(20,130,66,.5),0 10px 24px -10px rgba(14,52,30,.34)}
+.cl-kcalpop{position:fixed;left:50%;top:20%;transform:translateX(-50%);z-index:130;pointer-events:none;white-space:nowrap;font-family:var(--disp);font-weight:800;font-size:1.15rem;color:#fff;background:linear-gradient(180deg,#43d488,#16a34a);padding:9px 18px;border-radius:99px;box-shadow:0 14px 32px -8px rgba(20,140,70,.6),inset 0 1px 0 rgba(255,255,255,.45);animation:clkcalpop 1.15s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes clkcalpop{0%{opacity:0;transform:translateX(-50%) translateY(16px) scale(.8)}18%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.04)}30%{transform:translateX(-50%) translateY(0) scale(1)}72%{opacity:1;transform:translateX(-50%) translateY(-8px) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-46px) scale(.95)}}
 .cl-ringcard.glow{animation:clringglow 2.6s ease-in-out infinite}
 @keyframes clringglow{0%,100%{box-shadow:inset 0 2px 0 rgba(255,255,255,.55),0 32px 62px -22px rgba(20,130,66,.5),0 0 0 0 rgba(52,209,127,0)}50%{box-shadow:inset 0 2px 0 rgba(255,255,255,.55),0 30px 58px -18px rgba(20,130,66,.7),0 0 36px 2px rgba(52,209,127,.42)}}
 .cl-ringwrap{position:relative;width:210px;height:210px;margin:6px auto 4px}

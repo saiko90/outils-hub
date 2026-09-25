@@ -332,6 +332,7 @@ const LX = {
     macrosDay: "Macros du jour", weekTitle: "Cette semaine",
     streak: (n: number) => `${n} jour${n > 1 ? "s" : ""}`,
     celebStreak: (n: number) => `${n} jours d'affilée ! 🔥`, celebGoal: "Objectif du jour atteint ! 🎯",
+    streakTitle: "Ta série", streakUnit: (n: number) => `jour${n > 1 ? "s" : ""} d'affilée`, streakSecured: "Sécurisée aujourd'hui ✓", streakAtRisk: "Note un repas pour la garder 🔥", streakNext: (r: number, m: number) => `Plus que ${r} jour${r > 1 ? "s" : ""} → palier ${m}`, streakRecord: "À ton record — continue ! 🔥",
     myDay: "Ma journée", meals: { matin: "Petit-déjeuner", midi: "Déjeuner", snack: "Collations", soir: "Dîner" },
     addShort: "Ajouter", addMealSoir: "Ajouter ton repas du soir",
     act: {
@@ -407,6 +408,7 @@ const LX = {
     macrosDay: "Makros heute", weekTitle: "Diese Woche",
     streak: (n: number) => `${n} Tag${n > 1 ? "e" : ""}`,
     celebStreak: (n: number) => `${n} Tage in Folge! 🔥`, celebGoal: "Tagesziel erreicht! 🎯",
+    streakTitle: "Deine Serie", streakUnit: (n: number) => `Tag${n > 1 ? "e" : ""} in Folge`, streakSecured: "Heute gesichert ✓", streakAtRisk: "Trag eine Mahlzeit ein, um sie zu halten 🔥", streakNext: (r: number, m: number) => `Noch ${r} Tag${r > 1 ? "e" : ""} → Stufe ${m}`, streakRecord: "Auf deinem Rekord — weiter so! 🔥",
     myDay: "Mein Tag", meals: { matin: "Frühstück", midi: "Mittagessen", snack: "Snacks", soir: "Abendessen" },
     addShort: "Hinzufügen", addMealSoir: "Abendessen hinzufügen",
     act: {
@@ -482,6 +484,7 @@ const LX = {
     macrosDay: "Today's macros", weekTitle: "This week",
     streak: (n: number) => `${n} day${n > 1 ? "s" : ""}`,
     celebStreak: (n: number) => `${n} days in a row! 🔥`, celebGoal: "Daily goal reached! 🎯",
+    streakTitle: "Your streak", streakUnit: (n: number) => `day${n > 1 ? "s" : ""} in a row`, streakSecured: "Secured today ✓", streakAtRisk: "Log a meal to keep it 🔥", streakNext: (r: number, m: number) => `${r} day${r > 1 ? "s" : ""} to reach ${m}`, streakRecord: "At your record — keep going! 🔥",
     myDay: "My day", meals: { matin: "Breakfast", midi: "Lunch", snack: "Snacks", soir: "Dinner" },
     addShort: "Add", addMealSoir: "Add your dinner",
     act: {
@@ -1460,6 +1463,16 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     for (let i = histoire.length - 1; i >= 0; i--) { if (histoire[i].kcal > 0) n++; else break; }
     return n;
   }, [histoire]);
+  // Série « vivante » : reste affichée le matin même si rien n'est encore noté aujourd'hui
+  // (elle ne se brise qu'à minuit). Transforme le « j'ai perdu ma série » en « garde-la ! ».
+  const loggedToday = (histoire[histoire.length - 1]?.kcal || 0) > 0;
+  const streakAlive = useMemo(() => {
+    let n = 0;
+    const start = loggedToday ? histoire.length - 1 : histoire.length - 2;
+    for (let i = start; i >= 0; i--) { if ((histoire[i]?.kcal || 0) > 0) n++; else break; }
+    return n;
+  }, [histoire, loggedToday]);
+  const streakNextMs = useMemo(() => { const MS = [3, 7, 14, 30, 50, 100, 200, 365]; return MS.find((m) => m > streakAlive) ?? null; }, [streakAlive]);
 
   // Célébrations : paliers de série (en direct) + objectif du jour atteint (1×/jour).
   useEffect(() => {
@@ -1957,6 +1970,24 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                   <div><div className="cl-rk" style={{ color: over ? "var(--rose)" : "var(--ink)" }}>{ringPct}%</div><div className="cl-rl">{x.objectif}</div></div>
                 </div>
               </div>
+
+              {streakAlive > 0 && (
+                <div className={`cl-card cl-streakcard ${loggedToday ? "secured" : "risk"}`}>
+                  <div className="cl-streak-top">
+                    <span className="cl-streak-flame" aria-hidden>🔥</span>
+                    <div className="cl-streak-h">
+                      <div className="cl-streak-n">{streakAlive} <small>{x.streakUnit(streakAlive)}</small></div>
+                      <div className="cl-streak-status">{loggedToday ? x.streakSecured : x.streakAtRisk}</div>
+                    </div>
+                  </div>
+                  {streakNextMs && (
+                    <div className="cl-streak-next">
+                      <div className="cl-streak-bar" aria-hidden><span style={{ width: `${Math.round((streakAlive / streakNextMs) * 100)}%` }} /></div>
+                      <div className="cl-streak-next-l">{x.streakNext(streakNextMs - streakAlive, streakNextMs)}</div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {hcPas !== undefined && (
                 <div className="cl-card cl-stepstat">
@@ -3000,6 +3031,20 @@ const CSS = `
 .cl-sub{font-size:.8rem;color:var(--muted);margin-top:5px;font-weight:700}
 .cl-chip{display:inline-flex;align-items:center;gap:5px;font-weight:800;font-size:.78rem;background:#fff3e0;color:#c9761a;border:1px solid #f6dcae;border-radius:99px;padding:6px 11px;white-space:nowrap}
 .cl-flame{display:inline-block;animation:clflick 1.5s ease-in-out infinite;transform-origin:center bottom}
+/* ===== Carte série (rétention) ===== */
+.cl-streakcard{display:flex;flex-direction:column;gap:11px;background:linear-gradient(160deg,#fff,#fff7ec);border:1px solid #f6dcae}
+.cl-streakcard.risk{border-color:#f2c07a;box-shadow:0 0 0 4px rgba(240,150,40,.11)}
+.cl-streak-top{display:flex;align-items:center;gap:13px}
+.cl-streak-flame{font-size:2.15rem;flex:none;filter:drop-shadow(0 4px 8px rgba(201,118,26,.4));animation:clflick 1.5s ease-in-out infinite;transform-origin:center bottom}
+.cl-streak-h{min-width:0}
+.cl-streak-n{font-family:var(--disp);font-weight:700;font-size:1.95rem;line-height:1;color:#b8641a;font-variant-numeric:tabular-nums}
+.cl-streak-n small{font-family:var(--body);font-size:.8rem;font-weight:800;color:#c9761a}
+.cl-streak-status{font-size:.82rem;font-weight:800;margin-top:5px}
+.cl-streakcard.secured .cl-streak-status{color:var(--green)}
+.cl-streakcard.risk .cl-streak-status{color:#d97514}
+.cl-streak-bar{height:8px;border-radius:99px;background:#f3e2c6;overflow:hidden;margin-bottom:6px;box-shadow:inset 0 1px 2px rgba(120,70,10,.14)}
+.cl-streak-bar>span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#f6b44a,#e8890f);box-shadow:0 0 8px rgba(232,137,15,.5);transition:width .6s cubic-bezier(.3,.9,.3,1)}
+.cl-streak-next-l{font-size:.76rem;font-weight:800;color:#a8710f;text-align:right}
 @keyframes clflick{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.15)}}
 .cl-sectt{font-family:var(--disp);font-weight:600;font-size:1.02rem;margin:22px 2px 11px;display:flex;align-items:center;gap:8px}
 .cl-dot{width:9px;height:9px;border-radius:3px;background:var(--rose);flex:none;display:inline-block}

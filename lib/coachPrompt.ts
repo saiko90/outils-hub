@@ -16,6 +16,44 @@ export type CoachApiCtx = {
   prefs?: CoachPrefs;
 };
 
+// Contexte reçu du client → contexte sûr et borné (types vérifiés, textes coupés, listes limitées).
+// Protège le coût (tokens Gemini) et la route (plus de 500 sur un champ manquant).
+export function sanitizeCtx(raw: unknown): CoachApiCtx {
+  const o = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const num = (v: unknown, max = 100000) => (typeof v === "number" && isFinite(v) ? Math.max(-max, Math.min(max, Math.round(v * 10) / 10)) : undefined);
+  const str = (v: unknown, n: number) => (typeof v === "string" ? v.slice(0, n) : undefined);
+  const out: CoachApiCtx = { lang: o.lang === "de" || o.lang === "en" ? o.lang : "fr" };
+  if (o.profil && typeof o.profil === "object") {
+    const p = o.profil as Record<string, unknown>;
+    out.profil = {
+      sexe: p.sexe === "homme" || p.sexe === "femme" ? p.sexe : undefined,
+      age: num(p.age, 130), poids: num(p.poids, 500), taille: num(p.taille, 300),
+      activite: str(p.activite, 20), objectif: str(p.objectif, 20), poidsCible: num(p.poidsCible, 500),
+    };
+  }
+  out.cible = num(o.cible); out.bmr = num(o.bmr); out.tdee = num(o.tdee);
+  const m = o.macrosCible as Record<string, unknown> | undefined;
+  if (m && typeof m === "object") out.macrosCible = { proteines: num(m.proteines) ?? 0, glucides: num(m.glucides) ?? 0, lipides: num(m.lipides) ?? 0 };
+  const a = o.aujourdhui as Record<string, unknown> | undefined;
+  if (a && typeof a === "object") {
+    const al = Array.isArray(a.aliments) ? (a.aliments as unknown[]).slice(0, 40) : [];
+    out.aujourdhui = {
+      kcal: num(a.kcal) ?? 0, prot: num(a.prot) ?? 0, gluc: num(a.gluc) ?? 0, lip: num(a.lip) ?? 0,
+      aliments: al.map((x) => {
+        const f = (x && typeof x === "object" ? x : {}) as Record<string, unknown>;
+        return { nom: str(f.nom, 60) || "?", grammes: num(f.grammes, 10000) ?? 0, kcal: num(f.kcal) ?? 0 };
+      }),
+    };
+  }
+  const w = o.poids as Record<string, unknown> | null | undefined;
+  if (w && typeof w === "object") out.poids = { debut: num(w.debut, 500) ?? 0, actuel: num(w.actuel, 500) ?? 0, delta: num(w.delta, 500) ?? 0 };
+  const pr = o.prefs as Record<string, unknown> | undefined;
+  if (pr && typeof pr === "object") {
+    out.prefs = { regime: str(pr.regime, 30), allergies: str(pr.allergies, 200), aime: str(pr.aime, 200), deteste: str(pr.deteste, 200) } as CoachPrefs;
+  }
+  return out;
+}
+
 export function coachLang(ctx: CoachApiCtx): "fr" | "de" | "en" {
   return ctx.lang === "de" || ctx.lang === "en" ? ctx.lang : "fr";
 }

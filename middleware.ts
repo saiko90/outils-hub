@@ -21,8 +21,9 @@ export function middleware(req: NextRequest) {
   }
   // Depuis outils.ch (ou ailleurs), toute page /o/calorio (FR/DE/EN) renvoie vers l'app calorio.ch
   // → l'utilisateur arrive sur le vrai site de calorio (installation PWA proposée, connexion sur le bon domaine).
-  if (!onCalorio && /^(\/(de|en))?\/o\/calorio\/?$/.test(pathname)) {
-    return NextResponse.redirect("https://calorio.ch/", 307);
+  const m = !onCalorio ? pathname.match(/^(?:\/(de|en))?\/o\/calorio\/?$/) : null;
+  if (m) {
+    return NextResponse.redirect(`https://calorio.ch/${m[1] || ""}`, 308); // vers la page d'accueil dans la bonne langue
   }
   if (host.startsWith("admin.") && !pathname.startsWith("/admin")) {
     const url = req.nextUrl.clone();

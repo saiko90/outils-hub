@@ -37,8 +37,9 @@ export async function POST(req: Request) {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        apikey: SB_ANON,
-        authorization: `Bearer ${SB_ANON}`,
+        // Clé serveur : la fonction de comptage n'est plus appelable publiquement (pas de gonflement des stats).
+        apikey: process.env.SUPABASE_SERVICE_ROLE_KEY || SB_ANON,
+        authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY || SB_ANON}`,
       },
       body: JSON.stringify({ p_path: path, p_country: country, p_ref: ref, p_host: host }),
     }).catch(() => {});

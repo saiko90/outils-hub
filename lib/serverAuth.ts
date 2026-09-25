@@ -31,18 +31,24 @@ export async function authUid(req: Request): Promise<string> {
   return (await authUser(req))?.id || "";
 }
 
-/** Pro actif selon la base (écrite uniquement par le webhook Stripe / service_role). */
-export async function isProServer(uid: string): Promise<boolean> {
-  if (!uid || !svcKey()) return false;
+/**
+ * Pro actif selon la base (écrite uniquement par le webhook Stripe / service_role).
+ * true / false = réponse sûre ; null = base injoignable (on ne sait pas : ne PAS traiter comme gratuit).
+ */
+export async function proStatus(uid: string): Promise<boolean | null> {
+  if (!uid || !svcKey()) return null;
   try {
     const r = await fetch(`${SB_URL}/rest/v1/calorio_pro?id=eq.${encodeURIComponent(uid)}&select=is_pro,pro_until`, { headers: svcHeaders() });
-    if (!r.ok) return false;
+    if (!r.ok) return null;
     const rows = (await r.json()) as { is_pro?: boolean; pro_until?: string | null }[];
     const p = rows[0];
     return !!p?.is_pro && (!p.pro_until || new Date(p.pro_until) > new Date());
   } catch {
-    return false;
+    return null;
   }
+}
+export async function isProServer(uid: string): Promise<boolean> {
+  return (await proStatus(uid)) === true;
 }
 
 /** Quota journalier (clé libre, ex. "vision:u:<uid>"). true = autorisé. */
@@ -75,13 +81,18 @@ export function clientIp(req: Request): string {
   return req.headers.get("x-real-ip") || "unknown";
 }
 
-/** Empreinte (SHA-256 tronqué) de l'adresse IP : sert aux quotas anti-abus sans conserver l'IP en clair. */
+/** Empreinte HMAC-SHA-256 (clé serveur secrète) de l'adresse IP : quotas anti-abus sans conserver l'IP,
+ *  et impossible à inverser sans la clé (contrairement à un simple hachage). */
 export async function ipFingerprint(req: Request): Promise<string> {
   const ip = clientIp(req);
   if (ip === "unknown") return "unknown";
+  const secret = process.env.IP_HASH_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+  if (!secret) return "unknown";
   try {
-    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`calorio:${ip}`));
-    return Array.from(new Uint8Array(buf)).slice(0, 12).map((b) => b.toString(16).padStart(2, "0")).join("");
+    const enc = new TextEncoder();
+    const k = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    const sig = await crypto.subtle.sign("HMAC", k, enc.encode(`calorio-ip:${ip}`));
+    return Array.from(new Uint8Array(sig)).slice(0, 12).map((b) => b.toString(16).padStart(2, "0")).join("");
   } catch {
     return "unknown";
   }

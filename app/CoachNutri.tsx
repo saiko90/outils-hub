@@ -408,7 +408,8 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
         body: JSON.stringify({ messages: next, context: ctx }),
       });
       if (r.status === 503) {
-        setMsgs((m) => [...m, { role: "model", text: t.notReady }]);
+        const e = (await r.clone().json().catch(() => ({}))) as { error?: string };
+        setMsgs((m) => [...m, { role: "model", text: e.error === "busy" ? t.err : t.notReady }]);
       } else if (r.status === 429) {
         setMsgs((m) => [...m, { role: "model", text: t.limit }]);
       } else if (r.status === 402) {

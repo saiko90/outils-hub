@@ -20,13 +20,24 @@ export async function POST(req: Request) {
   const rows = r.ok ? ((await r.json()) as { stripe_subscription_id?: string | null }[]) : [];
   const sub = rows[0]?.stripe_subscription_id;
   if (sub) {
-    const c = await stripe(`subscriptions/${encodeURIComponent(sub)}`, "DELETE");
-    // Déjà résilié / introuvable : on continue ; toute autre erreur bloque (on ne veut pas facturer un compte supprimé).
-    if (!c.ok && c.status !== 404) return NextResponse.json({ error: "stripe_cancel_failed" }, { status: 502 });
+    // On ne résilie que si l'abonnement court encore (un ancien abonnement déjà résilié ne doit pas
+    // bloquer la suppression). Toute autre erreur bloque : on ne veut pas facturer un compte supprimé.
+    const cur = await stripe(`subscriptions/${encodeURIComponent(sub)}`, "GET");
+    const status = String(cur.data?.status || "");
+    const running = cur.ok && status !== "canceled" && status !== "incomplete_expired";
+    if (!cur.ok && cur.status !== 404) return NextResponse.json({ error: "stripe_check_failed" }, { status: 502 });
+    if (running) {
+      const c = await stripe(`subscriptions/${encodeURIComponent(sub)}`, "DELETE");
+      if (!c.ok && c.status !== 404) return NextResponse.json({ error: "stripe_cancel_failed" }, { status: 502 });
+    }
   }
 
-  // Compteurs d'essais IA liés au compte (non reliés par clé étrangère).
-  await fetch(`${SB_URL}/rest/v1/ai_free?key=eq.${encodeURIComponent(`coach:u:${uid}`)}`, { method: "DELETE", headers: svcHeaders() });
+  // Compteurs techniques liés au compte (non reliés par clé étrangère) : effacés eux aussi.
+  const h = svcHeaders();
+  await Promise.all([
+    fetch(`${SB_URL}/rest/v1/ai_free?key=eq.${encodeURIComponent(`coach:u:${uid}`)}`, { method: "DELETE", headers: h }),
+    fetch(`${SB_URL}/rest/v1/coach_rate?ip=in.(${encodeURIComponent(`"coach:u:${uid}","vision:u:${uid}"`)})`, { method: "DELETE", headers: h }),
+  ]);
 
   const d = await fetch(`${SB_URL}/auth/v1/admin/users/${uid}`, { method: "DELETE", headers: svcHeaders() });
   if (!d.ok) return NextResponse.json({ error: "delete_failed" }, { status: 502 });

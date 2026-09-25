@@ -11,8 +11,9 @@ export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 const REWARD_DAYS = 30;
-// Anti-abus : le parrain n'est récompensé que pour des filleuls réellement actifs (≥ ACTIVE_DAYS jours
-// notés), et au plus MAX_REWARDS fois. Le filleul, lui, reçoit son mois tout de suite.
+// Anti-abus : parrain ET filleul ne sont récompensés que lorsque le filleul est réellement actif
+// (compte d'au moins ACTIVE_DAYS jours + au moins ACTIVE_DAYS jours notés) ; le parrain au plus MAX_REWARDS fois.
+// Les récompenses sont accordées « à la demande » (action mine, appelée à chaque ouverture de l'app).
 const ACTIVE_DAYS = 3;
 const MAX_REWARDS = 6;
 
@@ -64,27 +65,41 @@ async function proRow(uid: string): Promise<{ is_pro?: boolean; pro_until?: stri
   return Array.isArray(rows) && rows[0] ? rows[0] : null;
 }
 
-// Offre REWARD_DAYS jours de Pro, sans écraser un abonnement Stripe payant.
-async function grantBonus(uid: string): Promise<void> {
+// Offre REWARD_DAYS jours de Pro, sans jamais rétrograder : ni un abonnement payant en cours,
+// ni un Pro offert sans date de fin (plan « comp »). Renvoie false si rien n'a été ajouté.
+async function grantBonus(uid: string): Promise<boolean> {
   const cur = await proRow(uid);
-  if (cur?.stripe_subscription_id) return; // déjà payant : rien à faire
   const now = Date.now();
-  const base = cur?.pro_until ? Math.max(now, new Date(cur.pro_until).getTime()) : now;
+  const untilMs = cur?.pro_until ? new Date(cur.pro_until).getTime() : 0;
+  if (cur?.plan === "comp") return false; // Pro offert à vie
+  if (cur?.is_pro && !cur.pro_until) return false; // déjà Pro sans limite
+  if (cur?.is_pro && cur.stripe_subscription_id && untilMs > now) return false; // abonnement payant en cours
+  const base = Math.max(now, untilMs);
   const until = new Date(base + REWARD_DAYS * 86400000).toISOString();
-  await fetch(`${SB_URL}/rest/v1/calorio_pro`, {
+  const r = await fetch(`${SB_URL}/rest/v1/calorio_pro`, {
     method: "POST",
     headers: { ...sh(), Prefer: "resolution=merge-duplicates,return=minimal" },
-    body: JSON.stringify({ id: uid, is_pro: true, pro_until: until, plan: "ref", updated_at: new Date().toISOString() }),
+    body: JSON.stringify({ id: uid, is_pro: true, pro_until: until, plan: cur?.stripe_subscription_id ? cur.plan || "ref" : "ref", updated_at: new Date().toISOString() }),
   });
+  return r.ok;
 }
 
-// Filleul « réel » : au moins ACTIVE_DAYS jours différents avec des aliments notés.
+// Filleul « réel » : compte créé il y a au moins ACTIVE_DAYS jours ET au moins ACTIVE_DAYS jours différents
+// avec des aliments notés (impossible à simuler en quelques minutes avec des comptes jetables).
 async function isActive(uid: string): Promise<boolean> {
-  const r = await fetch(`${SB_URL}/rest/v1/calorio_users?id=eq.${uid}&select=journal`, { headers: sh() });
-  if (!r.ok) return false;
-  const rows = (await r.json().catch(() => [])) as { journal?: Record<string, unknown[]> | null }[];
-  const j = rows[0]?.journal || {};
-  return Object.values(j).filter((v) => Array.isArray(v) && v.length > 0).length >= ACTIVE_DAYS;
+  try {
+    const u = await fetch(`${SB_URL}/auth/v1/admin/users/${uid}`, { headers: sh() });
+    if (!u.ok) return false;
+    const created = new Date(((await u.json()) as { created_at?: string }).created_at || Date.now()).getTime();
+    if (Date.now() - created < ACTIVE_DAYS * 86400000) return false;
+    const r = await fetch(`${SB_URL}/rest/v1/calorio_users?id=eq.${uid}&select=journal`, { headers: sh() });
+    if (!r.ok) return false;
+    const rows = (await r.json().catch(() => [])) as { journal?: Record<string, unknown[]> | null }[];
+    const j = rows[0]?.journal || {};
+    return Object.values(j).filter((v) => Array.isArray(v) && v.length > 0).length >= ACTIVE_DAYS;
+  } catch {
+    return false;
+  }
 }
 
 export async function POST(req: Request) {
@@ -119,7 +134,20 @@ export async function POST(req: Request) {
       const done = upd.ok ? ((await upd.json()) as unknown[]) : [];
       if (done.length) { await grantBonus(uid); rewarded++; } // PATCH conditionnel : jamais deux fois
     }
-    return NextResponse.json({ code, count: list.length, rewarded, pending: list.length - rewarded, rewardDays: REWARD_DAYS, maxRewards: MAX_REWARDS });
+    // Côté filleul : son mois offert arrive dès qu'il est actif.
+    let refereeRewardedNow = false;
+    const mineAsReferee = await fetch(`${SB_URL}/rest/v1/calorio_referrals?referee_id=eq.${uid}&referee_rewarded=eq.false&select=id`, { headers: sh() });
+    const asRef = mineAsReferee.ok ? ((await mineAsReferee.json().catch(() => [])) as { id: string }[]) : [];
+    if (asRef[0] && (await isActive(uid))) {
+      const upd = await fetch(`${SB_URL}/rest/v1/calorio_referrals?id=eq.${asRef[0].id}&referee_rewarded=eq.false`, {
+        method: "PATCH",
+        headers: { ...sh(), Prefer: "return=representation" },
+        body: JSON.stringify({ referee_rewarded: true }),
+      });
+      const done = upd.ok ? ((await upd.json()) as unknown[]) : [];
+      if (done.length) refereeRewardedNow = await grantBonus(uid);
+    }
+    return NextResponse.json({ code, count: list.length, rewarded, pending: list.length - rewarded, rewardDays: REWARD_DAYS, maxRewards: MAX_REWARDS, refereeRewardedNow, refereePending: !!asRef[0] && !refereeRewardedNow });
   }
 
   // --- CLAIM : le filleul réclame via un code ---
@@ -149,8 +177,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "already_referred" }, { status: 409 });
   }
 
-  // Le filleul reçoit son mois tout de suite ; le parrain dès que le filleul est actif.
-  await grantBonus(uid);
+  // Récompenses (filleul et parrain) accordées dès que le filleul est actif (voir action « mine »).
 
-  return NextResponse.json({ ok: true, rewardDays: REWARD_DAYS });
+  return NextResponse.json({ ok: true, pending: true, rewardDays: REWARD_DAYS, activeDays: ACTIVE_DAYS });
 }

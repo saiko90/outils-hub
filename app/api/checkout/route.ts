@@ -69,7 +69,8 @@ export async function POST(req: Request) {
   form.set("client_reference_id", uid);
   if (existingCustomer) form.set("customer", existingCustomer); // réutilise le client Stripe (historique, carte)
   else form.set("customer_email", email);
-  form.set("subscription_data[trial_period_days]", "7");
+  // Essai de 7 jours réservé à un premier abonnement (pas à chaque retour d'un ancien abonné).
+  if (!existingCustomer) form.set("subscription_data[trial_period_days]", "7");
   form.set("subscription_data[metadata][supabase_uid]", uid);
   form.set("allow_promotion_codes", "true");
   form.set("locale", locale);

@@ -13,7 +13,7 @@
   "navigationDividerColorDark": "#000000",
   "backgroundColor": "#f3f7f2",
   "enableNotifications": true,
-  "startUrl": "/",
+  "startUrl": "/calorio",
   "webManifestUrl": "https://calorio.ch/calorio.webmanifest",
   "iconUrl": "https://calorio.ch/calorio-icon-512.png",
   "maskableIconUrl": "https://calorio.ch/calorio-icon-512.png",
@@ -24,7 +24,10 @@
   "enableSiteSettingsShortcut": true,
   "features": {},
   "shortcuts": [],
-  "signingKey": { "path": "./android.keystore", "alias": "calorio" },
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "calorio"
+  },
   "fullScopeUrl": "https://calorio.ch/",
   "minSdkVersion": 21,
   "isChromeOSOnly": false,

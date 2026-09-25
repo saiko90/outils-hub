@@ -1,4 +1,4 @@
-import { persona, contextBlock, trimMessages, geminiPayload, modelList, coachLang, sseTextDelta, type CoachMsg, type CoachApiCtx } from "@/lib/coachPrompt";
+import { persona, contextBlock, trimMessages, geminiPayload, modelList, coachLang, sanitizeCtx, sseTextDelta, type CoachMsg, type CoachApiCtx } from "@/lib/coachPrompt";
 import { coachGuard } from "@/lib/coachRate";
 
 // Relais « Coach nutrition » en STREAMING (réponse en direct, mot par mot).
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     return new Response("bad_request", { status: 400 });
   }
 
-  const ctx = body.context || {};
+  const ctx = sanitizeCtx(body.context); // types vérifiés + tailles bornées (coût Gemini maîtrisé)
   const lang = coachLang(ctx);
   const msgs = trimMessages(body.messages);
   if (msgs.length === 0) return new Response("empty", { status: 400 });
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
   // Garde-fou serveur (origine, Pro vérifié en base, essais gratuits, quotas) — après validation,
   // pour qu'une requête malformée ne consomme pas d'essai. 402 = Pro requis, 429 = quota atteint.
   const blocked = await coachGuard(req);
-  if (blocked) return new Response(blocked === 402 ? "pro_required" : blocked === 429 ? "rate_limited" : "forbidden", { status: blocked });
+  if (blocked) return new Response(blocked === 402 ? "pro_required" : blocked === 429 ? "rate_limited" : blocked === 503 ? "busy" : "forbidden", { status: blocked });
 
   const sys = persona(lang) + "\n\n" + contextBlock(ctx);
   const payload = geminiPayload(sys, msgs);

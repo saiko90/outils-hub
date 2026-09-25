@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { authUser, isProServer, dailyQuota } from "@/lib/serverAuth";
+import { authUser, proStatus, dailyQuota } from "@/lib/serverAuth";
 
 // Analyse photo d'un repas → estimation des aliments et calories (Gemini Vision).
 // La clé reste côté serveur (GEMINI_API_KEY). Fonction Pro.
@@ -25,11 +25,12 @@ export async function POST(req: Request) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) return NextResponse.json({ error: "not_configured" }, { status: 503 });
 
-  // Fonction Pro : compte connecté + Pro vérifié en base + quota journalier par utilisateur.
+  // Fonction Pro : compte connecté + Pro vérifié en base (le quota est décompté après validation de la photo).
   const user = await authUser(req);
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
-  if (!(await isProServer(user.id))) return NextResponse.json({ error: "pro_required" }, { status: 402 });
-  if (!(await dailyQuota(`vision:u:${user.id}`, VISION_DAILY_MAX))) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  const pro = await proStatus(user.id);
+  if (pro === null) return NextResponse.json({ error: "busy" }, { status: 503 });
+  if (!pro) return NextResponse.json({ error: "pro_required" }, { status: 402 });
 
   let body: { image?: string; mime?: string; lang?: string };
   try {
@@ -41,7 +42,8 @@ export async function POST(req: Request) {
   const mime = ALLOWED_MIME.includes(body.mime || "") ? (body.mime as string) : "image/jpeg";
   const lang = body.lang === "de" ? "allemand" : body.lang === "en" ? "anglais" : "français";
   if (!image || image.length < 100) return NextResponse.json({ error: "no_image" }, { status: 400 });
-  if (image.length > 8_000_000) return NextResponse.json({ error: "too_large" }, { status: 413 });
+  if (image.length > 4_000_000) return NextResponse.json({ error: "too_large" }, { status: 413 }); // < limite Vercel (~4,5 Mo)
+  if (!(await dailyQuota(`vision:u:${user.id}`, VISION_DAILY_MAX))) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
 
   const payload = {
     contents: [

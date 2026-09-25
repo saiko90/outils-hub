@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { persona, contextBlock, trimMessages, geminiPayload, modelList, coachLang, type CoachMsg, type CoachApiCtx } from "@/lib/coachPrompt";
+import { persona, contextBlock, trimMessages, geminiPayload, modelList, coachLang, sanitizeCtx, type CoachMsg, type CoachApiCtx } from "@/lib/coachPrompt";
 import { coachGuard } from "@/lib/coachRate";
 
 // Relais serveur « Coach nutrition » (Pro), NON-streaming et robuste — sert aussi de
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "bad_request" }, { status: 400 });
   }
 
-  const ctx = body.context || {};
+  const ctx = sanitizeCtx(body.context); // types vérifiés + tailles bornées (coût Gemini maîtrisé)
   const lang = coachLang(ctx);
   const msgs = trimMessages(body.messages);
   if (msgs.length === 0) return NextResponse.json({ error: "empty" }, { status: 400 });
@@ -29,6 +29,7 @@ export async function POST(req: Request) {
   const blocked = await coachGuard(req);
   if (blocked === 402) return NextResponse.json({ error: "pro_required" }, { status: 402 });
   if (blocked === 429) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  if (blocked === 503) return NextResponse.json({ error: "busy" }, { status: 503 });
   if (blocked) return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   const sys = persona(lang) + "\n\n" + contextBlock(ctx);

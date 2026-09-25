@@ -36,7 +36,7 @@ self.addEventListener("notificationclick", (event) => {
 });
 
 /* ---- Cache hors-ligne (app-shell) ---- */
-const CACHE = "calorio-cache-v2"; // changer de version purge l'ancien cache à l'activation
+const CACHE = "calorio-cache-v3"; // changer de version purge l'ancien cache à l'activation
 const PRECACHE = ["/calorio", "/calorio-icon-192.png", "/calorio-icon-180.png", "/calorio.webmanifest"];
 
 self.addEventListener("install", (event) => {
@@ -66,7 +66,13 @@ self.addEventListener("fetch", (event) => {
   if (req.mode === "navigate") {
     event.respondWith(
       fetch(req)
-        .then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {}); return res; })
+        .then((res) => {
+          // Seulement les pages de l'app qui ont répondu correctement (pas d'erreur ni de redirection en cache).
+          if (res && res.ok && !res.redirected && url.pathname.startsWith("/calorio")) {
+            const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+          }
+          return res;
+        })
         .catch(() => caches.match(req).then((m) => m || caches.match("/calorio")))
     );
     return;

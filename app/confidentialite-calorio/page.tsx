@@ -46,9 +46,9 @@ export default function Page() {
         <p>Si tu crées un compte gratuit (pour synchroniser entre appareils), nous traitons :</p>
         <ul className="pv-ul">
           <li><b>Adresse e-mail</b> — pour créer et sécuriser ton compte (connexion par lien e-mail ou Google).</li>
-          <li><b>Données de suivi</b> — profil (âge, sexe, taille, poids, niveau d'activité, objectif), journal alimentaire, historique de poids, repas et aliments enregistrés, préférences alimentaires (dont allergies), trophées et conversations favorites avec Vito — afin de synchroniser ton compte entre tes appareils.</li>
+          <li><b>Données de suivi</b> — profil (âge, sexe, taille, poids, niveau d'activité, objectif), journal alimentaire, séances de sport, hydratation, historique de poids, repas et aliments enregistrés, préférences alimentaires (dont allergies), trophées et conversations favorites avec Vito — afin de synchroniser ton compte entre tes appareils.</li>
           <li><b>Statut d'abonnement</b> (gratuit / Pro) et, si tu actives les notifications, l'adresse technique d'abonnement push de chacun de tes appareils.</li>
-          <li><b>Parrainage</b> — ton code d'invitation et les liens de parrainage (qui a invité qui), pour attribuer les mois offerts.</li>
+          <li><b>Parrainage</b> — ton code d'invitation et les liens de parrainage (qui a invité qui), pour attribuer les mois offerts une fois le filleul actif.</li>
         </ul>
         <p><b>Base légale.</b> Tes données de poids et d'alimentation sont des données sur la santé, donc des données sensibles. Nous les traitons parce que tu le demandes expressément : en créant un compte, en activant la synchronisation ou en utilisant une fonction (coach, photo, duo), tu consens à ce traitement pour cette finalité (art. 6 al. 6-7 nLPD ; art. 6(1)(a) et 9(2)(a) RGPD). Tu peux retirer ce consentement à tout moment en supprimant ton compte.</p>
 
@@ -68,20 +68,20 @@ export default function Page() {
         <p>Les paiements de l'abonnement Pro sont traités par <b>Stripe</b>. calorio ne voit ni ne stocke tes données de carte : elles sont gérées directement par Stripe, prestataire de paiement certifié. Tu gères ton abonnement (carte, factures, résiliation) depuis l'app : Aide → Mon compte → Mon abonnement.</p>
 
         <h2 className="pv-h2">Mesure d'audience et protection contre les abus</h2>
-        <p>calorio utilise une mesure d'audience <b>sans cookie</b> : nous comptons des pages vues de façon <b>agrégée</b>, sans stocker ton adresse IP ni créer d'identifiant publicitaire. Pour empêcher l'usage abusif du coach IA, nous conservons un compteur journalier associé à une <b>empreinte irréversible</b> de l'adresse IP (jamais l'adresse elle-même), effacé après quelques jours. Aucun traceur publicitaire.</p>
+        <p>calorio utilise une mesure d'audience <b>sans cookie</b> : nous comptons des pages vues de façon <b>agrégée</b>, sans stocker ton adresse IP ni créer d'identifiant publicitaire. Pour empêcher l'usage abusif du coach IA, nous conservons des compteurs associés à une <b>empreinte chiffrée</b> de l'adresse IP (calculée avec une clé secrète : l'adresse elle-même n'est jamais enregistrée). Les compteurs journaliers sont effacés après quelques jours. Aucun traceur publicitaire.</p>
 
         <h2 className="pv-h2">Hébergement et sous-traitants</h2>
         <p>Les données de compte sont hébergées via <b>Supabase</b> (base de données) et l'application est servie par <b>Vercel</b>. Le coach et l'analyse photo utilisent <b>Google Gemini</b>, les paiements <b>Stripe</b> et la recherche d'aliments <b>Open Food Facts</b>. Les polices de caractères sont hébergées par calorio lui-même (aucune requête vers Google Fonts). Ces prestataires peuvent traiter des données hors de Suisse/UE avec des garanties appropriées (clauses contractuelles types).</p>
 
         <h2 className="pv-h2">Durée de conservation</h2>
-        <p>Tes données de compte sont conservées tant que ton compte existe, puis effacées immédiatement à sa suppression. Sans compte, elles restent sur ton appareil jusqu'à ce que tu les effaces.</p>
+        <p>Tes données de compte sont conservées tant que ton compte existe, puis effacées immédiatement à sa suppression (journal, poids, profil, préférences, abonnements aux notifications et compteurs liés au compte). Seuls les justificatifs de paiement conservés par Stripe restent soumis aux obligations comptables légales. Sans compte, les données restent sur ton appareil jusqu'à ce que tu les effaces.</p>
 
         <h2 className="pv-h2">Tes droits</h2>
         <p>Tu disposes des droits d'accès, de rectification, d'effacement, de portabilité et d'opposition. Concrètement, dans l'application :</p>
         <ul className="pv-ul">
           <li><b>Exporter</b> toutes tes données : Aide → Mes données → Télécharger.</li>
           <li><b>Supprimer ton compte</b> et toutes les données associées, immédiatement et définitivement : Aide → Mon compte → Supprimer mon compte. Un abonnement en cours est résilié.</li>
-          <li>À la <b>déconnexion</b>, tes données sont retirées de l'appareil (elles restent dans ton compte).</li>
+          <li>À la <b>déconnexion</b>, une fois tes données bien enregistrées dans ton compte, elles sont retirées de l'appareil et ses notifications sont désactivées.</li>
         </ul>
         <p>Pour toute question ou demande : <a href="mailto:m.kaeser90@gmail.com">m.kaeser90@gmail.com</a>. Tu peux aussi t'adresser au Préposé fédéral à la protection des données et à la transparence (PFPDT).</p>
 

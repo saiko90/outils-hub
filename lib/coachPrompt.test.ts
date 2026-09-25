@@ -42,3 +42,18 @@ describe("contextBlock", () => {
     expect(contextBlock({})).toBe("");
   });
 });
+
+describe("sanitizeCtx", () => {
+  it("borne les listes et les textes, et tolère un contexte incomplet", async () => {
+    const { sanitizeCtx, contextBlock } = await import("./coachPrompt");
+    const big = Array.from({ length: 500 }, (_, i) => ({ nom: "x".repeat(5000), grammes: 100, kcal: i }));
+    const c = sanitizeCtx({ aujourdhui: { kcal: 10, aliments: big }, prefs: { allergies: "a".repeat(10000) }, profil: { sexe: "homme", secret: "y".repeat(9999) } });
+    expect(c.aujourdhui!.aliments.length).toBe(40);
+    expect(c.aujourdhui!.aliments[0].nom.length).toBe(60);
+    expect(c.prefs!.allergies!.length).toBe(200);
+    expect(JSON.stringify(c.profil)).not.toContain("secret");
+    expect(contextBlock(c).length).toBeLessThan(6000);
+    expect(() => contextBlock(sanitizeCtx({ aujourdhui: { kcal: 5 } }))).not.toThrow();
+    expect(() => contextBlock(sanitizeCtx("n'importe quoi"))).not.toThrow();
+  });
+});

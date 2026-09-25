@@ -106,7 +106,7 @@ export default function Landing({ lang }: { lang: LLang }) {
   // Utilisateur qui revient (profil déjà réglé, app installée) ou lien d'intention (?pro, ?go) :
   // on l'emmène directement dans l'app, avant tout affichage. Les nouveaux visiteurs voient cette page.
   // Un lien de parrainage (?ref) est conservé sur les boutons « commencer ».
-  const bootScript = `(function(){try{var s=location.search,q=new URLSearchParams(s);var back=localStorage.getItem('calorio.onboarded')==='1'||!!localStorage.getItem('calorio.journal');var standalone=window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches;if(back||standalone||q.has('pro')||q.has('go')){location.replace('/calorio'+s+location.hash);return;}if(q.has('ref')){document.documentElement.classList.add('lp-has-ref');}}catch(e){}})();`;
+  const bootScript = `(function(){try{var s=location.search,q=new URLSearchParams(s);var back=localStorage.getItem('calorio.onboarded')==='1'||!!localStorage.getItem('calorio.journal');var standalone=window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches;var auth=/access_token|error_description/.test(location.hash)||q.has('code');if(back||standalone||auth||q.has('pro')||q.has('go')){location.replace('/calorio'+s+location.hash);return;}if(q.has('ref')){document.documentElement.classList.add('lp-has-ref');}}catch(e){}})();`;
   const refScript = `(function(){try{var r=new URLSearchParams(location.search).get('ref');if(!r||!/^[A-Za-z0-9]{4,10}$/.test(r))return;document.querySelectorAll('a[data-app]').forEach(function(a){var u=new URL(a.getAttribute('href'),location.origin);u.searchParams.set('ref',r);a.setAttribute('href',u.pathname+u.search);});}catch(e){}})();`;
 
   return (

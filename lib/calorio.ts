@@ -632,7 +632,7 @@ export function bilan(consomme: Total, cible: number): Bilan {
 /* Suivi de poids                                                      */
 /* ------------------------------------------------------------------ */
 
-export type Pesee = { date: string; poids: number }; // date ISO "yyyy-mm-dd"
+export type Pesee = { date: string; poids: number; at?: number }; // date ISO "yyyy-mm-dd", at = saisie (ms)
 
 export type TendancePoids = {
   debut: number; // premier poids enregistré

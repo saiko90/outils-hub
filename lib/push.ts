@@ -72,10 +72,9 @@ export async function disablePush(userId: string): Promise<PushResult> {
   }
   try {
     const supa = getSupabase();
-    if (supa) {
-      const q = supa.from("calorio_push").delete().eq("user_id", userId);
-      await (endpoint ? q.eq("endpoint", endpoint) : q);
-    }
+    // Uniquement l'abonnement de CET appareil : sans abonnement local, on ne touche à rien
+    // (sinon on couperait les notifications des autres appareils du compte).
+    if (supa && endpoint) await supa.from("calorio_push").delete().eq("user_id", userId).eq("endpoint", endpoint);
   } catch {
     /* ignore */
   }

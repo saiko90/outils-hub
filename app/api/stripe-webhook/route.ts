@@ -123,16 +123,18 @@ export async function POST(req: Request) {
       const prev = uid ? await getPro(service, uid) : null;
       // Un ancien abonnement qui s'arrête ne doit pas couper un abonnement plus récent encore actif.
       const otherSubActive = !!(turnsOff && prev?.is_pro && prev.stripe_subscription_id && sub.id && prev.stripe_subscription_id !== sub.id);
-      const orderOk = fresh ? !(turnsOff && prev?.plan === "comp") : shouldApply(prev, eventAt, turnsOff);
+      const orderOk = fresh ? true : shouldApply(prev, eventAt, turnsOff);
       if (uid && !otherSubActive && orderOk) {
         const end = sub.current_period_end || sub.items?.data?.[0]?.current_period_end;
+        // Pro offert (« comp ») : il le reste quoi qu'il arrive à un abonnement Stripe (on garde juste les références).
+        const comp = prev?.plan === "comp";
         await setPro(service, {
           id: uid,
-          is_pro: active,
-          pro_until: end ? new Date(end * 1000).toISOString() : null,
+          is_pro: comp ? true : active,
+          pro_until: comp ? null : end ? new Date(end * 1000).toISOString() : null,
           stripe_customer_id: sub.customer || null,
           stripe_subscription_id: sub.id || null,
-          plan: sub.items?.data?.[0]?.price?.id || null,
+          plan: comp ? "comp" : sub.items?.data?.[0]?.price?.id || null,
           stripe_event_at: fresh ? new Date().toISOString() : eventAt,
           updated_at: new Date().toISOString(),
         });

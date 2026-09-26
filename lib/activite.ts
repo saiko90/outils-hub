@@ -111,7 +111,7 @@ export const SPORTS: Sport[] = [
 export const SPORT_BY_ID: Record<string, Sport> = Object.fromEntries(SPORTS.map((s) => [s.id, s]));
 
 /** Une séance saisie par l'utilisateur. */
-export type Seance = { sportId: SportId; minutes: number };
+export type Seance = { sportId: SportId; minutes: number; id?: string };
 
 /** Signaux du jour agrégés (Health Connect + saisie). */
 export type SignauxJour = {

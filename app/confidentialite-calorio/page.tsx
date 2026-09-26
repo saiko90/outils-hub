@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: "#f3f7f2" };
 
-const MAJ = "25 septembre 2026";
+const MAJ = "26 septembre 2026";
 
 export default function Page() {
   return (
@@ -68,7 +68,7 @@ export default function Page() {
         <p>Les paiements de l'abonnement Pro sont traités par <b>Stripe</b>. calorio ne voit ni ne stocke tes données de carte : elles sont gérées directement par Stripe, prestataire de paiement certifié. Tu gères ton abonnement (carte, factures, résiliation) depuis l'app : Aide → Mon compte → Mon abonnement.</p>
 
         <h2 className="pv-h2">Mesure d'audience et protection contre les abus</h2>
-        <p>calorio utilise une mesure d'audience <b>sans cookie</b> : nous comptons des pages vues de façon <b>agrégée</b>, sans stocker ton adresse IP ni créer d'identifiant publicitaire. Pour empêcher l'usage abusif du coach IA, nous conservons des compteurs associés à une <b>empreinte chiffrée</b> de l'adresse IP (calculée avec une clé secrète : l'adresse elle-même n'est jamais enregistrée). Les compteurs journaliers sont effacés après quelques jours. Aucun traceur publicitaire.</p>
+        <p>calorio utilise une mesure d'audience <b>sans cookie</b> : nous comptons des pages vues de façon <b>agrégée</b>, sans stocker ton adresse IP ni créer d'identifiant publicitaire. Pour empêcher l'usage abusif du coach IA, nous conservons des compteurs associés à une <b>empreinte de l'adresse IP</b> (un code calculé avec une clé secrète, dont on ne peut pas retrouver l'adresse : l'adresse elle-même n'est jamais enregistrée). Ces compteurs sont effacés après quelques jours. Les essais gratuits du coach d'un compte sont comptés avec le compte et supprimés avec lui. Aucun traceur publicitaire.</p>
 
         <h2 className="pv-h2">Hébergement et sous-traitants</h2>
         <p>Les données de compte sont hébergées via <b>Supabase</b> (base de données) et l'application est servie par <b>Vercel</b>. Le coach et l'analyse photo utilisent <b>Google Gemini</b>, les paiements <b>Stripe</b> et la recherche d'aliments <b>Open Food Facts</b>. Les polices de caractères sont hébergées par calorio lui-même (aucune requête vers Google Fonts). Ces prestataires peuvent traiter des données hors de Suisse/UE avec des garanties appropriées (clauses contractuelles types).</p>
@@ -81,7 +81,7 @@ export default function Page() {
         <ul className="pv-ul">
           <li><b>Exporter</b> toutes tes données : Aide → Mes données → Télécharger.</li>
           <li><b>Supprimer ton compte</b> et toutes les données associées, immédiatement et définitivement : Aide → Mon compte → Supprimer mon compte. Un abonnement en cours est résilié.</li>
-          <li>À la <b>déconnexion</b>, une fois tes données bien enregistrées dans ton compte, elles sont retirées de l'appareil et ses notifications sont désactivées.</li>
+          <li>À la <b>déconnexion</b>, une fois tes données bien enregistrées dans ton compte, elles sont retirées de l'appareil et ses notifications sont désactivées. Si elles n'ont pas pu être envoyées (pas de connexion), l'app te propose de les garder sur l'appareil : elles restent alors rattachées à ton compte et ne sont jamais versées dans le compte de quelqu'un d'autre.</li>
         </ul>
         <p>Pour toute question ou demande : <a href="mailto:m.kaeser90@gmail.com">m.kaeser90@gmail.com</a>. Tu peux aussi t'adresser au Préposé fédéral à la protection des données et à la transparence (PFPDT).</p>
 

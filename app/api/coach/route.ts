@@ -26,7 +26,8 @@ export async function POST(req: Request) {
   if (msgs.length === 0) return NextResponse.json({ error: "empty" }, { status: 400 });
 
   // Garde-fou serveur (origine, Pro vérifié en base, essais gratuits, quotas).
-  const blocked = await coachGuard(req);
+  const gate = await coachGuard(req);
+  const blocked = gate.status;
   if (blocked === 402) return NextResponse.json({ error: "pro_required" }, { status: 402 });
   if (blocked === 429) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   if (blocked === 503) return NextResponse.json({ error: "busy" }, { status: 503 });
@@ -76,6 +77,7 @@ export async function POST(req: Request) {
           const blocked = data.promptFeedback?.blockReason;
           return NextResponse.json({ reply: blocked ? "Désolé, je préfère ne pas répondre à ça — on reste sur la nutrition ? 🥕" : "Hmm, je n'ai pas de réponse là. Reformule ?" });
         }
+        await gate.consume(); // essai décompté seulement pour une vraie réponse
         return NextResponse.json({ reply });
       }
       lastStatus = r.status;

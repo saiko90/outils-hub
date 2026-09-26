@@ -1,101 +1,164 @@
-// Fusion local ↔ cloud des données calorio, jour par jour (jamais « le dernier qui écrit écrase tout »).
-// Chaque jour porte un horodatage de dernière modification (meta). Règles :
-//  - jour présent d'un seul côté → on le garde ;
-//  - des deux côtés, horodatés tous les deux → le plus récent gagne (égalité → local) ;
-//  - horodaté d'un seul côté → ce côté gagne (il a été modifié depuis l'arrivée des horodatages) ;
-//  - aucun horodatage (anciennes données) → combinaison prudente (union des lignes).
-// Conséquence : un appareil vierge ne peut pas effacer l'historique, et une suppression récente
-// n'est pas « ressuscitée » par une vieille copie.
+// Synchro calorio : fusion à TROIS VOIES, élément par élément.
+//
+// Chaque appareil garde une copie de ce qu'il a envoyé au cloud lors de sa dernière synchro réussie
+// (la « base »). En comparant base / appareil / cloud, on sait pour chaque élément (ligne du journal,
+// séance, pesée, repas enregistré, aliment perso, favori Vito, réglage…) qui l'a ajouté, modifié ou
+// supprimé depuis — et on combine les deux côtés sans rien perdre :
+//  - ajouté d'un seul côté → gardé ;
+//  - modifié d'un seul côté → la modification gagne ;
+//  - supprimé d'un côté et inchangé de l'autre → supprimé (plus de « résurrection ») ;
+//  - modifié des deux côtés → l'appareil gagne (c'est la saisie la plus fraîche de l'utilisateur).
+// Sans base (premier passage sur un appareil) : union des éléments ; pour les réglages, le cloud gagne
+// (un nouvel appareil ne doit pas écraser le profil du compte avec ses valeurs par défaut).
 
-export type Journal = Record<string, unknown[]>;
-export type JournalMeta = Record<string, number>;
-
-function lineId(l: unknown): string {
-  if (l && typeof l === "object") {
-    const o = l as { key?: unknown; id?: unknown };
-    if (typeof o.key === "string") return o.key;
-    if (typeof o.id === "string") return o.id;
-  }
-  return JSON.stringify(l);
+/** JSON à clés triées : l'égalité ne dépend pas de l'ordre des clés (Postgres/jsonb les réordonne). */
+export function stable(v: unknown): string {
+  if (v === undefined) return "undefined";
+  if (v === null || typeof v !== "object") return JSON.stringify(v);
+  if (Array.isArray(v)) return `[${v.map(stable).join(",")}]`;
+  const o = v as Record<string, unknown>;
+  return `{${Object.keys(o).filter((k) => o[k] !== undefined).sort().map((k) => `${JSON.stringify(k)}:${stable(o[k])}`).join(",")}}`;
 }
+const eq = (a: unknown, b: unknown) => stable(a) === stable(b);
 
-export function unionLines(a: unknown[], b: unknown[]): unknown[] {
-  const seen = new Set<string>();
-  const out: unknown[] = [];
-  for (const l of [...a, ...b]) {
-    const id = lineId(l);
-    if (!seen.has(id)) { seen.add(id); out.push(l); }
-  }
-  return out;
-}
-
-/** Fusion générique d'une table « par jour » avec horodatages. */
-export function mergeDayMap<V>(
-  local: Record<string, V>,
-  localMeta: JournalMeta,
-  cloud: Record<string, V>,
-  cloudMeta: JournalMeta,
-  combine: (l: V, c: V) => V,
-  valid: (v: unknown) => boolean = () => true
-): { data: Record<string, V>; meta: JournalMeta } {
-  const data: Record<string, V> = {};
-  const meta: JournalMeta = {};
-  const days = new Set([...Object.keys(local || {}), ...Object.keys(cloud || {})]);
-  for (const d of days) {
-    const l = local && d in local && valid(local[d]) ? local[d] : undefined;
-    const c = cloud && d in cloud && valid(cloud[d]) ? cloud[d] : undefined;
-    const lm = localMeta?.[d];
-    const cm = cloudMeta?.[d];
-    let v: V;
-    if (l !== undefined && c === undefined) v = l;
-    else if (c !== undefined && l === undefined) v = c;
-    else if (l !== undefined && c !== undefined) {
-      if (JSON.stringify(l) === JSON.stringify(c)) v = l;
-      else if (typeof lm === "number" && typeof cm === "number") v = cm > lm ? c : l;
-      else if (typeof lm === "number") v = l;
-      else if (typeof cm === "number") v = c;
-      else v = combine(l, c);
-    } else continue;
-    data[d] = v;
-    const m = Math.max(lm || 0, cm || 0);
-    if (m > 0) meta[d] = m;
-  }
-  return { data, meta };
-}
-
-export function mergeJournal(
-  local: Journal,
-  localMeta: JournalMeta,
-  cloud: Journal,
-  cloudMeta: JournalMeta
-): { journal: Journal; meta: JournalMeta } {
-  const r = mergeDayMap<unknown[]>(local || {}, localMeta || {}, cloud || {}, cloudMeta || {}, unionLines, Array.isArray);
-  return { journal: r.data, meta: r.meta };
-}
-
-export type PeseeLike = { date: string; poids: number; at?: number };
-
-/**
- * Union des pesées par date (doublon : la plus récemment saisie, sinon la locale), triées.
- * `deleted` = pierres tombales {date: horodatage de suppression} : une pesée supprimée ne revient pas,
- * sauf si elle a été ressaisie après la suppression.
- */
-export function mergePesees<T extends PeseeLike>(local: T[], cloud: T[], deleted: Record<string, number> = {}): T[] {
-  const by = new Map<string, T>();
-  const put = (p: T) => {
-    const cur = by.get(p.date);
-    if (!cur || (p.at || 0) >= (cur.at || 0)) by.set(p.date, p);
+/** Fusion à trois voies de deux tables clé → valeur (ordre : celui de l'appareil, puis nouveautés du cloud). */
+export function merge3<T>(base: Map<string, T> | null, local: Map<string, T>, cloud: Map<string, T>): Map<string, T> {
+  const out = new Map<string, T>();
+  const b = base || new Map<string, T>();
+  const decide = (k: string): { keep: boolean; v?: T } => {
+    const inB = b.has(k), inL = local.has(k), inC = cloud.has(k);
+    const vb = b.get(k), vl = local.get(k), vc = cloud.get(k);
+    if (inL && inC) {
+      if (eq(vl, vc)) return { keep: true, v: vl };
+      if (inB && eq(vl, vb)) return { keep: true, v: vc }; // seul le cloud a changé
+      return { keep: true, v: vl }; // seul l'appareil a changé, ou les deux → l'appareil
+    }
+    if (inL && !inC) {
+      if (inB && eq(vl, vb)) return { keep: false }; // supprimé ailleurs, inchangé ici
+      return { keep: true, v: vl }; // ajouté ici (ou modifié ici malgré une suppression ailleurs)
+    }
+    if (!inL && inC) {
+      if (inB && eq(vc, vb)) return { keep: false }; // supprimé ici, inchangé ailleurs
+      return { keep: true, v: vc }; // ajouté ailleurs
+    }
+    return { keep: false };
   };
-  for (const p of cloud || []) if (p && typeof p.date === "string") put(p);
-  for (const p of local || []) if (p && typeof p.date === "string") put(p);
-  return Array.from(by.values())
-    .filter((p) => !(p.date in deleted) || (p.at || 0) > deleted[p.date])
-    .sort((a, b) => a.date.localeCompare(b.date));
+  for (const k of local.keys()) { const d = decide(k); if (d.keep) out.set(k, d.v as T); }
+  for (const k of cloud.keys()) { if (out.has(k) || local.has(k)) continue; const d = decide(k); if (d.keep) out.set(k, d.v as T); }
+  return out;
 }
 
-/** Union de deux tables de pierres tombales (on garde la suppression la plus récente). */
-export function mergeTombstones(a: Record<string, number> = {}, b: Record<string, number> = {}): Record<string, number> {
-  const out: Record<string, number> = { ...a };
-  for (const [k, v] of Object.entries(b || {})) if (typeof v === "number" && v > (out[k] || 0)) out[k] = v;
+/** Réglage « document » (profil, préférences…) : trois voies au niveau du document entier. */
+export function merge3Value<T>(hasBase: boolean, base: T | undefined, local: T | undefined, cloud: T | undefined): T | undefined {
+  if (cloud === undefined || cloud === null) return local;
+  if (local === undefined || local === null) return cloud;
+  if (eq(local, cloud)) return local;
+  if (!hasBase) return cloud; // 1er passage sur cet appareil : le compte fait foi
+  if (eq(local, base)) return cloud; // seul le cloud a changé
+  return local;
+}
+
+/* ---------- aplatissement des structures calorio en tables clé → valeur ---------- */
+
+const SEP = "\u0001";
+
+function itemId(item: unknown, fallback: string): string {
+  if (item && typeof item === "object") {
+    const o = item as { key?: unknown; id?: unknown };
+    if (typeof o.key === "string" && o.key) return o.key;
+    if (typeof o.id === "string" && o.id) return o.id;
+  }
+  return fallback;
+}
+
+/** { jour: [éléments] } → Map "jour␁id" (id = key/id, sinon contenu + rang pour les anciennes données). */
+export function flattenDays(days: Record<string, unknown[]> | null | undefined): Map<string, unknown> {
+  const m = new Map<string, unknown>();
+  for (const [d, arr] of Object.entries(days || {})) {
+    if (!Array.isArray(arr)) continue;
+    const seen: Record<string, number> = {};
+    for (const it of arr) {
+      const raw = stable(it);
+      const n = (seen[raw] = (seen[raw] || 0) + 1);
+      m.set(`${d}${SEP}${itemId(it, `~${raw}#${n}`)}`, it);
+    }
+  }
+  return m;
+}
+export function unflattenDays(m: Map<string, unknown>): Record<string, unknown[]> {
+  const out: Record<string, unknown[]> = {};
+  for (const [k, v] of m) {
+    const d = k.slice(0, k.indexOf(SEP));
+    (out[d] ||= []).push(v);
+  }
   return out;
+}
+export function flattenList<T>(list: T[] | null | undefined, idOf: (x: T) => string | undefined): Map<string, T> {
+  const m = new Map<string, T>();
+  for (const x of list || []) { const id = x && idOf(x); if (id) m.set(id, x); }
+  return m;
+}
+export function flattenNumbers(o: Record<string, number> | null | undefined): Map<string, number> {
+  const m = new Map<string, number>();
+  for (const [k, v] of Object.entries(o || {})) if (typeof v === "number") m.set(k, v);
+  return m;
+}
+
+/* ---------- document de synchro complet ---------- */
+
+export type SyncDoc = {
+  journal: Record<string, unknown[]>;
+  activites: Record<string, unknown[]>;
+  water: Record<string, number>;
+  pesees: { date: string; poids: number; at?: number }[];
+  meals: { id: string }[];
+  foods: { id: string }[];
+  favs: { id: string }[];
+  profil?: Record<string, unknown>;
+  waterGoal?: number;
+  coachPrefs?: Record<string, unknown>;
+  fast?: Record<string, unknown> | null;
+  trophies: Record<string, number>;
+  used: Record<string, boolean>;
+  streakBest: number;
+  coachActive?: { id?: string; msgs?: unknown[]; updated?: number } | null;
+};
+
+export function emptyDoc(): SyncDoc {
+  return { journal: {}, activites: {}, water: {}, pesees: [], meals: [], foods: [], favs: [], trophies: {}, used: {}, streakBest: 0 };
+}
+
+const byId = (x: { id?: string }) => (typeof x?.id === "string" ? x.id : undefined);
+const byDate = (x: { date?: string }) => (typeof x?.date === "string" ? x.date : undefined);
+
+export function mergeDoc(base: SyncDoc | null, local: SyncDoc, cloud: SyncDoc): SyncDoc {
+  const hb = !!base;
+  const B = base || emptyDoc();
+  const days = (f: (d: SyncDoc) => Record<string, unknown[]>) =>
+    unflattenDays(merge3(hb ? flattenDays(f(B)) : null, flattenDays(f(local)), flattenDays(f(cloud))));
+  const list = <T extends object>(f: (d: SyncDoc) => T[], idOf: (x: T) => string | undefined) =>
+    Array.from(merge3(hb ? flattenList(f(B), idOf) : null, flattenList(f(local), idOf), flattenList(f(cloud), idOf)).values());
+  const water = Object.fromEntries(merge3(hb ? flattenNumbers(B.water) : null, flattenNumbers(local.water), flattenNumbers(cloud.water)));
+  const pesees = list((d) => d.pesees, byDate).sort((a, b) => a.date.localeCompare(b.date));
+  // Conversation Vito active : la plus récente.
+  const ca = local.coachActive, cc = cloud.coachActive;
+  const coachActive = (cc?.updated || 0) > (ca?.updated || 0) ? cc : ca;
+  return {
+    journal: days((d) => d.journal),
+    activites: days((d) => d.activites),
+    water,
+    pesees,
+    meals: list((d) => d.meals, byId).slice(0, 30),
+    foods: list((d) => d.foods, byId).slice(0, 200),
+    favs: list((d) => d.favs, byId).slice(0, 50),
+    profil: merge3Value(hb, B.profil, local.profil, cloud.profil),
+    waterGoal: merge3Value(hb, B.waterGoal, local.waterGoal, cloud.waterGoal),
+    coachPrefs: merge3Value(hb, B.coachPrefs, local.coachPrefs, cloud.coachPrefs),
+    fast: merge3Value(hb, B.fast, local.fast, cloud.fast),
+    // Trophées et actions : ne font que croître → union.
+    trophies: { ...cloud.trophies, ...local.trophies },
+    used: { ...cloud.used, ...local.used },
+    streakBest: Math.max(local.streakBest || 0, cloud.streakBest || 0),
+    coachActive: coachActive ?? null,
+  };
 }

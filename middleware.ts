@@ -17,13 +17,14 @@ export function middleware(req: NextRequest) {
   const local = host === "localhost" || host === "127.0.0.1";
   if (!local && pathname.startsWith("/calorio-accueil")) {
     const rest = pathname.replace(/^\/calorio-accueil/, "") || "/";
-    return NextResponse.redirect(`https://calorio.ch${rest}`, 308);
+    return NextResponse.redirect(`https://calorio.ch${rest}${req.nextUrl.search}`, 308);
   }
   // Depuis outils.ch (ou ailleurs), toute page /o/calorio (FR/DE/EN) renvoie vers l'app calorio.ch
   // → l'utilisateur arrive sur le vrai site de calorio (installation PWA proposée, connexion sur le bon domaine).
   const m = !onCalorio ? pathname.match(/^(?:\/(de|en))?\/o\/calorio\/?$/) : null;
   if (m) {
-    return NextResponse.redirect(`https://calorio.ch/${m[1] || ""}`, 308); // vers la page d'accueil dans la bonne langue
+    // vers la page d'accueil dans la bonne langue, en gardant ?ref=, ?pro=… 
+    return NextResponse.redirect(`https://calorio.ch/${m[1] || ""}${req.nextUrl.search}`, 308);
   }
   if (host.startsWith("admin.") && !pathname.startsWith("/admin")) {
     const url = req.nextUrl.clone();

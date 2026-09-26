@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { SB_URL, authUid } from "@/lib/serverAuth";
+import { stripe } from "@/lib/stripeServer";
 
 // Parrainage calorio. Deux actions :
 //  - "mine"  : renvoie (et crée si besoin) le code d'invitation de l'utilisateur + ses stats.
@@ -59,9 +60,10 @@ async function getOrCreateCode(uid: string): Promise<string> {
   return "";
 }
 
-async function proRow(uid: string): Promise<{ is_pro?: boolean; pro_until?: string | null; plan?: string | null; stripe_subscription_id?: string | null } | null> {
-  const r = await fetch(`${SB_URL}/rest/v1/calorio_pro?id=eq.${uid}&select=is_pro,pro_until,plan,stripe_subscription_id`, { headers: sh() });
-  const rows = (await r.json()) as { is_pro?: boolean; pro_until?: string | null; plan?: string | null; stripe_subscription_id?: string | null }[];
+type ProR = { is_pro?: boolean; pro_until?: string | null; plan?: string | null; stripe_subscription_id?: string | null; stripe_customer_id?: string | null };
+async function proRow(uid: string): Promise<ProR | null> {
+  const r = await fetch(`${SB_URL}/rest/v1/calorio_pro?id=eq.${uid}&select=is_pro,pro_until,plan,stripe_subscription_id,stripe_customer_id`, { headers: sh() });
+  const rows = (await r.json()) as ProR[];
   return Array.isArray(rows) && rows[0] ? rows[0] : null;
 }
 
@@ -71,9 +73,17 @@ async function grantBonus(uid: string): Promise<boolean> {
   const cur = await proRow(uid);
   const now = Date.now();
   const untilMs = cur?.pro_until ? new Date(cur.pro_until).getTime() : 0;
-  if (cur?.plan === "comp") return false; // Pro offert à vie
-  if (cur?.is_pro && !cur.pro_until) return false; // déjà Pro sans limite
-  if (cur?.is_pro && cur.stripe_subscription_id && untilMs > now) return false; // abonnement payant en cours
+  if (cur?.plan === "comp") return true; // Pro offert à vie : rien à ajouter (récompense considérée comme reçue)
+  if (cur?.is_pro && !cur.pro_until) return true; // déjà Pro sans limite
+  if (cur?.is_pro && cur.stripe_subscription_id && untilMs > now) {
+    // Abonné payant : le mois offert devient un avoir Stripe (déduit de sa prochaine facture).
+    if (!cur.stripe_customer_id) return false;
+    const f = new URLSearchParams();
+    f.set("amount", "-490"); f.set("currency", "chf");
+    f.set("description", "calorio — 1 mois offert (parrainage)");
+    const r = await stripe(`customers/${encodeURIComponent(cur.stripe_customer_id)}/balance_transactions`, "POST", f);
+    return r.ok;
+  }
   const base = Math.max(now, untilMs);
   const until = new Date(base + REWARD_DAYS * 86400000).toISOString();
   const r = await fetch(`${SB_URL}/rest/v1/calorio_pro`, {
@@ -82,6 +92,10 @@ async function grantBonus(uid: string): Promise<boolean> {
     body: JSON.stringify({ id: uid, is_pro: true, pro_until: until, plan: cur?.stripe_subscription_id ? cur.plan || "ref" : "ref", updated_at: new Date().toISOString() }),
   });
   return r.ok;
+}
+
+async function unmark(path: string, body: Record<string, boolean>) {
+  await fetch(`${SB_URL}/rest/v1/${path}`, { method: "PATCH", headers: { ...sh(), Prefer: "return=minimal" }, body: JSON.stringify(body) }).catch(() => {});
 }
 
 // Filleul « réel » : compte créé il y a au moins ACTIVE_DAYS jours ET au moins ACTIVE_DAYS jours différents
@@ -132,7 +146,9 @@ export async function POST(req: Request) {
         body: JSON.stringify({ reward_granted: true }),
       });
       const done = upd.ok ? ((await upd.json()) as unknown[]) : [];
-      if (done.length) { await grantBonus(uid); rewarded++; } // PATCH conditionnel : jamais deux fois
+      if (!done.length) continue; // PATCH conditionnel : jamais deux fois
+      if (await grantBonus(uid)) rewarded++;
+      else await unmark(`calorio_referrals?id=eq.${ref.id}`, { reward_granted: false }); // rien n'a pu être offert : on réessaiera
     }
     // Côté filleul : son mois offert arrive dès qu'il est actif.
     let refereeRewardedNow = false;
@@ -145,7 +161,10 @@ export async function POST(req: Request) {
         body: JSON.stringify({ referee_rewarded: true }),
       });
       const done = upd.ok ? ((await upd.json()) as unknown[]) : [];
-      if (done.length) refereeRewardedNow = await grantBonus(uid);
+      if (done.length) {
+        refereeRewardedNow = await grantBonus(uid);
+        if (!refereeRewardedNow) await unmark(`calorio_referrals?id=eq.${asRef[0].id}`, { referee_rewarded: false });
+      }
     }
     return NextResponse.json({ code, count: list.length, rewarded, pending: list.length - rewarded, rewardDays: REWARD_DAYS, maxRewards: MAX_REWARDS, refereeRewardedNow, refereePending: !!asRef[0] && !refereeRewardedNow });
   }
@@ -153,6 +172,16 @@ export async function POST(req: Request) {
   // --- CLAIM : le filleul réclame via un code ---
   const code = (body.code || "").trim().toUpperCase();
   if (!code || code.length < 4) return NextResponse.json({ error: "bad_code" }, { status: 400 });
+
+  // Un parrainage ne vaut que pour un NOUVEAU compte (créé il y a moins de 7 jours) : deux comptes
+  // existants ne peuvent pas se parrainer mutuellement pour obtenir des mois offerts.
+  try {
+    const u = await fetch(`${SB_URL}/auth/v1/admin/users/${uid}`, { headers: sh() });
+    const created = u.ok ? new Date(((await u.json()) as { created_at?: string }).created_at || 0).getTime() : 0;
+    if (!created || Date.now() - created > 7 * 86400000) return NextResponse.json({ error: "not_new" }, { status: 409 });
+  } catch {
+    return NextResponse.json({ error: "not_new" }, { status: 409 });
+  }
 
   // Déjà parrainé ?
   const already = await fetch(`${SB_URL}/rest/v1/calorio_referrals?referee_id=eq.${uid}&select=id`, { headers: sh() });

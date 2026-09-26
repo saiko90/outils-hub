@@ -63,6 +63,26 @@ export async function dailyQuota(key: string, max: number): Promise<boolean> {
   }
 }
 
+/** Nombre d'essais déjà consommés pour une clé (sans consommer). 0 si inconnu. */
+export async function freeUsed(key: string): Promise<number> {
+  if (!svcKey()) return 0;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/ai_free_get`, { method: "POST", headers: svcHeaders(), body: JSON.stringify({ p_key: key }) });
+    if (!r.ok) return 0;
+    const n = (await r.json()) as number;
+    return typeof n === "number" ? n : 0;
+  } catch {
+    return 0;
+  }
+}
+/** Consomme un essai (appelé seulement après une vraie réponse). */
+export async function consumeFree(key: string): Promise<void> {
+  if (!svcKey()) return;
+  try {
+    await fetch(`${SB_URL}/rest/v1/rpc/ai_free_bump`, { method: "POST", headers: svcHeaders(), body: JSON.stringify({ p_key: key, p_max: 1000 }) });
+  } catch { /* ignore */ }
+}
+
 /** Quota « à vie » (essais gratuits). true = encore autorisé. */
 export async function lifetimeQuota(key: string, max: number): Promise<boolean> {
   if (!svcKey()) return true;

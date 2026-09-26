@@ -36,7 +36,7 @@ import { type Detected } from "@/lib/coachDetect";
 import { type CoachPrefs } from "@/lib/coachPrompt";
 import { getSupabase, authHeader } from "@/lib/supabaseClient";
 import { localISO, addDaysISO, diffDaysISO, streakEndingAt } from "@/lib/dates";
-import { mergeJournal, mergePesees, mergeDayMap, mergeTombstones, unionLines, type Journal, type JournalMeta } from "@/lib/syncMerge";
+import { mergeDoc, type SyncDoc } from "@/lib/syncMerge";
 import {
   besoinsDynamiques,
   SPORTS,
@@ -351,7 +351,7 @@ const LX = {
     yesterday: "Hier", dayNavLabel: "Changer de jour", prevDay: "Jour précédent", nextDay: "Jour suivant", backToday: "Revenir à aujourd'hui", editingDay: (d: string) => `Tu modifies : ${d}`,
     back: "Retour",
     reached: "atteint",
-    logoutUnsynced: "Certaines données ne sont pas encore synchronisées (pas de connexion ?). Te déconnecter quand même ? Elles resteront sur cet appareil.",
+    logoutUnsynced: "Certaines données ne sont pas encore dans ton compte (pas de connexion ?). Tu peux te déconnecter quand même : elles resteront sur cet appareil et reviendront dans ton compte à ta prochaine connexion.", logoutKeep: "Me déconnecter",
     refRewarded: "🎉 Tu as utilisé calorio 3 jours : 1 mois de Pro offert est activé !",
     myDay: "Ma journée", meals: { matin: "Petit-déjeuner", midi: "Déjeuner", snack: "Collations", soir: "Dîner" },
     addShort: "Ajouter", addMealSoir: "Ajouter ton repas du soir",
@@ -438,7 +438,7 @@ const LX = {
     yesterday: "Gestern", dayNavLabel: "Tag wechseln", prevDay: "Vorheriger Tag", nextDay: "Nächster Tag", backToday: "Zurück zu heute", editingDay: (d: string) => `Du bearbeitest: ${d}`,
     back: "Zurück",
     reached: "erreicht",
-    logoutUnsynced: "Einige Daten sind noch nicht synchronisiert (keine Verbindung?). Trotzdem abmelden? Sie bleiben auf diesem Gerät.",
+    logoutUnsynced: "Einige Daten sind noch nicht in deinem Konto (keine Verbindung?). Du kannst dich trotzdem abmelden: sie bleiben auf diesem Gerät und kommen bei der nächsten Anmeldung in dein Konto.", logoutKeep: "Abmelden",
     refRewarded: "🎉 3 Tage calorio: dein Gratis-Monat Pro ist aktiviert!",
     myDay: "Mein Tag", meals: { matin: "Frühstück", midi: "Mittagessen", snack: "Snacks", soir: "Abendessen" },
     addShort: "Hinzufügen", addMealSoir: "Abendessen hinzufügen",
@@ -525,7 +525,7 @@ const LX = {
     yesterday: "Yesterday", dayNavLabel: "Change day", prevDay: "Previous day", nextDay: "Next day", backToday: "Back to today", editingDay: (d: string) => `You're editing: ${d}`,
     back: "Back",
     reached: "reached",
-    logoutUnsynced: "Some data isn't synced yet (no connection?). Sign out anyway? It will stay on this device.",
+    logoutUnsynced: "Some data isn't in your account yet (no connection?). You can still sign out: it stays on this device and goes back to your account next time you sign in.", logoutKeep: "Sign out",
     refRewarded: "🎉 3 days of calorio: your free month of Pro is now active!",
     myDay: "My day", meals: { matin: "Breakfast", midi: "Lunch", snack: "Snacks", soir: "Dinner" },
     addShort: "Add", addMealSoir: "Add your dinner",
@@ -865,8 +865,9 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const syncReadyRef = useRef(false);
   const pulledUidRef = useRef("");
   const pullingRef = useRef(false);
-  const syncingRef = useRef(false);
+  const syncPromiseRef = useRef<Promise<boolean> | null>(null);
   const pendingSyncRef = useRef(false);
+  const lastSyncRef = useRef(0);
   const retryRef = useRef(0);
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [retryTick, setRetryTick] = useState(0);
@@ -949,6 +950,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     // Premier lancement : aucun profil enregistré et jamais onboardé → on propose le réglage initial.
     try { if (!p && localStorage.getItem("calorio.onboarded") !== "1") setShowOnboarding(true); } catch { /* ignore */ }
     try { const th = localStorage.getItem("calorio.theme"); if (th === "dark" || th === "auto" || th === "light") setTheme(th); } catch { /* ignore */ }
+    // Nettoyage des clés de l'ancien moteur de synchro (remplacé par la fusion à trois voies).
+    try { ["calorio.journalMeta", "calorio.activitesMeta", "calorio.waterMeta", "calorio.peseesDeleted"].forEach((k) => localStorage.removeItem(k)); } catch { /* ignore */ }
     const jour = load<Record<string, Line[]>>("calorio.journal", {});
     loadedDayRef.current = day; // les sauvegardes écrivent dans le jour réellement chargé
     setLines(migrateLines(jour[day], lang));
@@ -1059,10 +1062,6 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     if (JSON.stringify(jour[k] || []) === JSON.stringify(lines)) return; // rien de neuf (ex. simple chargement)
     jour[k] = lines;
     save("calorio.journal", jour);
-    // Horodatage par jour : permet une fusion fiable entre appareils.
-    const meta = load<JournalMeta>("calorio.journalMeta", {});
-    meta[k] = Date.now();
-    save("calorio.journalMeta", meta);
   }, [mounted, lines]);
   useEffect(() => {
     if (!mounted) return;
@@ -1072,7 +1071,6 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     if (JSON.stringify(a[k] || []) === JSON.stringify(seances)) return;
     a[k] = seances;
     save("calorio.activites", a);
-    const meta = load<JournalMeta>("calorio.activitesMeta", {}); meta[k] = Date.now(); save("calorio.activitesMeta", meta);
   }, [mounted, seances]);
   // Health Connect (app native Capacitor). La demande d'autorisation ouvre une
   // fenêtre système : on la déclenche au tap sur le bouton (geste utilisateur = fiable).
@@ -1151,82 +1149,137 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     try { localStorage.setItem("calorio.onboarded", "1"); } catch { /* ignore */ }
     setShowOnboarding(false);
   };
-  // Profil venu du cloud (1re lecture de la session) : ses réglages l'emportent sur ceux de l'appareil.
-  const applyProfil = (p: Record<string, unknown> | null) => {
-    if (!p) return;
-    // Utilisateur qui revient (profil venu du cloud) → pas d'onboarding.
-    setShowOnboarding(false);
-    try { localStorage.setItem("calorio.onboarded", "1"); } catch { /* ignore */ }
-    if (p.sexe) setSexe(p.sexe as Sexe);
-    if (typeof p.age === "number") setAge(p.age);
-    if (typeof p.poids === "number") setPoids(p.poids);
-    if (typeof p.taille === "number") setTaille(p.taille);
-    if (p.activite) setActivite(p.activite as Activite);
-    if (p.objectif) setObjectif(p.objectif as Objectif);
-    if (typeof p.poidsCible === "number") setPoidsCible(p.poidsCible);
-    if (typeof p.waterGoal === "number") { const g = Math.max(2, Math.min(20, p.waterGoal)); setWaterGoal(g); save("calorio.waterGoal", g); }
-    // Préférences Vito : on applique le cloud si le local est vide (pas d'écrasement d'une saisie fraîche).
-    if (p.coachPrefs && typeof p.coachPrefs === "object") {
-      const local = load<CoachPrefs>("calorio.coach.prefs", {});
-      const localEmpty = !local.regime && !local.allergies && !local.aime && !local.deteste;
-      if (localEmpty) { const cloud = p.coachPrefs as CoachPrefs; setCoachPrefs(cloud); save("calorio.coach.prefs", cloud); }
-    }
+  // --- Synchro à trois voies (voir lib/syncMerge.ts) ---
+  const PROFIL_KEYS = ["sexe", "age", "poids", "taille", "activite", "objectif", "poidsCible"] as const;
+  const pickProfil = (o: Record<string, unknown> | null | undefined) => {
+    if (!o) return undefined;
+    const p: Record<string, unknown> = {};
+    for (const k of PROFIL_KEYS) if (o[k] !== undefined && o[k] !== null && o[k] !== "") p[k] = o[k];
+    return Object.keys(p).length ? p : undefined;
   };
-
-  // Fusion complète cloud → appareil, calculée d'un coup à partir du stockage local (pas de mise à jour
-  // différée) : journal, séances, eau, pesées (avec suppressions), trophées, repas, aliments, Vito.
-  const mergeCloudData = (data: { profil?: unknown; journal?: unknown; pesees?: unknown } | null) => {
-    if (!data) return;
-    const prof = (data.profil && typeof data.profil === "object" ? data.profil : {}) as Record<string, unknown>;
-    const obj = <T,>(k: string): T => (prof[k] && typeof prof[k] === "object" ? (prof[k] as T) : ({} as T));
-    const mj = mergeJournal(load<Journal>("calorio.journal", {}), load<JournalMeta>("calorio.journalMeta", {}), (data.journal as Journal) || {}, obj<JournalMeta>("journalMeta"));
-    save("calorio.journal", mj.journal); save("calorio.journalMeta", mj.meta);
-    const ma = mergeDayMap<unknown[]>(load("calorio.activites", {}), load<JournalMeta>("calorio.activitesMeta", {}), obj("activites"), obj<JournalMeta>("activitesMeta"), unionLines, Array.isArray);
-    save("calorio.activites", ma.data); save("calorio.activitesMeta", ma.meta);
-    const mw = mergeDayMap<number>(load("calorio.water", {}), load<JournalMeta>("calorio.waterMeta", {}), obj("water"), obj<JournalMeta>("waterMeta"), (x1, x2) => Math.max(x1, x2), (v) => typeof v === "number");
-    save("calorio.water", mw.data); save("calorio.waterMeta", mw.meta);
-    const tomb = mergeTombstones(load("calorio.peseesDeleted", {}), obj("peseesDeleted"));
-    const mp = mergePesees(load<Pesee[]>("calorio.pesees", []), Array.isArray(data.pesees) ? (data.pesees as Pesee[]) : [], tomb);
-    save("calorio.pesees", mp); save("calorio.peseesDeleted", tomb);
-    const sb = Math.max(load<number>("calorio.streakBest", 0), typeof prof.streakBest === "number" ? prof.streakBest : 0);
-    save("calorio.streakBest", sb);
-    // Collections : union (on ne perd jamais un trophée, un repas ou un aliment déjà présent d'un côté).
-    const troph = { ...obj<Record<string, number>>("trophies"), ...load<Record<string, number>>("calorio.trophies", {}) };
-    save("calorio.trophies", troph);
-    const usedM = { ...obj<Record<string, boolean>>("used"), ...load<Record<string, boolean>>("calorio.used", {}) };
-    save("calorio.used", usedM);
-    const unionById = <T extends { id?: string }>(local: T[], cloud: unknown, max: number): T[] => {
-      const by = new Map(local.filter((x) => x && x.id).map((x) => [x.id as string, x] as const));
-      if (Array.isArray(cloud)) for (const c of cloud as T[]) if (c && c.id && !by.has(c.id)) by.set(c.id, c);
-      return Array.from(by.values()).slice(0, max);
+  // Document de synchro de l'appareil (lu dans le stockage, toujours à jour).
+  const localDoc = (): SyncDoc => ({
+    journal: load("calorio.journal", {}),
+    activites: load("calorio.activites", {}),
+    water: load("calorio.water", {}),
+    pesees: load("calorio.pesees", []),
+    meals: load("calorio.meals", []),
+    foods: load("calorio.customFoods", []),
+    favs: load("calorio.coach.favs", []),
+    profil: pickProfil(load<Record<string, unknown> | null>("calorio.profil", null)),
+    waterGoal: load<number | undefined>("calorio.waterGoal", undefined),
+    coachPrefs: load<Record<string, unknown> | undefined>("calorio.coach.prefs", undefined),
+    fast: load<Record<string, unknown> | null>("calorio.fast", null),
+    trophies: load("calorio.trophies", {}),
+    used: load("calorio.used", {}),
+    streakBest: load<number>("calorio.streakBest", 0),
+    coachActive: load("calorio.coach.active", null),
+  });
+  // Document de synchro du cloud (ligne calorio_users).
+  const cloudDoc = (data: { profil?: unknown; journal?: unknown; pesees?: unknown } | null): SyncDoc => {
+    const prof = (data?.profil && typeof data.profil === "object" ? data.profil : {}) as Record<string, unknown>;
+    const o = <T,>(k: string, d: T): T => (prof[k] !== undefined && prof[k] !== null ? (prof[k] as T) : d);
+    return {
+      journal: (data?.journal && typeof data.journal === "object" ? data.journal : {}) as SyncDoc["journal"],
+      activites: o("activites", {}),
+      water: o("water", {}),
+      pesees: Array.isArray(data?.pesees) ? (data!.pesees as SyncDoc["pesees"]) : [],
+      meals: o("savedMeals", []),
+      foods: o("customFoods", []),
+      favs: o("coachFavs", []),
+      profil: pickProfil(prof),
+      waterGoal: typeof prof.waterGoal === "number" ? prof.waterGoal : undefined,
+      coachPrefs: prof.coachPrefs && typeof prof.coachPrefs === "object" ? (prof.coachPrefs as Record<string, unknown>) : undefined,
+      fast: prof.fast && typeof prof.fast === "object" ? (prof.fast as Record<string, unknown>) : null,
+      trophies: o("trophies", {}),
+      used: o("used", {}),
+      streakBest: typeof prof.streakBest === "number" ? prof.streakBest : 0,
+      coachActive: o("coachActive", null),
     };
-    const meals = unionById<SavedMeal>(load<SavedMeal[]>("calorio.meals", []), prof.savedMeals, 30);
-    save("calorio.meals", meals);
-    const foods = unionById<Food>(load<Food[]>("calorio.customFoods", []), prof.customFoods, 200);
-    save("calorio.customFoods", foods);
-    if (prof.coachActive && typeof prof.coachActive === "object") {
-      const cloud = prof.coachActive as { id?: string; msgs?: unknown[]; updated?: number };
-      const local = load<{ updated?: number } | null>("calorio.coach.active", null);
-      if (Array.isArray(cloud.msgs) && (cloud.updated || 0) > (local?.updated || 0)) save("calorio.coach.active", cloud);
-    }
-    save("calorio.coach.favs", unionById(load<{ id: string }[]>("calorio.coach.favs", []), prof.coachFavs, 50));
-    // État de l'écran : seulement si quelque chose a réellement changé (pas de fausse modification).
+  };
+  // Écrit le document fusionné sur l'appareil (stockage + écran), sans fausse modification.
+  const applyDoc = (d: SyncDoc) => {
+    save("calorio.journal", d.journal); save("calorio.activites", d.activites); save("calorio.water", d.water);
+    save("calorio.pesees", d.pesees); save("calorio.meals", d.meals); save("calorio.customFoods", d.foods);
+    save("calorio.coach.favs", d.favs); save("calorio.trophies", d.trophies); save("calorio.used", d.used);
+    save("calorio.streakBest", d.streakBest);
+    if (d.coachActive) save("calorio.coach.active", d.coachActive);
+    if (d.fast !== undefined) save("calorio.fast", d.fast);
     const same = (x1: unknown, x2: unknown) => JSON.stringify(x1) === JSON.stringify(x2);
     const k = loadedDayRef.current;
     if (k) {
-      const nl = migrateLines(mj.journal[k], lang);
+      const nl = migrateLines(d.journal[k], lang);
       setLines((prev) => (same(prev, nl) ? prev : nl));
-      const ns = (ma.data[k] as Seance[] | undefined) || [];
+      const ns = (d.activites[k] as Seance[] | undefined) || [];
       setSeances((prev) => (same(prev, ns) ? prev : ns));
-      const nw = mw.data[k] || 0;
+      const nw = d.water[k] || 0;
       setWater((prev) => (prev === nw ? prev : nw));
     }
-    setPesees((prev) => (same(prev, mp) ? prev : mp));
-    setStreakBest((prev) => (prev === sb ? prev : sb));
-    setTrophies((prev) => (same(prev, troph) ? prev : troph));
-    setUsed((prev) => (same(prev, usedM) ? prev : usedM));
-    setSavedMeals((prev) => (same(prev, meals) ? prev : meals));
-    setCustomFoods((prev) => (same(prev, foods) ? prev : foods));
+    setPesees((prev) => (same(prev, d.pesees) ? prev : (d.pesees as Pesee[])));
+    setStreakBest((prev) => (prev === d.streakBest ? prev : d.streakBest));
+    setTrophies((prev) => (same(prev, d.trophies) ? prev : d.trophies));
+    setUsed((prev) => (same(prev, d.used) ? prev : d.used));
+    setSavedMeals((prev) => (same(prev, d.meals) ? prev : (d.meals as SavedMeal[])));
+    setCustomFoods((prev) => (same(prev, d.foods) ? prev : (d.foods as Food[])));
+    if (d.fast && typeof d.fast === "object") {
+      const f = d.fast as { start: number | null; hours: number };
+      setFast((prev) => (same(prev, f) ? prev : f));
+    }
+    // Réglages : profil, objectif d'eau, préférences Vito.
+    const p = d.profil as Record<string, unknown> | undefined;
+    if (p && !same(pickProfil(load("calorio.profil", null)), p)) {
+      save("calorio.profil", { ...load<Record<string, unknown>>("calorio.profil", {}), ...p });
+      setShowOnboarding(false);
+      try { localStorage.setItem("calorio.onboarded", "1"); } catch { /* ignore */ }
+      if (p.sexe) setSexe(p.sexe as Sexe);
+      if (typeof p.age === "number") setAge(p.age);
+      if (typeof p.poids === "number") setPoids(p.poids);
+      if (typeof p.taille === "number") setTaille(p.taille);
+      if (p.activite) setActivite(p.activite as Activite);
+      if (p.objectif) setObjectif(p.objectif as Objectif);
+      setPoidsCible(typeof p.poidsCible === "number" ? p.poidsCible : "");
+    }
+    if (typeof d.waterGoal === "number" && d.waterGoal !== load("calorio.waterGoal", undefined)) {
+      const g = Math.max(2, Math.min(20, d.waterGoal)); setWaterGoal(g); save("calorio.waterGoal", g);
+    }
+    if (d.coachPrefs && !same(d.coachPrefs, load("calorio.coach.prefs", undefined))) {
+      setCoachPrefs(d.coachPrefs as CoachPrefs); save("calorio.coach.prefs", d.coachPrefs);
+    }
+  };
+  // Fusion cloud → appareil. Renvoie le document fusionné (celui qu'on enverra).
+  const mergeCloudData = (data: { profil?: unknown; journal?: unknown; pesees?: unknown } | null): SyncDoc => {
+    const base = load<SyncDoc | null>("calorio.syncBase", null);
+    const merged = mergeDoc(base, localDoc(), cloudDoc(data));
+    applyDoc(merged);
+    return merged;
+  };
+
+  // Données d'un autre compte sur cet appareil (déconnexion hors ligne) : on les met de côté au lieu
+  // de les fusionner dans le compte qui se connecte, et on les restaure si leur propriétaire revient.
+  const USER_KEYS_KEEP = new Set(["calorio.lang", "calorio.theme"]);
+  const userKeys = () => {
+    const out: string[] = [];
+    try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith("calorio.") && !USER_KEYS_KEEP.has(k) && !k.startsWith("calorio.stash.")) out.push(k); } } catch { /* ignore */ }
+    return out;
+  };
+  const switchOwner = (uid: string) => {
+    try {
+      const owner = localStorage.getItem("calorio.owner");
+      if (owner && owner !== uid) {
+        const stash: Record<string, string> = {};
+        for (const k of userKeys()) { const v = localStorage.getItem(k); if (v !== null) stash[k] = v; localStorage.removeItem(k); }
+        localStorage.setItem(`calorio.stash.${owner}`, JSON.stringify(stash));
+        const mine = localStorage.getItem(`calorio.stash.${uid}`);
+        if (mine) {
+          const obj = JSON.parse(mine) as Record<string, string>;
+          for (const [k, v] of Object.entries(obj)) localStorage.setItem(k, v);
+          localStorage.removeItem(`calorio.stash.${uid}`);
+        }
+        localStorage.setItem("calorio.owner", uid);
+        return true; // l'écran doit être rechargé depuis le stockage
+      }
+    } catch { /* ignore */ }
+    return false;
   };
 
   // Statut Pro depuis la base (source de vérité) → état + cache d'affichage local.
@@ -1249,13 +1302,11 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     syncReadyRef.current = false;
     setSyncState("syncing");
     try {
+      if (switchOwner(uid)) { window.location.reload(); return; }
       const { data, error } = await supa.from("calorio_users").select("profil,journal,pesees").eq("id", uid).maybeSingle();
       if (error) throw error;
-      if (data) {
-        applyProfil((data.profil as Record<string, unknown>) || null);
-        mergeCloudData(data);
-        setAuthMsg("");
-      }
+      if (data) { mergeCloudData(data); setAuthMsg(""); }
+      try { localStorage.setItem("calorio.owner", uid); } catch { /* ignore */ }
       await refreshPro(uid);
       pulledUidRef.current = uid;
       syncReadyRef.current = true;
@@ -1389,7 +1440,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const shareGrade = () => shareText(x.troShareGrade(x.gradeNames[grade.index], trophyCount));
 
   // Export / import des données (confiance + portabilité). Clés locales connues.
-  const CAL_KEYS = ["calorio.profil", "calorio.journal", "calorio.pesees", "calorio.recents", "calorio.trophies", "calorio.used", "calorio.streakBest", "calorio.lang", "calorio.water", "calorio.waterGoal", "calorio.fast", "calorio.meals", "calorio.customFoods", "calorio.coach.prefs", "calorio.coach.favs", "calorio.coach.active", "calorio.journalMeta", "calorio.activites", "calorio.activitesMeta", "calorio.waterMeta", "calorio.peseesDeleted"];
+  const CAL_KEYS = ["calorio.profil", "calorio.journal", "calorio.pesees", "calorio.recents", "calorio.trophies", "calorio.used", "calorio.streakBest", "calorio.lang", "calorio.water", "calorio.waterGoal", "calorio.fast", "calorio.meals", "calorio.customFoods", "calorio.coach.prefs", "calorio.coach.favs", "calorio.coach.active", "calorio.activites"];
   const exportData = () => {
     const out: Record<string, unknown> = { _app: "calorio", _v: 1, _date: new Date().toISOString() };
     for (const k of CAL_KEYS) {
@@ -1415,58 +1466,66 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     } catch { setDataMsg(x.importErr); }
   };
 
-  // Ligne cloud complète, lue dans le stockage local (toujours à jour après la fusion, contrairement
-  // aux états React qui ne changent qu'au rendu suivant).
-  const cloudRow = (uid: string) => {
-    // Conversations Vito : on borne la taille (dernier échange + favoris) pour ne pas gonfler la ligne.
-    const ca = load<{ id?: string; msgs?: unknown[]; updated?: number } | null>("calorio.coach.active", null);
-    const coachActive = ca && Array.isArray(ca.msgs) ? { id: ca.id, msgs: ca.msgs.slice(-40), updated: ca.updated || 0 } : null;
-    const coachFavs = load<{ id: string; title: string; msgs: unknown[]; updated: number }[]>("calorio.coach.favs", [])
-      .slice(0, 20).map((c) => ({ ...c, msgs: (c.msgs || []).slice(-40) }));
+  // Ligne cloud à partir du document fusionné (+ réglages et conversation Vito bornée).
+  const cloudRow = (uid: string, d: SyncDoc) => {
+    const ca = d.coachActive && Array.isArray(d.coachActive.msgs) ? { id: d.coachActive.id, msgs: d.coachActive.msgs.slice(-40), updated: d.coachActive.updated || 0 } : null;
+    const favs = (d.favs as { id: string; msgs?: unknown[] }[]).slice(0, 20).map((c) => ({ ...c, msgs: (c.msgs || []).slice(-40) }));
     return {
       id: uid,
       profil: {
-        ...load<Record<string, unknown>>("calorio.profil", {}),
-        trophies: load("calorio.trophies", {}), used: load("calorio.used", {}),
-        savedMeals: load("calorio.meals", []), customFoods: load("calorio.customFoods", []),
-        waterGoal: load("calorio.waterGoal", WATER_GOAL), coachPrefs: load("calorio.coach.prefs", {}),
-        coachActive, coachFavs,
-        journalMeta: load("calorio.journalMeta", {}),
-        activites: load("calorio.activites", {}), activitesMeta: load("calorio.activitesMeta", {}),
-        water: load("calorio.water", {}), waterMeta: load("calorio.waterMeta", {}),
-        fast: load("calorio.fast", null), streakBest: load("calorio.streakBest", 0),
-        peseesDeleted: load("calorio.peseesDeleted", {}),
+        ...(d.profil || {}),
+        trophies: d.trophies, used: d.used, savedMeals: d.meals, customFoods: d.foods,
+        waterGoal: d.waterGoal, coachPrefs: d.coachPrefs, coachActive: ca, coachFavs: favs,
+        activites: d.activites, water: d.water, fast: d.fast, streakBest: d.streakBest,
       },
-      journal: load("calorio.journal", {}),
-      pesees: load("calorio.pesees", []),
+      journal: d.journal,
+      pesees: d.pesees,
       updated_at: new Date().toISOString(),
     };
   };
-  // Synchro : relire le cloud, fusionner jour par jour, puis écrire. Deux appareils ouverts en même temps
-  // ne s'écrasent donc plus l'un l'autre. Renvoie true si tout est bien dans le cloud.
-  const syncNow = async (uid: string): Promise<boolean> => {
-    const supa = getSupabase();
-    if (!supa || !syncReadyRef.current) return false;
-    if (syncingRef.current) { pendingSyncRef.current = true; return false; }
-    syncingRef.current = true;
-    setSyncState("syncing");
-    try {
-      const { data, error } = await supa.from("calorio_users").select("profil,journal,pesees").eq("id", uid).maybeSingle();
-      if (error) throw error;
-      if (data) mergeCloudData(data);
-      const { error: e2 } = await supa.from("calorio_users").upsert(cloudRow(uid));
-      if (e2) throw e2;
-      setSyncState("ok");
-      retryRef.current = 0;
-      return true;
-    } catch {
-      setSyncState("error");
-      scheduleRetry();
-      return false;
-    } finally {
-      syncingRef.current = false;
+  // Synchro : relire le cloud, fusionner élément par élément (trois voies), écrire, puis mémoriser
+  // ce qui a été envoyé comme nouvelle base. Une seule synchro à la fois ; les demandes pendant une
+  // synchro en cours sont regroupées dans une synchro suivante.
+  const syncNow = (uid: string): Promise<boolean> => {
+    if (syncPromiseRef.current) { pendingSyncRef.current = true; return syncPromiseRef.current; }
+    const run = (async () => {
+      const supa = getSupabase();
+      if (!supa || !syncReadyRef.current) return false;
+      setSyncState("syncing");
+      try {
+        const { data, error } = await supa.from("calorio_users").select("profil,journal,pesees").eq("id", uid).maybeSingle();
+        if (error) throw error;
+        const merged = mergeCloudData(data);
+        const row = cloudRow(uid, merged);
+        const { error: e2 } = await supa.from("calorio_users").upsert(row);
+        if (e2) {
+          // 23503 : le compte a été supprimé depuis un autre appareil → on se déconnecte ici au lieu de réessayer sans fin.
+          if ((e2 as { code?: string }).code === "23503") { await supa.auth.signOut().catch(() => {}); return false; }
+          throw e2;
+        }
+        save("calorio.syncBase", merged);
+        lastSyncRef.current = Date.now();
+        setSyncState("ok");
+        retryRef.current = 0;
+        return true;
+      } catch {
+        setSyncState("error");
+        scheduleRetry();
+        return false;
+      }
+    })();
+    syncPromiseRef.current = run;
+    run.finally(() => {
+      syncPromiseRef.current = null;
       if (pendingSyncRef.current) { pendingSyncRef.current = false; setSyncTick((n) => n + 1); }
-    }
+    });
+    return run;
+  };
+  // Attendre la synchro en cours puis en faire une complète (déconnexion).
+  const syncFully = async (uid: string): Promise<boolean> => {
+    if (syncPromiseRef.current) { try { await syncPromiseRef.current; } catch { /* ignore */ } }
+    pendingSyncRef.current = false;
+    return syncNow(uid);
   };
 
   // Push cloud (debounce) quand connecté, APRÈS la fusion initiale, et que les données changent.
@@ -1477,6 +1536,17 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, user, sexe, age, poids, taille, activite, objectif, poidsCible, pesees, lines, seances, water, fast, trophies, used, savedMeals, customFoods, waterGoal, coachPrefs, convTick, syncTick]);
+
+  // Retour au premier plan : on relit le cloud (données saisies sur un autre appareil entre-temps).
+  useEffect(() => {
+    if (!user) return;
+    const onVis = () => {
+      if (document.visibilityState !== "visible" || !syncReadyRef.current) return;
+      if (Date.now() - lastSyncRef.current > 15000) setSyncTick((n) => n + 1);
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [user]);
 
   // Nouvel essai programmé après une erreur : relire/fusionner si la 1re lecture a échoué, sinon renvoyer.
   useEffect(() => {
@@ -1511,32 +1581,30 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const { error } = await supa.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href.split("?")[0] } });
     setAuthMsg(error ? t.authErr : t.authSent);
   };
-  // Déconnexion : on s'assure que tout est dans le cloud AVANT d'effacer l'appareil (appareil éventuellement
-  // partagé). Si l'envoi échoue, on ne supprime rien sans l'accord de l'utilisateur.
-  const signOut = async () => {
-    let clearLocal = true;
-    if (user) {
-      let ok = syncReadyRef.current ? await syncNow(user.id) : false;
-      if (!ok && !syncReadyRef.current) {
-        await pullFromCloud(user.id);
-        if (syncReadyRef.current) ok = await syncNow(user.id);
-      }
-      if (!ok) {
-        if (!window.confirm(x.logoutUnsynced)) return;
-        clearLocal = false; // on garde les données sur l'appareil plutôt que de les perdre
-      }
-      await disablePush(user.id).catch(() => ({ ok: false })); // plus de notifications de ce compte ici
-    }
+  // Déconnexion : on attend que tout soit dans le cloud AVANT d'effacer l'appareil (appareil éventuellement
+  // partagé). Si l'envoi échoue, on demande (fenêtre de l'app) : garder les données sur l'appareil ou annuler.
+  const [logoutAsk, setLogoutAsk] = useState(false);
+  const [logoutBusy, setLogoutBusy] = useState(false);
+  const finishSignOut = async (clearLocal: boolean) => {
+    setLogoutAsk(false);
+    if (user) await disablePush(user.id).catch(() => ({ ok: false })); // plus de notifications de ce compte ici
     await getSupabase()?.auth.signOut();
     if (clearLocal) {
-      try {
-        const keep = new Set(["calorio.lang", "calorio.theme"]);
-        const keys: string[] = [];
-        for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith("calorio.") && !keep.has(k)) keys.push(k); }
-        keys.forEach((k) => localStorage.removeItem(k));
-      } catch { /* ignore */ }
+      try { userKeys().forEach((k) => localStorage.removeItem(k)); } catch { /* ignore */ }
     }
     window.location.reload();
+  };
+  const signOut = async () => {
+    if (!user || logoutBusy) { if (!user) await finishSignOut(true); return; }
+    setLogoutBusy(true);
+    let ok = syncReadyRef.current ? await syncFully(user.id) : false;
+    if (!ok && !syncReadyRef.current) {
+      await pullFromCloud(user.id);
+      if (syncReadyRef.current) ok = await syncFully(user.id);
+    }
+    setLogoutBusy(false);
+    if (ok) await finishSignOut(true);
+    else setLogoutAsk(true);
   };
 
   const goPro = () => {
@@ -1676,7 +1744,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const addSeance = () => {
     const min = Math.max(1, typeof actMin === "number" ? actMin : 0);
     if (!SPORT_BY_ID[actSport]) return;
-    setSeances((s) => [...s, { sportId: actSport, minutes: min }]);
+    setSeances((s) => [...s, { sportId: actSport, minutes: min, id: newKey() }]);
   };
   const removeSeance = (i: number) => setSeances((s) => s.filter((_, j) => j !== i));
 
@@ -1787,7 +1855,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       ...d,
       pct: Math.round((d.kcal / maxV) * 100),
       over: d.kcal > besoinsAffiche.cible,
-      letter: new Date(d.date).toLocaleDateString(locale, { weekday: "narrow" }).toUpperCase(),
+      letter: new Date(`${d.date}T12:00:00`).toLocaleDateString(locale, { weekday: "narrow" }).toUpperCase(),
     }));
   }, [histoire, besoinsAffiche.cible, locale]);
   // Séries calculées sur tout l'historique (plus limitées aux 14 jours du graphique : les paliers 30, 100, 365 sont atteignables).
@@ -1922,7 +1990,6 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     const w = load<Record<string, number>>("calorio.water", {});
     if ((w[k] || 0) === water) return;
     w[k] = water; save("calorio.water", w);
-    const meta = load<JournalMeta>("calorio.waterMeta", {}); meta[k] = Date.now(); save("calorio.waterMeta", meta);
   }, [mounted, water]);
   useEffect(() => { if (!mounted) return; save("calorio.fast", fast); }, [mounted, fast]);
   useEffect(() => { if (!mounted) return; save("calorio.waterGoal", waterGoal); }, [mounted, waterGoal]);
@@ -2137,7 +2204,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       // Tab reste dans la fenêtre ouverte (piège à focus).
-      if (e.key === "Tab" && (scanning || proOpen || authOpen || addOpen)) {
+      if (e.key === "Tab" && (scanning || proOpen || authOpen || addOpen || logoutAsk || !!newTrophy)) {
         const dlgs = document.querySelectorAll<HTMLElement>('.cl [role="dialog"]');
         const d = dlgs[dlgs.length - 1];
         const f = d ? Array.from(d.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled]):not([type="hidden"]), select, textarea, a[href], [tabindex]:not([tabindex="-1"])')).filter((el) => el.offsetParent !== null) : [];
@@ -2151,6 +2218,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       }
       if (e.key !== "Escape") return;
       if (scanning) stopScan();
+      else if (logoutAsk) setLogoutAsk(false);
+      else if (newTrophy) setNewTrophy("");
       else if (proOpen) setProOpen(false);
       else if (authOpen) setAuthOpen(false);
       else if (addOpen) { if (addMode !== "menu") { setAddMode("menu"); setQ(""); } else setAddOpen(false); }
@@ -2158,10 +2227,10 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scanning, proOpen, authOpen, addOpen, addMode]);
+  }, [scanning, proOpen, authOpen, addOpen, addMode, logoutAsk, newTrophy]);
   // Focus : à l'ouverture d'une fenêtre, on place le focus dedans ; à la fermeture, on le rend.
   const lastFocusRef = useRef<HTMLElement | null>(null);
-  const anyDialog = scanning || proOpen || authOpen || addOpen;
+  const anyDialog = scanning || proOpen || authOpen || addOpen || logoutAsk || !!newTrophy;
   useEffect(() => {
     if (anyDialog) {
       if (!lastFocusRef.current) lastFocusRef.current = document.activeElement as HTMLElement | null;
@@ -2264,11 +2333,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     setPoidsInput("");
     setPoidsDate(todayISO());
   };
-  const removePesee = (date: string) => {
-    // Pierre tombale : la pesée supprimée ne reviendra pas d'un autre appareil.
-    const tomb = load<Record<string, number>>("calorio.peseesDeleted", {}); tomb[date] = Date.now(); save("calorio.peseesDeleted", tomb);
-    setPesees((prev) => prev.filter((p) => p.date !== date));
-  };
+  const removePesee = (date: string) => setPesees((prev) => prev.filter((p) => p.date !== date));
 
   // Rendu identique côté serveur et au 1er rendu client (mounted=false) → évite les erreurs
   // d'hydratation (formatage Intl / valeurs issues du localStorage divergentes). L'app interactive
@@ -2304,7 +2369,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               <b>{syncState === "error" ? `⚠️ ${x.syncErr}` : syncState === "syncing" ? `☁️ ${x.syncing}` : `☁️ ${t.synced}`}{proDb && <span className="cl-acc-pro">Pro</span>}</b>
               <span>{user.email}</span>
             </div>
-            <button className="cl-login-out" onClick={signOut} title={x.logoutWarn}>{t.logout}</button>
+            <button className="cl-login-out" onClick={signOut} disabled={logoutBusy} title={x.logoutWarn}>{logoutBusy ? "…" : t.logout}</button>
           </>
         ) : (
           <>
@@ -3178,6 +3243,19 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         </div>
       )}
 
+      {logoutAsk && (
+        <div className="cl-scanoverlay" onClick={() => setLogoutAsk(false)}>
+          <div className="cl-authpanel" role="dialog" aria-modal="true" aria-label={t.logout} onClick={(e) => e.stopPropagation()}>
+            <div className="cl-auth-h">{t.logout}</div>
+            <p className="cl-auth-s">{x.logoutUnsynced}</p>
+            <div className="cl-datarow">
+              <button className="cl-databtn" onClick={() => setLogoutAsk(false)}>{x.cancel}</button>
+              <button className="cl-databtn danger" onClick={() => finishSignOut(false)}>{x.logoutKeep}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {authOpen && !user && (
         <div className="cl-scanoverlay" onClick={() => setAuthOpen(false)}>
           <div className="cl-authpanel" role="dialog" aria-modal="true" aria-label={t.authTitle} onClick={(e) => e.stopPropagation()}>
@@ -3234,7 +3312,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         const meta = tr ? x.tro[tr.id] : ["", ""];
         return (
           <div className="cl-scanoverlay cl-trofx" onClick={() => setNewTrophy("")}>
-            <div className="cl-tromodal" onClick={(e) => e.stopPropagation()}>
+            <div className="cl-tromodal" role="dialog" aria-modal="true" aria-label={x.troToast} onClick={(e) => e.stopPropagation()}>
               <div className="cl-troburst" aria-hidden>{["🎉", "✨", "🎊", "⭐", "🌟", "✨", "🎉", "⭐"].map((c, i) => <span key={i} style={{ "--i": i } as CSSProperties}>{c}</span>)}</div>
               <div className="cl-tromodal-emo">{tr?.emo}</div>
               <div className="cl-tromodal-h">🏆 {x.troToast}</div>

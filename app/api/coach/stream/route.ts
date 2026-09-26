@@ -26,7 +26,8 @@ export async function POST(req: Request) {
 
   // Garde-fou serveur (origine, Pro vérifié en base, essais gratuits, quotas) — après validation,
   // pour qu'une requête malformée ne consomme pas d'essai. 402 = Pro requis, 429 = quota atteint.
-  const blocked = await coachGuard(req);
+  const gate = await coachGuard(req);
+  const blocked = gate.status;
   if (blocked) return new Response(blocked === 402 ? "pro_required" : blocked === 429 ? "rate_limited" : blocked === 503 ? "busy" : "forbidden", { status: blocked });
 
   const sys = persona(lang) + "\n\n" + contextBlock(ctx);
@@ -76,8 +77,10 @@ export async function POST(req: Request) {
         }
       } catch { /* coupure réseau : on clôt proprement avec ce qu'on a */ }
       if (sent === 0) {
-        // rien reçu : signale au client de basculer sur le repli non-streaming
+        // rien reçu : signale au client de basculer sur le repli non-streaming (aucun essai consommé)
         controller.enqueue(encoder.encode("\u0000EMPTY"));
+      } else {
+        await gate.consume(); // essai décompté seulement pour une vraie réponse
       }
       controller.close();
     },

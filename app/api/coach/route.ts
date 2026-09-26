@@ -74,21 +74,23 @@ export async function POST(req: Request) {
         };
         const reply = data.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("").trim();
         if (!reply) {
+          await gate.refund(); // pas de vraie réponse : l'essai est rendu
           const blocked = data.promptFeedback?.blockReason;
           return NextResponse.json({ reply: blocked ? "Désolé, je préfère ne pas répondre à ça — on reste sur la nutrition ? 🥕" : "Hmm, je n'ai pas de réponse là. Reformule ?" });
         }
-        await gate.consume(); // essai décompté seulement pour une vraie réponse
-        return NextResponse.json({ reply });
+        return NextResponse.json({ reply }); // l'essai réservé est consommé
       }
       lastStatus = r.status;
       lastDetail = (await r.text().catch(() => "")).slice(0, 300);
       if (r.status === 404) break;
       const retryable = r.status === 503 || r.status === 429 || r.status === 500 || r.status === 502;
       if (!retryable) {
+        await gate.refund();
         return NextResponse.json({ error: "gemini_error", status: r.status, message: lastDetail }, { status: 502 });
       }
       await sleep(400 * (attempt + 1));
     }
   }
+  await gate.refund();
   return NextResponse.json({ reply: busyMsg, busy: true, lastStatus });
 }

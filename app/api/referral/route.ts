@@ -69,7 +69,7 @@ async function proRow(uid: string): Promise<ProR | null> {
 
 // Offre REWARD_DAYS jours de Pro, sans jamais rétrograder : ni un abonnement payant en cours,
 // ni un Pro offert sans date de fin (plan « comp »). Renvoie false si rien n'a été ajouté.
-async function grantBonus(uid: string): Promise<boolean> {
+async function grantBonus(uid: string, idem?: string): Promise<boolean> {
   const cur = await proRow(uid);
   const now = Date.now();
   const untilMs = cur?.pro_until ? new Date(cur.pro_until).getTime() : 0;
@@ -81,7 +81,8 @@ async function grantBonus(uid: string): Promise<boolean> {
     const f = new URLSearchParams();
     f.set("amount", "-490"); f.set("currency", "chf");
     f.set("description", "calorio — 1 mois offert (parrainage)");
-    const r = await stripe(`customers/${encodeURIComponent(cur.stripe_customer_id)}/balance_transactions`, "POST", f);
+    // Clé d'idempotence : un nouvel essai ne crédite jamais deux fois le même parrainage.
+    const r = await stripe(`customers/${encodeURIComponent(cur.stripe_customer_id)}/balance_transactions`, "POST", f, idem);
     return r.ok;
   }
   const base = Math.max(now, untilMs);
@@ -147,7 +148,7 @@ export async function POST(req: Request) {
       });
       const done = upd.ok ? ((await upd.json()) as unknown[]) : [];
       if (!done.length) continue; // PATCH conditionnel : jamais deux fois
-      if (await grantBonus(uid)) rewarded++;
+      if (await grantBonus(uid, `calorio-ref-${ref.id}-referrer`)) rewarded++;
       else await unmark(`calorio_referrals?id=eq.${ref.id}`, { reward_granted: false }); // rien n'a pu être offert : on réessaiera
     }
     // Côté filleul : son mois offert arrive dès qu'il est actif.
@@ -162,7 +163,7 @@ export async function POST(req: Request) {
       });
       const done = upd.ok ? ((await upd.json()) as unknown[]) : [];
       if (done.length) {
-        refereeRewardedNow = await grantBonus(uid);
+        refereeRewardedNow = await grantBonus(uid, `calorio-ref-${asRef[0].id}-referee`);
         if (!refereeRewardedNow) await unmark(`calorio_referrals?id=eq.${asRef[0].id}`, { referee_rewarded: false });
       }
     }

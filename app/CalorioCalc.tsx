@@ -353,6 +353,7 @@ const LX = {
     reached: "atteint",
     logoutUnsynced: "Certaines données ne sont pas encore dans ton compte (pas de connexion ?). Tu peux te déconnecter quand même : elles resteront sur cet appareil et reviendront dans ton compte à ta prochaine connexion.", logoutKeep: "Me déconnecter",
     refRewarded: "🎉 Tu as utilisé calorio 3 jours : 1 mois de Pro offert est activé !",
+    quotaFull: "La mémoire de ce navigateur est pleine : tes dernières saisies risquent de ne pas être gardées. Connecte-toi pour les sauvegarder dans ton compte, ou télécharge une copie.",
     myDay: "Ma journée", meals: { matin: "Petit-déjeuner", midi: "Déjeuner", snack: "Collations", soir: "Dîner" },
     addShort: "Ajouter", addMealSoir: "Ajouter ton repas du soir",
     act: {
@@ -440,6 +441,7 @@ const LX = {
     reached: "erreicht",
     logoutUnsynced: "Einige Daten sind noch nicht in deinem Konto (keine Verbindung?). Du kannst dich trotzdem abmelden: sie bleiben auf diesem Gerät und kommen bei der nächsten Anmeldung in dein Konto.", logoutKeep: "Abmelden",
     refRewarded: "🎉 3 Tage calorio: dein Gratis-Monat Pro ist aktiviert!",
+    quotaFull: "Der Speicher dieses Browsers ist voll: deine letzten Einträge werden eventuell nicht gespeichert. Melde dich an, um sie im Konto zu sichern, oder lade eine Kopie herunter.",
     myDay: "Mein Tag", meals: { matin: "Frühstück", midi: "Mittagessen", snack: "Snacks", soir: "Abendessen" },
     addShort: "Hinzufügen", addMealSoir: "Abendessen hinzufügen",
     act: {
@@ -527,6 +529,7 @@ const LX = {
     reached: "reached",
     logoutUnsynced: "Some data isn't in your account yet (no connection?). You can still sign out: it stays on this device and goes back to your account next time you sign in.", logoutKeep: "Sign out",
     refRewarded: "🎉 3 days of calorio: your free month of Pro is now active!",
+    quotaFull: "This browser's storage is full: your latest entries may not be kept. Sign in to save them to your account, or download a copy.",
     myDay: "My day", meals: { matin: "Breakfast", midi: "Lunch", snack: "Snacks", soir: "Dinner" },
     addShort: "Add", addMealSoir: "Add your dinner",
     act: {
@@ -702,11 +705,69 @@ function load<T>(k: string, fallback: T): T {
     return fallback;
   }
 }
+// Pendant un changement de compte sur l'appareil, plus aucune écriture (évite qu'un ancien état
+// ne se réécrive après la mise de côté des données).
+let SAVE_BLOCKED = false;
 function save(k: string, v: unknown) {
+  if (SAVE_BLOCKED) return;
   try {
     localStorage.setItem(k, JSON.stringify(v));
+  } catch (e) {
+    // Stockage plein : on prévient l'app (message à l'écran) au lieu de perdre des saisies en silence.
+    const name = (e as { name?: string })?.name || "";
+    if (/quota/i.test(name) && typeof window !== "undefined") window.dispatchEvent(new Event("calorio-quota"));
+  }
+}
+
+// --- Appareil partagé : les données appartiennent à un compte ---
+// Données d'un autre compte (gardées lors d'une déconnexion hors ligne) : mises de côté au lieu d'être
+// versées dans le compte qui se connecte, puis restaurées quand leur propriétaire revient (30 jours max).
+const KEEP_KEYS = new Set(["calorio.lang", "calorio.theme"]);
+function userKeysLS(): string[] {
+  const out: string[] = [];
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith("calorio.") && !KEEP_KEYS.has(k) && !k.startsWith("calorio.stash.")) out.push(k); } } catch { /* ignore */ }
+  return out;
+}
+function sessionUidLS(): string {
+  try {
+    const raw = localStorage.getItem("sb-srcvnqfgtazupuzwznrr-auth-token");
+    const o = raw ? (JSON.parse(raw) as { user?: { id?: string } }) : null;
+    return o?.user?.id || "";
+  } catch { return ""; }
+}
+/** true si le contenu du stockage a changé (l'écran doit alors être rechargé). */
+function switchOwnerLS(uid: string): boolean {
+  if (!uid) return false;
+  try {
+    // Purge des mises de côté trop anciennes.
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (!k || !k.startsWith("calorio.stash.")) continue;
+      try {
+        const st = JSON.parse(localStorage.getItem(k) || "{}") as { at?: number; data?: unknown };
+        if (!st.at) localStorage.setItem(k, JSON.stringify({ at: Date.now(), data: st.data ?? st })); // ancien format
+        else if (Date.now() - st.at > 30 * 86400000) localStorage.removeItem(k);
+      } catch { localStorage.removeItem(k); }
+    }
+    let changed = false;
+    const owner = localStorage.getItem("calorio.owner");
+    if (owner && owner !== uid) {
+      const data: Record<string, string> = {};
+      for (const k of userKeysLS()) { const v = localStorage.getItem(k); if (v !== null) data[k] = v; localStorage.removeItem(k); }
+      localStorage.setItem(`calorio.stash.${owner}`, JSON.stringify({ at: Date.now(), data }));
+      changed = true;
+    }
+    const mine = localStorage.getItem(`calorio.stash.${uid}`);
+    if (mine && (changed || !owner || owner === uid)) {
+      const st = JSON.parse(mine) as { data?: Record<string, string> };
+      for (const [k, v] of Object.entries(st.data || {})) if (changed || localStorage.getItem(k) === null) localStorage.setItem(k, v);
+      localStorage.removeItem(`calorio.stash.${uid}`);
+      changed = true;
+    }
+    if (changed) localStorage.setItem("calorio.owner", uid);
+    return changed;
   } catch {
-    /* stockage indisponible : on ignore */
+    return false;
   }
 }
 
@@ -857,6 +918,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [mealMsg, setMealMsg] = useState("");
   const [coachSeed, setCoachSeed] = useState("");
   const [coachPrefs, setCoachPrefs] = useState<CoachPrefs>({});
+  const [coachVersion, setCoachVersion] = useState(0); // recharge Vito après une synchro qui le concerne
+  const [quotaFull, setQuotaFull] = useState(false);
   const [convTick, setConvTick] = useState(0); // bump quand une conversation Vito change → déclenche la synchro
   // Synchro cloud : on n'envoie RIEN tant que le cloud n'a pas été lu et fusionné (sinon un appareil
   // vierge pourrait écraser l'historique). État affiché honnêtement à l'utilisateur.
@@ -937,6 +1000,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
   // chargement mémoire
   useEffect(() => {
+    // Appareil partagé : on range les données du bon compte AVANT de lire quoi que ce soit.
+    switchOwnerLS(sessionUidLS());
     const p = load("calorio.profil", null as null | Record<string, unknown>);
     if (p) {
       if (p.sexe) setSexe(p.sexe as Sexe);
@@ -1249,38 +1314,17 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // Fusion cloud → appareil. Renvoie le document fusionné (celui qu'on enverra).
   const mergeCloudData = (data: { profil?: unknown; journal?: unknown; pesees?: unknown } | null): SyncDoc => {
     const base = load<SyncDoc | null>("calorio.syncBase", null);
-    const merged = mergeDoc(base, localDoc(), cloudDoc(data));
+    const before = localDoc();
+    const merged = mergeDoc(base, before, cloudDoc(data));
     applyDoc(merged);
+    // Vito garde son propre état : on le recharge si ses favoris ou sa conversation ont changé ailleurs.
+    if (JSON.stringify(before.favs) !== JSON.stringify(merged.favs) || (merged.coachActive?.updated || 0) > (before.coachActive?.updated || 0)) {
+      setCoachVersion((v) => v + 1);
+    }
     return merged;
   };
 
-  // Données d'un autre compte sur cet appareil (déconnexion hors ligne) : on les met de côté au lieu
-  // de les fusionner dans le compte qui se connecte, et on les restaure si leur propriétaire revient.
-  const USER_KEYS_KEEP = new Set(["calorio.lang", "calorio.theme"]);
-  const userKeys = () => {
-    const out: string[] = [];
-    try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith("calorio.") && !USER_KEYS_KEEP.has(k) && !k.startsWith("calorio.stash.")) out.push(k); } } catch { /* ignore */ }
-    return out;
-  };
-  const switchOwner = (uid: string) => {
-    try {
-      const owner = localStorage.getItem("calorio.owner");
-      if (owner && owner !== uid) {
-        const stash: Record<string, string> = {};
-        for (const k of userKeys()) { const v = localStorage.getItem(k); if (v !== null) stash[k] = v; localStorage.removeItem(k); }
-        localStorage.setItem(`calorio.stash.${owner}`, JSON.stringify(stash));
-        const mine = localStorage.getItem(`calorio.stash.${uid}`);
-        if (mine) {
-          const obj = JSON.parse(mine) as Record<string, string>;
-          for (const [k, v] of Object.entries(obj)) localStorage.setItem(k, v);
-          localStorage.removeItem(`calorio.stash.${uid}`);
-        }
-        localStorage.setItem("calorio.owner", uid);
-        return true; // l'écran doit être rechargé depuis le stockage
-      }
-    } catch { /* ignore */ }
-    return false;
-  };
+  const userKeys = userKeysLS;
 
   // Statut Pro depuis la base (source de vérité) → état + cache d'affichage local.
   const refreshPro = async (uid: string) => {
@@ -1302,7 +1346,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     syncReadyRef.current = false;
     setSyncState("syncing");
     try {
-      if (switchOwner(uid)) { window.location.reload(); return; }
+      if (switchOwnerLS(uid)) { SAVE_BLOCKED = true; window.location.reload(); return; }
       const { data, error } = await supa.from("calorio_users").select("profil,journal,pesees").eq("id", uid).maybeSingle();
       if (error) throw error;
       if (data) { mergeCloudData(data); setAuthMsg(""); }
@@ -1486,6 +1530,13 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // Synchro : relire le cloud, fusionner élément par élément (trois voies), écrire, puis mémoriser
   // ce qui a été envoyé comme nouvelle base. Une seule synchro à la fois ; les demandes pendant une
   // synchro en cours sont regroupées dans une synchro suivante.
+  // Compte supprimé (depuis un autre appareil) : déconnexion et effacement des données de cet appareil.
+  const accountGone = async () => {
+    SAVE_BLOCKED = true;
+    await getSupabase()?.auth.signOut().catch(() => {});
+    try { userKeysLS().forEach((k) => localStorage.removeItem(k)); } catch { /* ignore */ }
+    window.location.reload();
+  };
   const syncNow = (uid: string): Promise<boolean> => {
     if (syncPromiseRef.current) { pendingSyncRef.current = true; return syncPromiseRef.current; }
     const run = (async () => {
@@ -1493,17 +1544,52 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       if (!supa || !syncReadyRef.current) return false;
       setSyncState("syncing");
       try {
-        const { data, error } = await supa.from("calorio_users").select("profil,journal,pesees").eq("id", uid).maybeSingle();
-        if (error) throw error;
-        const merged = mergeCloudData(data);
-        const row = cloudRow(uid, merged);
-        const { error: e2 } = await supa.from("calorio_users").upsert(row);
-        if (e2) {
-          // 23503 : le compte a été supprimé depuis un autre appareil → on se déconnecte ici au lieu de réessayer sans fin.
-          if ((e2 as { code?: string }).code === "23503") { await supa.auth.signOut().catch(() => {}); return false; }
-          throw e2;
+        // Écriture conditionnelle : on n'écrit que si la ligne n'a pas changé depuis notre lecture
+        // (sinon un autre appareil vient d'écrire → on relit et on refusionne). Jusqu'à 4 tentatives.
+        for (let attempt = 0; ; attempt++) {
+          const { data, error } = await supa.from("calorio_users").select("profil,journal,pesees,updated_at").eq("id", uid).maybeSingle();
+          if (error) throw error;
+          const hasBase = !!load("calorio.syncBase", null);
+          // Aucune ligne lue alors qu'on a déjà synchronisé : lecture anormale (session, droits) → on ne fusionne
+          // SURTOUT pas (tout paraîtrait « supprimé ailleurs »).
+          if (!data && hasBase) {
+            // Compte supprimé depuis un autre appareil ? → on se déconnecte ici au lieu de réessayer sans fin.
+            const { error: ue } = await supa.auth.getUser();
+            if (ue && /not.?found|user.*(missing|exist)|403|401/i.test(`${ue.message} ${(ue as { status?: number }).status ?? ""}`)) {
+              await accountGone();
+              return false;
+            }
+            throw new Error("empty_read");
+          }
+          const merged = mergeCloudData(data);
+          const row = cloudRow(uid, merged);
+          let conflict = false;
+          if (data) {
+            const readAt = (data as { updated_at?: string }).updated_at;
+            const q = supa.from("calorio_users").update(row).eq("id", uid);
+            const { data: upd, error: e2 } = await (readAt ? q.eq("updated_at", readAt) : q).select("id");
+            if (e2) {
+              if ((e2 as { code?: string }).code === "23503") { await accountGone(); return false; }
+              throw e2;
+            }
+            conflict = !upd || upd.length === 0;
+          } else {
+            const { error: e2 } = await supa.from("calorio_users").insert(row);
+            if (e2) {
+              const code = (e2 as { code?: string }).code;
+              // 23503 : compte supprimé ailleurs → on se déconnecte ici au lieu de réessayer sans fin.
+              if (code === "23503") { await accountGone(); return false; }
+              if (code === "23505") conflict = true; // créée entre-temps par un autre appareil
+              else throw e2;
+            }
+          }
+          if (!conflict) {
+            // La base = exactement ce qui est parti dans le cloud (bornes comprises).
+            save("calorio.syncBase", cloudDoc(row));
+            break;
+          }
+          if (attempt >= 3) throw new Error("conflict");
         }
-        save("calorio.syncBase", merged);
         lastSyncRef.current = Date.now();
         setSyncState("ok");
         retryRef.current = 0;
@@ -1547,6 +1633,28 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     document.addEventListener("visibilitychange", onVis);
     return () => document.removeEventListener("visibilitychange", onVis);
   }, [user]);
+
+  // Plusieurs onglets / app installée + navigateur : quand un autre onglet modifie les données, on relit
+  // le stockage ici (sinon cet onglet réécrirait son état périmé et effacerait les saisies de l'autre).
+  useEffect(() => {
+    if (!mounted) return;
+    let t: ReturnType<typeof setTimeout> | null = null;
+    let coach = false;
+    const onStorage = (e: StorageEvent) => {
+      if (!e.key || !e.key.startsWith("calorio.") || e.key === "calorio.syncBase" || e.key.startsWith("calorio.stash.")) return;
+      if (e.key.startsWith("calorio.coach.")) coach = true;
+      if (t) clearTimeout(t);
+      t = setTimeout(() => {
+        applyDoc(localDoc());
+        if (coach) { coach = false; setCoachVersion((v) => v + 1); }
+      }, 60);
+    };
+    const onQuota = () => setQuotaFull(true);
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("calorio-quota", onQuota);
+    return () => { if (t) clearTimeout(t); window.removeEventListener("storage", onStorage); window.removeEventListener("calorio-quota", onQuota); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
 
   // Nouvel essai programmé après une erreur : relire/fusionner si la 1re lecture a échoué, sinon renvoyer.
   useEffect(() => {
@@ -2359,6 +2467,12 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       )}
 
       <div className="cl-amb" aria-hidden />
+      {quotaFull && (
+        <div className="cl-pastbar cl-quota" role="alert">
+          <span>⚠️ {x.quotaFull}</span>
+          <button onClick={exportData}>{x.exportBtn}</button>
+        </div>
+      )}
 
       {/* ===== Bannière login ===== */}
       <div className="cl-login">
@@ -2825,7 +2939,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         {/* ========== 4. VITO (coach) ========== */}
         {tab === "coach" && (
           <div className="cl-screen play cl-coachwrap" key="coach">
-            <CoachNutri ctx={coachCtx} isPro={proActive} onGoPro={goPro} seed={coachSeed} onConsumeSeed={() => setCoachSeed("")} onAddDetected={addFromCoach} onPrefsChange={updateCoachPrefs} onConvChange={() => setConvTick((n) => n + 1)} />
+            <CoachNutri key={coachVersion} ctx={coachCtx} isPro={proActive} onGoPro={goPro} seed={coachSeed} onConsumeSeed={() => setCoachSeed("")} onAddDetected={addFromCoach} onPrefsChange={updateCoachPrefs} onConvChange={() => setConvTick((n) => n + 1)} />
           </div>
         )}
 
@@ -3604,6 +3718,7 @@ const CSS = `
 .cl-pastbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:14px;background:#fff6dd;border:1px solid #f1d98a;color:#5a4410;font-size:.84rem;font-weight:700}
 .cl[data-theme="dark"] .cl-pastbar{background:#3a3114;border-color:#6b5a1f;color:#f5e3a8}
 .cl-pastbar button{border:0;background:#5a4410;color:#fff;border-radius:99px;padding:6px 12px;font-weight:800;font-size:.78rem;cursor:pointer;white-space:nowrap}
+.cl-quota{position:relative;z-index:5;margin:8px 12px 0}
 .cl-kcalpop{position:fixed;left:50%;top:20%;transform:translateX(-50%);z-index:130;pointer-events:none;white-space:nowrap;font-family:var(--disp);font-weight:800;font-size:1.15rem;color:#fff;background:linear-gradient(180deg,#43d488,#16a34a);padding:9px 18px;border-radius:99px;box-shadow:0 14px 32px -8px rgba(20,140,70,.6),inset 0 1px 0 rgba(255,255,255,.45);animation:clkcalpop 1.15s cubic-bezier(.22,1,.36,1) forwards}
 @keyframes clkcalpop{0%{opacity:0;transform:translateX(-50%) translateY(16px) scale(.8)}18%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.04)}30%{transform:translateX(-50%) translateY(0) scale(1)}72%{opacity:1;transform:translateX(-50%) translateY(-8px) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-46px) scale(.95)}}
 .cl-ringcard.glow{animation:clringglow 2.6s ease-in-out infinite}

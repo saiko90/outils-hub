@@ -58,6 +58,31 @@ export function merge3Value<T>(hasBase: boolean, base: T | undefined, local: T |
   return local;
 }
 
+/** Réglages champ par champ (poids changé sur un appareil, âge sur l'autre → les deux sont gardés). */
+export function mergeFields(hasBase: boolean, base: Record<string, unknown> | undefined, local: Record<string, unknown> | undefined, cloud: Record<string, unknown> | undefined): Record<string, unknown> | undefined {
+  if (!local && !cloud) return undefined;
+  if (!cloud) return local;
+  if (!local) return cloud;
+  const out: Record<string, unknown> = {};
+  for (const k of new Set([...Object.keys(local), ...Object.keys(cloud)])) {
+    const v = merge3Value(hasBase, base?.[k], local[k], cloud[k]);
+    if (v !== undefined) out[k] = v;
+  }
+  return out;
+}
+
+/** Compteur par jour (verres d'eau) : on additionne ce que chaque appareil a ajouté depuis la base. */
+export function mergeCounters(base: Record<string, number> | null, local: Record<string, number>, cloud: Record<string, number>): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const d of new Set([...Object.keys(local || {}), ...Object.keys(cloud || {})])) {
+    const l = local?.[d] ?? 0, c = cloud?.[d] ?? 0;
+    if (!base) { out[d] = Math.max(l, c); continue; }
+    const b = base[d] ?? 0;
+    out[d] = Math.max(0, c + (l - b));
+  }
+  return out;
+}
+
 /* ---------- aplatissement des structures calorio en tables clé → valeur ---------- */
 
 const SEP = "\u0001";
@@ -134,11 +159,15 @@ const byDate = (x: { date?: string }) => (typeof x?.date === "string" ? x.date :
 export function mergeDoc(base: SyncDoc | null, local: SyncDoc, cloud: SyncDoc): SyncDoc {
   const hb = !!base;
   const B = base || emptyDoc();
-  const days = (f: (d: SyncDoc) => Record<string, unknown[]>) =>
-    unflattenDays(merge3(hb ? flattenDays(f(B)) : null, flattenDays(f(local)), flattenDays(f(cloud))));
+  // Jours : fusion élément par élément, puis ordre chronologique stable (les clés commencent par l'heure de saisie).
+  const days = (f: (d: SyncDoc) => Record<string, unknown[]>) => {
+    const m = merge3(hb ? flattenDays(f(B)) : null, flattenDays(f(local)), flattenDays(f(cloud)));
+    const sorted = new Map([...m.entries()].sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)));
+    return unflattenDays(sorted);
+  };
   const list = <T extends object>(f: (d: SyncDoc) => T[], idOf: (x: T) => string | undefined) =>
     Array.from(merge3(hb ? flattenList(f(B), idOf) : null, flattenList(f(local), idOf), flattenList(f(cloud), idOf)).values());
-  const water = Object.fromEntries(merge3(hb ? flattenNumbers(B.water) : null, flattenNumbers(local.water), flattenNumbers(cloud.water)));
+  const water = mergeCounters(hb ? B.water : null, local.water || {}, cloud.water || {});
   const pesees = list((d) => d.pesees, byDate).sort((a, b) => a.date.localeCompare(b.date));
   // Conversation Vito active : la plus récente.
   const ca = local.coachActive, cc = cloud.coachActive;
@@ -150,10 +179,10 @@ export function mergeDoc(base: SyncDoc | null, local: SyncDoc, cloud: SyncDoc): 
     pesees,
     meals: list((d) => d.meals, byId).slice(0, 30),
     foods: list((d) => d.foods, byId).slice(0, 200),
-    favs: list((d) => d.favs, byId).slice(0, 50),
-    profil: merge3Value(hb, B.profil, local.profil, cloud.profil),
+    favs: list((d) => d.favs, byId).slice(0, 20),
+    profil: mergeFields(hb, B.profil, local.profil, cloud.profil),
     waterGoal: merge3Value(hb, B.waterGoal, local.waterGoal, cloud.waterGoal),
-    coachPrefs: merge3Value(hb, B.coachPrefs, local.coachPrefs, cloud.coachPrefs),
+    coachPrefs: mergeFields(hb, B.coachPrefs, local.coachPrefs, cloud.coachPrefs),
     fast: merge3Value(hb, B.fast, local.fast, cloud.fast),
     // Trophées et actions : ne font que croître → union.
     trophies: { ...cloud.trophies, ...local.trophies },

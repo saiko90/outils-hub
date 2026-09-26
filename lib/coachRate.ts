@@ -4,12 +4,12 @@
 // - Non-Pro : 3 messages d'essai, comptés côté serveur après chaque vraie réponse (à vie pour un compte,
 //   par jour et par réseau sans compte).
 // - Filet global par IP et par jour.
-import { authUser, proStatus, dailyQuota, freeUsed, consumeFree, clientIp, ipFingerprint } from "@/lib/serverAuth";
+import { authUser, proStatus, dailyQuota, lifetimeQuota, refundFree, clientIp, ipFingerprint } from "@/lib/serverAuth";
 
 const ALLOWED_HOSTS = ["calorio.ch", "outils.ch", "localhost", "127.0.0.1"];
 export const IP_DAILY_MAX = 60; // filet anti-script (plusieurs appareils derrière une même box)
 export const PRO_DAILY_MAX = 40; // le client s'arrête à 20/jour ; marge pour le repli non-streaming
-export const FREE_TRIES = 3; // décomptés seulement après une vraie réponse
+export const FREE_TRIES = 3; // réservés atomiquement, rendus si le coach ne répond pas
 
 // Les clients sans Origin (certaines WebView natives) passent — les quotas les couvrent.
 export function originAllowed(req: Request): boolean {
@@ -25,7 +25,7 @@ export function originAllowed(req: Request): boolean {
 
 export { clientIp };
 
-export type CoachGate = { status: number | null; consume: () => Promise<void> };
+export type CoachGate = { status: number | null; refund: () => Promise<void> };
 const nothing = async () => {};
 function swissDay(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Zurich" }).format(new Date());
@@ -33,26 +33,24 @@ function swissDay(): string {
 
 /**
  * status null = autorisé ; sinon statut HTTP à renvoyer (403 origine, 429 quota, 402 Pro requis, 503 statut inconnu).
- * `consume` décompte l'essai gratuit : à appeler UNIQUEMENT après une vraie réponse du coach
- * (un échec ou un repli streaming → non-streaming ne coûte donc aucun essai).
+ * L'essai gratuit est RÉSERVÉ de façon atomique avant l'appel (des requêtes en parallèle ne peuvent pas dépasser
+ * la limite) ; `refund` le rend si le coach n'a finalement pas répondu.
  */
 export async function coachGuard(req: Request): Promise<CoachGate> {
-  if (!originAllowed(req)) return { status: 403, consume: nothing };
+  if (!originAllowed(req)) return { status: 403, refund: nothing };
   const user = await authUser(req);
   if (user) {
     const pro = await proStatus(user.id);
-    if (pro === null) return { status: 503, consume: nothing }; // base injoignable : on ne touche pas aux essais
-    // Pro : quota par compte uniquement (pas de plafond par IP, qui bloquerait des abonnés derrière
-    // un même réseau d'opérateur ou d'entreprise).
-    if (pro) return { status: (await dailyQuota(`coach:u:${user.id}`, PRO_DAILY_MAX)) ? null : 429, consume: nothing };
+    if (pro === null) return { status: 503, refund: nothing }; // base injoignable : on ne touche pas aux essais
+    // Pro : quota par compte uniquement (pas de plafond par IP).
+    if (pro) return { status: (await dailyQuota(`coach:u:${user.id}`, PRO_DAILY_MAX)) ? null : 429, refund: nothing };
   }
   // Non-Pro / anonyme : filet par IP (empreinte HMAC), puis essais gratuits.
   const ip = await ipFingerprint(req);
-  if (ip !== "unknown" && !(await dailyQuota(`coach:ip:${ip}`, IP_DAILY_MAX))) return { status: 429, consume: nothing };
-  // Compte gratuit : essais « à vie » du compte. Sans compte : essais par jour et par réseau (un réseau 4G
-  // partagé ne bloque donc personne définitivement).
+  if (ip !== "unknown" && !(await dailyQuota(`coach:ip:${ip}`, IP_DAILY_MAX))) return { status: 429, refund: nothing };
+  // Compte gratuit : essais « à vie » du compte. Sans compte : par jour et par réseau.
   const key = user ? `coach:u:${user.id}` : ip === "unknown" ? "" : `coach:anon:${ip}:${swissDay()}`;
-  if (!key) return { status: null, consume: nothing };
-  if ((await freeUsed(key)) >= FREE_TRIES) return { status: 402, consume: nothing };
-  return { status: null, consume: () => consumeFree(key) };
+  if (!key) return { status: null, refund: nothing };
+  if (!(await lifetimeQuota(key, FREE_TRIES))) return { status: 402, refund: nothing };
+  return { status: null, refund: () => refundFree(key) };
 }

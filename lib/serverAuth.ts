@@ -83,6 +83,14 @@ export async function consumeFree(key: string): Promise<void> {
   } catch { /* ignore */ }
 }
 
+/** Rend un essai réservé (le coach n'a pas répondu). */
+export async function refundFree(key: string): Promise<void> {
+  if (!svcKey()) return;
+  try {
+    await fetch(`${SB_URL}/rest/v1/rpc/ai_free_refund`, { method: "POST", headers: svcHeaders(), body: JSON.stringify({ p_key: key }) });
+  } catch { /* ignore */ }
+}
+
 /** Quota « à vie » (essais gratuits). true = encore autorisé. */
 export async function lifetimeQuota(key: string, max: number): Promise<boolean> {
   if (!svcKey()) return true;

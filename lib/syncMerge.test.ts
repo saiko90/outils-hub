@@ -83,3 +83,23 @@ describe("mergeDoc — scénario de l'audit (deux appareils, même jour)", () =>
     expect(r.streakBest).toBe(30);
   });
 });
+
+describe("améliorations du 4e audit", () => {
+  it("profil fusionné champ par champ", async () => {
+    const { mergeFields } = await import("./syncMerge");
+    const base = { poids: 60, age: 30 };
+    expect(mergeFields(true, base, { poids: 58, age: 30 }, { poids: 60, age: 31 })).toEqual({ poids: 58, age: 31 });
+  });
+  it("eau : les verres ajoutés sur deux appareils s'additionnent", async () => {
+    const { mergeCounters } = await import("./syncMerge");
+    expect(mergeCounters({ d: 2 }, { d: 4 }, { d: 3 })).toEqual({ d: 5 });
+    expect(mergeCounters(null, { d: 4 }, { d: 3 })).toEqual({ d: 4 });
+  });
+  it("ordre chronologique identique sur tous les appareils", () => {
+    const a = { key: "1700000000001-a" }, b = { key: "1700000000002-b" };
+    const r1 = mergeDoc(null, doc({ journal: { d: [b] } }), doc({ journal: { d: [a] } }));
+    const r2 = mergeDoc(null, doc({ journal: { d: [a] } }), doc({ journal: { d: [b] } }));
+    expect(r1.journal.d).toEqual(r2.journal.d);
+    expect((r1.journal.d[0] as { key: string }).key).toBe(a.key);
+  });
+});

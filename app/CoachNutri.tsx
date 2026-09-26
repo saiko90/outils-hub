@@ -290,9 +290,28 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
 
   // Persistance (survit au démontage lors d'un changement d'onglet et au rechargement).
   // onConvChange prévient le parent pour une synchro cloud (téléphone ↔ ordinateur).
-  useEffect(() => { if (ready) { saveJSON(AK, { id: activeId, msgs, updated: Date.now() }); onConvChange?.(); } }, [ready, activeId, msgs]); // eslint-disable-line react-hooks/exhaustive-deps
+  // On ne date la conversation que si elle a réellement changé (ouvrir Vito ne déclenche plus de synchro).
+  const lastConvRef = useRef("");
+  useEffect(() => {
+    if (!ready) return;
+    const sig = JSON.stringify({ activeId, msgs });
+    if (!lastConvRef.current) { lastConvRef.current = sig; return; } // 1er passage : état chargé, rien de neuf
+    if (sig === lastConvRef.current) return;
+    lastConvRef.current = sig;
+    saveJSON(AK, { id: activeId, msgs, updated: Date.now() });
+    onConvChange?.();
+  }, [ready, activeId, msgs]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (ready) saveJSON(RK, recent); }, [ready, recent]);
-  useEffect(() => { if (ready) { saveJSON(FK, favs); onConvChange?.(); } }, [ready, favs]); // eslint-disable-line react-hooks/exhaustive-deps
+  const lastFavsRef = useRef("");
+  useEffect(() => {
+    if (!ready) return;
+    const sig = JSON.stringify(favs);
+    if (!lastFavsRef.current) { lastFavsRef.current = sig; return; } // état chargé : rien à envoyer
+    if (sig === lastFavsRef.current) return;
+    lastFavsRef.current = sig;
+    saveJSON(FK, favs);
+    onConvChange?.();
+  }, [ready, favs]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight;

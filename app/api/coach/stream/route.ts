@@ -50,7 +50,7 @@ export async function POST(req: Request) {
       // non-ok → on essaie le modèle suivant (le client repliera si tout échoue)
     } catch { clearTimeout(to); }
   }
-  if (!upstream || !upstream.body) return new Response("upstream_unavailable", { status: 503 });
+  if (!upstream || !upstream.body) { await gate.refund(); return new Response("upstream_unavailable", { status: 503 }); }
 
   const reader = upstream.body.getReader();
   const decoder = new TextDecoder();
@@ -77,10 +77,9 @@ export async function POST(req: Request) {
         }
       } catch { /* coupure réseau : on clôt proprement avec ce qu'on a */ }
       if (sent === 0) {
-        // rien reçu : signale au client de basculer sur le repli non-streaming (aucun essai consommé)
+        // rien reçu : l'essai est rendu, et le client bascule sur le repli non-streaming
+        await gate.refund();
         controller.enqueue(encoder.encode("\u0000EMPTY"));
-      } else {
-        await gate.consume(); // essai décompté seulement pour une vraie réponse
       }
       controller.close();
     },

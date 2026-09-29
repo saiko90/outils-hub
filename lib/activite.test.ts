@@ -123,3 +123,14 @@ describe("activite — intégrité de la table de MET", () => {
     }
   });
 });
+
+describe("activite — marche inclinée sur tapis", () => {
+  it("existe en deux intensités, plus intense que la marche rapide, et compte ses pas", () => {
+    const m = SPORT_BY_ID["marche_inclinee"], f = SPORT_BY_ID["marche_inclinee_forte"];
+    expect(m && f).toBeTruthy();
+    expect(m.met).toBeGreaterThan(SPORT_BY_ID["marche_rapide"].met);
+    expect(f.met).toBeGreaterThan(m.met);
+    expect(kcalSeanceBrut({ sportId: "marche_inclinee", minutes: 45 }, 62)).toBeCloseTo(279, 5);
+    expect(pasSeance({ sportId: "marche_inclinee_forte", minutes: 30 })).toBe(3300);
+  });
+});

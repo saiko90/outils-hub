@@ -43,6 +43,9 @@ export const SPORTS: Sport[] = [
   { id: "marche_lente", met: 2.8, spm: 90, emoji: "🚶", groupe: "marche", fr: "Marche lente", de: "Langsames Gehen", en: "Slow walk" },
   { id: "marche", met: 3.5, spm: 110, emoji: "🚶", groupe: "marche", fr: "Marche", de: "Gehen", en: "Walking" },
   { id: "marche_rapide", met: 5.0, spm: 130, emoji: "🚶", groupe: "marche", fr: "Marche rapide", de: "Zügiges Gehen", en: "Brisk walk" },
+  // Tapis roulant incliné (compendium : ~6 MET à 5-8 % ; ~8 MET à 10-15 %, type « 12-3-30 »).
+  { id: "marche_inclinee", met: 6.0, spm: 115, emoji: "⛰️", groupe: "marche", fr: "Marche inclinée (tapis, 5-8 %)", de: "Steigungsgehen (Laufband, 5-8 %)", en: "Incline treadmill walk (5-8%)" },
+  { id: "marche_inclinee_forte", met: 8.0, spm: 110, emoji: "⛰️", groupe: "marche", fr: "Marche inclinée forte (tapis, 10-15 %)", de: "Steiles Gehen (Laufband, 10-15 %)", en: "Steep incline treadmill walk (10-15%)" },
   { id: "marche_nordique", met: 6.0, spm: 120, emoji: "🥢", groupe: "marche", fr: "Marche nordique", de: "Nordic Walking", en: "Nordic walking" },
   { id: "course_lente", met: 8.3, spm: 150, emoji: "🏃", groupe: "marche", fr: "Course footing", de: "Joggen", en: "Jogging" },
   { id: "course", met: 9.8, spm: 165, emoji: "🏃", groupe: "marche", fr: "Course à pied", de: "Laufen", en: "Running" },

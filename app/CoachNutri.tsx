@@ -244,7 +244,7 @@ function Avo({ state, size = 120 }: { state: AvoState; size?: number }) {
 }
 
 /* ---------------- Coach ---------------- */
-export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsumeSeed, onAddDetected, onPrefsChange, onConvChange }: { ctx: CoachCtx; isPro?: boolean; onGoPro?: () => void; seed?: string; onConsumeSeed?: () => void; onAddDetected?: (d: Detected) => void; onPrefsChange?: (p: CoachPrefs) => void; onConvChange?: () => void }) {
+export default function CoachNutri({ ctx, isPro: proProp, onGoPro, inApp, seed, onConsumeSeed, onAddDetected, onPrefsChange, onConvChange }: { ctx: CoachCtx; isPro?: boolean; onGoPro?: () => void; inApp?: boolean; seed?: string; onConsumeSeed?: () => void; onAddDetected?: (d: Detected) => void; onPrefsChange?: (p: CoachPrefs) => void; onConvChange?: () => void }) {
   const lang = ctx.lang;
   const t = L[lang] ?? L.fr;
   const [localPro, setLocalPro] = useState(false);
@@ -533,11 +533,11 @@ export default function CoachNutri({ ctx, isPro: proProp, onGoPro, seed, onConsu
         <div className="cn-locktxt">
           <span className="cn-pro">{tasted ? "🥕" : "🔒"} {t.proBadge}</span>
           <h3>{tasted ? t.lockTitleUsed : t.lockTitle}</h3>
-          <p>{tasted ? t.lockSubUsed : t.lockSub}</p>
+          <p>{tasted ? (inApp ? t.lockSubUsed.replace(/\s[^.]*(7 jours|7 Tage|7-day)[^.]*\.$/, "") : t.lockSubUsed) : t.lockSub}</p>
           <ul className="cn-feats">
             {t.feats.map((f) => <li key={f}><span>✓</span>{f}</li>)}
           </ul>
-          <button className="cn-cta" onClick={onGoPro}>{tasted ? t.ctaTrial : t.cta}</button>
+          <button className="cn-cta" onClick={onGoPro}>{tasted && !inApp ? t.ctaTrial : t.cta}</button>
         </div>
       </section>
     );

@@ -115,7 +115,7 @@ const L = {
     refClaimed: "🎉 Invitation enregistrée ! Note tes repas 3 jours : ton ami et toi recevrez chacun 1 mois de Pro.",
     google: "Continuer avec Google", or: "ou", emailPh: "ton@email.ch", magic: "Recevoir un lien de connexion",
     authSent: "📩 Regarde tes e-mails : clique sur le lien pour te connecter.", authErr: "Souci de connexion, réessaie.", cloudOn: "☁️ Données synchronisées sur ton compte.",
-    proTitle: "Passe en calorio Pro", proSub: "Débloque Vito, ton coach nutrition IA, et l'analyse de tes repas en photo.",
+    proInApp: "L'abonnement Pro arrive très bientôt dans l'app. Tu es déjà Pro ? Connecte-toi avec ton compte : tout est débloqué.", proInAppLogin: "Se connecter", proTitle: "Passe en calorio Pro", proSub: "Débloque Vito, ton coach nutrition IA, et l'analyse de tes repas en photo.",
     planMonthly: "Mensuel", planYearly: "Annuel", perMonth: "/mois", perYear: "/an",
     yearlySave: "2 mois offerts", trial: "7 jours d'essai gratuit, sans engagement — annulable à tout moment.",
     proFeats: ["Vito, ton coach nutrition IA — conseils illimités", "Analyse de tes repas en photo", "Rappels du soir personnalisés selon tes calories restantes", "Ton bilan de la semaine, chaque dimanche"],
@@ -209,7 +209,7 @@ const L = {
     refClaimed: "🎉 Einladung gespeichert! Erfasse 3 Tage lang deine Mahlzeiten: du und deine Freundin erhaltet je 1 Monat Pro.",
     google: "Mit Google fortfahren", or: "oder", emailPh: "dein@email.ch", magic: "Login-Link erhalten",
     authSent: "📩 Schau in deine E-Mails: klicke auf den Link zum Anmelden.", authErr: "Verbindungsproblem, nochmal versuchen.", cloudOn: "☁️ Daten mit deinem Konto synchronisiert.",
-    proTitle: "Werde calorio Pro", proSub: "Schalte Vito frei, deinen KI-Ernährungscoach, und die Foto-Analyse deiner Mahlzeiten.",
+    proInApp: "Das Pro-Abo kommt sehr bald in die App. Du bist schon Pro? Melde dich mit deinem Konto an: alles ist freigeschaltet.", proInAppLogin: "Anmelden", proTitle: "Werde calorio Pro", proSub: "Schalte Vito frei, deinen KI-Ernährungscoach, und die Foto-Analyse deiner Mahlzeiten.",
     planMonthly: "Monatlich", planYearly: "Jährlich", perMonth: "/Monat", perYear: "/Jahr",
     yearlySave: "2 Monate gratis", trial: "7 Tage gratis testen, unverbindlich — jederzeit kündbar.",
     proFeats: ["Vito, dein KI-Ernährungscoach — unbegrenzte Tipps", "Foto-Analyse deiner Mahlzeiten", "Personalisierte Abend-Erinnerungen nach deinen Restkalorien", "Deine Wochenbilanz, jeden Sonntag"],
@@ -302,7 +302,7 @@ const L = {
     refClaimed: "🎉 Invite saved! Log your meals for 3 days: you and your friend will each get 1 month of Pro.",
     google: "Continue with Google", or: "or", emailPh: "you@email.com", magic: "Get a sign-in link",
     authSent: "📩 Check your inbox: click the link to sign in.", authErr: "Connection issue, try again.", cloudOn: "☁️ Data synced to your account.",
-    proTitle: "Go calorio Pro", proSub: "Unlock Vito, your AI nutrition coach, and photo analysis of your meals.",
+    proInApp: "The Pro subscription is coming to the app very soon. Already Pro? Sign in with your account: everything is unlocked.", proInAppLogin: "Sign in", proTitle: "Go calorio Pro", proSub: "Unlock Vito, your AI nutrition coach, and photo analysis of your meals.",
     planMonthly: "Monthly", planYearly: "Yearly", perMonth: "/mo", perYear: "/yr",
     yearlySave: "2 months free", trial: "7-day free trial, no commitment — cancel anytime.",
     proFeats: ["Vito, your AI nutrition coach — unlimited tips", "Photo analysis of your meals", "Personalised evening reminders based on your remaining calories", "Your weekly recap, every Sunday"],
@@ -969,6 +969,11 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [authEmail, setAuthEmail] = useState("");
   const [authMsg, setAuthMsg] = useState("");
   const [proOpen, setProOpen] = useState(false);
+  // App Android (Google Play) : pas d'achat hors Google Play Billing dans l'app (règles Play) → on n'y propose pas Stripe.
+  const [playApp, setPlayApp] = useState(false);
+  useEffect(() => {
+    try { const C = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor; if (C?.isNativePlatform?.()) setPlayApp(true); } catch { /* ignore */ }
+  }, []);
   const [checkoutMsg, setCheckoutMsg] = useState("");
   // Parrainage (viralité)
   const [refCode, setRefCode] = useState("");
@@ -1716,6 +1721,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   };
 
   const goPro = () => {
+    if (playApp) { setCheckoutMsg(""); setProOpen(true); return; }
     if (!user) { setAuthOpen(true); setAuthMsg(t.loginFirst); return; }
     setCheckoutMsg("");
     setProOpen(true);
@@ -2939,7 +2945,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         {/* ========== 4. VITO (coach) ========== */}
         {tab === "coach" && (
           <div className="cl-screen play cl-coachwrap" key="coach">
-            <CoachNutri key={coachVersion} ctx={coachCtx} isPro={proActive} onGoPro={goPro} seed={coachSeed} onConsumeSeed={() => setCoachSeed("")} onAddDetected={addFromCoach} onPrefsChange={updateCoachPrefs} onConvChange={() => setConvTick((n) => n + 1)} />
+            <CoachNutri key={coachVersion} ctx={coachCtx} isPro={proActive} onGoPro={goPro} inApp={playApp} seed={coachSeed} onConsumeSeed={() => setCoachSeed("")} onAddDetected={addFromCoach} onPrefsChange={updateCoachPrefs} onConvChange={() => setConvTick((n) => n + 1)} />
           </div>
         )}
 
@@ -3087,7 +3093,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               <>
                 <div className="cl-sectt"><span className="cl-dot" />{x.accountTitle}</div>
                 <div className="cl-card cl-account">
-                  {hasBilling && (
+                  {hasBilling && !playApp && (
                     <div className="cl-field">
                       <div className="cl-fl">💳 {x.billingTitle}<small>{x.billingSub}</small></div>
                       <button className="cl-databtn" onClick={openBilling} disabled={accountBusy}>{x.billingBtn}</button>
@@ -3107,7 +3113,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
             <div className="cl-sectt"><span className="cl-dot" />{t.faqTitle}</div>
             <div className="cl-card cl-faq">
-              {t.faq.map((f, i) => (
+              {t.faq.filter((f) => !(playApp && /CHF|Stripe|abonnement|Abo\b|Pro-Abo|subscription/i.test(f.q + f.a))).map((f, i) => (
                 <details className="cl-faqitem" key={i} open={faqOpen === i} onToggle={(e) => { if ((e.target as HTMLDetailsElement).open) setFaqOpen(i); }}>
                   <summary>{f.q}</summary>
                   <p>{f.a}</p>
@@ -3399,6 +3405,13 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
             <ul className="cl-pro-feats">
               {t.proFeats.map((f) => <li key={f}><span aria-hidden>✓</span>{f}</li>)}
             </ul>
+            {playApp ? (
+              <>
+                <p className="cl-pro-trial">{t.proInApp}</p>
+                {!user && <button className="cl-plan best" onClick={() => { setProOpen(false); setAuthMsg(""); setAuthOpen(true); }}><span className="cl-plan-name">{t.proInAppLogin}</span></button>}
+              </>
+            ) : (
+              <>
             <div className="cl-plans">
               <button className="cl-plan best" onClick={() => startCheckout("yearly")}>
                 <span className="cl-plan-badge">★ {t.yearlySave}</span>
@@ -3414,7 +3427,9 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
             <p className="cl-pro-trial">🎁 {t.trial}</p>
             <p className="cl-pro-secure">🔒 {t.proSecure}</p>
             <p className="cl-pro-compare">{t.proCompare}</p>
-            {checkoutMsg && checkoutMsg !== "…" && <p className="cl-scanmsg">{checkoutMsg}</p>}
+                          </>
+            )}
+{checkoutMsg && checkoutMsg !== "…" && <p className="cl-scanmsg">{checkoutMsg}</p>}
             <button className="cl-pro-close" onClick={() => setProOpen(false)}>{t.close}</button>
           </div>
         </div>

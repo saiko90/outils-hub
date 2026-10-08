@@ -135,7 +135,7 @@ const L = {
     regimes: { aucun: "Aucun", vegetarien: "Végétarien", vegan: "Végan", pescetarien: "Pescétarien", sans_gluten: "Sans gluten", sans_lactose: "Sans lactose" } as Record<string, string>,
   },
   de: {
-    proBadge: "Pro", coach: "Vito, dein Ernährungscoach",
+    proBadge: "Pro", coach: "Vito, dein Ernährungs\u00ADcoach",
     lockTitle: "Chatte mit Vito, deinem KI-Ernährungscoach",
     lockSub: "Er kennt deine Kalorien, dein Essen und dein Ziel — und sagt dir, was du heute Abend essen sollst und wie du ausgleichst.",
     feats: ["Persönliche Tipps aus deinem Tagesjournal", "Mahlzeiten- und Snack-Ideen für dein Ziel", "Sofortige Antworten, 100 % Ernährung, ohne Urteil"],

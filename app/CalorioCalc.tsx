@@ -992,6 +992,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // Google Play Billing (plugin natif @capgo/native-purchases, présent à partir de l'app 1.2.0).
   const [playSub, setPlaySub] = useState(false); // abonnement Pro actif acheté via Google Play
   const [playPlans, setPlayPlans] = useState<{ monthly?: PlayOffer; yearly?: PlayOffer }>({});
+  // "none" = Google ne propose encore aucun forfait (abonnement pas encore activé) → texte « bientôt » au lieu de boutons morts.
+  const [playPlansState, setPlayPlansState] = useState<"loading" | "ready" | "none">("loading");
   const [playMsg, setPlayMsg] = useState("");
   const [playBusy, setPlayBusy] = useState(false);
   const [checkoutMsg, setCheckoutMsg] = useState("");
@@ -1774,10 +1776,13 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const loadPlayPlans = async () => {
     const NP = nativePurchases();
     if (!NP) return;
+    if (playPlansState !== "ready") setPlayPlansState("loading");
     try {
       const { products } = await NP.getProducts({ productIdentifiers: [PLAY_PRODUCT_ID], productType: "subs" });
-      setPlayPlans(pickPlayOffers(products || []));
-    } catch { setPlayPlans({}); }
+      const plans = pickPlayOffers(products || []);
+      setPlayPlans(plans);
+      setPlayPlansState(plans.monthly || plans.yearly ? "ready" : "none");
+    } catch { setPlayPlans({}); setPlayPlansState("none"); }
   };
   // Le serveur relit l'achat chez Google, le rattache à ce compte et active Pro.
   const verifyPlay = async (purchaseToken: string): Promise<boolean> => {
@@ -3494,15 +3499,15 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               {t.proFeats.map((f) => <li key={f}><span aria-hidden>✓</span>{f}</li>)}
             </ul>
             {playApp ? (
-              nativePurchases() ? (
+              nativePurchases() && playPlansState !== "none" ? (
                 <>
                   <div className="cl-plans">
-                    <button className="cl-plan best" onClick={() => buyPlay("yearly")} disabled={playBusy}>
+                    <button className="cl-plan best" onClick={() => buyPlay("yearly")} disabled={playBusy || !playPlans.yearly}>
                       <span className="cl-plan-badge">★ {t.yearlySave}</span>
                       <span className="cl-plan-name">{t.planYearly}</span>
                       <span className="cl-plan-price">{playPlans.yearly?.priceString || "…"}<small>{t.perYear}</small></span>
                     </button>
-                    <button className="cl-plan" onClick={() => buyPlay("monthly")} disabled={playBusy}>
+                    <button className="cl-plan" onClick={() => buyPlay("monthly")} disabled={playBusy || !playPlans.monthly}>
                       <span className="cl-plan-name">{t.planMonthly}</span>
                       <span className="cl-plan-price">{playPlans.monthly?.priceString || "…"}<small>{t.perMonth}</small></span>
                     </button>

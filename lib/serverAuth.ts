@@ -10,6 +10,15 @@ export function svcHeaders(): Record<string, string> {
   return { apikey: k, authorization: `Bearer ${k}`, "content-type": "application/json" };
 }
 
+/** Pro effectif : abonnement web (Stripe / offert) OU abonnement Google Play encore payé. */
+export type ProRowLite = { is_pro?: boolean | null; pro_until?: string | null; play_until?: string | null };
+export function proActiveRow(p: ProRowLite | null | undefined, now = Date.now()): boolean {
+  if (!p) return false;
+  const web = !!p.is_pro && (!p.pro_until || Date.parse(p.pro_until) > now);
+  const play = !!p.play_until && Date.parse(p.play_until) > now;
+  return web || play;
+}
+
 export type AuthUser = { id: string; email: string };
 
 /** Utilisateur identifié par son jeton Supabase (en-tête Authorization: Bearer …), sinon null. */
@@ -38,11 +47,10 @@ export async function authUid(req: Request): Promise<string> {
 export async function proStatus(uid: string): Promise<boolean | null> {
   if (!uid || !svcKey()) return null;
   try {
-    const r = await fetch(`${SB_URL}/rest/v1/calorio_pro?id=eq.${encodeURIComponent(uid)}&select=is_pro,pro_until`, { headers: svcHeaders() });
+    const r = await fetch(`${SB_URL}/rest/v1/calorio_pro?id=eq.${encodeURIComponent(uid)}&select=is_pro,pro_until,play_until`, { headers: svcHeaders() });
     if (!r.ok) return null;
-    const rows = (await r.json()) as { is_pro?: boolean; pro_until?: string | null }[];
-    const p = rows[0];
-    return !!p?.is_pro && (!p.pro_until || new Date(p.pro_until) > new Date());
+    const rows = (await r.json()) as ProRowLite[];
+    return proActiveRow(rows[0]);
   } catch {
     return null;
   }

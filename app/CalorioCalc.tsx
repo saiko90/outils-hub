@@ -35,6 +35,7 @@ import { type DuoSummary } from "@/lib/duo";
 import { type Detected } from "@/lib/coachDetect";
 import { type CoachPrefs } from "@/lib/coachPrompt";
 import { getSupabase, authHeader } from "@/lib/supabaseClient";
+import { pickPlayOffers, type PlayOffer, type PlayProduct } from "@/lib/playOffers";
 import { localISO, addDaysISO, diffDaysISO, streakEndingAt } from "@/lib/dates";
 import { mergeDoc, type SyncDoc } from "@/lib/syncMerge";
 import {
@@ -115,7 +116,7 @@ const L = {
     refClaimed: "🎉 Invitation enregistrée ! Note tes repas 3 jours : ton ami et toi recevrez chacun 1 mois de Pro.",
     google: "Continuer avec Google", or: "ou", emailPh: "ton@email.ch", magic: "Recevoir un lien de connexion",
     authSent: "📩 Regarde tes e-mails : clique sur le lien pour te connecter.", authErr: "Souci de connexion, réessaie.", cloudOn: "☁️ Données synchronisées sur ton compte.",
-    proInApp: "L'abonnement Pro arrive très bientôt dans l'app. Tu es déjà Pro ? Connecte-toi avec ton compte : tout est débloqué.", proInAppLogin: "Se connecter", proTitle: "Passe en calorio Pro", proSub: "Débloque Vito, ton coach nutrition IA, et l'analyse de tes repas en photo.",
+    playSecure: "Paiement sécurisé par Google Play · résiliable à tout moment dans le Play Store", playRestore: "Restaurer mes achats", playRestoreNone: "Aucun abonnement Google Play trouvé sur ce compte.", playPending: "Paiement en attente de confirmation par Google Play. Pro s'activera dès qu'il est validé.", playErr: "L'achat n'a pas pu être finalisé. Réessaie dans un moment.", playOk: "Bienvenue dans calorio Pro ! 🥕", playManaged: "Tu es déjà Pro grâce à ton abonnement Google Play. Gère-le dans le Play Store.", playUpdate: "Mets à jour l'app calorio depuis le Play Store pour t'abonner.", playManageTitle: "Mon abonnement Google Play", playManageSub: "Changer de formule ou résilier dans le Play Store.", playManageBtn: "Ouvrir", proInApp: "L'abonnement Pro arrive très bientôt dans l'app. Tu es déjà Pro ? Connecte-toi avec ton compte : tout est débloqué.", proInAppLogin: "Se connecter", proTitle: "Passe en calorio Pro", proSub: "Débloque Vito, ton coach nutrition IA, et l'analyse de tes repas en photo.",
     planMonthly: "Mensuel", planYearly: "Annuel", perMonth: "/mois", perYear: "/an",
     yearlySave: "2 mois offerts", trial: "7 jours d'essai gratuit, sans engagement — annulable à tout moment.",
     proFeats: ["Vito, ton coach nutrition IA — conseils illimités", "Analyse de tes repas en photo", "Rappels du soir personnalisés selon tes calories restantes", "Ton bilan de la semaine, chaque dimanche"],
@@ -209,7 +210,7 @@ const L = {
     refClaimed: "🎉 Einladung gespeichert! Erfasse 3 Tage lang deine Mahlzeiten: du und deine Freundin erhaltet je 1 Monat Pro.",
     google: "Mit Google fortfahren", or: "oder", emailPh: "dein@email.ch", magic: "Login-Link erhalten",
     authSent: "📩 Schau in deine E-Mails: klicke auf den Link zum Anmelden.", authErr: "Verbindungsproblem, nochmal versuchen.", cloudOn: "☁️ Daten mit deinem Konto synchronisiert.",
-    proInApp: "Das Pro-Abo kommt sehr bald in die App. Du bist schon Pro? Melde dich mit deinem Konto an: alles ist freigeschaltet.", proInAppLogin: "Anmelden", proTitle: "Werde calorio Pro", proSub: "Schalte Vito frei, deinen KI-Ernährungscoach, und die Foto-Analyse deiner Mahlzeiten.",
+    playSecure: "Sichere Zahlung über Google Play · jederzeit im Play Store kündbar", playRestore: "Käufe wiederherstellen", playRestoreNone: "Kein Google-Play-Abo für dieses Konto gefunden.", playPending: "Zahlung wartet auf Bestätigung durch Google Play. Pro wird aktiviert, sobald sie bestätigt ist.", playErr: "Der Kauf konnte nicht abgeschlossen werden. Versuch es gleich nochmal.", playOk: "Willkommen bei calorio Pro! 🥕", playManaged: "Du bist bereits Pro über dein Google-Play-Abo. Verwalte es im Play Store.", playUpdate: "Aktualisiere die calorio-App im Play Store, um ein Abo abzuschliessen.", playManageTitle: "Mein Google-Play-Abo", playManageSub: "Plan wechseln oder im Play Store kündigen.", playManageBtn: "Öffnen", proInApp: "Das Pro-Abo kommt sehr bald in die App. Du bist schon Pro? Melde dich mit deinem Konto an: alles ist freigeschaltet.", proInAppLogin: "Anmelden", proTitle: "Werde calorio Pro", proSub: "Schalte Vito frei, deinen KI-Ernährungscoach, und die Foto-Analyse deiner Mahlzeiten.",
     planMonthly: "Monatlich", planYearly: "Jährlich", perMonth: "/Monat", perYear: "/Jahr",
     yearlySave: "2 Monate gratis", trial: "7 Tage gratis testen, unverbindlich — jederzeit kündbar.",
     proFeats: ["Vito, dein KI-Ernährungscoach — unbegrenzte Tipps", "Foto-Analyse deiner Mahlzeiten", "Personalisierte Abend-Erinnerungen nach deinen Restkalorien", "Deine Wochenbilanz, jeden Sonntag"],
@@ -302,7 +303,7 @@ const L = {
     refClaimed: "🎉 Invite saved! Log your meals for 3 days: you and your friend will each get 1 month of Pro.",
     google: "Continue with Google", or: "or", emailPh: "you@email.com", magic: "Get a sign-in link",
     authSent: "📩 Check your inbox: click the link to sign in.", authErr: "Connection issue, try again.", cloudOn: "☁️ Data synced to your account.",
-    proInApp: "The Pro subscription is coming to the app very soon. Already Pro? Sign in with your account: everything is unlocked.", proInAppLogin: "Sign in", proTitle: "Go calorio Pro", proSub: "Unlock Vito, your AI nutrition coach, and photo analysis of your meals.",
+    playSecure: "Secure payment via Google Play · cancel anytime in the Play Store", playRestore: "Restore purchases", playRestoreNone: "No Google Play subscription found for this account.", playPending: "Payment pending confirmation by Google Play. Pro will turn on as soon as it clears.", playErr: "The purchase couldn't be completed. Please try again shortly.", playOk: "Welcome to calorio Pro! 🥕", playManaged: "You're already Pro through your Google Play subscription. Manage it in the Play Store.", playUpdate: "Update the calorio app from the Play Store to subscribe.", playManageTitle: "My Google Play subscription", playManageSub: "Switch plan or cancel in the Play Store.", playManageBtn: "Open", proInApp: "The Pro subscription is coming to the app very soon. Already Pro? Sign in with your account: everything is unlocked.", proInAppLogin: "Sign in", proTitle: "Go calorio Pro", proSub: "Unlock Vito, your AI nutrition coach, and photo analysis of your meals.",
     planMonthly: "Monthly", planYearly: "Yearly", perMonth: "/mo", perYear: "/yr",
     yearlySave: "2 months free", trial: "7-day free trial, no commitment — cancel anytime.",
     proFeats: ["Vito, your AI nutrition coach — unlimited tips", "Photo analysis of your meals", "Personalised evening reminders based on your remaining calories", "Your weekly recap, every Sunday"],
@@ -608,6 +609,20 @@ const ACCENT = "#22c55e", ACCENT2 = "#84cc16";
 
 type BeforeInstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
 type TabKey = "stats" | "journee" | "poids" | "coach" | "aide";
+// ---- Google Play Billing (app Android) : plugin natif, absent sur le web ----
+const PLAY_PRODUCT_ID = "calorio_pro";
+type PlayTx = { purchaseToken?: string; purchaseState?: string | number };
+type NativePurchasesApi = {
+  getProducts: (o: { productIdentifiers: string[]; productType: string }) => Promise<{ products: PlayProduct[] }>;
+  purchaseProduct: (o: Record<string, unknown>) => Promise<PlayTx>;
+  getPurchases: (o: { productType: string }) => Promise<{ purchases: PlayTx[] }>;
+  manageSubscriptions: () => Promise<void>;
+};
+function nativePurchases(): NativePurchasesApi | null {
+  if (typeof window === "undefined") return null;
+  const C = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean; Plugins?: { NativePurchases?: NativePurchasesApi } } }).Capacitor;
+  return C?.isNativePlatform?.() ? C.Plugins?.NativePurchases || null : null;
+}
 const TABS: TabKey[] = ["stats", "journee", "poids", "coach", "aide"];
 type MealKey = "matin" | "midi" | "snack" | "soir";
 const MEALS: MealKey[] = ["matin", "midi", "snack", "soir"];
@@ -974,6 +989,11 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   useEffect(() => {
     try { const C = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor; if (C?.isNativePlatform?.()) setPlayApp(true); } catch { /* ignore */ }
   }, []);
+  // Google Play Billing (plugin natif @capgo/native-purchases, présent à partir de l'app 1.2.0).
+  const [playSub, setPlaySub] = useState(false); // abonnement Pro actif acheté via Google Play
+  const [playPlans, setPlayPlans] = useState<{ monthly?: PlayOffer; yearly?: PlayOffer }>({});
+  const [playMsg, setPlayMsg] = useState("");
+  const [playBusy, setPlayBusy] = useState(false);
   const [checkoutMsg, setCheckoutMsg] = useState("");
   // Parrainage (viralité)
   const [refCode, setRefCode] = useState("");
@@ -1335,8 +1355,10 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const refreshPro = async (uid: string) => {
     const supa = getSupabase();
     if (!supa) return;
-    const { data: pro } = await supa.from("calorio_pro").select("is_pro,pro_until,stripe_customer_id").eq("id", uid).maybeSingle();
-    const active = !!pro?.is_pro && (!pro.pro_until || new Date(pro.pro_until as string) > new Date());
+    const { data: pro } = await supa.from("calorio_pro").select("is_pro,pro_until,stripe_customer_id,play_until").eq("id", uid).maybeSingle();
+    const play = !!pro?.play_until && new Date(pro.play_until as string) > new Date();
+    setPlaySub(play);
+    const active = play || (!!pro?.is_pro && (!pro.pro_until || new Date(pro.pro_until as string) > new Date()));
     setProDb(active);
     setIsPro(active);
     setHasBilling(!!pro?.stripe_customer_id);
@@ -1721,7 +1743,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   };
 
   const goPro = () => {
-    if (playApp) { setCheckoutMsg(""); setProOpen(true); return; }
+    if (playApp) { setCheckoutMsg(""); setPlayMsg(""); setProOpen(true); loadPlayPlans(); return; }
     if (!user) { setAuthOpen(true); setAuthMsg(t.loginFirst); return; }
     setCheckoutMsg("");
     setProOpen(true);
@@ -1742,9 +1764,64 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       });
       const j = (await r.json()) as { url?: string; error?: string };
       if (j.url) { window.location.href = j.url; return; }
+      if (r.status === 409 && j.error === "already_subscribed_play") { setCheckoutMsg(t.playManaged); return; }
       if (r.status === 409) { setProOpen(false); openBilling(); return; } // déjà abonné → gestion
       setCheckoutMsg(t.checkoutErr);
     } catch { setCheckoutMsg(t.checkoutErr); }
+  };
+
+  // ---- Google Play Billing (app Android) ----
+  const loadPlayPlans = async () => {
+    const NP = nativePurchases();
+    if (!NP) return;
+    try {
+      const { products } = await NP.getProducts({ productIdentifiers: [PLAY_PRODUCT_ID], productType: "subs" });
+      setPlayPlans(pickPlayOffers(products || []));
+    } catch { setPlayPlans({}); }
+  };
+  // Le serveur relit l'achat chez Google, le rattache à ce compte et active Pro.
+  const verifyPlay = async (purchaseToken: string): Promise<boolean> => {
+    const r = await fetch("/api/play/verify", { method: "POST", headers: { "content-type": "application/json", ...(await authHeader()) }, body: JSON.stringify({ purchaseToken }) });
+    const j = (await r.json().catch(() => ({}))) as { pro?: boolean };
+    return r.ok && !!j.pro;
+  };
+  const buyPlay = async (plan: "monthly" | "yearly") => {
+    const NP = nativePurchases();
+    if (!NP) { setPlayMsg(t.playUpdate); return; }
+    if (!user) { setProOpen(false); setAuthMsg(t.loginFirst); setAuthOpen(true); return; }
+    if (playBusy) return;
+    setPlayBusy(true); setPlayMsg("");
+    try {
+      const offer = playPlans[plan];
+      const tx = await NP.purchaseProduct({ productIdentifier: PLAY_PRODUCT_ID, planIdentifier: plan, productType: "subs", appAccountToken: user.id, ...(offer?.offerToken ? { offerToken: offer.offerToken } : {}) });
+      if (tx?.purchaseState && /pending|^2$/i.test(String(tx.purchaseState))) { setPlayMsg(t.playPending); return; }
+      if (tx?.purchaseToken && (await verifyPlay(tx.purchaseToken))) {
+        await refreshPro(user.id);
+        setPlayMsg(t.playOk);
+        setTimeout(() => setProOpen(false), 1200);
+      } else setPlayMsg(t.playErr);
+    } catch (e) {
+      // Annulation par l'utilisateur : pas de message d'erreur.
+      if (!/cancel/i.test(String((e as Error)?.message || e))) setPlayMsg(t.playErr);
+    } finally { setPlayBusy(false); }
+  };
+  const restorePlay = async (silent = false) => {
+    const NP = nativePurchases();
+    if (!NP || !user) return;
+    if (!silent) { setPlayBusy(true); setPlayMsg(""); }
+    try {
+      const { purchases } = await NP.getPurchases({ productType: "subs" });
+      let ok = false;
+      for (const p of purchases || []) if (p.purchaseToken && (await verifyPlay(p.purchaseToken))) ok = true;
+      if (ok) { await refreshPro(user.id); if (!silent) { setPlayMsg(t.playOk); setTimeout(() => setProOpen(false), 1200); } }
+      else if (!silent) setPlayMsg(t.playRestoreNone);
+    } catch { if (!silent) setPlayMsg(t.playErr); }
+    finally { if (!silent) setPlayBusy(false); }
+  };
+  const managePlay = () => {
+    const NP = nativePurchases();
+    if (NP) { NP.manageSubscriptions().catch(() => {}); return; }
+    window.open(`https://play.google.com/store/account/subscriptions?sku=${PLAY_PRODUCT_ID}&package=ch.calorio.twa`, "_blank", "noopener");
   };
 
   // Portail Stripe : changer de carte, factures, résilier.
@@ -1794,6 +1871,11 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   }, [mounted, user]);
 
   const proActive = isPro || proDb;
+  // App Android : un achat Google Play fait mais pas encore rattaché (app fermée trop tôt, autre appareil…) est récupéré en silence.
+  useEffect(() => {
+    if (playApp && user && !proActive && nativePurchases()) restorePlay(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playApp, user?.id]);
 
   // langue interne (surcharge la langue du site, persistée par appareil)
   const changeLang = (l: Lang) => {
@@ -3093,6 +3175,12 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               <>
                 <div className="cl-sectt"><span className="cl-dot" />{x.accountTitle}</div>
                 <div className="cl-card cl-account">
+                  {playSub && (
+                    <div className="cl-field">
+                      <div className="cl-fl">▶️ {t.playManageTitle}<small>{t.playManageSub}</small></div>
+                      <button className="cl-databtn" onClick={managePlay}>{t.playManageBtn}</button>
+                    </div>
+                  )}
                   {hasBilling && !playApp && (
                     <div className="cl-field">
                       <div className="cl-fl">💳 {x.billingTitle}<small>{x.billingSub}</small></div>
@@ -3406,10 +3494,30 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               {t.proFeats.map((f) => <li key={f}><span aria-hidden>✓</span>{f}</li>)}
             </ul>
             {playApp ? (
-              <>
-                <p className="cl-pro-trial">{t.proInApp}</p>
-                {!user && <button className="cl-plan best" onClick={() => { setProOpen(false); setAuthMsg(""); setAuthOpen(true); }}><span className="cl-plan-name">{t.proInAppLogin}</span></button>}
-              </>
+              nativePurchases() ? (
+                <>
+                  <div className="cl-plans">
+                    <button className="cl-plan best" onClick={() => buyPlay("yearly")} disabled={playBusy}>
+                      <span className="cl-plan-badge">★ {t.yearlySave}</span>
+                      <span className="cl-plan-name">{t.planYearly}</span>
+                      <span className="cl-plan-price">{playPlans.yearly?.priceString || "…"}<small>{t.perYear}</small></span>
+                    </button>
+                    <button className="cl-plan" onClick={() => buyPlay("monthly")} disabled={playBusy}>
+                      <span className="cl-plan-name">{t.planMonthly}</span>
+                      <span className="cl-plan-price">{playPlans.monthly?.priceString || "…"}<small>{t.perMonth}</small></span>
+                    </button>
+                  </div>
+                  {(playPlans.yearly?.trial || playPlans.monthly?.trial) && <p className="cl-pro-trial">🎁 {t.trial}</p>}
+                  <p className="cl-pro-secure">🔒 {t.playSecure}</p>
+                  {playMsg && <p className="cl-scanmsg">{playMsg}</p>}
+                  {user && <button className="cl-pro-close" onClick={() => restorePlay(false)} disabled={playBusy}>{t.playRestore}</button>}
+                </>
+              ) : (
+                <>
+                  <p className="cl-pro-trial">{t.proInApp}</p>
+                  {!user && <button className="cl-plan best" onClick={() => { setProOpen(false); setAuthMsg(""); setAuthOpen(true); }}><span className="cl-plan-name">{t.proInAppLogin}</span></button>}
+                </>
+              )
             ) : (
               <>
             <div className="cl-plans">

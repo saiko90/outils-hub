@@ -50,9 +50,11 @@ export async function POST(req: Request) {
   // Déjà abonné (Stripe) ? → pas de second abonnement : le client ouvre le portail à la place.
   let existingCustomer = "";
   try {
-    const pr = await fetch(`${SB_URL}/rest/v1/calorio_pro?id=eq.${uid}&select=is_pro,pro_until,stripe_customer_id,stripe_subscription_id`, { headers: svcHeaders() });
-    const rows = pr.ok ? ((await pr.json()) as { is_pro?: boolean; pro_until?: string | null; stripe_customer_id?: string | null; stripe_subscription_id?: string | null }[]) : [];
+    const pr = await fetch(`${SB_URL}/rest/v1/calorio_pro?id=eq.${uid}&select=is_pro,pro_until,stripe_customer_id,stripe_subscription_id,play_until`, { headers: svcHeaders() });
+    const rows = pr.ok ? ((await pr.json()) as { is_pro?: boolean; pro_until?: string | null; stripe_customer_id?: string | null; stripe_subscription_id?: string | null; play_until?: string | null }[]) : [];
     const p = rows[0];
+    // Déjà abonné via Google Play (app Android) : pas de second abonnement sur le web.
+    if (p?.play_until && new Date(p.play_until) > new Date()) return NextResponse.json({ error: "already_subscribed_play" }, { status: 409 });
     const activeStripe = !!p?.is_pro && !!p?.stripe_subscription_id && (!p.pro_until || new Date(p.pro_until) > new Date());
     if (activeStripe) return NextResponse.json({ error: "already_subscribed" }, { status: 409 });
     existingCustomer = p?.stripe_customer_id || "";

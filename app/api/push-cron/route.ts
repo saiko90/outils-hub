@@ -2,6 +2,7 @@ import webpush from "web-push";
 import { pickPush, buildStreak, buildRecap, buildRemaining, type PushType } from "@/lib/pushMessages";
 import { cibleFromProfil } from "@/lib/duo";
 import { VAPID_PUBLIC_KEY } from "@/lib/vapid";
+import { proActiveRow, type ProRowLite } from "@/lib/serverAuth";
 
 // Cron d'envoi des notifications calorio Pro (rappels repas + encouragements).
 // Sécurisé par CRON_SECRET (en-tête Authorization: Bearer <secret> ajouté par Vercel Cron).
@@ -115,10 +116,11 @@ export async function GET(req: Request) {
   if (subs.length === 0) return Response.json({ job, sent: 0, note: "no subscribers" });
 
   // 2) statut Pro (is_pro + pro_until)
-  const proRes = await rest("calorio_pro?is_pro=eq.true&select=id,pro_until");
-  const proRows = proRes.ok ? ((await proRes.json()) as { id: string; pro_until: string | null }[]) : [];
+  const nowIso = new Date().toISOString();
+  const proRes = await rest(`calorio_pro?or=(is_pro.eq.true,play_until.gt.${encodeURIComponent(nowIso)})&select=id,is_pro,pro_until,play_until`);
+  const proRows = proRes.ok ? ((await proRes.json()) as (ProRowLite & { id: string })[]) : [];
   const now = Date.now();
-  const proSet = new Set(proRows.filter((p) => !p.pro_until || Date.parse(p.pro_until) > now).map((p) => p.id));
+  const proSet = new Set(proRows.filter((p) => proActiveRow(p, now)).map((p) => p.id));
 
   // Rappels de base (midi, soir, encouragement) → TOUS les abonnés (rétention des gratuits).
   // Le rappel personnalisé « calories restantes » (avec Vito) et le bilan hebdo restent réservés au Pro.

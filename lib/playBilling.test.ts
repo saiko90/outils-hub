@@ -29,6 +29,15 @@ describe("Google Play : lecture d'un abonnement", () => {
 });
 
 describe("Google Play : tarifs affichés", () => {
+  it("format réel du plugin Android (identifier = forfait, planIdentifier = abonnement)", () => {
+    const r = pickPlayOffers([
+      { planIdentifier: "calorio_pro", identifier: "monthly", offerId: null, priceString: "CHF 4.90", offerToken: "base-m" },
+      { planIdentifier: "calorio_pro", identifier: "monthly", offerId: "essai-7j", priceString: "CHF 4.90", offerToken: "trial-m" },
+      { planIdentifier: "calorio_pro", identifier: "yearly", offerId: null, priceString: "CHF 39.00", offerToken: "base-y" },
+    ]);
+    expect(r.monthly).toEqual({ priceString: "CHF 4.90", offerToken: "trial-m", trial: true });
+    expect(r.yearly).toEqual({ priceString: "CHF 39.00", offerToken: "base-y", trial: false });
+  });
   it("préfère l'offre d'essai mais affiche le prix du forfait de base", () => {
     const r = pickPlayOffers([
       { planIdentifier: "monthly", priceString: "CHF 4.90", offerToken: "base-m" },

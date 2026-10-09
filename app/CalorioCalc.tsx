@@ -995,6 +995,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [playPlans, setPlayPlans] = useState<{ monthly?: PlayOffer; yearly?: PlayOffer }>({});
   // "none" = Google ne propose encore aucun forfait (abonnement pas encore activé) → texte « bientôt » au lieu de boutons morts.
   const [playPlansState, setPlayPlansState] = useState<"loading" | "ready" | "none">("loading");
+  const [playDiag, setPlayDiag] = useState(""); // raison technique quand Google ne renvoie aucun forfait (aide au support)
   const [playMsg, setPlayMsg] = useState("");
   const [playBusy, setPlayBusy] = useState(false);
   const [checkoutMsg, setCheckoutMsg] = useState("");
@@ -1863,7 +1864,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       const plans = pickPlayOffers(products || []);
       setPlayPlans(plans);
       setPlayPlansState(plans.monthly || plans.yearly ? "ready" : "none");
-    } catch { setPlayPlans({}); setPlayPlansState("none"); }
+      setPlayDiag(plans.monthly || plans.yearly ? "" : `${(products || []).length} offre(s) reçue(s)`);
+    } catch (e) { setPlayPlans({}); setPlayPlansState("none"); setPlayDiag(String((e as Error)?.message || e).slice(0, 80)); }
   };
   // Le serveur relit l'achat chez Google, le rattache à ce compte et active Pro.
   const verifyPlay = async (purchaseToken: string): Promise<boolean> => {
@@ -3649,6 +3651,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               ) : (
                 <>
                   <p className="cl-pro-trial">{t.proInApp}</p>
+                  {playDiag && <p className="cl-auth-legal">Google Play : {playDiag}</p>}
                   {!user && <button className="cl-plan best" onClick={() => { setProOpen(false); setAuthMsg(""); setAuthOpen(true); }}><span className="cl-plan-name">{t.proInAppLogin}</span></button>}
                 </>
               )

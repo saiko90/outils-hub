@@ -6,7 +6,8 @@ export type PlayProduct = { identifier?: string; planIdentifier?: string; offerI
 export function pickPlayOffers(products: PlayProduct[]): { monthly?: PlayOffer; yearly?: PlayOffer } {
   const out: { monthly?: PlayOffer; yearly?: PlayOffer } = {};
   for (const plan of ["monthly", "yearly"] as const) {
-    const all = products.filter((p) => (p.planIdentifier || p.identifier) === plan || (p.identifier || "").endsWith(`:${plan}`));
+    // @capgo/native-purchases (Android) : identifier = forfait de base (« monthly »), planIdentifier = abonnement (« calorio_pro »).
+    const all = products.filter((p) => p.identifier === plan || p.planIdentifier === plan || (p.identifier || "").endsWith(`:${plan}`));
     const base = all.find((p) => !p.offerId) || all[0];
     const trial = all.find((p) => !!p.offerId);
     if (!base && !trial) continue;

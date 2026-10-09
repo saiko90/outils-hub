@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { authUser, svcKey } from "@/lib/serverAuth";
-import { acknowledge, fetchSub, PLAY_PRODUCT, playConfigured } from "@/lib/googlePlay";
+import { acknowledge, fetchSub, PLAY_PRODUCT, playConfigIssue, playConfigured } from "@/lib/googlePlay";
 import { applyPlay, ownerOfToken, releaseToken } from "@/lib/playPro";
 
 // Appelé par l'app Android juste après un achat (ou « Restaurer mes achats »).
@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
-  if (!svcKey() || !playConfigured()) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+  if (!svcKey() || !playConfigured()) return NextResponse.json({ error: "not_configured", detail: svcKey() ? playConfigIssue() : "db" }, { status: 503 });
   const user = await authUser(req);
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
 

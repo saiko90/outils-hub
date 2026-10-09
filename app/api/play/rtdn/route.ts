@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { svcKey } from "@/lib/serverAuth";
-import { acknowledge, fetchSub, PLAY_PACKAGE, PLAY_PRODUCT, playConfigured } from "@/lib/googlePlay";
+import { acknowledge, fetchSub, PLAY_PACKAGE, PLAY_PRODUCT, playConfigIssue, playConfigured } from "@/lib/googlePlay";
 import { applyPlay, ownerOfToken, releaseToken } from "@/lib/playPro";
 
 // Notifications Google Play en temps réel (RTDN) via Pub/Sub en mode « push » :
@@ -21,10 +21,10 @@ function sameKey(a: string, b: string): boolean {
 }
 
 export async function POST(req: Request) {
-  const expected = process.env.PLAY_RTDN_KEY || "";
+  const expected = (process.env.PLAY_RTDN_KEY || "").trim();
   const key = new URL(req.url).searchParams.get("key") || "";
   if (!expected || !sameKey(key, expected)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  if (!svcKey() || !playConfigured()) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+  if (!svcKey() || !playConfigured()) return NextResponse.json({ error: "not_configured", detail: svcKey() ? playConfigIssue() : "db" }, { status: 503 });
 
   let n: Rtdn = {};
   try {

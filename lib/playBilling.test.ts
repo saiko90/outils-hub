@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { interpretSub } from "./googlePlay";
+import { interpretSub, parseServiceAccount } from "./googlePlay";
 import { pickPlayOffers } from "./playOffers";
 import { proActiveRow } from "./serverAuth";
 
@@ -46,5 +46,30 @@ describe("Pro effectif", () => {
     expect(proActiveRow({ is_pro: true, pro_until: "2026-10-01T00:00:00Z", play_until: null }, NOW)).toBe(false);
     expect(proActiveRow({ is_pro: true, pro_until: null }, NOW)).toBe(true);
     expect(proActiveRow(null, NOW)).toBe(false);
+  });
+});
+
+describe("Clé du compte de service (copier-coller)", () => {
+  const KEY = "-----BEGIN PRIVATE KEY-----\nAAAA\nBBBB\n-----END PRIVATE KEY-----\n";
+  const json = JSON.stringify({ type: "service_account", client_email: "sa@x.iam.gserviceaccount.com", private_key: KEY, token_uri: "https://oauth2.googleapis.com/token" }, null, 2);
+  it("JSON normal", () => {
+    expect(parseServiceAccount(json)?.private_key).toBe(KEY);
+  });
+  it("entouré d'espaces / retours à la ligne", () => {
+    expect(parseServiceAccount(`\n  ${json}\n`)?.client_email).toBe("sa@x.iam.gserviceaccount.com");
+  });
+  it("encodé en base64", () => {
+    expect(parseServiceAccount(Buffer.from(json).toString("base64"))?.private_key).toBe(KEY);
+  });
+  it("clé privée avec de vrais retours à la ligne (JSON cassé)", () => {
+    const broken = json.replace(/\\n/g, "\n");
+    expect(() => JSON.parse(broken)).toThrow();
+    const sa = parseServiceAccount(broken);
+    expect(sa?.client_email).toBe("sa@x.iam.gserviceaccount.com");
+    expect(sa?.private_key).toBe(KEY);
+  });
+  it("vide ou sans clé privée → null", () => {
+    expect(parseServiceAccount("")).toBeNull();
+    expect(parseServiceAccount('{"client_email":"a@b"}')).toBeNull();
   });
 });

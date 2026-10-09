@@ -9,19 +9,43 @@ export const PLAY_PRODUCT = "calorio_pro"; // abonnement avec deux forfaits de b
 
 type ServiceAccount = { client_email: string; private_key: string; token_uri?: string };
 
-function serviceAccount(): ServiceAccount | null {
-  const raw = process.env.GOOGLE_PLAY_SA_JSON;
-  if (!raw) return null;
-  try {
-    const j = JSON.parse(raw) as ServiceAccount;
-    return j.client_email && j.private_key ? j : null;
-  } catch {
-    return null;
+/** Lit la clé JSON du compte de service. Tolère les copier-coller abîmés : JSON encodé en base64,
+ *  ou clé privée dont les « \n » sont devenus de vrais retours à la ligne (le JSON est alors invalide). */
+export function parseServiceAccount(raw: string | undefined): ServiceAccount | null {
+  const txt = (raw || "").trim();
+  if (!txt) return null;
+  const ok = (j: Partial<ServiceAccount> | null): ServiceAccount | null =>
+    j && typeof j.client_email === "string" && typeof j.private_key === "string" && j.private_key.includes("PRIVATE KEY")
+      ? { client_email: j.client_email.trim(), private_key: j.private_key.replace(/\\n/g, "\n"), token_uri: j.token_uri }
+      : null;
+  const tryJson = (t: string) => {
+    try { return ok(JSON.parse(t) as Partial<ServiceAccount>); } catch { return null; }
+  };
+  const direct = tryJson(txt);
+  if (direct) return direct;
+  if (!txt.startsWith("{")) {
+    const decoded = tryJson(Buffer.from(txt, "base64").toString("utf8").trim());
+    if (decoded) return decoded;
   }
+  // Dernier recours : extraire les champs utiles même si le JSON est cassé.
+  const email = /"client_email"\s*:\s*"([^"]+)"/.exec(txt)?.[1];
+  const key = /"private_key"\s*:\s*"(-----BEGIN PRIVATE KEY-----[\s\S]*?-----END PRIVATE KEY-----[^"]*)"/.exec(txt)?.[1];
+  const uri = /"token_uri"\s*:\s*"([^"]+)"/.exec(txt)?.[1];
+  return email && key ? ok({ client_email: email, private_key: key, token_uri: uri }) : null;
+}
+
+function serviceAccount(): ServiceAccount | null {
+  return parseServiceAccount(process.env.GOOGLE_PLAY_SA_JSON);
 }
 
 export function playConfigured(): boolean {
   return !!serviceAccount();
+}
+
+/** Diagnostic sans secret : « sa_missing », « sa_invalid », ou null si la clé est lisible. */
+export function playConfigIssue(): string | null {
+  if (!process.env.GOOGLE_PLAY_SA_JSON) return "sa_missing";
+  return serviceAccount() ? null : "sa_invalid";
 }
 
 const b64url = (b: Buffer | string) => (typeof b === "string" ? Buffer.from(b, "utf8") : b).toString("base64").replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_");

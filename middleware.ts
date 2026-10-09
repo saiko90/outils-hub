@@ -7,6 +7,11 @@ export function middleware(req: NextRequest) {
   const host = (req.headers.get("host") || "").split(":")[0];
   const { pathname } = req.nextUrl;
   const onCalorio = host === "calorio.ch" || host === "www.calorio.ch";
+  // Connexion de l'app Android : l'app ouvre www.calorio.ch (hôte différent → le système l'ouvre dans le
+  // navigateur et non dans l'app) ; on renvoie vers calorio.ch, où vit la session du navigateur.
+  if (host === "www.calorio.ch" && req.nextUrl.searchParams.has("applogin")) {
+    return NextResponse.redirect(`https://calorio.ch${pathname}${req.nextUrl.search}`, 307);
+  }
   // calorio.ch : page d'accueil indexable (FR / DE / EN) ; l'application vit sur /calorio.
   if (onCalorio && (pathname === "/" || pathname === "/de" || pathname === "/en")) {
     const url = req.nextUrl.clone();

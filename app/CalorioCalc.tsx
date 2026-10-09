@@ -35,6 +35,7 @@ import { type DuoSummary } from "@/lib/duo";
 import { type Detected } from "@/lib/coachDetect";
 import { type CoachPrefs } from "@/lib/coachPrompt";
 import { getSupabase, authHeader } from "@/lib/supabaseClient";
+import { APP_INTENT_URL, APP_LOGIN_KEY, APP_LOGIN_TTL_MS, codeFromHash, isHex64, parsePendingApp } from "@/lib/appLogin";
 import { pickPlayOffers, type PlayOffer, type PlayProduct } from "@/lib/playOffers";
 import { localISO, addDaysISO, diffDaysISO, streakEndingAt } from "@/lib/dates";
 import { mergeDoc, type SyncDoc } from "@/lib/syncMerge";
@@ -115,7 +116,7 @@ const L = {
     shareText: "J'utilise calorio pour suivre mes calories — simple et suisse. Rejoins-moi, on gagne chacun 1 mois Pro 🥕",
     refClaimed: "🎉 Invitation enregistrée ! Note tes repas 3 jours : ton ami et toi recevrez chacun 1 mois de Pro.",
     google: "Continuer avec Google", or: "ou", emailPh: "ton@email.ch", magic: "Recevoir un lien de connexion",
-    authSent: "📩 Regarde tes e-mails : clique sur le lien pour te connecter.", authErr: "Souci de connexion, réessaie.", cloudOn: "☁️ Données synchronisées sur ton compte.",
+    authSent: "📩 Regarde tes e-mails : clique sur le lien pour te connecter.", appLoginBtn: "Se connecter (Google ou e-mail)", appLoginHint: "La connexion s'ouvre dans ton navigateur. Une fois connecté, reviens ici : l'app se connecte toute seule.", appLoginWait: "Connexion en cours dans ton navigateur… Code à vérifier :", appLoginCancel: "Annuler", appLoginExpired: "La demande a expiré. Réessaie.", appLoginBrowser: "Connecte-toi pour relier l'app calorio à ton compte 👇", appLoginAskTitle: "Connecter l'app calorio ?", appLoginAsk: "L'app calorio de ton téléphone demande à se connecter au compte {email}. Vérifie qu'elle affiche le code :", appLoginWarn: "Tu n'as pas lancé cette connexion toi-même depuis l'app ? Refuse.", appLoginYes: "Connecter l'app", appLoginNo: "Refuser", appLoginDone: "✅ C'est fait ! Retourne dans l'app calorio : elle se connecte toute seule.", appLoginOpen: "Ouvrir l'app calorio", appLoginErr: "La demande a expiré. Relance la connexion depuis l'app.", authErr: "Souci de connexion, réessaie.", cloudOn: "☁️ Données synchronisées sur ton compte.",
     playSecure: "Paiement sécurisé par Google Play · résiliable à tout moment dans le Play Store", playRestore: "Restaurer mes achats", playRestoreNone: "Aucun abonnement Google Play trouvé sur ce compte.", playPending: "Paiement en attente de confirmation par Google Play. Pro s'activera dès qu'il est validé.", playErr: "L'achat n'a pas pu être finalisé. Réessaie dans un moment.", playOk: "Bienvenue dans calorio Pro ! 🥕", playManaged: "Tu es déjà Pro grâce à ton abonnement Google Play. Gère-le dans le Play Store.", playUpdate: "Mets à jour l'app calorio depuis le Play Store pour t'abonner.", playManageTitle: "Mon abonnement Google Play", playManageSub: "Changer de formule ou résilier dans le Play Store.", playManageBtn: "Ouvrir", proInApp: "L'abonnement Pro arrive très bientôt dans l'app. Tu es déjà Pro ? Connecte-toi avec ton compte : tout est débloqué.", proInAppLogin: "Se connecter", proTitle: "Passe en calorio Pro", proSub: "Débloque Vito, ton coach nutrition IA, et l'analyse de tes repas en photo.",
     planMonthly: "Mensuel", planYearly: "Annuel", perMonth: "/mois", perYear: "/an",
     yearlySave: "2 mois offerts", trial: "7 jours d'essai gratuit, sans engagement — annulable à tout moment.",
@@ -209,7 +210,7 @@ const L = {
     shareText: "Ich tracke meine Kalorien mit calorio — einfach und schweizerisch. Mach mit, wir bekommen je 1 Monat Pro 🥕",
     refClaimed: "🎉 Einladung gespeichert! Erfasse 3 Tage lang deine Mahlzeiten: du und deine Freundin erhaltet je 1 Monat Pro.",
     google: "Mit Google fortfahren", or: "oder", emailPh: "dein@email.ch", magic: "Login-Link erhalten",
-    authSent: "📩 Schau in deine E-Mails: klicke auf den Link zum Anmelden.", authErr: "Verbindungsproblem, nochmal versuchen.", cloudOn: "☁️ Daten mit deinem Konto synchronisiert.",
+    authSent: "📩 Schau in deine E-Mails: klicke auf den Link zum Anmelden.", appLoginBtn: "Anmelden (Google oder E-Mail)", appLoginHint: "Die Anmeldung öffnet sich in deinem Browser. Danach kommst du hierher zurück: die App meldet sich automatisch an.", appLoginWait: "Anmeldung läuft in deinem Browser… Prüfcode:", appLoginCancel: "Abbrechen", appLoginExpired: "Die Anfrage ist abgelaufen. Versuch es nochmal.", appLoginBrowser: "Melde dich an, um die calorio-App mit deinem Konto zu verbinden 👇", appLoginAskTitle: "calorio-App verbinden?", appLoginAsk: "Die calorio-App auf deinem Handy möchte sich mit dem Konto {email} verbinden. Prüfe, ob sie diesen Code anzeigt:", appLoginWarn: "Du hast diese Anmeldung nicht selbst in der App gestartet? Lehne ab.", appLoginYes: "App verbinden", appLoginNo: "Ablehnen", appLoginDone: "✅ Erledigt! Geh zurück in die calorio-App: sie meldet sich automatisch an.", appLoginOpen: "calorio-App öffnen", appLoginErr: "Die Anfrage ist abgelaufen. Starte die Anmeldung erneut in der App.", authErr: "Verbindungsproblem, nochmal versuchen.", cloudOn: "☁️ Daten mit deinem Konto synchronisiert.",
     playSecure: "Sichere Zahlung über Google Play · jederzeit im Play Store kündbar", playRestore: "Käufe wiederherstellen", playRestoreNone: "Kein Google-Play-Abo für dieses Konto gefunden.", playPending: "Zahlung wartet auf Bestätigung durch Google Play. Pro wird aktiviert, sobald sie bestätigt ist.", playErr: "Der Kauf konnte nicht abgeschlossen werden. Versuch es gleich nochmal.", playOk: "Willkommen bei calorio Pro! 🥕", playManaged: "Du bist bereits Pro über dein Google-Play-Abo. Verwalte es im Play Store.", playUpdate: "Aktualisiere die calorio-App im Play Store, um ein Abo abzuschliessen.", playManageTitle: "Mein Google-Play-Abo", playManageSub: "Plan wechseln oder im Play Store kündigen.", playManageBtn: "Öffnen", proInApp: "Das Pro-Abo kommt sehr bald in die App. Du bist schon Pro? Melde dich mit deinem Konto an: alles ist freigeschaltet.", proInAppLogin: "Anmelden", proTitle: "Werde calorio Pro", proSub: "Schalte Vito frei, deinen KI-Ernährungscoach, und die Foto-Analyse deiner Mahlzeiten.",
     planMonthly: "Monatlich", planYearly: "Jährlich", perMonth: "/Monat", perYear: "/Jahr",
     yearlySave: "2 Monate gratis", trial: "7 Tage gratis testen, unverbindlich — jederzeit kündbar.",
@@ -302,7 +303,7 @@ const L = {
     shareText: "I use calorio to track my calories — simple and Swiss. Join me and we each get 1 month Pro 🥕",
     refClaimed: "🎉 Invite saved! Log your meals for 3 days: you and your friend will each get 1 month of Pro.",
     google: "Continue with Google", or: "or", emailPh: "you@email.com", magic: "Get a sign-in link",
-    authSent: "📩 Check your inbox: click the link to sign in.", authErr: "Connection issue, try again.", cloudOn: "☁️ Data synced to your account.",
+    authSent: "📩 Check your inbox: click the link to sign in.", appLoginBtn: "Sign in (Google or email)", appLoginHint: "Sign-in opens in your browser. Once signed in, come back here: the app signs in by itself.", appLoginWait: "Signing in in your browser… Code to check:", appLoginCancel: "Cancel", appLoginExpired: "The request expired. Please try again.", appLoginBrowser: "Sign in to connect the calorio app to your account 👇", appLoginAskTitle: "Connect the calorio app?", appLoginAsk: "The calorio app on your phone wants to sign in to {email}. Check that it shows this code:", appLoginWarn: "Didn't start this sign-in yourself from the app? Decline.", appLoginYes: "Connect the app", appLoginNo: "Decline", appLoginDone: "✅ Done! Go back to the calorio app: it signs in by itself.", appLoginOpen: "Open the calorio app", appLoginErr: "The request expired. Start the sign-in again from the app.", authErr: "Connection issue, try again.", cloudOn: "☁️ Data synced to your account.",
     playSecure: "Secure payment via Google Play · cancel anytime in the Play Store", playRestore: "Restore purchases", playRestoreNone: "No Google Play subscription found for this account.", playPending: "Payment pending confirmation by Google Play. Pro will turn on as soon as it clears.", playErr: "The purchase couldn't be completed. Please try again shortly.", playOk: "Welcome to calorio Pro! 🥕", playManaged: "You're already Pro through your Google Play subscription. Manage it in the Play Store.", playUpdate: "Update the calorio app from the Play Store to subscribe.", playManageTitle: "My Google Play subscription", playManageSub: "Switch plan or cancel in the Play Store.", playManageBtn: "Open", proInApp: "The Pro subscription is coming to the app very soon. Already Pro? Sign in with your account: everything is unlocked.", proInAppLogin: "Sign in", proTitle: "Go calorio Pro", proSub: "Unlock Vito, your AI nutrition coach, and photo analysis of your meals.",
     planMonthly: "Monthly", planYearly: "Yearly", perMonth: "/mo", perYear: "/yr",
     yearlySave: "2 months free", trial: "7-day free trial, no commitment — cancel anytime.",
@@ -1717,6 +1718,86 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     setAuthMsg("…");
     const { error } = await supa.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href.split("?")[0] } });
     setAuthMsg(error ? t.authErr : t.authSent);
+  };
+
+  // ---- Connexion de l'app Android via le navigateur (Google refuse la connexion dans une WebView) ----
+  // Détails et sécurité : lib/appLogin.ts.
+  const [appLogin, setAppLogin] = useState<{ s: string; code: string; t: number } | null>(null);
+  const [appLoginMsg, setAppLoginMsg] = useState("");
+  const startAppLogin = async () => {
+    try {
+      const hex = (b: Uint8Array) => Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
+      const s = hex(crypto.getRandomValues(new Uint8Array(32)));
+      const h = hex(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s))));
+      const r = await fetch("/api/app-login/start", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ h }) });
+      if (!r.ok) { setAppLoginMsg(t.authErr); return; }
+      setAppLoginMsg("");
+      setAppLogin({ s, code: codeFromHash(h), t: Date.now() });
+      // Hôte différent de celui de l'app → Android ouvre la page dans le navigateur ; l'app reste ouverte ici.
+      window.location.href = `https://www.calorio.ch/calorio?applogin=${h}`;
+    } catch { setAppLoginMsg(t.authErr); }
+  };
+  // L'app attend l'approbation faite dans le navigateur, puis ouvre la session avec le jeton à usage unique.
+  useEffect(() => {
+    if (!appLogin) return;
+    let stop = false;
+    let busy = false;
+    const tick = async () => {
+      if (stop || busy) return;
+      if (Date.now() - appLogin.t > APP_LOGIN_TTL_MS) { stop = true; setAppLogin(null); setAppLoginMsg(t.appLoginExpired); return; }
+      busy = true;
+      try {
+        const r = await fetch("/api/app-login/claim", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ s: appLogin.s }) });
+        const j = (await r.json().catch(() => ({}))) as { tokenHash?: string; expired?: boolean };
+        if (j.tokenHash) {
+          stop = true;
+          const res = await getSupabase()?.auth.verifyOtp({ token_hash: j.tokenHash, type: "magiclink" });
+          setAppLogin(null);
+          if (!res || res.error) setAppLoginMsg(t.authErr);
+        } else if (j.expired) {
+          stop = true; setAppLogin(null); setAppLoginMsg(t.appLoginExpired);
+        }
+      } catch { /* réseau : on réessaie au prochain tour */ } finally { busy = false; }
+    };
+    const iv = setInterval(tick, 2500);
+    const onVis = () => { if (document.visibilityState === "visible") tick(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { stop = true; clearInterval(iv); document.removeEventListener("visibilitychange", onVis); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appLogin]);
+
+  // Côté navigateur : demande reçue de l'app (?applogin=…) → on la garde le temps de la connexion, puis on demande l'accord.
+  const [pendingApp, setPendingApp] = useState<{ h: string; code: string } | null>(null);
+  const [pendingState, setPendingState] = useState<"ask" | "busy" | "done" | "err">("ask");
+  useEffect(() => {
+    try {
+      const native = !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.();
+      const url = new URL(window.location.href);
+      const h = url.searchParams.get("applogin");
+      if (h !== null) {
+        url.searchParams.delete("applogin");
+        window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+        if (!native && isHex64(h)) localStorage.setItem(APP_LOGIN_KEY, JSON.stringify({ h, t: Date.now() }));
+      }
+      if (!native) setPendingApp(parsePendingApp(localStorage.getItem(APP_LOGIN_KEY)));
+    } catch { /* stockage indisponible */ }
+  }, []);
+  useEffect(() => {
+    if (pendingApp && !user) { setAuthMsg(t.appLoginBrowser); setAuthOpen(true); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingApp]);
+  const approveApp = async () => {
+    if (!pendingApp || pendingState === "busy") return;
+    setPendingState("busy");
+    try {
+      const r = await fetch("/api/app-login/approve", { method: "POST", headers: { "content-type": "application/json", ...(await authHeader()) }, body: JSON.stringify({ h: pendingApp.h }) });
+      setPendingState(r.ok ? "done" : "err");
+    } catch { setPendingState("err"); }
+    try { localStorage.removeItem(APP_LOGIN_KEY); } catch { /* ignore */ }
+  };
+  const closePendingApp = () => {
+    try { localStorage.removeItem(APP_LOGIN_KEY); } catch { /* ignore */ }
+    setPendingApp(null);
   };
   // Déconnexion : on attend que tout soit dans le cloud AVANT d'effacer l'appareil (appareil éventuellement
   // partagé). Si l'envoi échoue, on demande (fenêtre de l'app) : garder les données sur l'appareil ou annuler.
@@ -3469,22 +3550,70 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         </div>
       )}
 
+      {pendingApp && user && (
+        <div className="cl-scanoverlay">
+          <div className="cl-authpanel" role="dialog" aria-modal="true" aria-label={t.appLoginAskTitle}>
+            <div className="cl-auth-h">{t.appLoginAskTitle}</div>
+            {pendingState === "done" ? (
+              <>
+                <p className="cl-auth-s">{t.appLoginDone}</p>
+                {/Android/i.test(navigator.userAgent) && <a className="cl-auth-g" href={APP_INTENT_URL}>{t.appLoginOpen}</a>}
+                <button className="cl-pro-close" onClick={closePendingApp}>{t.close}</button>
+              </>
+            ) : pendingState === "err" ? (
+              <>
+                <p className="cl-auth-s">{t.appLoginErr}</p>
+                <button className="cl-pro-close" onClick={closePendingApp}>{t.close}</button>
+              </>
+            ) : (
+              <>
+                <p className="cl-auth-s">{t.appLoginAsk.replace("{email}", user.email || "")}</p>
+                <div className="cl-applogin-code">{pendingApp.code}</div>
+                <button className="cl-auth-g" onClick={approveApp} disabled={pendingState === "busy"}>{t.appLoginYes}</button>
+                <button className="cl-pro-close" onClick={closePendingApp}>{t.appLoginNo}</button>
+                <p className="cl-auth-legal">{t.appLoginWarn}</p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {authOpen && !user && (
         <div className="cl-scanoverlay" onClick={() => setAuthOpen(false)}>
           <div className="cl-authpanel" role="dialog" aria-modal="true" aria-label={t.authTitle} onClick={(e) => e.stopPropagation()}>
             <button className="cl-chooser-x cl-auth-close" onClick={() => setAuthOpen(false)} aria-label={t.close}>×</button>
             <div className="cl-auth-h">{t.authTitle}</div>
             <p className="cl-auth-s">{t.authSub}</p>
-            <button className="cl-auth-g" onClick={signInGoogle}>
-              <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.1 0 24 0 14.6 0 6.4 5.4 2.5 13.3l7.8 6.1C12.2 13.2 17.6 9.5 24 9.5z" /><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.1 5.3-4.6 7l7.1 5.5c4.2-3.9 6.6-9.6 6.6-16z" /><path fill="#FBBC05" d="M10.3 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6l-7.8-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.5 10.7l7.8-6.1z" /><path fill="#34A853" d="M24 48c6.1 0 11.3-2 15-5.5l-7.1-5.5c-2 1.3-4.6 2.1-7.9 2.1-6.4 0-11.8-3.7-13.7-9.4l-7.8 6.1C6.4 42.6 14.6 48 24 48z" /></svg>
-              {t.google}
-            </button>
-            <div className="cl-auth-or"><span>{t.or}</span></div>
-            <div className="cl-auth-email">
-              <input type="email" aria-label={t.emailPh} placeholder={t.emailPh} value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") signInEmail(); }} />
-              <button onClick={signInEmail}>{t.magic}</button>
-            </div>
-            {authMsg && <p className="cl-auth-msg" role="status">{authMsg}</p>}
+            {playApp ? (
+              <>
+                {appLogin ? (
+                  <>
+                    <p className="cl-auth-s">{t.appLoginWait}</p>
+                    <div className="cl-applogin-code" aria-live="polite">{appLogin.code}</div>
+                    <button className="cl-pro-close" onClick={() => setAppLogin(null)}>{t.appLoginCancel}</button>
+                  </>
+                ) : (
+                  <>
+                    <button className="cl-auth-g" onClick={startAppLogin}>{t.appLoginBtn}</button>
+                    <p className="cl-auth-legal">{t.appLoginHint}</p>
+                  </>
+                )}
+                {(appLoginMsg || authMsg) && <p className="cl-auth-msg" role="status">{appLoginMsg || authMsg}</p>}
+              </>
+            ) : (
+              <>
+              <button className="cl-auth-g" onClick={signInGoogle}>
+                <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.1 0 24 0 14.6 0 6.4 5.4 2.5 13.3l7.8 6.1C12.2 13.2 17.6 9.5 24 9.5z" /><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.1 5.3-4.6 7l7.1 5.5c4.2-3.9 6.6-9.6 6.6-16z" /><path fill="#FBBC05" d="M10.3 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6l-7.8-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.5 10.7l7.8-6.1z" /><path fill="#34A853" d="M24 48c6.1 0 11.3-2 15-5.5l-7.1-5.5c-2 1.3-4.6 2.1-7.9 2.1-6.4 0-11.8-3.7-13.7-9.4l-7.8 6.1C6.4 42.6 14.6 48 24 48z" /></svg>
+                {t.google}
+              </button>
+              <div className="cl-auth-or"><span>{t.or}</span></div>
+              <div className="cl-auth-email">
+                <input type="email" aria-label={t.emailPh} placeholder={t.emailPh} value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") signInEmail(); }} />
+                <button onClick={signInEmail}>{t.magic}</button>
+              </div>
+              {authMsg && <p className="cl-auth-msg" role="status">{authMsg}</p>}
+              </>
+            )}
             <p className="cl-auth-legal">{x.authConsent} <a href="/confidentialite-calorio" target="_blank" rel="noopener">{x.privacyLink}</a></p>
           </div>
         </div>
@@ -4092,6 +4221,8 @@ const CSS = `
 .cl-auth-email input{flex:1;min-width:150px;background:var(--card2);border:1.5px solid var(--line);border-radius:12px;color:var(--ink);padding:13px 14px;font-size:.92rem}
 .cl-auth-email button{background:var(--btn);color:#fff;border:0;border-radius:12px;padding:13px 16px;font-weight:800;font-size:.85rem;cursor:pointer;white-space:nowrap}
 .cl-auth-msg{margin:12px 0 0;font-size:.85rem;color:var(--green);font-weight:700}
+.cl-applogin-code{margin:10px auto 14px;font-size:2rem;font-weight:800;letter-spacing:.35em;text-align:center;font-variant-numeric:tabular-nums;color:var(--ink,inherit)}
+a.cl-auth-g{text-decoration:none;justify-content:center}
 /* modale Pro */
 .cl-promodal{width:min(94vw,420px);background:var(--card);border-radius:24px;padding:26px;text-align:center;box-shadow:0 30px 70px -20px rgba(14,40,24,.5)}
 .cl-pro-h{font-family:var(--disp);font-size:1.4rem;font-weight:600;color:var(--ink)}

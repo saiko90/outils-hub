@@ -45,6 +45,7 @@ export async function POST(req: Request) {
     const cfg = await ensurePortalConfig(returnUrl);
     if (cfg) s = await mk(cfg);
   }
+  if (!s.ok && /no such customer/i.test(JSON.stringify(s.data))) return NextResponse.json({ error: "no_customer" }, { status: 404 });
   if (!s.ok || !s.data.url) return NextResponse.json({ error: "stripe_error" }, { status: 502 });
   return NextResponse.json({ url: s.data.url });
 }

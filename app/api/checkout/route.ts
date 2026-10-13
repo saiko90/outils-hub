@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { SB_URL, SB_ANON, svcHeaders } from "@/lib/serverAuth";
-import { stripeLocale } from "@/lib/stripeServer";
+import { stripeLocale, calorioPrices, customerExists } from "@/lib/stripeServer";
 
 // Crée une session Stripe Checkout (abonnement Pro) pour l'utilisateur connecté.
 // La clé secrète Stripe reste côté serveur (env). L'utilisateur est identifié via
@@ -12,8 +12,7 @@ const SITE = "https://outils.ch";
 
 export async function POST(req: Request) {
   const key = process.env.STRIPE_SECRET_KEY;
-  const priceMonthly = process.env.STRIPE_PRICE_MONTHLY;
-  const priceYearly = process.env.STRIPE_PRICE_YEARLY;
+  const { monthly: priceMonthly, yearly: priceYearly } = key ? await calorioPrices() : {};
   if (!key || !priceMonthly || !priceYearly) {
     return NextResponse.json({ error: "not_configured", message: "Le paiement n'est pas encore activé." }, { status: 503 });
   }
@@ -59,6 +58,8 @@ export async function POST(req: Request) {
     if (activeStripe) return NextResponse.json({ error: "already_subscribed" }, { status: 409 });
     existingCustomer = p?.stripe_customer_id || "";
   } catch { /* on continue : Stripe reste la source de vérité */ }
+  // Client d'un ancien compte Stripe (ou du mode test) : inconnu ici, on repart d'un nouveau client.
+  if (existingCustomer && !(await customerExists(existingCustomer).catch(() => false))) existingCustomer = "";
   const returnPath = base === SITE ? "/o/calorio" : "/calorio";
 
   // 3) Créer la session Checkout (abonnement, essai 7 jours)

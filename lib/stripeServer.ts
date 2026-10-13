@@ -18,3 +18,31 @@ export function safeBase(origin: unknown): string {
 export function stripeLocale(lang: unknown): string {
   return lang === "de" ? "de" : lang === "en" ? "en" : "fr";
 }
+
+// Prix calorio Pro, retrouvés par leur « lookup key » dans le compte Stripe branché (calorio_monthly /
+// calorio_yearly). Changer de compte Stripe ne demande donc que la nouvelle clé secrète ; les variables
+// STRIPE_PRICE_MONTHLY / STRIPE_PRICE_YEARLY ne servent plus que de secours.
+let priceCache: { monthly?: string; yearly?: string; at: number } | null = null;
+export async function calorioPrices(): Promise<{ monthly?: string; yearly?: string }> {
+  if (priceCache && Date.now() - priceCache.at < 10 * 60_000) return priceCache;
+  const out: { monthly?: string; yearly?: string } = {};
+  try {
+    const r = await stripe("prices?active=true&lookup_keys[]=calorio_monthly&lookup_keys[]=calorio_yearly&limit=10", "GET");
+    const list = r.ok && Array.isArray(r.data.data) ? (r.data.data as { id?: string; lookup_key?: string }[]) : [];
+    for (const p of list) {
+      if (p.lookup_key === "calorio_monthly" && p.id) out.monthly = p.id;
+      if (p.lookup_key === "calorio_yearly" && p.id) out.yearly = p.id;
+    }
+  } catch { /* secours : variables d'environnement */ }
+  const res = { monthly: out.monthly || process.env.STRIPE_PRICE_MONTHLY, yearly: out.yearly || process.env.STRIPE_PRICE_YEARLY };
+  if (out.monthly && out.yearly) priceCache = { ...res, at: Date.now() };
+  return res;
+}
+
+// Un client Stripe enregistré peut venir d'un autre compte (ou du mode test) : on vérifie qu'il existe
+// dans le compte branché avant de le réutiliser.
+export async function customerExists(id: string): Promise<boolean> {
+  if (!id) return false;
+  const r = await stripe(`customers/${encodeURIComponent(id)}`, "GET");
+  return r.ok && !r.data.deleted;
+}

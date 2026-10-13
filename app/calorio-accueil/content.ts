@@ -15,6 +15,7 @@ export type LandingCopy = {
   lead: string;
   ctaMain: string;
   ctaSub: string;
+  playAlt: string;
   trust: string[];
   refBanner: string;
   shotsAlt: [string, string, string];
@@ -45,7 +46,8 @@ export const COPY: Record<LLang, LandingCopy> = {
     h1b: "sans te prendre la tête.",
     lead: "Note tes repas en quelques secondes, vois tout de suite ce qu'il te reste pour la journée et avance vers ton objectif, à ton rythme. L'essentiel est gratuit, sans pub, et sans compte obligatoire.",
     ctaMain: "Commencer gratuitement",
-    ctaSub: "Directement dans le navigateur, sur mobile ou ordinateur.",
+    ctaSub: "Sur Android avec l'app Google Play, ou directement dans le navigateur (iPhone, ordinateur).",
+    playAlt: "Disponible sur Google Play",
     trust: ["Sans publicité", "Sans compte obligatoire", "Français · Deutsch · English", "Données hébergées en Europe"],
     refBanner: "Un ami t'invite : utilise calorio 3 jours et vous recevez chacun 1 mois de Pro offert.",
     shotsAlt: ["Écran du jour : anneau des calories restantes et macros", "Journal du jour par repas", "Courbe de poids et objectif"],
@@ -77,7 +79,7 @@ export const COPY: Record<LLang, LandingCopy> = {
       { q: "calorio est-il vraiment gratuit ?", a: "Oui. Le journal, la recherche d'aliments, le scan de code-barres, le suivi du poids et la synchronisation sont gratuits, sans publicité. La version Pro (CHF 4.90 par mois ou CHF 39 par an) ajoute le coach Vito et l'analyse photo." },
       { q: "Faut-il créer un compte ?", a: "Non. Sans compte, tout reste sur ton appareil. Un compte gratuit sert seulement à retrouver tes données sur ton téléphone et ton ordinateur." },
       { q: "Comment calorio calcule-t-il ma cible ?", a: "Avec la formule de Mifflin-St Jeor pour ton métabolisme de base, multipliée par ton niveau d'activité puis ajustée à ton objectif. La cible ne descend jamais sous un minimum de sécurité (1200 kcal pour une femme, 1500 kcal pour un homme). C'est une estimation, pas un avis médical." },
-      { q: "Y a-t-il une application Android ?", a: "Oui, calorio arrive sur Google Play avec Health Connect pour les pas et les calories dépensées. En attendant, l'app web s'installe sur l'écran d'accueil depuis ton navigateur." },
+      { q: "Y a-t-il une application Android ?", a: "Oui, calorio est disponible sur Google Play, avec Health Connect pour les pas et les calories dépensées. Ton compte et tes données sont les mêmes dans l'app et dans le navigateur. Sur iPhone, l'app web s'installe sur l'écran d'accueil depuis Safari." },
       { q: "Que deviennent mes données ?", a: "Elles ne sont jamais vendues. Avec un compte, elles sont hébergées en Europe. Tu peux les exporter ou supprimer ton compte à tout moment depuis l'app." },
     ],
     finalTitle: "Ta première journée prend deux minutes.",
@@ -93,7 +95,8 @@ export const COPY: Record<LLang, LandingCopy> = {
     h1b: "ganz ohne Stress.",
     lead: "Erfasse Mahlzeiten in Sekunden, sieh sofort, was dir heute noch bleibt, und komm deinem Ziel in deinem Tempo näher. Das Wichtigste ist gratis, werbefrei und ohne Konto nutzbar.",
     ctaMain: "Gratis starten",
-    ctaSub: "Direkt im Browser, auf Handy oder Computer.",
+    ctaSub: "Auf Android mit der App von Google Play oder direkt im Browser (iPhone, Computer).",
+    playAlt: "Jetzt bei Google Play",
     trust: ["Ohne Werbung", "Ohne Kontopflicht", "Français · Deutsch · English", "Daten in Europa gespeichert"],
     refBanner: "Eine Freundin lädt dich ein: nutze calorio 3 Tage und ihr erhaltet beide 1 Monat Pro gratis.",
     shotsAlt: ["Tagesansicht: Ring mit restlichen Kalorien und Makros", "Tagebuch nach Mahlzeiten", "Gewichtskurve und Ziel"],
@@ -125,7 +128,7 @@ export const COPY: Record<LLang, LandingCopy> = {
       { q: "Ist calorio wirklich gratis?", a: "Ja. Tagebuch, Lebensmittelsuche, Barcode-Scan, Gewichtsverlauf und Synchronisierung sind gratis und werbefrei. Pro (CHF 4.90 pro Monat oder CHF 39 pro Jahr) ergänzt den Coach Vito und die Foto-Analyse." },
       { q: "Brauche ich ein Konto?", a: "Nein. Ohne Konto bleibt alles auf deinem Gerät. Ein Gratiskonto brauchst du nur, um deine Daten auf Handy und Computer zu haben." },
       { q: "Wie berechnet calorio mein Ziel?", a: "Mit der Mifflin-St-Jeor-Formel für deinen Grundumsatz, multipliziert mit deinem Aktivitätsniveau und an dein Ziel angepasst. Das Ziel fällt nie unter ein Sicherheits-Minimum (1200 kcal für Frauen, 1500 kcal für Männer). Eine Schätzung, keine medizinische Beratung." },
-      { q: "Gibt es eine Android-App?", a: "Ja, calorio kommt mit Health Connect für Schritte und Kalorienverbrauch auf Google Play. Bis dahin lässt sich die Web-App aus dem Browser auf dem Startbildschirm installieren." },
+      { q: "Gibt es eine Android-App?", a: "Ja, calorio ist auf Google Play erhältlich, mit Health Connect für Schritte und Kalorienverbrauch. Konto und Daten sind in der App und im Browser dieselben. Auf dem iPhone lässt sich die Web-App aus Safari auf dem Startbildschirm installieren." },
       { q: "Was passiert mit meinen Daten?", a: "Sie werden nie verkauft. Mit Konto werden sie in Europa gespeichert. Du kannst sie jederzeit in der App exportieren oder dein Konto löschen." },
     ],
     finalTitle: "Dein erster Tag dauert zwei Minuten.",
@@ -141,7 +144,8 @@ export const COPY: Record<LLang, LandingCopy> = {
     h1b: "without the headache.",
     lead: "Log meals in seconds, see right away what's left for the day, and move towards your goal at your own pace. The essentials are free, ad-free, and you don't need an account.",
     ctaMain: "Start for free",
-    ctaSub: "Right in your browser, on phone or computer.",
+    ctaSub: "On Android with the Google Play app, or right in your browser (iPhone, computer).",
+    playAlt: "Get it on Google Play",
     trust: ["No ads", "No account required", "Français · Deutsch · English", "Data hosted in Europe"],
     refBanner: "A friend invited you: use calorio for 3 days and you each get 1 month of Pro free.",
     shotsAlt: ["Today screen: ring of calories left and macros", "Today's log by meal", "Weight curve and goal"],
@@ -173,7 +177,7 @@ export const COPY: Record<LLang, LandingCopy> = {
       { q: "Is calorio really free?", a: "Yes. The log, food search, barcode scanning, weight tracking and sync are free, with no ads. Pro (CHF 4.90 a month or CHF 39 a year) adds the Vito coach and photo analysis." },
       { q: "Do I need an account?", a: "No. Without an account everything stays on your device. A free account only lets you get your data on both phone and computer." },
       { q: "How does calorio work out my target?", a: "With the Mifflin-St Jeor formula for your basal metabolism, multiplied by your activity level and adjusted to your goal. The target never drops below a safety minimum (1200 kcal for women, 1500 kcal for men). It's an estimate, not medical advice." },
-      { q: "Is there an Android app?", a: "Yes, calorio is coming to Google Play with Health Connect for steps and calories burned. Meanwhile, the web app installs on your home screen from your browser." },
+      { q: "Is there an Android app?", a: "Yes, calorio is available on Google Play, with Health Connect for steps and calories burned. Your account and data are the same in the app and in the browser. On iPhone, the web app installs on your home screen from Safari." },
       { q: "What happens to my data?", a: "It's never sold. With an account it's hosted in Europe. You can export it or delete your account at any time from the app." },
     ],
     finalTitle: "Your first day takes two minutes.",

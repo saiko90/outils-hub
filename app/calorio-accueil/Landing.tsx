@@ -75,6 +75,8 @@ function Check() {
 export default function Landing({ lang }: { lang: LLang }) {
   const c = COPY[lang];
   const app = `/calorio${lang === "fr" ? "" : `?lang=${lang}`}`;
+  // Fiche Google Play (langue de la page + source pour les statistiques d'acquisition de la Play Console).
+  const play = `https://play.google.com/store/apps/details?id=ch.calorio.twa&hl=${lang}&referrer=utm_source%3Dcalorio.ch%26utm_medium%3Dlanding`;
   const shots = ["/calorio-shot-stats.jpg", "/calorio-shot-journee.jpg", "/calorio-shot-poids.jpg"];
 
   const ld = {
@@ -142,6 +144,7 @@ export default function Landing({ lang }: { lang: LLang }) {
             <p className="lp-lead">{c.lead}</p>
             <div className="lp-cta-row">
               <a className="lp-btn" href={app} data-app>{c.ctaMain}<span aria-hidden> →</span></a>
+              <a className="lp-play" href={play} target="_blank" rel="noopener"><img src={`/badges/google-play-${lang}.png`} alt={c.playAlt} width={155} height={60} /></a>
             </div>
             <p className="lp-cta-sub">{c.ctaSub}</p>
             <ul className="lp-trust">
@@ -220,7 +223,10 @@ export default function Landing({ lang }: { lang: LLang }) {
         <section className="lp-final">
           <h2>{c.finalTitle}</h2>
           <p>{c.finalText}</p>
-          <a className="lp-btn" href={app} data-app>{c.ctaMain}<span aria-hidden> →</span></a>
+          <div className="lp-cta-row lp-cta-center">
+            <a className="lp-btn" href={app} data-app>{c.ctaMain}<span aria-hidden> →</span></a>
+            <a className="lp-play" href={play} target="_blank" rel="noopener"><img src={`/badges/google-play-${lang}.png`} alt={c.playAlt} width={155} height={60} /></a>
+          </div>
         </section>
       </main>
 
@@ -311,6 +317,12 @@ body{background:var(--lp-bg) !important;color:var(--lp-ink)}
 .lp-faq summary::after{content:"+";float:right;color:var(--lp-green-ink);font-weight:900}
 .lp-faq details[open] summary::after{content:"–"}
 .lp-faq p{margin:0 0 14px;color:var(--lp-muted);line-height:1.6}
+.lp-cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.lp-cta-center{justify-content:center}
+.lp-play{display:inline-flex;border-radius:12px;line-height:0;transition:transform .15s ease}
+.lp-play:hover{transform:translateY(-1px)}
+.lp-play:focus-visible{outline:3px solid var(--lp-green);outline-offset:3px}
+.lp-play img{height:60px;width:auto;display:block}
 .lp-final{margin:40px 0 20px;padding:44px 28px;border-radius:28px;text-align:center;background:linear-gradient(150deg,#123d24,#0e2a19);color:#eaf6ee}
 .lp-final h2{font-size:clamp(1.6rem,3.2vw,2.3rem);font-weight:700;color:#fff}
 .lp-final p{color:#b9d4c3;margin:12px auto 24px;max-width:48ch;line-height:1.55}

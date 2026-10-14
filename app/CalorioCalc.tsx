@@ -58,6 +58,7 @@ const L = {
     valuesLabel: "Ce qui distingue calorio",
     values: ["Scan code-barres gratuit", "Sans publicité", "Données privées", "Coach IA (Pro)"],
     proCompare: "Le coaching nutrition IA que d'autres facturent ~200 $/an — ici à prix juste. Sans pub, données privées, résiliable en un clic.",
+    proTerms: "Conditions de l'abonnement et mentions légales",
     intro: {
       besoins: "Réglons ton profil pour connaître tes calories cible chaque jour.",
       journal: "Note ce que tu manges — on compare en direct à ton objectif.",
@@ -153,6 +154,7 @@ const L = {
     valuesLabel: "Was calorio auszeichnet",
     values: ["Gratis Barcode-Scan", "Keine Werbung", "Private Daten", "KI-Coach (Pro)"],
     proCompare: "Das KI-Ernährungscoaching, das andere mit ~200 $/Jahr berechnen — hier fair. Keine Werbung, private Daten, jederzeit kündbar.",
+    proTerms: "Abo-Bedingungen und Impressum",
     intro: {
       besoins: "Stell dein Profil ein, um deine täglichen Zielkalorien zu kennen.",
       journal: "Notiere, was du isst — wir vergleichen live mit deinem Ziel.",
@@ -246,6 +248,7 @@ const L = {
     valuesLabel: "What sets calorio apart",
     values: ["Free barcode scanning", "No ads", "Private data", "AI coach (Pro)"],
     proCompare: "The AI nutrition coaching others charge ~$200/yr for — here at a fair price. No ads, private data, cancel in one click.",
+    proTerms: "Subscription terms and legal notice",
     intro: {
       besoins: "Set your profile to know your daily target calories.",
       journal: "Log what you eat — we compare it live to your goal.",
@@ -3675,6 +3678,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                           </>
             )}
 {checkoutMsg && checkoutMsg !== "…" && <p className="cl-scanmsg">{checkoutMsg}</p>}
+            <p className="cl-pro-terms"><a href="/mentions-legales#conditions" target="_blank" rel="noopener">{t.proTerms}</a></p>
             <button className="cl-pro-close" onClick={() => setProOpen(false)}>{t.close}</button>
           </div>
         </div>
@@ -4244,6 +4248,7 @@ a.cl-auth-g{text-decoration:none;justify-content:center}
 .cl-plan-price{font-family:var(--disp);font-size:1.35rem;font-weight:600;color:var(--ink);white-space:nowrap}
 .cl-plan-price small{font-size:.78rem;font-weight:600;color:var(--muted)}
 .cl-pro-trial{margin:16px 0 0;font-size:.85rem;color:var(--green);font-weight:700}
+.cl-pro-terms{margin:10px 0 0;font-size:.76rem;text-align:center}.cl-pro-terms a{color:var(--muted);text-decoration:underline}
 .cl-pro-compare{margin:12px 0 0;font-size:.8rem;line-height:1.5;color:var(--muted)}
 .cl-pro-close{margin-top:14px;background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:12px;padding:11px 20px;font-size:.85rem;cursor:pointer}
 /* eau */

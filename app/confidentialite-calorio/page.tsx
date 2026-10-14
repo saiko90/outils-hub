@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { PV_CSS as CSS } from "@/lib/calorioLegalStyle";
 
 const CANON = "https://calorio.ch/confidentialite-calorio";
 
@@ -28,7 +29,7 @@ export default function Page() {
         <p className="pv-intro">calorio est un compteur de calories et journal nutritionnel. Cette page explique quelles données sont traitées, pourquoi, et tes droits. En résumé : <b>tes données ne sont jamais vendues</b>, et l'application fonctionne même sans créer de compte.</p>
 
         <h2 className="pv-h2">Responsable du traitement</h2>
-        <p>calorio est édité par <b>Krystel Fiorbianco — Swiss Digital Studio</b>, Valais, Suisse. Contact : <a href="mailto:m.kaeser90@gmail.com">m.kaeser90@gmail.com</a>.</p>
+        <p>calorio est édité par <b>Krystel Fiorbianco — Swiss Digital Studio</b>, Route de Derborence 28, 1976 Aven, Suisse. Contact : <a href="mailto:contact@swissdigitalstudio.ch">contact@swissdigitalstudio.ch</a>.</p>
 
         <h2 className="pv-h2">Utilisation sans compte</h2>
         <p>Par défaut, tu peux utiliser calorio <b>sans créer de compte</b>. Dans ce cas, tes données (profil, journal alimentaire, poids, préférences) restent stockées <b>localement sur ton appareil</b> et ne sont pas transmises à nos serveurs.</p>
@@ -83,7 +84,7 @@ export default function Page() {
           <li><b>Supprimer ton compte</b> et toutes les données associées, immédiatement et définitivement : Aide → Mon compte → Supprimer mon compte. Un abonnement en cours est résilié.</li>
           <li>À la <b>déconnexion</b>, une fois tes données bien enregistrées dans ton compte, elles sont retirées de l'appareil et ses notifications sont désactivées. Si elles n'ont pas pu être envoyées (pas de connexion), l'app te propose de les garder sur l'appareil : elles restent alors rattachées à ton compte et ne sont jamais versées dans le compte de quelqu'un d'autre.</li>
         </ul>
-        <p>Pour toute question ou demande : <a href="mailto:m.kaeser90@gmail.com">m.kaeser90@gmail.com</a>. Tu peux aussi t'adresser au Préposé fédéral à la protection des données et à la transparence (PFPDT).</p>
+        <p>Pour toute question ou demande : <a href="mailto:contact@swissdigitalstudio.ch">contact@swissdigitalstudio.ch</a>. Tu peux aussi t'adresser au Préposé fédéral à la protection des données et à la transparence (PFPDT).</p>
 
         <h2 className="pv-h2">Enfants</h2>
         <p>calorio n'est pas destiné aux enfants de moins de 13 ans et ne leur est pas spécifiquement adressé.</p>
@@ -99,25 +100,3 @@ export default function Page() {
     </>
   );
 }
-
-const CSS = `
-body{background:#f3f7f2 !important}
-.pv-bg{position:fixed;inset:0;z-index:-5;background:radial-gradient(1100px 560px at 50% -8%, #e9faf0, #f3f7f2 62%)}
-.pv{max-width:720px;margin:0 auto;padding:16px 18px 70px;color:#2b3243;font-family:inherit;line-height:1.6}
-.pv a{color:#16a34a}
-.pv-top{padding:8px 2px 10px}
-.pv-brand{display:inline-flex;align-items:center;gap:9px;font-size:1.2rem;font-weight:800;letter-spacing:-.3px;color:#16a34a;text-decoration:none}
-.pv-brand img{border-radius:9px}
-.pv-h1{font-size:1.9rem;font-weight:800;letter-spacing:-.5px;color:#1a2030;margin:8px 0 4px}
-.pv-maj{color:#9aa2b4;font-size:.85rem;margin:0 0 18px}
-.pv-intro{font-size:1.02rem;color:#4b5563;margin:0 0 8px}
-.pv-intro b{color:#166a3a}
-.pv-h2{font-size:1.18rem;font-weight:800;color:#1a2030;margin:26px 0 8px;padding-bottom:8px;border-bottom:1px solid #f6cdd9}
-.pv p{margin:0 0 10px;color:#3b4252}
-.pv b{color:#232a37}
-.pv-ul{margin:0 0 12px;padding-left:20px;color:#3b4252}
-.pv-ul li{margin:6px 0}
-.pv-back{margin:28px 0 0}
-.pv-back a{text-decoration:none;font-weight:700}
-@media(max-width:560px){.pv-h1{font-size:1.55rem}}
-`;

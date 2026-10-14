@@ -18,6 +18,12 @@ export function middleware(req: NextRequest) {
     url.pathname = pathname === "/" ? "/calorio-accueil" : `/calorio-accueil${pathname}`;
     return NextResponse.rewrite(url);
   }
+  // calorio.ch : mentions légales et conditions propres à calorio (exigences TWINT : nom, adresse, contact, prix CHF).
+  if (onCalorio && /^\/(?:(?:de|en)\/)?(?:mentions-legales|impressum|legal-notice|conditions|agb|terms)\/?$/.test(pathname)) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/mentions-legales-calorio";
+    return NextResponse.rewrite(url);
+  }
   // La page d'accueil n'existe que sous calorio.ch/ (évite le contenu dupliqué).
   const local = host === "localhost" || host === "127.0.0.1";
   if (!local && pathname.startsWith("/calorio-accueil")) {

@@ -237,6 +237,7 @@ export default function Landing({ lang }: { lang: LLang }) {
           <a href="/calories">{c.footer.foods}</a>
           <a href={lang === "en" ? "/calorio-vs-myfitnesspal/en" : "/calorio-vs-myfitnesspal"}>{c.footer.compare}</a>
           <a href="/confidentialite-calorio">{c.footer.privacy}</a>
+          <a href="/mentions-legales">{c.footer.legal}</a>
         </nav>
       </footer>
       <script dangerouslySetInnerHTML={{ __html: refScript }} />

@@ -59,6 +59,7 @@ const L = {
     values: ["Scan code-barres gratuit", "Sans publicité", "Données privées", "Coach IA (Pro)"],
     proCompare: "Le coaching nutrition IA que d'autres facturent ~200 $/an — ici à prix juste. Sans pub, données privées, résiliable en un clic.",
     proTerms: "Conditions de l'abonnement et mentions légales",
+    promoActive: (c: string) => `Code ${c} : −20 % appliqué au paiement`,
     intro: {
       besoins: "Réglons ton profil pour connaître tes calories cible chaque jour.",
       journal: "Note ce que tu manges — on compare en direct à ton objectif.",
@@ -155,6 +156,7 @@ const L = {
     values: ["Gratis Barcode-Scan", "Keine Werbung", "Private Daten", "KI-Coach (Pro)"],
     proCompare: "Das KI-Ernährungscoaching, das andere mit ~200 $/Jahr berechnen — hier fair. Keine Werbung, private Daten, jederzeit kündbar.",
     proTerms: "Abo-Bedingungen und Impressum",
+    promoActive: (c: string) => `Code ${c}: −20 % beim Bezahlen`,
     intro: {
       besoins: "Stell dein Profil ein, um deine täglichen Zielkalorien zu kennen.",
       journal: "Notiere, was du isst — wir vergleichen live mit deinem Ziel.",
@@ -249,6 +251,7 @@ const L = {
     values: ["Free barcode scanning", "No ads", "Private data", "AI coach (Pro)"],
     proCompare: "The AI nutrition coaching others charge ~$200/yr for — here at a fair price. No ads, private data, cancel in one click.",
     proTerms: "Subscription terms and legal notice",
+    promoActive: (c: string) => `Code ${c}: 20% off applied at checkout`,
     intro: {
       besoins: "Set your profile to know your daily target calories.",
       journal: "Log what you eat — we compare it live to your goal.",
@@ -864,6 +867,19 @@ const ACT_GROUPS = Object.keys(ACT_GROUP_LABELS).map((key) => ({
   items: SPORTS.filter((s) => s.groupe === key),
 }));
 
+
+// Code promo partenaire mémorisé depuis un lien ?code= (valable 60 jours).
+const PROMO_KEY = "calorio.promo";
+function readPromo(): string {
+  try {
+    const raw = localStorage.getItem(PROMO_KEY);
+    if (!raw) return "";
+    const p = JSON.parse(raw) as { code?: string; at?: number };
+    if (!p.code || !p.at || Date.now() - p.at > 60 * 86400000) { localStorage.removeItem(PROMO_KEY); return ""; }
+    return /^[A-Z0-9]{3,20}$/.test(p.code) ? p.code : "";
+  } catch { return ""; }
+}
+
 export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [langOv, setLangOv] = useState<Lang | null>(null);
   const lang: Lang = langOv ?? propLang;
@@ -1002,6 +1018,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [playMsg, setPlayMsg] = useState("");
   const [playBusy, setPlayBusy] = useState(false);
   const [checkoutMsg, setCheckoutMsg] = useState("");
+  const [promoCode, setPromoCode] = useState("");
   // Parrainage (viralité)
   const [refCode, setRefCode] = useState("");
   const [refCount, setRefCount] = useState(0);
@@ -1095,6 +1112,14 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       const ref = url.searchParams.get("ref");
       if (ref && /^[A-Za-z0-9]{4,10}$/.test(ref) && !localStorage.getItem("calorio.ref")) {
         localStorage.setItem("calorio.ref", ref.toUpperCase());
+      }
+      // Code promo partenaire (?code=LAURA20) : gardé 60 jours et appliqué au paiement Stripe.
+      const promo = url.searchParams.get("code");
+      if (promo && /^[A-Za-z0-9]{3,20}$/.test(promo)) {
+        localStorage.setItem(PROMO_KEY, JSON.stringify({ code: promo.toUpperCase(), at: Date.now() }));
+        setPromoCode(promo.toUpperCase());
+      } else {
+        setPromoCode(readPromo());
       }
     } catch {
       /* ignore */
@@ -1847,7 +1872,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       const r = await fetch("/api/checkout", {
         method: "POST",
         headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
-        body: JSON.stringify({ plan, origin: window.location.origin, lang }),
+        body: JSON.stringify({ plan, origin: window.location.origin, lang, promo: readPromo() || undefined }),
       });
       const j = (await r.json()) as { url?: string; error?: string };
       if (j.url) { window.location.href = j.url; return; }
@@ -3673,6 +3698,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               </button>
             </div>
             <p className="cl-pro-trial">🎁 {t.trial}</p>
+            {promoCode && <p className="cl-pro-promo">🏷️ {t.promoActive(promoCode)}</p>}
             <p className="cl-pro-secure">🔒 {t.proSecure}</p>
             <p className="cl-pro-compare">{t.proCompare}</p>
                           </>
@@ -4248,6 +4274,7 @@ a.cl-auth-g{text-decoration:none;justify-content:center}
 .cl-plan-price{font-family:var(--disp);font-size:1.35rem;font-weight:600;color:var(--ink);white-space:nowrap}
 .cl-plan-price small{font-size:.78rem;font-weight:600;color:var(--muted)}
 .cl-pro-trial{margin:16px 0 0;font-size:.85rem;color:var(--green);font-weight:700}
+.cl-pro-promo{margin:6px 0 0;text-align:center;font-size:.82rem;font-weight:700;color:var(--green)}
 .cl-pro-terms{margin:10px 0 0;font-size:.76rem;text-align:center}.cl-pro-terms a{color:var(--muted);text-decoration:underline}
 .cl-pro-compare{margin:12px 0 0;font-size:.8rem;line-height:1.5;color:var(--muted)}
 .cl-pro-close{margin-top:14px;background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:12px;padding:11px 20px;font-size:.85rem;cursor:pointer}

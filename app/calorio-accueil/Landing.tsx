@@ -109,7 +109,8 @@ export default function Landing({ lang }: { lang: LLang }) {
   // on l'emmène directement dans l'app, avant tout affichage. Les nouveaux visiteurs voient cette page.
   // Un lien de parrainage (?ref) est conservé sur les boutons « commencer ».
   const bootScript = `(function(){try{var s=location.search,q=new URLSearchParams(s);var back=localStorage.getItem('calorio.onboarded')==='1'||!!localStorage.getItem('calorio.journal');var standalone=window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches;var auth=/access_token|error_description/.test(location.hash)||q.has('code');if(back||standalone||auth||q.has('pro')||q.has('go')){location.replace('/calorio'+s+location.hash);return;}if(q.has('ref')){document.documentElement.classList.add('lp-has-ref');}}catch(e){}})();`;
-  const refScript = `(function(){try{var r=new URLSearchParams(location.search).get('ref');if(!r||!/^[A-Za-z0-9]{4,10}$/.test(r))return;document.querySelectorAll('a[data-app]').forEach(function(a){var u=new URL(a.getAttribute('href'),location.origin);u.searchParams.set('ref',r);a.setAttribute('href',u.pathname+u.search);});}catch(e){}})();`;
+  // Transmet ?ref= (parrainage) et ?code= (code promo partenaire) aux liens vers l'app.
+  const refScript = `(function(){try{var q=new URLSearchParams(location.search),r=q.get('ref'),c=q.get('code');if(r&&!/^[A-Za-z0-9]{4,10}$/.test(r))r=null;if(c&&!/^[A-Za-z0-9]{3,20}$/.test(c))c=null;if(!r&&!c)return;document.querySelectorAll('a[data-app]').forEach(function(a){var u=new URL(a.getAttribute('href'),location.origin);if(r)u.searchParams.set('ref',r);if(c)u.searchParams.set('code',c.toUpperCase());a.setAttribute('href',u.pathname+u.search);});}catch(e){}})();`;
 
   return (
     <div className={`lp ${calorioFontVars}`} lang={lang}>
@@ -237,6 +238,7 @@ export default function Landing({ lang }: { lang: LLang }) {
           <a href="/calories">{c.footer.foods}</a>
           <a href={lang === "en" ? "/calorio-vs-myfitnesspal/en" : "/calorio-vs-myfitnesspal"}>{c.footer.compare}</a>
           <a href="/confidentialite-calorio">{c.footer.privacy}</a>
+          <a href={lang === "fr" ? "/partenaires" : `/${lang}/${lang === "de" ? "partner" : "partners"}`}>{c.footer.partners}</a>
           <a href="/mentions-legales">{c.footer.legal}</a>
         </nav>
       </footer>

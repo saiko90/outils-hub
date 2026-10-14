@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { SB_URL, SB_ANON, svcHeaders } from "@/lib/serverAuth";
-import { stripeLocale, calorioPrices, customerExists } from "@/lib/stripeServer";
+import { stripe, stripeLocale, calorioPrices, customerExists } from "@/lib/stripeServer";
 
 // Crée une session Stripe Checkout (abonnement Pro) pour l'utilisateur connecté.
 // La clé secrète Stripe reste côté serveur (env). L'utilisateur est identifié via
@@ -37,8 +37,10 @@ export async function POST(req: Request) {
   let plan = "yearly";
   let base = SITE;
   let locale = "fr";
+  let promo = "";
   try {
-    const body = (await req.json()) as { plan?: string; origin?: string; lang?: string };
+    const body = (await req.json()) as { plan?: string; origin?: string; lang?: string; promo?: string };
+    if (typeof body.promo === "string" && /^[A-Za-z0-9]{3,20}$/.test(body.promo)) promo = body.promo.toUpperCase();
     if (body.plan === "monthly" || body.plan === "yearly") plan = body.plan;
     locale = stripeLocale(body.lang);
     const allowed = ["https://calorio.ch", "https://www.calorio.ch", "https://outils.ch"];
@@ -75,7 +77,19 @@ export async function POST(req: Request) {
   // Essai de 7 jours réservé à un premier abonnement (pas à chaque retour d'un ancien abonné).
   if (!existingCustomer) form.set("subscription_data[trial_period_days]", "7");
   form.set("subscription_data[metadata][supabase_uid]", uid);
-  form.set("allow_promotion_codes", "true");
+  // Code partenaire (lien ?code=) : appliqué d'office s'il existe et est actif ; sinon le client peut en saisir un.
+  let promoId = "";
+  if (promo) {
+    const pc = await stripe(`promotion_codes?code=${encodeURIComponent(promo)}&active=true&limit=1`, "GET").catch(() => null);
+    const list = pc && pc.ok && Array.isArray(pc.data.data) ? (pc.data.data as { id?: string }[]) : [];
+    promoId = list[0]?.id || "";
+  }
+  if (promoId) {
+    form.set("discounts[0][promotion_code]", promoId);
+    form.set("subscription_data[metadata][partner_code]", promo);
+  } else {
+    form.set("allow_promotion_codes", "true");
+  }
   form.set("locale", locale);
   // Image de marque calorio sur la page de paiement (indépendante de celle du compte Stripe).
   form.set("branding_settings[display_name]", "calorio");

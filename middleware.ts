@@ -24,6 +24,12 @@ export function middleware(req: NextRequest) {
     url.pathname = "/mentions-legales-calorio";
     return NextResponse.rewrite(url);
   }
+  // calorio.ch : programme partenaires (créateurs, coachs).
+  if (onCalorio && /^\/(?:(?:de|en)\/)?(?:partenaires|partner|partners)\/?$/.test(pathname)) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/partenaires-calorio";
+    return NextResponse.rewrite(url);
+  }
   // La page d'accueil n'existe que sous calorio.ch/ (évite le contenu dupliqué).
   const local = host === "localhost" || host === "127.0.0.1";
   if (!local && pathname.startsWith("/calorio-accueil")) {

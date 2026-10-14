@@ -81,6 +81,8 @@ export async function POST(req: Request) {
   form.set("branding_settings[display_name]", "calorio");
   form.set("branding_settings[icon][type]", "url");
   form.set("branding_settings[icon][url]", "https://calorio.ch/calorio-icon-512.png");
+  form.set("branding_settings[logo][type]", "url");
+  form.set("branding_settings[logo][url]", "https://calorio.ch/calorio-icon-512.png");
   form.set("branding_settings[background_color]", "#ffffff");
   form.set("branding_settings[button_color]", "#16a34a");
   form.set("branding_settings[border_style]", "rounded");

@@ -880,6 +880,27 @@ function readPromo(): string {
   } catch { return ""; }
 }
 
+
+// Demande d'avis Google Play (fenêtre officielle « In-App Review », app Android uniquement).
+// Seulement après un moment positif (objectif du jour atteint ou palier de série), pour quelqu'un
+// qui utilise vraiment l'app (au moins 4 jours notés), et au plus une fois tous les 60 jours.
+// Google décide lui-même s'il affiche la fenêtre (quota) ; aucune récompense n'est liée à l'avis.
+const REVIEW_KEY = "calorio.review.at";
+function maybeAskPlayReview() {
+  try {
+    const C = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean; Plugins?: { InAppReview?: { requestReview?: () => Promise<void> } } } }).Capacitor;
+    const R = C?.isNativePlatform?.() ? C.Plugins?.InAppReview : undefined;
+    if (!R?.requestReview) return;
+    const last = Number(localStorage.getItem(REVIEW_KEY) || 0);
+    if (Date.now() - last < 60 * 86400000) return;
+    const jour = load<Record<string, unknown[]>>("calorio.journal", {});
+    const days = Object.values(jour).filter((rows) => rowsKcal(rows) > 0).length;
+    if (days < 4) return;
+    localStorage.setItem(REVIEW_KEY, String(Date.now()));
+    setTimeout(() => { R.requestReview?.().catch(() => {}); }, 3600); // après les confettis
+  } catch { /* ignore */ }
+}
+
 export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [langOv, setLangOv] = useState<Lang | null>(null);
   const lang: Lang = langOv ?? propLang;
@@ -2193,7 +2214,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     if (prevStreakRef.current === null) { prevStreakRef.current = streak; return; } // init : pas de confettis au chargement
     if (streak > prevStreakRef.current) {
       const crossed = MS.find((m) => prevStreakRef.current! < m && streak >= m);
-      if (crossed) { haptic("success"); setCelebrate(x.celebStreak(crossed)); }
+      if (crossed) { haptic("success"); setCelebrate(x.celebStreak(crossed)); if (crossed >= 3) maybeAskPlayReview(); }
     }
     prevStreakRef.current = streak;
   }, [mounted, streak, x]);
@@ -2208,6 +2229,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     try { localStorage.setItem(flag, "1"); } catch { /* ignore */ }
     haptic("success");
     setCelebrate(x.celebGoal);
+    maybeAskPlayReview();
   }, [mounted, isToday, total.kcal, besoinsAffiche.cible, x]);
   // Auto-effacement de la célébration.
   useEffect(() => {

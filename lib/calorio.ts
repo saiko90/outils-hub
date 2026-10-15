@@ -304,6 +304,7 @@ export const ALIMENTS: Aliment[] = [
 
   // ── Produits laitiers (suite) ──
   a("emmental", "Emmental", "Emmentaler", "Emmental", "laitiers", 380, 28, 0, 30, 30, "🧀"),
+  a("vacherin_fribourgeois", "Vacherin fribourgeois", "Vacherin Fribourgeois", "Vacherin Fribourgeois", "laitiers", 357, 24, 0.1, 29, 30, "🧀"),
   a("cheddar", "Cheddar", "Cheddar", "Cheddar", "laitiers", 402, 25, 1.3, 33, 30, "🧀"),
   a("feta", "Feta", "Feta", "Feta", "laitiers", 264, 14, 4, 21, 40, "🧀"),
   a("chevre", "Fromage de chèvre", "Ziegenkäse", "Goat cheese", "laitiers", 364, 22, 2.5, 30, 30, "🧀"),
@@ -727,9 +728,9 @@ export const RECETTES: Recette[] = [
     [it("salade", 80), it("poulet", 120), it("parmesan", 20), it("pain_blanc", 30), it("mayonnaise", 20)]),
   // Spécialités suisses
   rc("raclette_valais", "Raclette valaisanne", "Walliser Raclette", "Swiss raclette", "🧀", "plat", 2, 20,
-    [it("raclette", 200), it("pomme_terre", 300), it("jambon", 60)]),
+    [it("raclette", 400), it("pomme_terre", 400), it("viande_sechee", 60), it("jambon", 60)]),
   rc("fondue_moitie", "Fondue moitié-moitié", "Fondue moitié-moitié", "Swiss cheese fondue", "🫕", "plat", 2, 25,
-    [it("gruyere", 120), it("emmental", 120), it("vin_blanc", 40), it("pain_blanc", 200)]),
+    [it("gruyere", 200), it("vacherin_fribourgeois", 200), it("vin_blanc", 180), it("pain_blanc", 300)]),
   rc("rosti_oeuf", "Rösti & œuf au plat", "Rösti mit Spiegelei", "Rösti with fried egg", "🥔", "plat", 1, 20,
     [it("rosti", 200), it("oeuf", 100), it("bacon", 30)]),
   // Sucré

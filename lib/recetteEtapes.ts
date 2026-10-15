@@ -118,11 +118,12 @@ export const RECETTE_ETAPES: Record<string, string[]> = {
   raclette_valais: [
     "Cuis les pommes de terre en robe des champs 20 minutes.",
     "Fais fondre les tranches de fromage à raclette dans les poêlons ou au four.",
-    "Nappe les pommes de terre de fromage fondu et sers avec le jambon.",
+    "Nappe les pommes de terre de fromage fondu et sers avec la viande séchée et le jambon.",
+    "Compte environ 200 g de fromage et 200 g de pommes de terre par personne (recommandation de Raclette Suisse).",
   ],
   fondue_moitie: [
     "Frotte le caquelon avec une gousse d'ail.",
-    "Fais chauffer le vin blanc puis ajoute progressivement le gruyère et l'emmental râpés en remuant en huit.",
+    "Fais chauffer le vin blanc puis ajoute progressivement le gruyère râpé et le vacherin fribourgeois en cubes, en remuant en huit.",
     "Quand la fondue est lisse et crémeuse, place-la sur le réchaud.",
     "Sers avec le pain coupé en cubes.",
   ],

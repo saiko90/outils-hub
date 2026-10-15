@@ -4,7 +4,7 @@
   "cat": "classiques",
   "emoji": "🫕",
   "kcal": { "value": "1250–1500", "label": { "fr": "kcal par personne", "de": "kcal pro Person" } },
-  "related": { "aliments": ["fondue", "gruyere", "pain_blanc", "vin_blanc"], "recettes": ["fondue_moitie"] },
+  "related": { "aliments": ["fondue", "gruyere", "vacherin_fribourgeois", "pain_blanc"], "recettes": ["fondue_moitie"] },
   "sources": [
     { "label": "Interprofession du Gruyère : recette de la fondue moitié-moitié (quantités pour 4)", "url": "https://gruyere.com/en/recipes/list-of-recipes/recipe-detail/fondue-half-half-gruyere-aop-and-vacherin-fribourgeois-aop" },
     { "label": "Fiche technique Gruyère AOP (valeurs pour 100 g)", "url": "https://cdn.api.groupe-pomona.fr/public/products/0254226/branch/ch/medias/gruyere-aop-doux-6-mois-piece-unitaire-1-5kg-intercheese_0254226_ch_technical.pdf" },

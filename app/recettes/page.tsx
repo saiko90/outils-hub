@@ -56,7 +56,7 @@ export default function Page() {
         })}
 
         <p className="ci-disc">Valeurs indicatives (moyennes par ingrédient) ; elles varient selon les marques et la préparation.</p>
-        <p className="ci-back"><a href="/calories">Voir aussi : calories des aliments →</a></p>
+        <p className="ci-back"><a href="/calories">Voir aussi : calories des aliments →</a> · <a href="/mag">Le Mag calorio →</a></p>
       </main>
     </>
   );

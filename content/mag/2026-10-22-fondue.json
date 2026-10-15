@@ -1,0 +1,103 @@
+{
+  "id": "fondue-moitie-moitie",
+  "date": "2026-10-22",
+  "cat": "classiques",
+  "emoji": "🫕",
+  "kcal": { "value": "1250–1500", "label": { "fr": "kcal par personne", "de": "kcal pro Person" } },
+  "related": { "aliments": ["fondue", "gruyere", "pain_blanc", "vin_blanc"], "recettes": ["fondue_moitie"] },
+  "sources": [
+    { "label": "Interprofession du Gruyère : recette de la fondue moitié-moitié (quantités pour 4)", "url": "https://gruyere.com/en/recipes/list-of-recipes/recipe-detail/fondue-half-half-gruyere-aop-and-vacherin-fribourgeois-aop" },
+    { "label": "Fiche technique Gruyère AOP (valeurs pour 100 g)", "url": "https://cdn.api.groupe-pomona.fr/public/products/0254226/branch/ch/medias/gruyere-aop-doux-6-mois-piece-unitaire-1-5kg-intercheese_0254226_ch_technical.pdf" },
+    { "label": "Fiche technique Vacherin Fribourgeois AOP (valeurs pour 100 g)", "url": "https://cdn.api.groupe-pomona.fr/public/products/0254412/branch/ch/medias/vacherin-fribourgeois-aop-1-4-meule-suisse-garantie-piece-1-6kg-cremo_0254412_ch_technical.pdf" }
+  ],
+  "fr": {
+    "slug": "calories-fondue-moitie-moitie",
+    "title": "Fondue moitié-moitié : combien de calories par personne ?",
+    "cardTitle": "Une fondue moitié-moitié, combien de calories ?",
+    "description": "Avec 200 g de fromage et le pain, une fondue moitié-moitié apporte 1250 à 1500 kcal par personne. Le détail, le poids du pain et une version plus légère.",
+    "intro": "Une fondue moitié-moitié apporte **environ 1250 à 1500 kcal par personne**, pain compris. Le fromage compte pour plus de la moitié, mais le pain pèse plus qu'on ne le pense.",
+    "blocks": [
+      { "type": "h2", "text": "Ce qu'il y a dans le caquelon" },
+      { "type": "p", "text": "La recette de l'Interprofession du Gruyère prévoit, pour 4 personnes, 400 g de Gruyère AOP, 400 g de Vacherin Fribourgeois AOP et 3,5 dl de vin blanc. Soit **200 g de fromage par personne**. Voici le détail pour une personne :" },
+      { "type": "table", "head": ["Élément", "Quantité", "Calories"], "rows": [
+        ["Gruyère AOP", "100 g", "400 kcal"],
+        ["Vacherin Fribourgeois AOP", "100 g", "357 kcal"],
+        ["Vin blanc dans le caquelon", "0,9 dl", "60 kcal"],
+        ["Maïzena et un trait de kirsch", "", "35 kcal"],
+        ["Pain en cubes", "150 g", "400 kcal"],
+        ["Total", "", "≈ 1250 kcal"]
+      ], "note": "Avec 200 g de pain, compte environ 130 kcal de plus. Un verre de vin blanc (1,5 dl) en ajoute environ 120 ; un thé noir, rien." },
+      { "type": "p", "text": "Le Gruyère AOP compte environ **400 kcal pour 100 g** et le Vacherin Fribourgeois AOP **environ 357 kcal**. Une part de fondue apporte ainsi une cinquantaine de grammes de protéines, mais aussi plus de 60 g de matières grasses." },
+      { "type": "h2", "text": "Le pain, le piège discret" },
+      { "type": "p", "text": "Un cube de pain de fondue pèse environ **5 à 8 g**. Trente cubes, c'est vite 150 à 200 g de pain, soit **400 à 530 kcal**, sans compter le fromage qui s'y accroche. Le pain mi-blanc ou le pain bis ne change presque rien aux calories, mais il cale un peu mieux." },
+      { "type": "h2", "text": "La version plus légère" },
+      { "type": "table", "head": ["Élément", "Quantité", "Calories"], "rows": [
+        ["Mélange moitié-moitié", "150 g", "570 kcal"],
+        ["Vin, maïzena et kirsch", "", "70 kcal"],
+        ["Pain en cubes", "100 g", "265 kcal"],
+        ["Pommes de terre vapeur à tremper", "150 g", "130 kcal"],
+        ["Légumes à tremper (brocoli, champignons)", "150 g", "40 kcal"],
+        ["Total", "", "≈ 1075 kcal"]
+      ] },
+      { "type": "ul", "items": [
+        "**Varie ce que tu trempes** : pommes de terre, brocoli, champignons ou quartiers de pomme remplacent une partie du pain.",
+        "**Une salade avant** : elle prend de la place sans alourdir.",
+        "**Thé noir à table** : c'est la tradition, et ça évite 100 à 250 kcal de vin.",
+        "**La religieuse avec modération** : la croûte du fond est délicieuse, mais c'est du fromage pur."
+      ] },
+      { "type": "tip", "title": "Le bon réflexe", "text": "Une fondue entre amis, ça se savoure. Garde simplement un repas plus léger le midi et le lendemain : sur la semaine, la soirée passe très bien. Et si la balance monte un peu le jour suivant, c'est surtout le sel." }
+    ],
+    "faq": [
+      { "q": "Combien de fromage à fondue prévoir par personne ?", "a": "Compte environ 200 g de fromage par personne pour un repas principal, comme dans la recette moitié-moitié de l'Interprofession du Gruyère (800 g pour 4)." },
+      { "q": "Combien de calories dans une portion de fondue sans le pain ?", "a": "Environ 850 kcal pour 200 g de fromage avec le vin, la maïzena et le kirsch. Le pain ajoute 400 à 530 kcal selon la quantité." },
+      { "q": "Le vin de la fondue s'évapore-t-il ?", "a": "En partie seulement : une bonne part de l'alcool reste dans le fromage. Compte environ 60 kcal par personne pour le vin du caquelon." },
+      { "q": "Comment noter une fondue dans calorio ?", "a": "Cherche « fondue » dans calorio et ajuste la portion à ce que tu as mangé, puis ajoute le pain et la boisson. La recette « Fondue moitié-moitié » s'ajoute aussi en un tap." }
+    ],
+    "social": "Une fondue moitié-moitié, combien de calories ? 🫕\n\nEnviron 1250 à 1500 kcal par personne avec 200 g de fromage et le pain. Le fromage compte pour plus de la moitié, mais le pain pèse plus qu'on ne le pense : 30 cubes, c'est vite 400 kcal.\n\nLe détail et une version plus légère dans le Mag calorio : calorio.ch/mag\n\nFondue moitié-moitié: wie viele Kalorien? Alles im calorio Magazin.\n\n#calorio #fondue #gruyere #suisse #suisseromande #nutrition #compteurdecalories"
+  },
+  "de": {
+    "slug": "kalorien-fondue-moitie-moitie",
+    "title": "Fondue moitié-moitié: wie viele Kalorien pro Person?",
+    "cardTitle": "Fondue moitié-moitié: wie viele Kalorien?",
+    "description": "Mit 200 g Käse und Brot liefert ein Fondue moitié-moitié 1250 bis 1500 kcal pro Person. Die Details, das Gewicht des Brotes und eine leichtere Variante.",
+    "intro": "Ein Fondue moitié-moitié liefert **etwa 1250 bis 1500 kcal pro Person**, Brot inklusive. Der Käse macht mehr als die Hälfte aus, aber das Brot zählt mehr, als man denkt.",
+    "blocks": [
+      { "type": "h2", "text": "Was im Caquelon steckt" },
+      { "type": "p", "text": "Das Rezept der Interprofession du Gruyère sieht für 4 Personen 400 g Gruyère AOP, 400 g Vacherin Fribourgeois AOP und 3,5 dl Weisswein vor. Also **200 g Käse pro Person**. So sieht eine Portion aus:" },
+      { "type": "table", "head": ["Zutat", "Menge", "Kalorien"], "rows": [
+        ["Gruyère AOP", "100 g", "400 kcal"],
+        ["Vacherin Fribourgeois AOP", "100 g", "357 kcal"],
+        ["Weisswein im Caquelon", "0,9 dl", "60 kcal"],
+        ["Maizena und ein Schuss Kirsch", "", "35 kcal"],
+        ["Brotwürfel", "150 g", "400 kcal"],
+        ["Total", "", "≈ 1250 kcal"]
+      ], "note": "Mit 200 g Brot kommen rund 130 kcal dazu. Ein Glas Weisswein (1,5 dl) zählt etwa 120 kcal, ein Schwarztee nichts." },
+      { "type": "p", "text": "Gruyère AOP hat etwa **400 kcal pro 100 g**, Vacherin Fribourgeois AOP **etwa 357 kcal**. Eine Portion Fondue liefert so rund 50 g Eiweiss, aber auch über 60 g Fett." },
+      { "type": "h2", "text": "Das Brot, die unauffällige Falle" },
+      { "type": "p", "text": "Ein Fondue-Brotwürfel wiegt etwa **5 bis 8 g**. Dreissig Würfel sind schnell 150 bis 200 g Brot, also **400 bis 530 kcal**, ohne den Käse, der daran hängt. Halbweiss- oder Ruchbrot ändert an den Kalorien fast nichts, macht aber etwas satter." },
+      { "type": "h2", "text": "Die leichtere Variante" },
+      { "type": "table", "head": ["Zutat", "Menge", "Kalorien"], "rows": [
+        ["Mischung moitié-moitié", "150 g", "570 kcal"],
+        ["Wein, Maizena und Kirsch", "", "70 kcal"],
+        ["Brotwürfel", "100 g", "265 kcal"],
+        ["Kartoffeln zum Eintunken", "150 g", "130 kcal"],
+        ["Gemüse zum Eintunken (Broccoli, Pilze)", "150 g", "40 kcal"],
+        ["Total", "", "≈ 1075 kcal"]
+      ] },
+      { "type": "ul", "items": [
+        "**Abwechslung beim Eintunken**: Kartoffeln, Broccoli, Pilze oder Apfelschnitze ersetzen einen Teil des Brotes.",
+        "**Ein Salat vorneweg**: Er füllt, ohne zu beschweren.",
+        "**Schwarztee am Tisch**: Das ist Tradition und spart 100 bis 250 kcal Wein.",
+        "**Die Religieuse mit Mass**: Die Kruste am Boden ist köstlich, aber reiner Käse."
+      ] },
+      { "type": "tip", "title": "Der richtige Reflex", "text": "Ein Fondue mit Freunden darf man geniessen. Plane einfach mittags und am nächsten Tag etwas Leichteres ein: Über die Woche gesehen fällt der Abend kaum ins Gewicht. Und wenn die Waage am Tag danach mehr zeigt, ist das vor allem das Salz." }
+    ],
+    "faq": [
+      { "q": "Wie viel Fonduekäse pro Person?", "a": "Rechne mit etwa 200 g Käse pro Person als Hauptmahlzeit, wie im Rezept moitié-moitié der Interprofession du Gruyère (800 g für 4)." },
+      { "q": "Wie viele Kalorien hat eine Portion Fondue ohne Brot?", "a": "Etwa 850 kcal für 200 g Käse mit Wein, Maizena und Kirsch. Das Brot bringt je nach Menge 400 bis 530 kcal dazu." },
+      { "q": "Verdampft der Wein im Fondue?", "a": "Nur teilweise: Ein guter Teil des Alkohols bleibt im Käse. Rechne mit etwa 60 kcal pro Person für den Wein im Caquelon." },
+      { "q": "Wie erfasse ich ein Fondue in calorio?", "a": "Suche in calorio nach «Fondue» und passe die Portion an, dann füge das Brot und das Getränk hinzu. Das Rezept «Fondue moitié-moitié» lässt sich auch mit einem Tipp hinzufügen." }
+    ],
+    "social": "Fondue moitié-moitié: wie viele Kalorien? 🫕\n\nRund 1250 bis 1500 kcal pro Person mit 200 g Käse und Brot. Der Käse macht mehr als die Hälfte aus, aber das Brot zählt mehr, als man denkt: 30 Würfel sind schnell 400 kcal.\n\nDetails und eine leichtere Variante im calorio Magazin: calorio.ch/de/magazin\n\n#calorio #fondue #gruyere #schweiz #ernährung #kalorienzähler"
+  }
+}

@@ -33,7 +33,7 @@ export default function Page() {
         <h1 className="ci-h1">Combien de calories dans… ?</h1>
         <p className="ci-intro">Les calories et macronutriments des aliments courants, pour 100 g et par portion. Clique un aliment pour le détail — et suis tes calories gratuitement, sans pub, avec calorio.</p>
         <a className="ci-cta" href="https://calorio.ch/calorio">Ouvrir calorio <span aria-hidden>→</span></a>
-        <p className="ci-xlink"><a href="/recettes">Voir aussi : recettes équilibrées & leurs calories →</a></p>
+        <p className="ci-xlink"><a href="/recettes">Voir aussi : recettes équilibrées & leurs calories →</a> · <a href="/mag">Le Mag calorio →</a></p>
 
         {CAT_ORDER.map((cat) => {
           const items = ALIMENTS.filter((a) => a.cat === cat);

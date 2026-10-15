@@ -30,6 +30,10 @@ export function middleware(req: NextRequest) {
     url.pathname = "/partenaires-calorio";
     return NextResponse.rewrite(url);
   }
+  // Le Mag calorio (FR /mag, DE /de/magazin) n'existe que sous calorio.ch (évite le contenu dupliqué sur outils.ch).
+  if (!onCalorio && (host === "outils.ch" || host === "www.outils.ch") && /^\/(?:mag|de\/magazin)(?:\/|$)/.test(pathname)) {
+    return NextResponse.redirect(`https://calorio.ch${pathname}${req.nextUrl.search}`, 308);
+  }
   // La page d'accueil n'existe que sous calorio.ch/ (évite le contenu dupliqué).
   const local = host === "localhost" || host === "127.0.0.1";
   if (!local && pathname.startsWith("/calorio-accueil")) {

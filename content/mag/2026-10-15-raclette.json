@@ -1,0 +1,102 @@
+{
+  "id": "raclette-soiree",
+  "date": "2026-10-15",
+  "cat": "classiques",
+  "emoji": "🧀",
+  "kcal": { "value": "1100–1400", "label": { "fr": "kcal par personne", "de": "kcal pro Person" } },
+  "related": { "aliments": ["raclette", "pomme_terre", "vin_blanc", "viande_sechee"], "recettes": ["raclette_valais"] },
+  "sources": [
+    { "label": "Raclette Suisse : fiche produit (valeurs pour 100 g)", "url": "https://www.raclette-suisse.ch/fileadmin/dateiablage/07_PDF/Produkteblatt_Raclette_Suisse_F.pdf" },
+    { "label": "Raclette Suisse : conseils pratiques (quantités par personne)", "url": "https://www.raclette-suisse.ch/fileadmin/dateiablage/07_PDF/raclette_suisse_conseils_pratiques_fr.pdf" }
+  ],
+  "fr": {
+    "slug": "calories-soiree-raclette",
+    "title": "Combien de calories dans une soirée raclette ?",
+    "cardTitle": "Une soirée raclette, combien de calories ?",
+    "description": "Fromage, pommes de terre, viande séchée et vin blanc : une soirée raclette apporte 1100 à 1400 kcal par personne. Le détail et une version plus légère.",
+    "intro": "Une soirée raclette classique apporte **environ 1100 à 1400 kcal par personne**, soit à peu près la moitié des besoins d'une journée. Le fromage pèse le plus lourd ; les pommes de terre, elles, sont plutôt légères.",
+    "blocks": [
+      { "type": "h2", "text": "Le détail d'une assiette de raclette" },
+      { "type": "p", "text": "Raclette Suisse conseille **200 à 250 g de fromage par personne**, avec autant de pommes de terre en robe des champs. Voici ce que donne une soirée typique, avec 200 g de fromage :" },
+      { "type": "table", "head": ["Élément", "Quantité", "Calories"], "rows": [
+        ["Fromage à raclette", "200 g", "680 kcal"],
+        ["Pommes de terre en robe des champs", "200 g", "175 kcal"],
+        ["Viande séchée et jambon", "60 g", "120 kcal"],
+        ["Cornichons et petits oignons", "50 g", "15 kcal"],
+        ["Vin blanc (Fendant)", "2 dl", "165 kcal"],
+        ["Total", "", "≈ 1155 kcal"]
+      ], "note": "Avec 250 g de fromage, compte environ 170 kcal de plus, soit près de 1330 kcal." },
+      { "type": "p", "text": "Le fromage à raclette suisse contient environ **340 kcal, 28 g de lipides et 26 g de protéines pour 100 g**. Une assiette de 200 g apporte donc à elle seule une bonne cinquantaine de grammes de protéines, mais aussi autant de matières grasses." },
+      { "type": "h2", "text": "Et une tranche, ça fait combien ?" },
+      { "type": "p", "text": "Une tranche de raclette pèse en général **20 à 30 g**, soit **70 à 100 kcal**. Avec 8 tranches, on arrive vite aux 200 g conseillés. Le plus simple pour suivre sa soirée : compter les tranches plutôt que d'estimer à l'œil." },
+      { "type": "h2", "text": "La version plus légère, sans se priver" },
+      { "type": "table", "head": ["Élément", "Quantité", "Calories"], "rows": [
+        ["Fromage à raclette", "150 g", "510 kcal"],
+        ["Pommes de terre en robe des champs", "300 g", "260 kcal"],
+        ["Salade verte, vinaigrette légère", "1 bol", "60 kcal"],
+        ["Cornichons et petits oignons", "50 g", "15 kcal"],
+        ["Thé ou eau (ou 1 dl de vin blanc)", "", "0 à 80 kcal"],
+        ["Total", "", "≈ 850 à 930 kcal"]
+      ] },
+      { "type": "ul", "items": [
+        "**Plus de pommes de terre, moins de fromage** : elles calent bien pour peu de calories.",
+        "**Une salade en entrée** : on arrive à table avec moins de faim.",
+        "**La charcuterie en option** : elle ajoute vite 100 à 200 kcal.",
+        "**Un verre plutôt que deux** : chaque décilitre de vin blanc compte environ 80 kcal."
+      ] },
+      { "type": "tip", "title": "Le bon réflexe", "text": "Une raclette ne fait pas grossir à elle seule : c'est l'équilibre de la semaine qui compte. Prévois un dîner plus léger à midi et une petite marche le lendemain. Et si la balance monte un peu le jour suivant, c'est surtout le sel : ça redescend en un ou deux jours." }
+    ],
+    "faq": [
+      { "q": "Combien de calories dans une tranche de raclette ?", "a": "Une tranche de 20 à 30 g apporte environ 70 à 100 kcal (le fromage à raclette suisse compte environ 340 kcal pour 100 g)." },
+      { "q": "Combien de fromage à raclette prévoir par personne ?", "a": "Raclette Suisse recommande 200 à 250 g de fromage par personne pour un repas principal, avec autant de pommes de terre." },
+      { "q": "Les pommes de terre de la raclette font-elles grossir ?", "a": "Non, elles sont plutôt légères : environ 87 kcal pour 100 g. Ce sont le fromage, la charcuterie et le vin qui font monter le total." },
+      { "q": "Comment noter une raclette dans calorio ?", "a": "Cherche « raclette » dans calorio et indique le poids de fromage (ou le nombre de tranches), puis ajoute les pommes de terre et la boisson. La recette « Raclette valaisanne » s'ajoute aussi en un tap." }
+    ],
+    "social": "Une soirée raclette, c'est combien de calories ? 🧀\n\nEnviron 1100 à 1400 kcal par personne avec 200 g de fromage, les pommes de terre, un peu de viande séchée et deux décis de Fendant. Le fromage pèse le plus lourd, les pommes de terre beaucoup moins.\n\nLe détail et la version plus légère (sans se priver) sont dans le Mag calorio : calorio.ch/mag\n\nRaclette-Abend: wie viele Kalorien? Alles im calorio Magazin.\n\n#calorio #raclette #valais #suisse #suisseromande #nutrition #compteurdecalories"
+  },
+  "de": {
+    "slug": "kalorien-raclette-abend",
+    "title": "Wie viele Kalorien hat ein Raclette-Abend?",
+    "cardTitle": "Raclette-Abend: wie viele Kalorien?",
+    "description": "Käse, Kartoffeln, Trockenfleisch und Weisswein: Ein Raclette-Abend liefert 1100 bis 1400 kcal pro Person. Die Details und eine leichtere Variante.",
+    "intro": "Ein klassischer Raclette-Abend liefert **etwa 1100 bis 1400 kcal pro Person**, also ungefähr die Hälfte des Tagesbedarfs. Am meisten schlägt der Käse zu Buche; die Kartoffeln sind eher leicht.",
+    "blocks": [
+      { "type": "h2", "text": "Ein Raclette-Teller im Detail" },
+      { "type": "p", "text": "Raclette Suisse empfiehlt **200 bis 250 g Käse pro Person**, dazu gleich viel Gschwellti. So sieht ein typischer Abend mit 200 g Käse aus:" },
+      { "type": "table", "head": ["Zutat", "Menge", "Kalorien"], "rows": [
+        ["Raclettekäse", "200 g", "680 kcal"],
+        ["Gschwellti (Kartoffeln mit Schale)", "200 g", "175 kcal"],
+        ["Trockenfleisch und Schinken", "60 g", "120 kcal"],
+        ["Essiggurken und Silberzwiebeln", "50 g", "15 kcal"],
+        ["Weisswein (Fendant)", "2 dl", "165 kcal"],
+        ["Total", "", "≈ 1155 kcal"]
+      ], "note": "Mit 250 g Käse kommen rund 170 kcal dazu, also fast 1330 kcal." },
+      { "type": "p", "text": "Schweizer Raclettekäse enthält etwa **340 kcal, 28 g Fett und 26 g Eiweiss pro 100 g**. Ein Teller mit 200 g Käse liefert also gut 50 g Eiweiss, aber auch ebenso viel Fett." },
+      { "type": "h2", "text": "Und wie viel hat eine Scheibe?" },
+      { "type": "p", "text": "Eine Raclettescheibe wiegt meist **20 bis 30 g**, also **70 bis 100 kcal**. Mit 8 Scheiben sind die empfohlenen 200 g schnell erreicht. Am einfachsten: Scheiben zählen statt schätzen." },
+      { "type": "h2", "text": "Die leichtere Variante, ohne Verzicht" },
+      { "type": "table", "head": ["Zutat", "Menge", "Kalorien"], "rows": [
+        ["Raclettekäse", "150 g", "510 kcal"],
+        ["Gschwellti", "300 g", "260 kcal"],
+        ["Grüner Salat, leichte Sauce", "1 Schale", "60 kcal"],
+        ["Essiggurken und Silberzwiebeln", "50 g", "15 kcal"],
+        ["Tee oder Wasser (oder 1 dl Weisswein)", "", "0 bis 80 kcal"],
+        ["Total", "", "≈ 850 bis 930 kcal"]
+      ] },
+      { "type": "ul", "items": [
+        "**Mehr Kartoffeln, weniger Käse**: Sie machen satt und haben wenig Kalorien.",
+        "**Ein Salat vorneweg**: So kommt man mit weniger Hunger an den Tisch.",
+        "**Fleisch nur als Option**: Es bringt schnell 100 bis 200 kcal dazu.",
+        "**Ein Glas statt zwei**: Jeder Deziliter Weisswein zählt rund 80 kcal."
+      ] },
+      { "type": "tip", "title": "Der richtige Reflex", "text": "Ein Raclette allein macht nicht dick: Entscheidend ist die Bilanz der Woche. Plane ein leichteres Mittagessen ein und einen kleinen Spaziergang am nächsten Tag. Und wenn die Waage am Tag danach etwas mehr zeigt, ist das vor allem das Salz: Das geht in ein, zwei Tagen wieder weg." }
+    ],
+    "faq": [
+      { "q": "Wie viele Kalorien hat eine Scheibe Raclettekäse?", "a": "Eine Scheibe von 20 bis 30 g liefert etwa 70 bis 100 kcal (Schweizer Raclettekäse hat rund 340 kcal pro 100 g)." },
+      { "q": "Wie viel Raclettekäse pro Person?", "a": "Raclette Suisse empfiehlt 200 bis 250 g Käse pro Person als Hauptmahlzeit, dazu gleich viel Kartoffeln." },
+      { "q": "Machen die Kartoffeln beim Raclette dick?", "a": "Nein, sie sind eher leicht: etwa 87 kcal pro 100 g. Käse, Fleisch und Wein treiben die Summe in die Höhe." },
+      { "q": "Wie erfasse ich ein Raclette in calorio?", "a": "Suche in calorio nach «Raclette» und gib die Käsemenge (oder die Anzahl Scheiben) ein, dann die Kartoffeln und das Getränk. Das Rezept «Walliser Raclette» lässt sich auch mit einem Tipp hinzufügen." }
+    ],
+    "social": "Raclette-Abend: wie viele Kalorien? 🧀\n\nRund 1100 bis 1400 kcal pro Person mit 200 g Käse, Gschwellti, etwas Trockenfleisch und zwei Dezi Fendant. Der Käse zählt am meisten, die Kartoffeln viel weniger.\n\nDetails und eine leichtere Variante im calorio Magazin: calorio.ch/de/magazin\n\n#calorio #raclette #wallis #schweiz #ernährung #kalorienzähler"
+  }
+}

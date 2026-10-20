@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { partnerRedirect } from "./lib/partnerLinks";
 
 // Sert le Cockpit admin sur le sous-domaine admin.outils.ch (réécriture vers /admin),
 // tout en le laissant aussi accessible sur outils.ch/admin. Aucun effet sur le site public.
@@ -29,6 +30,11 @@ export function middleware(req: NextRequest) {
     const url = req.nextUrl.clone();
     url.pathname = "/partenaires-calorio";
     return NextResponse.rewrite(url);
+  }
+  // calorio.ch : liens partenaires courts (calorio.ch/anne, calorio.ch/ANNE20) → accueil avec le code promo.
+  if (onCalorio) {
+    const dest = partnerRedirect(pathname);
+    if (dest) return NextResponse.redirect(`https://calorio.ch${dest}`, 307);
   }
   // Le Mag calorio (FR /mag, DE /de/magazin) n'existe que sous calorio.ch (évite le contenu dupliqué sur outils.ch).
   if (!onCalorio && (host === "outils.ch" || host === "www.outils.ch") && /^\/(?:mag|de\/magazin)(?:\/|$)/.test(pathname)) {

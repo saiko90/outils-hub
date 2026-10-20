@@ -1,0 +1,124 @@
+{
+  "id": "soupe-courge-legere",
+  "date": "2026-10-25",
+  "cat": "leger",
+  "emoji": "🎃",
+  "kcal": { "value": "425", "label": { "fr": "kcal par repas", "de": "kcal pro Mahlzeit" } },
+  "related": { "aliments": ["soupe_potiron", "graines_courge", "pomme_terre", "pain_complet"] },
+  "sources": [
+    { "label": "USDA FoodData Central : courge butternut crue (valeurs pour 100 g)", "url": "https://fdc.nal.usda.gov/food-details/169295/nutrients" },
+    { "label": "Knorr Gemüsebouillon : valeurs nutritives pour 100 ml de bouillon préparé (fiche produit)", "url": "https://www.rewe.de/shop/p/knorr-gemuesebouillon-vegan-ergibt-7-5l/9011281" },
+    { "label": "Base d'aliments calorio : pomme de terre (valeurs pour 100 g)", "url": "https://calorio.ch/calories/pomme-de-terre" },
+    { "label": "Base d'aliments calorio : graines de courge (valeurs pour 100 g)", "url": "https://calorio.ch/calories/graines-de-courge" },
+    { "label": "Base d'aliments calorio : crème 35 % (valeurs pour 100 g)", "url": "https://calorio.ch/calories/creme-35" },
+    { "label": "Base d'aliments calorio : pain complet (valeurs pour 100 g)", "url": "https://calorio.ch/calories/pain-complet" }
+  ],
+  "fr": {
+    "slug": "soupe-courge-legere-calories",
+    "title": "Soupe de courge légère : la recette à moins de 450 kcal",
+    "cardTitle": "Soupe de courge : un repas à 425 kcal",
+    "description": "Un grand bol de soupe de courge maison fait environ 245 kcal. Avec des graines de courge et du pain complet, le repas reste à 425 kcal. Recette et variantes.",
+    "intro": "Un grand bol de soupe de courge maison (5 dl) apporte **environ 245 kcal**. Avec une poignée de graines de courge grillées et une tranche de pain complet, tu as **un vrai repas à environ 425 kcal**.",
+    "blocks": [
+      { "type": "h2", "text": "La recette pour 4 grands bols" },
+      { "type": "p", "text": "En automne, on trouve des courges butternut partout : chez Migros, chez Coop et au marché. Crue, la butternut ne compte qu'**environ 45 kcal pour 100 g**, avec 2 g de fibres. Voici le détail de la marmite entière :" },
+      { "type": "table", "head": ["Ingrédient", "Quantité", "Calories"], "rows": [
+        ["Courge butternut (épluchée, sans graines)", "1 kg", "450 kcal"],
+        ["Pomme de terre farineuse", "200 g", "174 kcal"],
+        ["Oignon", "1 (100 g)", "40 kcal"],
+        ["Huile d'olive", "1 c. à soupe (10 g)", "88 kcal"],
+        ["Bouillon de légumes", "8 dl", "48 kcal"],
+        ["Crème entière 35 %", "0,5 dl", "170 kcal"],
+        ["Total", "4 bols d'environ 5 dl", "≈ 970 kcal"]
+      ], "note": "Soit environ 245 kcal par bol. Le sel, le poivre et la muscade ne comptent pratiquement pas." },
+      { "type": "ol", "items": [
+        "Épluche la courge, retire les graines et coupe-la en cubes. Coupe aussi la pomme de terre et l'oignon.",
+        "Fais revenir l'oignon 3 minutes dans l'huile, puis ajoute la courge et la pomme de terre.",
+        "Verse le bouillon et laisse cuire 20 à 25 minutes à couvert, jusqu'à ce que tout soit tendre.",
+        "Mixe, ajoute la crème, puis assaisonne avec sel, poivre et une pointe de muscade.",
+        "Fais griller les graines de courge 2 à 3 minutes à sec dans une poêle : elles deviennent croquantes."
+      ] },
+      { "type": "h2", "text": "Ton repas complet à 425 kcal" },
+      { "type": "table", "head": ["Élément", "Quantité", "Calories"], "rows": [
+        ["Soupe de courge", "1 bol (5 dl)", "245 kcal"],
+        ["Graines de courge grillées", "10 g", "56 kcal"],
+        ["Pain complet", "50 g", "124 kcal"],
+        ["Total", "", "≈ 425 kcal"]
+      ], "note": "Ce repas apporte environ 12 g de protéines. Envie de plus ? Remplace le pain par 80 g de pois chiches rôtis au four : ≈ 430 kcal et environ 14 g de protéines." },
+      { "type": "h2", "text": "Deux variantes selon tes envies" },
+      { "type": "table", "head": ["Variante", "Ce qui change", "Par bol"], "rows": [
+        ["Classique", "0,5 dl de crème entière", "≈ 245 kcal"],
+        ["Plus légère", "1 dl de lait demi-écrémé à la place de la crème", "≈ 210 kcal"],
+        ["Coco-curry", "1 dl de lait de coco à la place de la crème, 1 c. à café de curry et 10 g de gingembre frais", "≈ 250 kcal"]
+      ] },
+      { "type": "ul", "items": [
+        "**La pomme de terre fait le velouté** : elle donne une soupe bien onctueuse sans ajouter beaucoup de crème.",
+        "**Pèse la courge une fois épluchée** : la peau et les graines représentent une bonne partie du poids d'une courge entière.",
+        "**Prépare double** : la soupe se garde 3 jours au frigo et se congèle très bien, en portions.",
+        "**Les graines à la fin** : 10 g suffisent pour le croquant, mais elles comptent environ 56 kcal, alors on les dose à la cuillère."
+      ] },
+      { "type": "tip", "title": "Le bon réflexe", "text": "Une soupe n'est pas un « repas de régime » : c'est un vrai plat d'automne qui réchauffe. Si tu as encore faim après, ajoute sans hésiter un fruit ou un yaourt : mieux vaut un repas complet qu'une fringale à 22 heures." }
+    ],
+    "faq": [
+      { "q": "Combien de calories dans un bol de soupe de courge ?", "a": "Environ 245 kcal pour un grand bol de 5 dl de cette recette avec un peu de crème, et environ 210 kcal si tu remplaces la crème par du lait demi-écrémé." },
+      { "q": "La courge butternut est-elle calorique ?", "a": "Non : crue, elle apporte environ 45 kcal pour 100 g, avec 2 g de fibres. Ce sont surtout la crème, l'huile et ce que tu ajoutes à côté qui font varier le total." },
+      { "q": "Une soupe suffit-elle pour le souper ?", "a": "Avec des graines de courge et du pain complet (ou des pois chiches), elle fait un repas d'environ 425 kcal avec une douzaine de grammes de protéines. Si tu as encore faim, ajoute un fruit ou un yaourt." },
+      { "q": "Comment noter une soupe de courge dans calorio ?", "a": "Cherche « soupe de potiron » dans calorio (45 kcal pour 100 g) et indique environ 500 g pour un bol de 5 dl, puis ajoute les graines de courge et le pain. Pour être au plus près, tu peux aussi noter les ingrédients de ta recette un par un." }
+    ],
+    "social": "Soupe de courge : un vrai repas à 425 kcal 🎃\n\nUn grand bol de soupe de courge maison fait environ 245 kcal. Ajoute 10 g de graines de courge grillées et une tranche de pain complet : tu as un souper chaud et complet à environ 425 kcal.\n\nLa recette, le calcul détaillé et deux variantes (plus légère et coco-curry) sont dans le Mag calorio : calorio.ch/mag\n\nKürbissuppe: eine Mahlzeit mit 425 kcal. Rezept im calorio Magazin.\n\n#calorio #soupedecourge #butternut #automne #suisseromande #recettelegere #compteurdecalories"
+  },
+  "de": {
+    "slug": "kuerbissuppe-leicht-kalorien",
+    "title": "Leichte Kürbissuppe: das Rezept unter 450 kcal",
+    "cardTitle": "Kürbissuppe: eine Mahlzeit mit 425 kcal",
+    "description": "Ein grosser Teller hausgemachte Kürbissuppe hat rund 245 kcal. Mit Kürbiskernen und Vollkornbrot bleibt die Mahlzeit bei 425 kcal. Rezept und Varianten.",
+    "intro": "Ein grosser Teller hausgemachte Kürbissuppe (5 dl) liefert **rund 245 kcal**. Mit ein paar gerösteten Kürbiskernen und einer Scheibe Vollkornbrot wird daraus **ein richtiges Znacht mit etwa 425 kcal**.",
+    "blocks": [
+      { "type": "h2", "text": "Das Rezept für 4 grosse Teller" },
+      { "type": "p", "text": "Im Herbst gibt es Butternut-Kürbisse überall: in der Migros, im Coop und auf dem Markt. Roh hat der Butternut nur **rund 45 kcal pro 100 g**, dazu 2 g Nahrungsfasern. So sieht der ganze Topf aus:" },
+      { "type": "table", "head": ["Zutat", "Menge", "Kalorien"], "rows": [
+        ["Butternut-Kürbis (geschält, ohne Kerne)", "1 kg", "450 kcal"],
+        ["Kartoffel, mehligkochend", "200 g", "174 kcal"],
+        ["Zwiebel", "1 (100 g)", "40 kcal"],
+        ["Olivenöl", "1 EL (10 g)", "88 kcal"],
+        ["Gemüsebouillon", "8 dl", "48 kcal"],
+        ["Vollrahm 35 %", "0,5 dl", "170 kcal"],
+        ["Total", "4 Teller à rund 5 dl", "≈ 970 kcal"]
+      ], "note": "Das macht rund 245 kcal pro Teller. Salz, Pfeffer und Muskat fallen praktisch nicht ins Gewicht." },
+      { "type": "ol", "items": [
+        "Kürbis schälen, Kerne entfernen und in Würfel schneiden. Kartoffel und Zwiebel ebenfalls klein schneiden.",
+        "Zwiebel 3 Minuten im Öl andünsten, dann Kürbis und Kartoffel dazugeben.",
+        "Bouillon dazugiessen und zugedeckt 20 bis 25 Minuten köcheln lassen, bis alles weich ist.",
+        "Pürieren, den Rahm einrühren und mit Salz, Pfeffer und einer Prise Muskat abschmecken.",
+        "Kürbiskerne 2 bis 3 Minuten ohne Fett in der Bratpfanne rösten, bis sie knusprig sind."
+      ] },
+      { "type": "h2", "text": "Dein Znacht mit 425 kcal" },
+      { "type": "table", "head": ["Zutat", "Menge", "Kalorien"], "rows": [
+        ["Kürbissuppe", "1 Teller (5 dl)", "245 kcal"],
+        ["Geröstete Kürbiskerne", "10 g", "56 kcal"],
+        ["Vollkornbrot", "50 g", "124 kcal"],
+        ["Total", "", "≈ 425 kcal"]
+      ], "note": "Diese Mahlzeit liefert rund 12 g Eiweiss. Lust auf mehr? Ersetze das Brot durch 80 g im Ofen geröstete Kichererbsen: ≈ 430 kcal und etwa 14 g Eiweiss." },
+      { "type": "h2", "text": "Zwei Varianten nach Lust und Laune" },
+      { "type": "table", "head": ["Variante", "Was ändert", "Pro Teller"], "rows": [
+        ["Klassisch", "0,5 dl Vollrahm", "≈ 245 kcal"],
+        ["Leichter", "1 dl teilentrahmte Milch statt Rahm", "≈ 210 kcal"],
+        ["Kokos-Curry", "1 dl Kokosmilch statt Rahm, 1 TL Curry und 10 g frischer Ingwer", "≈ 250 kcal"]
+      ] },
+      { "type": "ul", "items": [
+        "**Die Kartoffel macht die Suppe sämig**: So wird sie schön cremig, ohne viel Rahm.",
+        "**Den Kürbis erst nach dem Rüsten wägen**: Schale und Kerne machen einen guten Teil des Gewichts eines ganzen Kürbisses aus.",
+        "**Gleich die doppelte Menge kochen**: Die Suppe hält 3 Tage im Kühlschrank und lässt sich portionenweise gut tiefkühlen.",
+        "**Die Kerne zum Schluss**: 10 g reichen für den Knusper, zählen aber rund 56 kcal, also lieber mit dem Löffel dosieren."
+      ] },
+      { "type": "tip", "title": "Der richtige Reflex", "text": "Eine Suppe ist kein «Diätessen», sondern ein feines Herbstgericht, das wärmt. Wenn du danach noch Hunger hast, nimm ruhig eine Frucht oder ein Joghurt dazu: Lieber eine vollständige Mahlzeit als Heisshunger um 22 Uhr." }
+    ],
+    "faq": [
+      { "q": "Wie viele Kalorien hat ein Teller Kürbissuppe?", "a": "Rund 245 kcal für einen grossen Teller (5 dl) nach diesem Rezept mit etwas Rahm, und rund 210 kcal, wenn du den Rahm durch teilentrahmte Milch ersetzt." },
+      { "q": "Hat Butternut-Kürbis viele Kalorien?", "a": "Nein: Roh liefert er rund 45 kcal pro 100 g, dazu 2 g Nahrungsfasern. Die Summe verändern vor allem Rahm, Öl und das, was du dazu isst." },
+      { "q": "Reicht eine Suppe als Znacht?", "a": "Mit Kürbiskernen und Vollkornbrot (oder Kichererbsen) wird sie zu einer Mahlzeit mit rund 425 kcal und etwa einem Dutzend Gramm Eiweiss. Wenn du noch Hunger hast, nimm eine Frucht oder ein Joghurt dazu." },
+      { "q": "Wie erfasse ich eine Kürbissuppe in calorio?", "a": "Suche in calorio nach «Kürbissuppe» (45 kcal pro 100 g) und gib für einen Teller von 5 dl rund 500 g ein, dann die Kürbiskerne und das Brot. Ganz genau wird es, wenn du die Zutaten deines Rezepts einzeln erfasst." }
+    ],
+    "social": "Kürbissuppe: eine Mahlzeit mit 425 kcal 🎃\n\nEin grosser Teller hausgemachte Kürbissuppe hat rund 245 kcal. Dazu 10 g geröstete Kürbiskerne und eine Scheibe Vollkornbrot: ein warmes, vollständiges Znacht mit etwa 425 kcal.\n\nRezept, Berechnung und zwei Varianten (leichter und Kokos-Curry) im calorio Magazin: calorio.ch/de/magazin\n\n#calorio #kürbissuppe #butternut #herbst #schweiz #leichtkochen #kalorienzähler"
+  }
+}

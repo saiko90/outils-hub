@@ -1,0 +1,16 @@
+name: calorio Mag sur Facebook et Instagram
+# Publie l'article du Mag date du jour sur la page Facebook Calorio et sur Instagram calorio_app,
+# vers 18h30 heure suisse. Deux horaires UTC (ete + hiver) : le serveur ne publie qu'entre 18h et 21h
+# a Zurich et ne publie jamais deux fois le meme article (il relit les dernieres publications).
+on:
+  schedule:
+    - cron: "30 16 * * *"
+    - cron: "30 17 * * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publier l'article du jour
+        run: |
+          curl -fsS --max-time 90 -X GET -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "https://calorio.ch/api/mag-social?hour=18"

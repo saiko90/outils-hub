@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { type Lang } from "@/lib/i18n";
+import { foodSig, topFoods } from "@/lib/calorioTop";
 import {
   type Sexe,
   type Activite,
@@ -415,7 +416,7 @@ const LX = {
     importOk: "✓ Données importées, rechargement…", importErr: "Fichier invalide. Choisis un export calorio.",
     waterTitle: "Hydratation", waterGoalTxt: (n: number, g: number) => `${n} / ${g} verres`, waterL: (l: string) => `≈ ${l} L`,
     fastTitle: "Jeûne intermittent", fastStartBtn: "Démarrer le jeûne", fastEndBtn: "Terminer", fastElapsed: "écoulé", fastRemaining: "restant", fastPick: "Choisis ta fenêtre", fastingLabel: "Jeûne en cours", fastDone: "Objectif atteint 🎉",
-    myMeals: "Mes repas", saveMeal: "💾 Enregistrer", saveMealDone: "Repas enregistré ✓", repeatYesterday: "↻ Répéter hier", quickLog: "⚡ Vite fait", noYesterday: "Rien de noté hier.", emptyMeals: "Enregistre un repas depuis ta journée pour le rajouter ici en un tap.", del: "Supprimer",
+    myMeals: "Mes repas", saveMeal: "💾 Enregistrer", saveMealDone: "Repas enregistré ✓", repeatYesterday: "↻ Répéter hier", quickLog: "⚡ Vite fait", qlRecent: "🕘 Récents", qlTop: "🔁 Les + utilisés", topTitle: "Les plus utilisés", topDays: (n: number) => `${n} jours`, photoSave: "💾 Enregistrer", photoSaveName: "Nom du repas", photoSaveOk: "Enregistrer", photoSaved: "Enregistré dans ⭐ Mes repas ✓", photoMealName: "Repas photo", noYesterday: "Rien de noté hier.", emptyMeals: "Enregistre un repas depuis ta journée pour le rajouter ici en un tap.", del: "Supprimer",
     vitoIdea: "🥕 Vito, une idée de repas ?",
     vitoMealPrompt: (kcal: string, p: string, g: string, l: string) => `Il me reste ${kcal} kcal aujourd'hui (dont environ ${p} g de protéines, ${g} g de glucides, ${l} g de lipides). Propose-moi 3 idées de repas simples et équilibrés qui rentrent dans ce budget.`,
     createFood: "Créer un aliment", createSub: "Ton propre aliment", myFoods: "Mes aliments",
@@ -503,7 +504,7 @@ const LX = {
     importOk: "✓ Daten importiert, wird neu geladen…", importErr: "Ungültige Datei. Wähle einen calorio-Export.",
     waterTitle: "Hydration", waterGoalTxt: (n: number, g: number) => `${n} / ${g} Gläser`, waterL: (l: string) => `≈ ${l} L`,
     fastTitle: "Intervallfasten", fastStartBtn: "Fasten starten", fastEndBtn: "Beenden", fastElapsed: "vergangen", fastRemaining: "übrig", fastPick: "Wähle dein Fenster", fastingLabel: "Fasten läuft", fastDone: "Ziel erreicht 🎉",
-    myMeals: "Meine Mahlzeiten", saveMeal: "💾 Speichern", saveMealDone: "Mahlzeit gespeichert ✓", repeatYesterday: "↻ Gestern wiederholen", quickLog: "⚡ Schnell", noYesterday: "Gestern nichts notiert.", emptyMeals: "Speichere eine Mahlzeit aus deinem Tag, um sie hier mit einem Tipp hinzuzufügen.", del: "Löschen",
+    myMeals: "Meine Mahlzeiten", saveMeal: "💾 Speichern", saveMealDone: "Mahlzeit gespeichert ✓", repeatYesterday: "↻ Gestern wiederholen", quickLog: "⚡ Schnell", qlRecent: "🕘 Kürzlich", qlTop: "🔁 Am häufigsten", topTitle: "Am häufigsten", topDays: (n: number) => `${n} Tage`, photoSave: "💾 Speichern", photoSaveName: "Name der Mahlzeit", photoSaveOk: "Speichern", photoSaved: "In ⭐ Meine Mahlzeiten gespeichert ✓", photoMealName: "Foto-Mahlzeit", noYesterday: "Gestern nichts notiert.", emptyMeals: "Speichere eine Mahlzeit aus deinem Tag, um sie hier mit einem Tipp hinzuzufügen.", del: "Löschen",
     vitoIdea: "🥕 Vito, eine Idee?",
     vitoMealPrompt: (kcal: string, p: string, g: string, l: string) => `Mir bleiben heute ${kcal} kcal (davon etwa ${p} g Proteine, ${g} g Kohlenhydrate, ${l} g Fette). Schlag mir 3 einfache, ausgewogene Mahlzeiten vor, die in dieses Budget passen.`,
     createFood: "Lebensmittel erstellen", createSub: "Dein eigenes", myFoods: "Meine Lebensmittel",
@@ -591,7 +592,7 @@ const LX = {
     importOk: "✓ Data imported, reloading…", importErr: "Invalid file. Pick a calorio export.",
     waterTitle: "Hydration", waterGoalTxt: (n: number, g: number) => `${n} / ${g} glasses`, waterL: (l: string) => `≈ ${l} L`,
     fastTitle: "Intermittent fasting", fastStartBtn: "Start fasting", fastEndBtn: "End", fastElapsed: "elapsed", fastRemaining: "left", fastPick: "Pick your window", fastingLabel: "Fasting", fastDone: "Goal reached 🎉",
-    myMeals: "My meals", saveMeal: "💾 Save", saveMealDone: "Meal saved ✓", repeatYesterday: "↻ Repeat yesterday", quickLog: "⚡ Quick add", noYesterday: "Nothing logged yesterday.", emptyMeals: "Save a meal from your day to add it here in one tap.", del: "Delete",
+    myMeals: "My meals", saveMeal: "💾 Save", saveMealDone: "Meal saved ✓", repeatYesterday: "↻ Repeat yesterday", quickLog: "⚡ Quick add", qlRecent: "🕘 Recent", qlTop: "🔁 Most used", topTitle: "Most used", topDays: (n: number) => `${n} days`, photoSave: "💾 Save", photoSaveName: "Meal name", photoSaveOk: "Save", photoSaved: "Saved to ⭐ My meals ✓", photoMealName: "Photo meal", noYesterday: "Nothing logged yesterday.", emptyMeals: "Save a meal from your day to add it here in one tap.", del: "Delete",
     vitoIdea: "🥕 Vito, a meal idea?",
     vitoMealPrompt: (kcal: string, p: string, g: string, l: string) => `I have ${kcal} kcal left today (about ${p} g protein, ${g} g carbs, ${l} g fat). Suggest 3 simple, balanced meal ideas that fit this budget.`,
     createFood: "Create a food", createSub: "Your own food", myFoods: "My foods",
@@ -1012,6 +1013,9 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // photo → calories
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoItems, setPhotoItems] = useState<Food[] | null>(null);
+  const [photoSaveName, setPhotoSaveName] = useState<string | null>(null); // null = formulaire fermé
+  const [photoSaved, setPhotoSaved] = useState(false);
+  const [qlMode, setQlMode] = useState<"recent" | "top" | null>(null); // null = choix automatique
   const [photoMsg, setPhotoMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
   // Comptes + synchro
@@ -1093,6 +1097,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     setSeances(load<Record<string, Seance[]>>("calorio.activites", {})[day] || []);
     setPesees(load<Pesee[]>("calorio.pesees", []));
     setRecents(load<Food[]>("calorio.recents", []));
+    { const qm = load<string>("calorio.qlMode", ""); if (qm === "recent" || qm === "top") setQlMode(qm); }
     setStreakBest(load<number>("calorio.streakBest", 0));
     setTrophies(load<Record<string, number>>("calorio.trophies", {}));
     setUsed(load("calorio.used", {}));
@@ -1564,7 +1569,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const shareGrade = () => shareText(x.troShareGrade(x.gradeNames[grade.index], trophyCount));
 
   // Export / import des données (confiance + portabilité). Clés locales connues.
-  const CAL_KEYS = ["calorio.profil", "calorio.journal", "calorio.pesees", "calorio.recents", "calorio.trophies", "calorio.used", "calorio.streakBest", "calorio.lang", "calorio.water", "calorio.waterGoal", "calorio.fast", "calorio.meals", "calorio.customFoods", "calorio.coach.prefs", "calorio.coach.favs", "calorio.coach.active", "calorio.activites"];
+  const CAL_KEYS = ["calorio.profil", "calorio.journal", "calorio.pesees", "calorio.recents", "calorio.qlMode", "calorio.trophies", "calorio.used", "calorio.streakBest", "calorio.lang", "calorio.water", "calorio.waterGoal", "calorio.fast", "calorio.meals", "calorio.customFoods", "calorio.coach.prefs", "calorio.coach.favs", "calorio.coach.active", "calorio.activites"];
   const exportData = () => {
     const out: Record<string, unknown> = { _app: "calorio", _v: 1, _date: new Date().toISOString() };
     for (const k of CAL_KEYS) {
@@ -2478,12 +2483,19 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     });
   }, [q, catFilter, lang]);
 
-  const addFood = (food: Food, meal?: MealKey) => {
+  // « Les plus utilisés » : l'historique (hors jour affiché) est lu une fois par jour, puis combiné aux lignes du jour.
+  const journalHist = useMemo(() => (mounted ? load<Record<string, Line[]>>("calorio.journal", {}) : {}), [mounted, day]); // eslint-disable-line react-hooks/exhaustive-deps
+  const topUsed = useMemo(() => topFoods<Food>(journalHist, day, lines), [journalHist, day, lines]);
+  const qlShown: "recent" | "top" = qlMode ?? (topUsed.length >= 3 ? "top" : "recent");
+  const pickQl = (m: "recent" | "top") => { setQlMode(m); save("calorio.qlMode", m); };
+
+  const addFood = (food: Food, meal?: MealKey, grammes?: number) => {
     haptic("tap");
     const m = meal ?? mealOfHour(new Date().getHours());
-    setLines((prev) => [...prev, { key: newKey(), food, grammes: food.portion || 100, meal: m }]);
+    const g = grammes && grammes > 0 ? grammes : food.portion || 100;
+    setLines((prev) => [...prev, { key: newKey(), food, grammes: g, meal: m }]);
     // Petit « +X kcal » qui s'envole : chaque ajout devient une micro-récompense.
-    const added = Math.round(calcAliment(food, food.portion || 100).kcal);
+    const added = Math.round(calcAliment(food, g).kcal);
     if (added > 0) {
       setKcalPop({ id: Date.now(), v: added });
       if (kcalPopTimer.current) clearTimeout(kcalPopTimer.current);
@@ -2491,8 +2503,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     }
     // Mémorise l'aliment dans les récents (dédup nom+marque, 12 max) pour un ré-ajout en un tap.
     setRecents((prev) => {
-      const sig = (f: Food) => `${f.nom}|${f.brand || ""}`.toLowerCase();
-      const next = [food, ...prev.filter((f) => sig(f) !== sig(food))].slice(0, 12);
+      const next = [food, ...prev.filter((f) => foodSig(f) !== foodSig(food))].slice(0, 12);
       save("calorio.recents", next);
       return next;
     });
@@ -2632,7 +2643,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const onPhoto = async (file: File) => {
     if (!proActive || photoBusy) return;
     if (!user) { setPhotoMsg(x.photoLogin); return; }
-    setPhotoMsg(t.photoAnalyzing); setPhotoItems(null); setPhotoBusy(true);
+    setPhotoMsg(t.photoAnalyzing); setPhotoItems(null); setPhotoSaveName(null); setPhotoSaved(false); setPhotoBusy(true);
     try {
       const { base64, mime } = await downscale(file, 1024);
       const r = await fetch("/api/vision", { method: "POST", headers: { "content-type": "application/json", ...(await authHeader()) }, body: JSON.stringify({ image: base64, mime, lang }) });
@@ -2655,7 +2666,22 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     } catch { setPhotoMsg(t.photoErr); }
     setPhotoBusy(false);
   };
-  const addAllPhoto = () => { photoItems?.forEach((f) => addFood(f)); setPhotoItems(null); };
+  const addAllPhoto = () => { photoItems?.forEach((f) => addFood(f)); setPhotoItems(null); setPhotoSaveName(null); };
+  // Enregistrer le résultat d'une photo comme repas réutilisable (⭐ Mes repas).
+  const openPhotoSave = () => {
+    if (!photoItems?.length) return;
+    const guess = photoItems.slice(0, 2).map((f) => f.nom).join(" + ") + (photoItems.length > 2 ? " …" : "");
+    setPhotoSaveName((guess || x.photoMealName).slice(0, 60));
+  };
+  const confirmPhotoSave = () => {
+    if (!photoItems?.length) return;
+    const dd = new Date().toLocaleDateString(locale, { day: "2-digit", month: "2-digit" });
+    const name = (photoSaveName || "").trim() || `${x.photoMealName} · ${dd}`;
+    const items = photoItems.map((f) => ({ food: { ...f, id: `photo:${newKey()}` }, grammes: f.portion || 100 }));
+    setSavedMeals((prev) => [{ id: newKey(), name: name.slice(0, 60), emoji: "📷", items }, ...prev].slice(0, 30));
+    setPhotoSaveName(null); setPhotoSaved(true);
+    haptic("tap");
+  };
 
   const savePoids = () => {
     if (poidsInput === "" || !(poidsInput > 0)) return;
@@ -3007,13 +3033,27 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
             {recents.length > 0 && (
               <div className="cl-quicklog">
-                <span className="cl-quicklog-l">{x.quickLog}</span>
+                <div className="cl-quicklog-h">
+                  <span className="cl-quicklog-l">{x.quickLog}</span>
+                  {topUsed.length > 0 && (
+                    <div className="cl-qlseg" role="tablist">
+                      <button role="tab" aria-selected={qlShown === "top"} className={qlShown === "top" ? "on" : ""} onClick={() => pickQl("top")}>{x.qlTop}</button>
+                      <button role="tab" aria-selected={qlShown === "recent"} className={qlShown === "recent" ? "on" : ""} onClick={() => pickQl("recent")}>{x.qlRecent}</button>
+                    </div>
+                  )}
+                </div>
                 <div className="cl-quicklog-row">
-                  {recents.slice(0, 10).map((f, i) => (
-                    <button key={`ql-${f.id}-${i}`} className="cl-qlchip" onClick={() => { addFood(f); setMealMsg(`✓ ${f.nom}`); setTimeout(() => setMealMsg(""), 1600); }}>
-                      <span aria-hidden>{f.emoji}</span> <span className="cl-qlchip-n">{f.nom}</span>
-                    </button>
-                  ))}
+                  {qlShown === "top" && topUsed.length > 0
+                    ? topUsed.slice(0, 10).map((e, i) => (
+                        <button key={`qt-${e.food.id}-${i}`} className="cl-qlchip" onClick={() => { addFood(e.food, undefined, e.grammes); setMealMsg(`✓ ${e.food.nom} · ${e.grammes} g`); setTimeout(() => setMealMsg(""), 1600); }}>
+                          <span aria-hidden>{e.food.emoji}</span> <span className="cl-qlchip-n">{e.food.nom}</span> <small className="cl-qlchip-g">{e.grammes} g</small>
+                        </button>
+                      ))
+                    : recents.slice(0, 10).map((f, i) => (
+                        <button key={`ql-${f.id}-${i}`} className="cl-qlchip" onClick={() => { addFood(f); setMealMsg(`✓ ${f.nom}`); setTimeout(() => setMealMsg(""), 1600); }}>
+                          <span aria-hidden>{f.emoji}</span> <span className="cl-qlchip-n">{f.nom}</span>
+                        </button>
+                      ))}
                 </div>
               </div>
             )}
@@ -3065,7 +3105,21 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
             {photoItems && photoItems.length > 0 && (
               <div className="cl-card cl-photorev">
-                <div className="cl-photoh"><b>📷 {t.photoTitle}</b><button className="cl-addall" onClick={addAllPhoto}>{t.photoAddAll}</button></div>
+                <div className="cl-photoh">
+                  <b>📷 {t.photoTitle}</b>
+                  <div className="cl-photoacts">
+                    {!photoSaved && photoSaveName === null && <button className="cl-photosave" onClick={openPhotoSave}>{x.photoSave}</button>}
+                    <button className="cl-addall" onClick={addAllPhoto}>{t.photoAddAll}</button>
+                  </div>
+                </div>
+                {photoSaveName !== null && (
+                  <form className="cl-photosaveform" onSubmit={(e) => { e.preventDefault(); confirmPhotoSave(); }}>
+                    <input id="cl-photo-meal-name" value={photoSaveName} onChange={(e) => setPhotoSaveName(e.target.value)} placeholder={x.photoSaveName} aria-label={x.photoSaveName} maxLength={60} autoFocus />
+                    <button type="submit" className="cl-addall">{x.photoSaveOk}</button>
+                    <button type="button" className="cl-photocancel" onClick={() => setPhotoSaveName(null)}>{x.cancel}</button>
+                  </form>
+                )}
+                {photoSaved && <p className="cl-photosaved">{x.photoSaved}</p>}
                 {photoItems.map((f) => {
                   const c = calcAliment(f, f.portion);
                   return (
@@ -3522,6 +3576,20 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                           </button>
                           <button className="cl-savedmeal-del" onClick={() => deleteCustomFood(f.id)} aria-label={x.del}>×</button>
                         </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {q.trim().length < 2 && topUsed.length > 0 && (
+                  <>
+                    <div className="cl-secth">🔁 {x.topTitle}</div>
+                    <div className="cl-foods">
+                      {topUsed.slice(0, 8).map((e, i) => (
+                        <button key={`t-${i}`} className="cl-food2" onClick={() => { addFood(e.food, addMeal ?? undefined, e.grammes); setAddOpen(false); }}>
+                          <span className="cl-fem">{e.food.emoji}</span>
+                          <span className="cl-f2n">{e.food.nom}<small> · {e.grammes} g · {x.topDays(e.days)}</small></span>
+                          <span className="cl-f2k">{nf(lang).format(Math.round(calcAliment(e.food, e.grammes).kcal))} kcal</span>
+                        </button>
                       ))}
                     </div>
                   </>
@@ -4261,6 +4329,12 @@ const CSS = `
 .cl-cf-remember{margin:0 2px 6px;padding:9px 11px;border-radius:12px;background:var(--greenbg);border:1px solid var(--greenline);color:#0f7a3d;font-size:.8rem;font-weight:700;line-height:1.35}
 .cl-photorev{margin-top:13px}
 .cl-photoh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:.95rem;color:var(--ink)}
+.cl-photoacts{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.cl-photosave{background:var(--card);color:var(--green);border:1.5px solid var(--greenline);border-radius:10px;padding:7px 12px;font-weight:800;font-size:.82rem;cursor:pointer}
+.cl-photosaveform{display:flex;gap:7px;align-items:center;margin:4px 0 8px;flex-wrap:wrap}
+.cl-photosaveform input{flex:1 1 160px;min-width:0;border:1.5px solid var(--greenline);border-radius:10px;padding:8px 11px;font-family:var(--body);font-size:.9rem;background:var(--card);color:var(--ink)}
+.cl-photocancel{background:none;border:0;color:var(--muted);font-weight:700;font-size:.82rem;cursor:pointer}
+.cl-photosaved{margin:2px 0 8px;font-size:.84rem;font-weight:700;color:var(--green)}
 .cl-addall{background:var(--btn);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:800;font-size:.82rem;cursor:pointer}
 .cl-addone{flex:none;width:30px;height:30px;border:0;border-radius:9px;background:var(--green);color:#fff;font-size:1.2rem;font-weight:800;cursor:pointer;line-height:1}
 /* auth (modale) */
@@ -4360,7 +4434,12 @@ a.cl-auth-g{text-decoration:none;justify-content:center}
 .cl-mealmsg{font-size:.84rem;font-weight:700;color:var(--green)}
 /* Journalisation express : re-log en un tap des aliments récents (rétention) */
 .cl-quicklog{margin:-4px 0 14px}
-.cl-quicklog-l{display:block;font-size:.72rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0 2px 7px}
+.cl-quicklog-h{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 2px 7px}
+.cl-quicklog-l{display:block;font-size:.72rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.cl-qlseg{display:inline-flex;background:var(--card);border:1.5px solid var(--greenline);border-radius:99px;padding:2px}
+.cl-qlseg button{border:0;background:none;border-radius:99px;padding:5px 10px;font-family:var(--body);font-weight:800;font-size:.74rem;color:var(--muted);cursor:pointer}
+.cl-qlseg button.on{background:var(--green);color:#fff}
+.cl-qlchip-g{flex:none;font-size:.72rem;font-weight:700;color:var(--muted)}
 .cl-quicklog-row{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .cl-quicklog-row::-webkit-scrollbar{display:none}
 .cl-qlchip{flex:none;display:inline-flex;align-items:center;gap:6px;max-width:180px;background:var(--card);border:1.5px solid var(--greenline);border-radius:99px;padding:9px 14px;font-family:var(--body);font-weight:700;font-size:.86rem;color:var(--ink);cursor:pointer;box-shadow:0 6px 14px -11px rgba(14,52,30,.4);transition:transform .12s,box-shadow .2s}

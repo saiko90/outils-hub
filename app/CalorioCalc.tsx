@@ -376,7 +376,7 @@ const LX = {
     weightTitle: "Mon poids", goalLine: (v: string) => `Objectif : ${v} kg`,
     sinceStart: "depuis le début", tileStart: "Départ", tileNow: "Actuel", tileGoal: "Objectif", tileWeek: "Cette semaine",
     addPesee: "Ajouter une pesée",
-    helpTitle: "Aide & réglages", helpSub: "Ton profil, tes préférences",
+    helpTitle: "Aide & réglages", rateTitle: "Tu aimes calorio ?", rateText: "Ton avis sur Google Play aide d'autres personnes en Suisse à trouver l'app. Une phrase suffit, et ça compte énormément pour un petit développeur valaisan.", rateBtn: "⭐ Donner mon avis", helpSub: "Ton profil, tes préférences",
     myNeeds: "Mes besoins", reglages: "Réglages", passPro: "Passer Pro", proSubShort: "Coach IA + analyse photo",
     themeLabel: "Thème", themeLight: "☀️ Clair", themeDark: "🌙 Sombre", themeAuto: "Auto",
     madeIn: "Fait en Suisse 🇨🇭 · Swiss Digital Studio",
@@ -464,7 +464,7 @@ const LX = {
     weightTitle: "Mein Gewicht", goalLine: (v: string) => `Ziel: ${v} kg`,
     sinceStart: "seit Beginn", tileStart: "Start", tileNow: "Aktuell", tileGoal: "Ziel", tileWeek: "Diese Woche",
     addPesee: "Gewicht eintragen",
-    helpTitle: "Hilfe & Einstellungen", helpSub: "Dein Profil, deine Vorlieben",
+    helpTitle: "Hilfe & Einstellungen", rateTitle: "Gefällt dir calorio?", rateText: "Deine Bewertung bei Google Play hilft anderen in der Schweiz, die App zu finden. Ein Satz genügt, und für einen kleinen Walliser Entwickler zählt das enorm.", rateBtn: "⭐ Bewertung schreiben", helpSub: "Dein Profil, deine Vorlieben",
     myNeeds: "Mein Bedarf", reglages: "Einstellungen", passPro: "Pro werden", proSubShort: "KI-Coach + Foto-Analyse",
     themeLabel: "Thema", themeLight: "☀️ Hell", themeDark: "🌙 Dunkel", themeAuto: "Auto",
     madeIn: "Gemacht in der Schweiz 🇨🇭 · Swiss Digital Studio",
@@ -552,7 +552,7 @@ const LX = {
     weightTitle: "My weight", goalLine: (v: string) => `Goal: ${v} kg`,
     sinceStart: "since the start", tileStart: "Start", tileNow: "Current", tileGoal: "Goal", tileWeek: "This week",
     addPesee: "Add a weigh-in",
-    helpTitle: "Help & settings", helpSub: "Your profile, your preferences",
+    helpTitle: "Help & settings", rateTitle: "Enjoying calorio?", rateText: "Your review on Google Play helps other people in Switzerland find the app. One sentence is enough, and it means a lot to a small indie developer from Valais.", rateBtn: "⭐ Write a review", helpSub: "Your profile, your preferences",
     myNeeds: "My needs", reglages: "Settings", passPro: "Go Pro", proSubShort: "AI coach + photo analysis",
     themeLabel: "Theme", themeLight: "☀️ Light", themeDark: "🌙 Dark", themeAuto: "Auto",
     madeIn: "Made in Switzerland 🇨🇭 · Swiss Digital Studio",
@@ -884,21 +884,21 @@ function readPromo(): string {
 
 // Demande d'avis Google Play (fenêtre officielle « In-App Review », app Android uniquement).
 // Seulement après un moment positif (objectif du jour atteint ou palier de série), pour quelqu'un
-// qui utilise vraiment l'app (au moins 4 jours notés), et au plus une fois tous les 60 jours.
+// qui utilise vraiment l'app (au moins 3 jours notés), et au plus une fois tous les 30 jours.
 // Google décide lui-même s'il affiche la fenêtre (quota) ; aucune récompense n'est liée à l'avis.
 const REVIEW_KEY = "calorio.review.at";
-function maybeAskPlayReview() {
+function maybeAskPlayReview(delay = 3600) {
   try {
     const C = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean; Plugins?: { InAppReview?: { requestReview?: () => Promise<void> } } } }).Capacitor;
     const R = C?.isNativePlatform?.() ? C.Plugins?.InAppReview : undefined;
     if (!R?.requestReview) return;
     const last = Number(localStorage.getItem(REVIEW_KEY) || 0);
-    if (Date.now() - last < 60 * 86400000) return;
+    if (Date.now() - last < 30 * 86400000) return;
     const jour = load<Record<string, unknown[]>>("calorio.journal", {});
     const days = Object.values(jour).filter((rows) => rowsKcal(rows) > 0).length;
-    if (days < 4) return;
+    if (days < 3) return;
     localStorage.setItem(REVIEW_KEY, String(Date.now()));
-    setTimeout(() => { R.requestReview?.().catch(() => {}); }, 3600); // après les confettis
+    setTimeout(() => { R.requestReview?.().catch(() => {}); }, delay); // après les confettis
   } catch { /* ignore */ }
 }
 
@@ -3296,6 +3296,14 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               )}
             </div>
 
+            {playApp && (
+              <div className="cl-card cl-rate">
+                <div className="cl-rate-h">{x.rateTitle}</div>
+                <p className="cl-rate-p">{x.rateText}</p>
+                <button className="cl-rate-btn" onClick={() => { try { window.open("https://play.google.com/store/apps/details?id=ch.calorio.twa&showAllReviews=true", "_blank", "noopener"); } catch { /* ignore */ } }}>{x.rateBtn}</button>
+              </div>
+            )}
+
             {user && refCode && (
               <div className="cl-card cl-invite">
                 <div className="cl-inv-h">🎁 {t.inviteTitle}</div>
@@ -3844,7 +3852,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         const tr = TROPHIES.find((z) => z.id === newTrophy);
         const meta = tr ? x.tro[tr.id] : ["", ""];
         return (
-          <div className="cl-scanoverlay cl-trofx" onClick={() => setNewTrophy("")}>
+          <div className="cl-scanoverlay cl-trofx" onClick={() => { setNewTrophy(""); maybeAskPlayReview(600); }}>
             <div className="cl-tromodal" role="dialog" aria-modal="true" aria-label={x.troToast} onClick={(e) => e.stopPropagation()}>
               <div className="cl-troburst" aria-hidden>{["🎉", "✨", "🎊", "⭐", "🌟", "✨", "🎉", "⭐"].map((c, i) => <span key={i} style={{ "--i": i } as CSSProperties}>{c}</span>)}</div>
               <div className="cl-tromodal-emo">{tr?.emo}</div>
@@ -3853,7 +3861,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
               <div className="cl-tromodal-d">{meta[1]}</div>
               <div className="cl-tromodal-btns">
                 <button className="cl-tromodal-share" onClick={() => shareTrophy(newTrophy)}>🥕 {troCopied ? x.troCopiedMsg : x.troShareBtn}</button>
-                <button className="cl-tromodal-ok" onClick={() => setNewTrophy("")}>{t.close}</button>
+                <button className="cl-tromodal-ok" onClick={() => { setNewTrophy(""); maybeAskPlayReview(600); }}>{t.close}</button>
               </div>
             </div>
           </div>
@@ -4309,6 +4317,13 @@ a.cl-login-inst{display:inline-flex;align-items:center;justify-content:center;te
 .cl-legal{margin:12px 2px 0;text-align:center;color:var(--soft);font-size:.78rem;line-height:1.6;font-weight:600}
 .cl-madein{margin-top:8px;font-weight:700}
 /* invitation */
+.cl-rate{background:linear-gradient(135deg,#fffaf0,#fff3d6);border:1px solid #f4dfa6}
+.cl-rate-h{font-family:var(--disp);font-weight:700;font-size:1.08rem;color:var(--ink);margin-bottom:4px}
+.cl-rate-p{margin:0 0 12px;font-size:.88rem;line-height:1.5;color:var(--muted)}
+.cl-rate-btn{background:#f5b301;color:#3a2a00;border:0;border-radius:12px;padding:11px 18px;font-weight:800;font-size:.92rem;cursor:pointer;font-family:var(--body)}
+.cl-rate-btn:active{transform:scale(.97)}
+.cl[data-theme="dark"] .cl-rate{background:#2f2810;border-color:#6b5a1f}
+@media(prefers-color-scheme:dark){.cl[data-theme="auto"] .cl-rate{background:#2f2810;border-color:#6b5a1f}}
 .cl-invite{background:linear-gradient(135deg,#fff6fa,#fdecf1);border:1px solid var(--roseline)}
 .cl-inv-h{font-family:var(--disp);font-weight:600;font-size:1.02rem;color:var(--ink)}
 .cl-inv-s{margin:5px 0 12px;font-size:.85rem;line-height:1.5;color:#6b5560}

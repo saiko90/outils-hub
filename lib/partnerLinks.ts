@@ -6,6 +6,7 @@
 export const PARTNER_ALIASES: Record<string, string> = {
   anne: "ANNE20",
   anouchka: "ANOUCHKA20",
+  cindy: "CINDY20",
 };
 
 /** Destination (chemin + requête) pour un lien partenaire, ou null si le chemin n'en est pas un. */

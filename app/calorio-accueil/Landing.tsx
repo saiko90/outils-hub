@@ -108,7 +108,7 @@ export default function Landing({ lang }: { lang: LLang }) {
   // Utilisateur qui revient (profil déjà réglé, app installée) ou lien d'intention (?pro, ?go) :
   // on l'emmène directement dans l'app, avant tout affichage. Les nouveaux visiteurs voient cette page.
   // Un lien de parrainage (?ref) est conservé sur les boutons « commencer ».
-  const bootScript = `(function(){try{var s=location.search,q=new URLSearchParams(s);var back=localStorage.getItem('calorio.onboarded')==='1'||!!localStorage.getItem('calorio.journal');var standalone=window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches;var auth=/access_token|error_description/.test(location.hash)||q.has('code');if(back||standalone||auth||q.has('pro')||q.has('go')){location.replace('/calorio'+s+location.hash);return;}if(q.has('ref')){document.documentElement.classList.add('lp-has-ref');}}catch(e){}})();`;
+  const bootScript = `(function(){try{var s=location.search,q=new URLSearchParams(s);var back=localStorage.getItem('calorio.onboarded')==='1'||!!localStorage.getItem('calorio.journal');var standalone=window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches;var auth=/access_token|error_description/.test(location.hash)||q.has('code');if(back||standalone||auth||q.has('pro')||q.has('go')){location.replace('/calorio'+s+location.hash);return;}if(/Android/i.test(navigator.userAgent||'')){document.documentElement.classList.add('lp-android');}if(q.has('ref')){document.documentElement.classList.add('lp-has-ref');}}catch(e){}})();`;
   // Transmet ?ref= (parrainage) et ?code= (code promo partenaire) aux liens vers l'app.
   const refScript = `(function(){try{var q=new URLSearchParams(location.search),r=q.get('ref'),c=q.get('code');if(r&&!/^[A-Za-z0-9]{4,10}$/.test(r))r=null;if(c&&!/^[A-Za-z0-9]{3,20}$/.test(c))c=null;if(!r&&!c)return;document.querySelectorAll('a[data-app]').forEach(function(a){var u=new URL(a.getAttribute('href'),location.origin);if(r)u.searchParams.set('ref',r);if(c)u.searchParams.set('code',c.toUpperCase());a.setAttribute('href',u.pathname+u.search);});}catch(e){}})();`;
 
@@ -254,6 +254,7 @@ const CSS = `
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--lp-bg:#0f1812;--lp-bg2:#15231a;--lp-card:#18251d;--lp-ink:#e6efe8;--lp-muted:#a2b3a8;--lp-line:#26382c;--lp-green:#46d487;--lp-green-ink:#6fe0a2;--lp-shadow:0,0,0}}
 :root[data-theme="dark"]{--lp-bg:#0f1812;--lp-bg2:#15231a;--lp-card:#18251d;--lp-ink:#e6efe8;--lp-muted:#a2b3a8;--lp-line:#26382c;--lp-green:#46d487;--lp-green-ink:#6fe0a2;--lp-shadow:0,0,0}
 html.lp-has-ref .lp-ref{display:block}
+html.lp-android .lp-cta-row .lp-play{order:-1}
 body{background:var(--lp-bg) !important;color:var(--lp-ink)}
 .lp{font-family:var(--font-nunito),"Nunito",system-ui,sans-serif;color:var(--lp-ink);background:radial-gradient(1200px 600px at 70% -10%,var(--lp-bg2),transparent 70%),var(--lp-bg);min-height:100vh;padding-inline:max(16px,calc((100vw - 1120px)/2));overflow-x:hidden}
 .lp a{color:inherit}

@@ -380,7 +380,7 @@ const LX = {
     myNeeds: "Mes besoins", reglages: "Réglages", passPro: "Passer Pro", proSubShort: "Coach IA + analyse photo",
     themeLabel: "Thème", themeLight: "☀️ Clair", themeDark: "🌙 Sombre", themeAuto: "Auto",
     madeIn: "Fait en Suisse 🇨🇭 · Swiss Digital Studio",
-    loginB: "Connecte-toi", loginS: "Synchronise tes données, gratuit", loginBtn: "Se connecter",
+    playBanner: "calorio en app Android", playBannerSub: "Ouverture en un tap et rappels, gratuite.", playBannerSync: "Connecte-toi d'abord ici pour garder tes données.", playBannerAlt: "Disponible sur Google Play", loginB: "Connecte-toi", loginS: "Synchronise tes données, gratuit", loginBtn: "Se connecter",
     syncedB: "Données synchronisées", vitoDispo: "Ton coach nutrition, dispo 24/7",
     goalWeight: "Poids objectif", toGoal: (v: string) => `plus que ${v} kg`, goalReached: "Objectif atteint 🎉",
     vitoHi: ["Bonjour 👋", "Coucou, c'est parti !", "Salut, prêt·e ?", "Hey, content de te voir 🥕"],
@@ -468,7 +468,7 @@ const LX = {
     myNeeds: "Mein Bedarf", reglages: "Einstellungen", passPro: "Pro werden", proSubShort: "KI-Coach + Foto-Analyse",
     themeLabel: "Thema", themeLight: "☀️ Hell", themeDark: "🌙 Dunkel", themeAuto: "Auto",
     madeIn: "Gemacht in der Schweiz 🇨🇭 · Swiss Digital Studio",
-    loginB: "Melde dich an", loginS: "Synchronisiere deine Daten, gratis", loginBtn: "Anmelden",
+    playBanner: "calorio als Android-App", playBannerSub: "Mit einem Tipp offen, mit Erinnerungen, gratis.", playBannerSync: "Melde dich zuerst hier an, um deine Daten zu behalten.", playBannerAlt: "Jetzt bei Google Play", loginB: "Melde dich an", loginS: "Synchronisiere deine Daten, gratis", loginBtn: "Anmelden",
     syncedB: "Daten synchronisiert", vitoDispo: "Dein Ernährungscoach, 24/7 da",
     goalWeight: "Zielgewicht", toGoal: (v: string) => `noch ${v} kg`, goalReached: "Ziel erreicht 🎉",
     vitoHi: ["Hallo 👋", "Hoi, los geht's!", "Bereit?", "Schön, dich zu sehen 🥕"],
@@ -556,7 +556,7 @@ const LX = {
     myNeeds: "My needs", reglages: "Settings", passPro: "Go Pro", proSubShort: "AI coach + photo analysis",
     themeLabel: "Theme", themeLight: "☀️ Light", themeDark: "🌙 Dark", themeAuto: "Auto",
     madeIn: "Made in Switzerland 🇨🇭 · Swiss Digital Studio",
-    loginB: "Sign in", loginS: "Sync your data, free", loginBtn: "Sign in",
+    playBanner: "calorio as an Android app", playBannerSub: "Opens in one tap, with reminders, free.", playBannerSync: "Sign in here first to keep your data.", playBannerAlt: "Get it on Google Play", loginB: "Sign in", loginS: "Sync your data, free", loginBtn: "Sign in",
     syncedB: "Data synced", vitoDispo: "Your nutrition coach, 24/7",
     goalWeight: "Target weight", toGoal: (v: string) => `${v} kg to go`, goalReached: "Goal reached 🎉",
     vitoHi: ["Hi 👋", "Hey, let's go!", "Ready?", "Good to see you 🥕"],
@@ -1034,6 +1034,21 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   useEffect(() => {
     try { const C = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor; if (C?.isNativePlatform?.()) setPlayApp(true); } catch { /* ignore */ }
   }, []);
+  // Android dans le navigateur (pas dans l'app) : on propose l'app Google Play (bandeau discret, masquable 30 jours).
+  const PLAY_BANNER_KEY = "calorio.playBanner";
+  const [androidWeb, setAndroidWeb] = useState(false);
+  const [playBannerOff, setPlayBannerOff] = useState(true);
+  useEffect(() => {
+    try {
+      const C = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+      if (C?.isNativePlatform?.() || !/Android/i.test(navigator.userAgent || "")) return;
+      setAndroidWeb(true);
+      const at = Number(localStorage.getItem(PLAY_BANNER_KEY) || 0);
+      setPlayBannerOff(at > 0 && Date.now() - at < 30 * 24 * 3600 * 1000);
+    } catch { /* ignore */ }
+  }, []);
+  const hidePlayBanner = () => { setPlayBannerOff(true); try { localStorage.setItem(PLAY_BANNER_KEY, String(Date.now())); } catch { /* ignore */ } };
+  const playStoreUrl = (medium: string) => `https://play.google.com/store/apps/details?id=ch.calorio.twa&hl=${lang}&referrer=${encodeURIComponent(`utm_source=calorio.ch&utm_medium=${medium}`)}`;
   // Google Play Billing (plugin natif @capgo/native-purchases, présent à partir de l'app 1.2.0).
   const [playSub, setPlaySub] = useState(false); // abonnement Pro actif acheté via Google Play
   const [playPlans, setPlayPlans] = useState<{ monthly?: PlayOffer; yearly?: PlayOffer }>({});
@@ -2747,13 +2762,29 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
         ) : (
           <>
             <div className="cl-login-tx"><b>{x.loginB}</b><span>{x.loginS}</span></div>
-            {installEvt && <button className="cl-login-inst" onClick={doInstall} title={t.installed} aria-label={t.installApp}>⬇️</button>}
+            {androidWeb ? (
+              <a className="cl-login-inst" href={playStoreUrl("webapp_header")} target="_blank" rel="noopener" title={x.playBannerAlt} aria-label={x.playBannerAlt}>⬇️</a>
+            ) : installEvt && <button className="cl-login-inst" onClick={doInstall} title={t.installed} aria-label={t.installApp}>⬇️</button>}
             <button className="cl-login-btn" onClick={() => { setAuthMsg(""); setAuthOpen(true); }}>{x.loginBtn}</button>
           </>
         )}
       </div>
 
       {checkoutMsg && checkoutMsg !== "…" && !proOpen && <p className="cl-toast">{checkoutMsg}</p>}
+
+      {androidWeb && !playBannerOff && !(samsungHint && !saDismissed) && (
+        <div className="cl-playban">
+          <img className="cl-playban-ic" src="/calorio-icon-192.png" alt="" width={40} height={40} />
+          <div className="cl-playban-tx">
+            <b>{x.playBanner}</b>
+            <span>{user ? x.playBannerSub : x.playBannerSync}</span>
+          </div>
+          <a className="cl-playban-go" href={playStoreUrl("webapp_banner")} target="_blank" rel="noopener" onClick={hidePlayBanner}>
+            <img src={`/badges/google-play-${lang === "de" ? "de" : lang === "en" ? "en" : "fr"}.png`} alt={x.playBannerAlt} width={129} height={50} />
+          </a>
+          <button className="cl-playban-x" onClick={hidePlayBanner} aria-label={t.close}>×</button>
+        </div>
+      )}
 
       {samsungHint && !saDismissed && (
         <div className="cl-sahint">
@@ -4051,6 +4082,14 @@ const CSS = `
 .cl-acc-pro{margin-left:6px;font-size:.6rem;font-weight:900;color:#5a3d00;background:var(--goldbg);border:1px solid var(--goldline);border-radius:99px;padding:2px 7px;text-transform:uppercase;vertical-align:middle;box-shadow:0 2px 6px -2px rgba(201,150,26,.6)}
 .cl-toast{position:relative;z-index:2;flex:none;margin:0;padding:11px 16px;background:var(--greenbg);border-bottom:1px solid var(--greenline);color:#0f7a3d;font-size:.88rem;font-weight:700;text-align:center}
 /* alerte Samsung */
+.cl-playban{position:relative;z-index:2;flex:none;display:flex;align-items:center;gap:10px;background:var(--greenbg);border-bottom:1px solid var(--greenline);padding:9px 34px 9px 14px}
+.cl-playban-ic{flex:none;width:40px;height:40px;border-radius:10px}
+.cl-playban-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;font-size:.78rem;line-height:1.35;color:var(--muted)}
+.cl-playban-tx b{font-size:.86rem;color:var(--ink)}
+.cl-playban-go{flex:none;line-height:0}
+.cl-playban-go img{width:112px;height:auto}
+.cl-playban-x{position:absolute;top:4px;right:6px;background:none;border:0;font-size:1.1rem;line-height:1;color:var(--muted);cursor:pointer;padding:4px}
+a.cl-login-inst{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
 .cl-sahint{position:relative;z-index:2;flex:none;background:#eef4ff;border-bottom:1px solid #cfe0fb;padding:13px 16px}
 .cl-sahint-top{display:flex;align-items:flex-start;gap:11px}
 .cl-sahint-ic{font-size:1.2rem;line-height:1.3;flex:none}

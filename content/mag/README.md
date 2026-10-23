@@ -33,6 +33,14 @@ mise en valeur), `{ "type": "tip", "title"?, "text" }`. Dans les textes, seuls `
 - `title` ≤ 70 caractères, `description` ≤ 160, `cardTitle` ≤ 48 (titre du visuel).
 - `kcal` : facultatif ; la valeur principale de l'article (sert au badge et au visuel).
 - `social` : la légende Facebook / Instagram (texte, 2 à 4 courts paragraphes, une ligne dans l'autre langue, 5 à 8 hashtags).
+- **Mentions de marques dans `social`** : quand l'article cite réellement une marque, une interprofession ou un producteur
+  comme source (recette, fiche nutritionnelle), mentionne son compte Instagram officiel dans la légende, une seule fois,
+  de façon naturelle (par exemple « selon la recette de @gruyere_aop »), et ajoute son hashtag. Les marques voient ces
+  mentions et y réagissent parfois. Règles : au maximum 2 mentions par légende ; uniquement des comptes qui figurent dans
+  la liste ci-dessous, ou un compte dont le site officiel de la marque renvoie lui-même vers ce compte (sinon : hashtag
+  seulement, pas de @) ; jamais de mention d'une marque qui n'est pas citée comme source dans l'article ; jamais de
+  mention de particuliers, d'influenceurs ou de concurrents ; jamais de critique d'une marque.
+  Comptes officiels vérifiés : `@gruyere_aop` (Interprofession du Gruyère, a commenté notre post fondue le 23.10.2026).
 
 ## Règles éditoriales (importantes)
 

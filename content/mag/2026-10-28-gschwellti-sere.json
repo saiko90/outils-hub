@@ -1,0 +1,386 @@
+{
+  "id": "gschwellti-sere-proteines",
+  "date": "2026-10-28",
+  "cat": "sportif",
+  "emoji": "🥔",
+  "kcal": {
+    "value": "545",
+    "label": {
+      "fr": "kcal par assiette",
+      "de": "kcal pro Teller"
+    }
+  },
+  "related": {
+    "aliments": [
+      "pomme_terre",
+      "fromage_blanc",
+      "oeuf",
+      "viande_sechee",
+      "cottage"
+    ]
+  },
+  "sources": [
+    {
+      "label": "Base d'aliments calorio : pomme de terre (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/pomme-de-terre"
+    },
+    {
+      "label": "Base d'aliments calorio : fromage blanc maigre / séré maigre (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/fromage-blanc-maigre"
+    },
+    {
+      "label": "Open Food Facts : Migros Bio Magerquark (valeurs pour 100 g, pour comparaison)",
+      "url": "https://world.openfoodfacts.org/product/7623186259630"
+    },
+    {
+      "label": "Base d'aliments calorio : œuf (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/uf"
+    },
+    {
+      "label": "Base d'aliments calorio : viande séchée (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/viande-sechee"
+    },
+    {
+      "label": "Base d'aliments calorio : cottage cheese (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/cottage-cheese"
+    },
+    {
+      "label": "USDA FoodData Central : pommes de terre cuites dans leur peau (valeurs pour 100 g)",
+      "url": "https://fdc.nal.usda.gov/food-details/170438/nutrients"
+    },
+    {
+      "label": "USDA FoodData Central : ciboulette crue (valeurs pour 100 g)",
+      "url": "https://fdc.nal.usda.gov/food-details/169994/nutrients"
+    },
+    {
+      "label": "International Society of Sports Nutrition : position sur les protéines et l'exercice (Jäger et al., 2017)",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5477153"
+    }
+  ],
+  "fr": {
+    "slug": "gschwellti-sere-proteines-calories",
+    "title": "Gschwellti et séré aux herbes : le souper protéiné à 45 g",
+    "cardTitle": "Gschwellti et séré : 45 g de protéines",
+    "description": "Pommes de terre en robe des champs, séré maigre aux herbes et un œuf : environ 545 kcal et 45 g de protéines par assiette. Recette, calcul et variantes sport.",
+    "intro": "Une assiette de Gschwellti (300 g de pommes de terre en robe des champs) avec 250 g de séré maigre aux herbes, un œuf et des crudités apporte **environ 545 kcal et 45 g de protéines**. Un souper suisse tout simple, bon marché et idéal après le sport.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "Pourquoi c'est un bon repas après l'entraînement"
+      },
+      {
+        "type": "p",
+        "text": "Le séré maigre (Magerquark) est l'un des produits les plus riches en protéines du rayon frais : **environ 12 g de protéines pour 100 g, pour seulement 60 à 70 kcal** selon la marque. Les pommes de terre apportent les glucides pour recharger après l'effort, avec à peine 87 kcal pour 100 g une fois cuites dans leur peau. Pour les sportifs qui veulent construire du muscle, la Société internationale de nutrition du sport (ISSN) cite des apports de **20 à 40 g de protéines par repas** : cette assiette est en plein dedans."
+      },
+      {
+        "type": "h2",
+        "text": "Le détail de l'assiette pour 1 personne"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Ingrédient",
+          "Quantité",
+          "Calories",
+          "Protéines"
+        ],
+        "rows": [
+          [
+            "Pommes de terre en robe des champs",
+            "300 g",
+            "261 kcal",
+            "6 g"
+          ],
+          [
+            "Séré maigre (Magerquark)",
+            "250 g (1 pot)",
+            "168 kcal",
+            "30 g"
+          ],
+          [
+            "Lait demi-écrémé (pour l'onctuosité)",
+            "2 c. à soupe (30 g)",
+            "14 kcal",
+            "1 g"
+          ],
+          [
+            "Ciboulette, persil, aneth",
+            "1 petit bouquet (10 g)",
+            "3 kcal",
+            "0 g"
+          ],
+          [
+            "Œuf dur",
+            "1 (50 g sans coquille)",
+            "78 kcal",
+            "6,5 g"
+          ],
+          [
+            "Concombre",
+            "100 g",
+            "15 kcal",
+            "0,7 g"
+          ],
+          [
+            "Radis",
+            "50 g",
+            "8 kcal",
+            "0,4 g"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 545 kcal",
+            "≈ 45 g"
+          ]
+        ],
+        "note": "Le sel, le poivre, l'ail et le paprika ne comptent pratiquement pas. Les valeurs du séré varient un peu selon la marque (environ 60 à 70 kcal et 11 à 12 g de protéines pour 100 g)."
+      },
+      {
+        "type": "ol",
+        "items": [
+          "Lave les pommes de terre (des petites fermes, type Charlotte ou Agria) et fais-les cuire 20 à 25 minutes dans l'eau salée, avec la peau.",
+          "Pendant ce temps, fais cuire l'œuf 9 minutes, puis passe-le sous l'eau froide.",
+          "Mélange le séré avec le lait jusqu'à ce qu'il soit lisse. Ajoute les herbes ciselées, une petite gousse d'ail pressée, du sel, du poivre et une pincée de paprika.",
+          "Coupe le concombre et les radis en bâtonnets ou en rondelles.",
+          "Sers les pommes de terre chaudes avec le séré bien frais, l'œuf coupé en deux et les crudités."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Trois variantes selon ton objectif"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Variante",
+          "Ce qui change",
+          "Calories",
+          "Protéines"
+        ],
+        "rows": [
+          [
+            "Classique",
+            "La recette ci-dessus",
+            "≈ 545 kcal",
+            "≈ 45 g"
+          ],
+          [
+            "Prise de muscle",
+            "400 g de pommes de terre et 30 g de viande séchée en plus",
+            "≈ 710 kcal",
+            "≈ 59 g"
+          ],
+          [
+            "Plus légère",
+            "200 g de pommes de terre, sans œuf",
+            "≈ 380 kcal",
+            "≈ 36 g"
+          ],
+          [
+            "Cottage cheese",
+            "250 g de cottage cheese à la place du séré",
+            "≈ 625 kcal",
+            "≈ 42 g"
+          ]
+        ]
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Garde la peau** : les pommes de terre en robe des champs restent bien fermes et tu gagnes du temps (pas besoin de les éplucher avant la cuisson).",
+          "**Un séré bien lisse** : quelques cuillères de lait ou d'eau minérale gazeuse suffisent à le rendre crémeux, sans ajouter de crème.",
+          "**Prépare d'avance** : les pommes de terre cuites et le séré aux herbes se gardent 2 à 3 jours au frigo. Parfait pour un souper rapide après l'entraînement.",
+          "**Varie les herbes** : ciboulette, persil, aneth, cresson ou un peu de raifort. En hiver, les herbes surgelées font très bien l'affaire."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Le bon réflexe",
+        "text": "Les protéines comptent, mais les glucides aussi après un effort : ne supprime pas les pommes de terre. Et si tu as encore faim, ajoute une tranche de pain complet ou un fruit, sans te prendre la tête."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Combien de calories dans une assiette de Gschwellti au séré ?",
+        "a": "Environ 545 kcal pour 300 g de pommes de terre, 250 g de séré maigre aux herbes, un œuf et des crudités. Sans œuf et avec 200 g de pommes de terre, on descend à environ 380 kcal."
+      },
+      {
+        "q": "Combien de protéines dans le séré maigre ?",
+        "a": "Environ 11 à 12 g pour 100 g selon la marque, soit environ 30 g dans un pot de 250 g, pour 60 à 70 kcal pour 100 g."
+      },
+      {
+        "q": "Les pommes de terre font-elles grossir ?",
+        "a": "Non, pas en elles-mêmes : cuites dans leur peau, elles apportent environ 87 kcal pour 100 g, moins que les pâtes ou le riz cuits. Ce sont surtout le beurre, la crème ou la friture qui font monter le total."
+      },
+      {
+        "q": "Comment noter ce repas dans calorio ?",
+        "a": "Ajoute « Pomme de terre » (300 g), « Fromage blanc maigre » (250 g, c'est le séré maigre) et « Œuf » (50 g), puis les crudités. calorio additionne aussi tes protéines du jour, en plus des calories."
+      }
+    ],
+    "social": "Gschwellti et séré aux herbes : 45 g de protéines 🥔💪\n\nPommes de terre en robe des champs, un pot de séré maigre aux herbes, un œuf dur et des crudités : environ 545 kcal et 45 g de protéines. Un souper suisse tout simple, pas cher et parfait après le sport.\n\nLa recette, le calcul détaillé et trois variantes (prise de muscle, plus légère, cottage cheese) sont dans le Mag calorio : calorio.ch/mag\n\nGschwellti mit Kräuterquark: 45 g Protein. Rezept im calorio Magazin.\n\n#calorio #gschwellti #sere #proteines #sport #musculation #suisseromande #compteurdecalories"
+  },
+  "de": {
+    "slug": "gschwellti-kraeuterquark-protein-kalorien",
+    "title": "Gschwellti mit Kräuterquark: das Protein-Znacht mit 45 g",
+    "cardTitle": "Gschwellti mit Quark: 45 g Protein",
+    "description": "Gschwellti, Magerquark mit Kräutern und ein Ei: rund 545 kcal und 45 g Eiweiss pro Teller. Rezept, Berechnung und Varianten für Sport und Muskelaufbau.",
+    "intro": "Ein Teller Gschwellti (300 g Kartoffeln in der Schale) mit 250 g Kräuterquark, einem Ei und etwas Rohkost liefert **rund 545 kcal und 45 g Eiweiss**. Ein einfaches, günstiges Schweizer Znacht, ideal nach dem Training.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "Darum passt es so gut nach dem Training"
+      },
+      {
+        "type": "p",
+        "text": "Magerquark gehört zu den eiweissreichsten Produkten im Kühlregal: **rund 12 g Eiweiss pro 100 g bei nur 60 bis 70 kcal**, je nach Marke. Die Kartoffeln liefern die Kohlenhydrate, um die Speicher nach dem Sport wieder aufzufüllen, und haben in der Schale gekocht nur 87 kcal pro 100 g. Für den Muskelaufbau nennt die Internationale Gesellschaft für Sporternährung (ISSN) **20 bis 40 g Eiweiss pro Mahlzeit**: Dieser Teller liegt genau in diesem Bereich."
+      },
+      {
+        "type": "h2",
+        "text": "So setzt sich der Teller zusammen (1 Person)"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Zutat",
+          "Menge",
+          "Kalorien",
+          "Eiweiss"
+        ],
+        "rows": [
+          [
+            "Gschwellti (Kartoffeln in der Schale)",
+            "300 g",
+            "261 kcal",
+            "6 g"
+          ],
+          [
+            "Magerquark",
+            "250 g (1 Becher)",
+            "168 kcal",
+            "30 g"
+          ],
+          [
+            "Milch teilentrahmt (für die Cremigkeit)",
+            "2 EL (30 g)",
+            "14 kcal",
+            "1 g"
+          ],
+          [
+            "Schnittlauch, Petersilie, Dill",
+            "1 kleiner Bund (10 g)",
+            "3 kcal",
+            "0 g"
+          ],
+          [
+            "Hart gekochtes Ei",
+            "1 (50 g ohne Schale)",
+            "78 kcal",
+            "6,5 g"
+          ],
+          [
+            "Gurke",
+            "100 g",
+            "15 kcal",
+            "0,7 g"
+          ],
+          [
+            "Radieschen",
+            "50 g",
+            "8 kcal",
+            "0,4 g"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 545 kcal",
+            "≈ 45 g"
+          ]
+        ],
+        "note": "Salz, Pfeffer, Knoblauch und Paprika fallen praktisch nicht ins Gewicht. Die Werte des Quarks schwanken je nach Marke etwas (rund 60 bis 70 kcal und 11 bis 12 g Eiweiss pro 100 g)."
+      },
+      {
+        "type": "ol",
+        "items": [
+          "Kartoffeln waschen (kleine, festkochende Sorten wie Charlotte oder Agria) und mit der Schale 20 bis 25 Minuten im Salzwasser kochen.",
+          "In der Zwischenzeit das Ei 9 Minuten kochen und kalt abschrecken.",
+          "Den Quark mit der Milch glatt rühren. Gehackte Kräuter, eine kleine gepresste Knoblauchzehe, Salz, Pfeffer und eine Prise Paprika dazugeben.",
+          "Gurke und Radieschen in Stängel oder Scheiben schneiden.",
+          "Die heissen Gschwellti mit dem kühlen Kräuterquark, dem halbierten Ei und der Rohkost servieren."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Drei Varianten je nach Ziel"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Variante",
+          "Was ändert",
+          "Kalorien",
+          "Eiweiss"
+        ],
+        "rows": [
+          [
+            "Klassisch",
+            "Das Rezept oben",
+            "≈ 545 kcal",
+            "≈ 45 g"
+          ],
+          [
+            "Muskelaufbau",
+            "400 g Kartoffeln und zusätzlich 30 g Trockenfleisch",
+            "≈ 710 kcal",
+            "≈ 59 g"
+          ],
+          [
+            "Leichter",
+            "200 g Kartoffeln, ohne Ei",
+            "≈ 380 kcal",
+            "≈ 36 g"
+          ],
+          [
+            "Hüttenkäse",
+            "250 g Hüttenkäse statt Quark",
+            "≈ 625 kcal",
+            "≈ 42 g"
+          ]
+        ]
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Die Schale bleibt dran**: So bleiben die Gschwellti schön fest, und du sparst dir das Schälen vor dem Kochen.",
+          "**Cremiger Quark ohne Rahm**: Ein paar Löffel Milch oder Mineralwasser mit Kohlensäure machen ihn schön luftig.",
+          "**Vorkochen lohnt sich**: Gekochte Kartoffeln und Kräuterquark halten 2 bis 3 Tage im Kühlschrank. Perfekt für ein schnelles Znacht nach dem Training.",
+          "**Kräuter variieren**: Schnittlauch, Petersilie, Dill, Kresse oder etwas Meerrettich. Im Winter tun es auch tiefgekühlte Kräuter."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Der richtige Reflex",
+        "text": "Eiweiss ist wichtig, aber nach dem Sport zählen auch die Kohlenhydrate: Lass die Kartoffeln also nicht weg. Und wenn du noch Hunger hast, nimm ruhig eine Scheibe Vollkornbrot oder eine Frucht dazu."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Wie viele Kalorien hat ein Teller Gschwellti mit Quark?",
+        "a": "Rund 545 kcal für 300 g Kartoffeln, 250 g Kräuterquark, ein Ei und etwas Rohkost. Ohne Ei und mit 200 g Kartoffeln sind es rund 380 kcal."
+      },
+      {
+        "q": "Wie viel Eiweiss hat Magerquark?",
+        "a": "Je nach Marke rund 11 bis 12 g pro 100 g, also etwa 30 g in einem 250-g-Becher, bei 60 bis 70 kcal pro 100 g."
+      },
+      {
+        "q": "Machen Kartoffeln dick?",
+        "a": "Nein, nicht an sich: In der Schale gekocht liefern sie rund 87 kcal pro 100 g, weniger als gekochte Teigwaren oder Reis. Die Summe steigt vor allem durch Butter, Rahm oder Frittieren."
+      },
+      {
+        "q": "Wie erfasse ich diese Mahlzeit in calorio?",
+        "a": "Füge «Kartoffel» (300 g), «Magerquark» (250 g) und «Ei» (50 g) hinzu, dann die Rohkost. calorio zählt neben den Kalorien auch dein Eiweiss des Tages zusammen."
+      }
+    ],
+    "social": "Gschwellti mit Kräuterquark: 45 g Protein 🥔💪\n\nKartoffeln in der Schale, ein Becher Magerquark mit Kräutern, ein hartes Ei und etwas Rohkost: rund 545 kcal und 45 g Eiweiss. Ein einfaches, günstiges Schweizer Znacht, perfekt nach dem Training.\n\nRezept, Berechnung und drei Varianten (Muskelaufbau, leichter, Hüttenkäse) im calorio Magazin: calorio.ch/de/magazin\n\n#calorio #gschwellti #quark #protein #sport #krafttraining #schweiz #kalorienzähler"
+  }
+}

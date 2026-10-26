@@ -1,0 +1,393 @@
+{
+  "id": "randonnee-calories-brulees",
+  "date": "2026-11-01",
+  "cat": "guides",
+  "emoji": "🥾",
+  "kcal": {
+    "value": "320–480",
+    "label": {
+      "fr": "kcal par heure de marche",
+      "de": "kcal pro Stunde Wandern"
+    }
+  },
+  "related": {
+    "aliments": [
+      "sandwich",
+      "pomme",
+      "barre_cereales",
+      "mix_fruits_secs"
+    ]
+  },
+  "sources": [
+    {
+      "label": "Compendium of Physical Activities 2024 : marche et randonnée (codes 17012, 17036, 17080, 17081, 17082, 17180)",
+      "url": "https://pacompendium.com/walking/"
+    },
+    {
+      "label": "Base d'aliments calorio : sandwich jambon (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/sandwich-jambon"
+    },
+    {
+      "label": "Base d'aliments calorio : pomme (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/pomme"
+    },
+    {
+      "label": "Base d'aliments calorio : barre de céréales (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/barre-de-cereales"
+    },
+    {
+      "label": "Base d'aliments calorio : mélange de fruits secs (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/melange-fruits-secs"
+    }
+  ],
+  "fr": {
+    "slug": "randonnee-calories-brulees",
+    "title": "Randonnée : combien de calories brûles-tu vraiment ?",
+    "cardTitle": "Randonnée : 320 à 480 kcal par heure",
+    "description": "Une heure de randonnée à rythme normal brûle 320 à 480 kcal selon ton poids, bien plus en montée. Tableau par poids, exemple d'une journée et pique-nique.",
+    "intro": "Une heure de randonnée à rythme normal brûle **environ 320 à 480 kcal** selon ton poids (de 60 à 90 kg). En montée raide, c'est plutôt **530 à 790 kcal par heure** : une belle sortie de 4 heures en montagne peut ainsi dépasser 1700 kcal.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "Comment on calcule"
+      },
+      {
+        "type": "p",
+        "text": "Les chercheurs du **Compendium of Physical Activities** (édition 2024) attribuent à chaque activité une valeur MET, c'est-à-dire son intensité par rapport au repos. Le calcul est simple : **calories ≈ MET × ton poids (kg) × la durée (heures)**. Une randonnée à rythme normal vaut 5,3 MET : pour 75 kg, cela fait 5,3 × 75 × 1 ≈ 400 kcal par heure."
+      },
+      {
+        "type": "h2",
+        "text": "Calories brûlées par heure, selon ton poids"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Activité (MET)",
+          "60 kg",
+          "75 kg",
+          "90 kg"
+        ],
+        "rows": [
+          [
+            "Balade tranquille dans les champs et les collines (3,8)",
+            "228 kcal",
+            "285 kcal",
+            "342 kcal"
+          ],
+          [
+            "Randonnée à rythme normal (5,3)",
+            "318 kcal",
+            "398 kcal",
+            "477 kcal"
+          ],
+          [
+            "Randonnée avec sac à dos (7,8)",
+            "468 kcal",
+            "585 kcal",
+            "702 kcal"
+          ],
+          [
+            "Montée raide, pente de 11 à 20 % (8,8)",
+            "528 kcal",
+            "660 kcal",
+            "792 kcal"
+          ],
+          [
+            "Descente tranquille (3,3)",
+            "198 kcal",
+            "248 kcal",
+            "297 kcal"
+          ]
+        ],
+        "note": "Valeurs brutes, qui incluent ce que ton corps dépense de toute façon au repos (environ 1 kcal par kg et par heure). Le terrain, le froid, le poids du sac et ta forme du jour font varier ces chiffres : ce sont des estimations."
+      },
+      {
+        "type": "h2",
+        "text": "Exemple : une randonnée de 4 heures en montagne"
+      },
+      {
+        "type": "p",
+        "text": "Prenons une personne de 70 kg qui monte 2 heures sur un sentier raide, marche une demi-heure sur un replat, puis redescend en 1 h 30 :"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Étape",
+          "Durée",
+          "Calories"
+        ],
+        "rows": [
+          [
+            "Montée raide (8,8 MET)",
+            "2 h",
+            "1232 kcal"
+          ],
+          [
+            "Replat à rythme normal (5,3 MET)",
+            "30 min",
+            "186 kcal"
+          ],
+          [
+            "Descente tranquille (3,3 MET)",
+            "1 h 30",
+            "347 kcal"
+          ],
+          [
+            "Total",
+            "4 h",
+            "≈ 1765 kcal"
+          ]
+        ],
+        "note": "Sur ces 1765 kcal, environ 280 kcal auraient de toute façon été dépensées au repos pendant ces 4 heures : l'effort lui-même représente donc environ 1485 kcal."
+      },
+      {
+        "type": "h2",
+        "text": "Et le pique-nique, il pèse combien ?"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Aliment",
+          "Quantité",
+          "Calories"
+        ],
+        "rows": [
+          [
+            "Sandwich au jambon",
+            "1 (180 g)",
+            "450 kcal"
+          ],
+          [
+            "Pomme",
+            "1 (150 g)",
+            "78 kcal"
+          ],
+          [
+            "Barre de céréales",
+            "1 (25 g)",
+            "95 kcal"
+          ],
+          [
+            "Mélange de fruits secs (Studentenfutter)",
+            "1 poignée (30 g)",
+            "138 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 760 kcal"
+          ]
+        ],
+        "note": "Un pique-nique classique couvre donc moins de la moitié de l'effort d'une grande journée. C'est normal et c'est bien : manger pendant la randonnée aide à garder de l'énergie jusqu'en bas."
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Mange avant d'avoir faim** : une petite pause toutes les 1 h 30 à 2 heures avec un fruit ou une barre évite le coup de pompe dans la descente.",
+          "**Bois régulièrement** : même en automne, on transpire beaucoup en montée. Emporte au moins 1 litre d'eau pour une demi-journée.",
+          "**Le dénivelé compte plus que les kilomètres** : 2 heures de montée raide dépensent bien plus que 2 heures sur du plat.",
+          "**Ta montre peut afficher un autre chiffre** : elle estime aussi, à partir de ton pouls et de tes mouvements. Les deux méthodes donnent un ordre de grandeur, pas une valeur exacte."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Le bon réflexe",
+        "text": "Une randonnée n'est pas une raison de te priver. Après une grande journée, un bon souper avec des glucides et des protéines aide ton corps à récupérer : profite de la vue, de la pause et du repas qui suit."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Combien de calories brûle-t-on en marchant une heure en montagne ?",
+        "a": "Environ 320 à 480 kcal par heure à rythme normal pour une personne de 60 à 90 kg, et environ 530 à 790 kcal en montée raide (pente de 11 à 20 %)."
+      },
+      {
+        "q": "Brûle-t-on des calories en descente ?",
+        "a": "Oui, mais nettement moins qu'en montée : une descente tranquille correspond à environ 3,3 MET, soit environ 250 kcal par heure pour 75 kg. Elle sollicite en revanche beaucoup les cuisses et les genoux."
+      },
+      {
+        "q": "Faut-il manger pendant une randonnée ?",
+        "a": "Oui, surtout pour une sortie de plus de 2 heures : de petites collations régulières (fruit, barre, fruits secs, sandwich) aident à garder de l'énergie. Un pique-nique classique compte environ 760 kcal."
+      },
+      {
+        "q": "Comment noter une randonnée dans calorio ?",
+        "a": "Dans « Activité du jour », touche « Ajouter une activité », choisis « Randonnée » et indique la durée en minutes. calorio ajoute uniquement l'effort en plus du repos à ta cible du jour, pour ne pas compter deux fois ton métabolisme de base."
+      }
+    ],
+    "social": "Randonnée : combien de calories brûles-tu vraiment ? 🥾\n\nUne heure de randonnée à rythme normal, c'est environ 320 à 480 kcal selon ton poids. En montée raide, on passe à 530 à 790 kcal par heure : une sortie de 4 heures en montagne peut dépasser 1700 kcal.\n\nLe tableau par poids, l'exemple d'une journée et le calcul du pique-nique sont dans le Mag calorio : calorio.ch/mag\n\nWandern: 320 bis 480 kcal pro Stunde. Alles im calorio Magazin.\n\n#calorio #randonnee #montagne #automne #valais #suisseromande #sport #compteurdecalories"
+  },
+  "de": {
+    "slug": "wandern-kalorienverbrauch",
+    "title": "Wandern: Wie viele Kalorien verbrennst du wirklich?",
+    "cardTitle": "Wandern: 320 bis 480 kcal pro Stunde",
+    "description": "Eine Stunde Wandern im normalen Tempo verbrennt je nach Gewicht rund 320 bis 480 kcal, bergauf deutlich mehr. Tabelle nach Gewicht, Beispieltour und Picknick.",
+    "intro": "Eine Stunde Wandern im normalen Tempo verbrennt je nach Gewicht (60 bis 90 kg) **rund 320 bis 480 kcal**. Steil bergauf sind es eher **530 bis 790 kcal pro Stunde**: Eine schöne 4-Stunden-Bergtour kann so über 1700 kcal ausmachen.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "So wird gerechnet"
+      },
+      {
+        "type": "p",
+        "text": "Das **Compendium of Physical Activities** (Ausgabe 2024) gibt jeder Aktivität einen MET-Wert, also ihre Intensität im Vergleich zur Ruhe. Die Rechnung ist einfach: **Kalorien ≈ MET × dein Gewicht (kg) × Dauer (Stunden)**. Wandern im normalen Tempo hat 5,3 MET: Bei 75 kg sind das 5,3 × 75 × 1 ≈ 400 kcal pro Stunde."
+      },
+      {
+        "type": "h2",
+        "text": "Kalorienverbrauch pro Stunde nach Gewicht"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Aktivität (MET)",
+          "60 kg",
+          "75 kg",
+          "90 kg"
+        ],
+        "rows": [
+          [
+            "Gemütlicher Spaziergang über Felder und Hügel (3,8)",
+            "228 kcal",
+            "285 kcal",
+            "342 kcal"
+          ],
+          [
+            "Wandern im normalen Tempo (5,3)",
+            "318 kcal",
+            "398 kcal",
+            "477 kcal"
+          ],
+          [
+            "Wandern mit Rucksack (7,8)",
+            "468 kcal",
+            "585 kcal",
+            "702 kcal"
+          ],
+          [
+            "Steil bergauf, 11 bis 20 % Steigung (8,8)",
+            "528 kcal",
+            "660 kcal",
+            "792 kcal"
+          ],
+          [
+            "Gemütlich bergab (3,3)",
+            "198 kcal",
+            "248 kcal",
+            "297 kcal"
+          ]
+        ],
+        "note": "Bruttowerte, die auch den Ruheumsatz enthalten (rund 1 kcal pro kg und Stunde). Gelände, Kälte, Rucksackgewicht und Tagesform verändern die Zahlen: Es sind Schätzungen."
+      },
+      {
+        "type": "h2",
+        "text": "Beispiel: eine 4-Stunden-Bergwanderung"
+      },
+      {
+        "type": "p",
+        "text": "Eine Person mit 70 kg steigt 2 Stunden auf einem steilen Weg auf, wandert eine halbe Stunde flach weiter und steigt dann in 1,5 Stunden wieder ab:"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Etappe",
+          "Dauer",
+          "Kalorien"
+        ],
+        "rows": [
+          [
+            "Steil bergauf (8,8 MET)",
+            "2 Std.",
+            "1232 kcal"
+          ],
+          [
+            "Flaches Stück im normalen Tempo (5,3 MET)",
+            "30 Min.",
+            "186 kcal"
+          ],
+          [
+            "Gemütlich bergab (3,3 MET)",
+            "1,5 Std.",
+            "347 kcal"
+          ],
+          [
+            "Total",
+            "4 Std.",
+            "≈ 1765 kcal"
+          ]
+        ],
+        "note": "Von diesen 1765 kcal wären rund 280 kcal in den 4 Stunden ohnehin in Ruhe verbraucht worden: Die Anstrengung selbst macht also etwa 1485 kcal aus."
+      },
+      {
+        "type": "h2",
+        "text": "Und wie viel bringt das Picknick?"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Lebensmittel",
+          "Menge",
+          "Kalorien"
+        ],
+        "rows": [
+          [
+            "Schinkensandwich",
+            "1 (180 g)",
+            "450 kcal"
+          ],
+          [
+            "Apfel",
+            "1 (150 g)",
+            "78 kcal"
+          ],
+          [
+            "Müesliriegel",
+            "1 (25 g)",
+            "95 kcal"
+          ],
+          [
+            "Studentenfutter",
+            "1 Handvoll (30 g)",
+            "138 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 760 kcal"
+          ]
+        ],
+        "note": "Ein klassisches Picknick deckt also weniger als die Hälfte einer grossen Tour. Das ist normal und gut so: Essen unterwegs hilft, bis ins Tal Energie zu haben."
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Essen, bevor der Hunger kommt**: Eine kurze Pause alle 1,5 bis 2 Stunden mit einer Frucht oder einem Riegel verhindert das Tief beim Abstieg.",
+          "**Regelmässig trinken**: Auch im Herbst schwitzt man bergauf viel. Nimm für einen halben Tag mindestens 1 Liter Wasser mit.",
+          "**Höhenmeter zählen mehr als Kilometer**: 2 Stunden steil bergauf verbrauchen deutlich mehr als 2 Stunden im Flachen.",
+          "**Deine Uhr zeigt vielleicht etwas anderes**: Auch sie schätzt, anhand von Puls und Bewegung. Beide Methoden geben eine Grössenordnung, keinen exakten Wert."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Der richtige Reflex",
+        "text": "Eine Wanderung ist kein Grund, auf etwas zu verzichten. Nach einer grossen Tour hilft ein gutes Znacht mit Kohlenhydraten und Eiweiss beim Erholen: Geniesse die Aussicht, die Pause und das Essen danach."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Wie viele Kalorien verbrennt man bei einer Stunde Bergwandern?",
+        "a": "Im normalen Tempo rund 320 bis 480 kcal pro Stunde für eine Person mit 60 bis 90 kg, steil bergauf (11 bis 20 % Steigung) rund 530 bis 790 kcal."
+      },
+      {
+        "q": "Verbrennt man beim Abstieg auch Kalorien?",
+        "a": "Ja, aber deutlich weniger als bergauf: Gemütlich bergab entspricht rund 3,3 MET, also etwa 250 kcal pro Stunde bei 75 kg. Dafür werden Oberschenkel und Knie stark beansprucht."
+      },
+      {
+        "q": "Soll man beim Wandern essen?",
+        "a": "Ja, vor allem bei Touren über 2 Stunden: Kleine, regelmässige Zwischenverpflegungen (Frucht, Riegel, Studentenfutter, Sandwich) helfen, die Energie zu halten. Ein klassisches Picknick hat rund 760 kcal."
+      },
+      {
+        "q": "Wie erfasse ich eine Wanderung in calorio?",
+        "a": "Tippe unter «Aktivität heute» auf «Aktivität hinzufügen», wähle «Wandern» und gib die Dauer in Minuten ein. calorio rechnet nur die Anstrengung über dem Ruheumsatz zu deinem Tagesziel dazu, damit dein Grundumsatz nicht doppelt zählt."
+      }
+    ],
+    "social": "Wandern: Wie viele Kalorien verbrennst du wirklich? 🥾\n\nEine Stunde Wandern im normalen Tempo sind je nach Gewicht rund 320 bis 480 kcal. Steil bergauf sind es 530 bis 790 kcal pro Stunde: Eine 4-Stunden-Bergtour kann über 1700 kcal ausmachen.\n\nTabelle nach Gewicht, Beispieltour und Picknick-Rechnung im calorio Magazin: calorio.ch/de/magazin\n\n#calorio #wandern #berge #herbst #wallis #schweiz #sport #kalorienzähler"
+  }
+}

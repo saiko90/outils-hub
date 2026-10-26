@@ -104,7 +104,7 @@ const L = {
     offTitle: "Produits trouvés en ligne", offLoading: "Recherche…", quickTitle: "Accès rapide", recentTitle: "Récents",
     addFood: "Ajouter un aliment", mLib: "Bibliothèque", mLibSub: "Aliments courants, par catégorie", mOnline: "Recherche en ligne", mOnlineSub: "Migros, Coop, marques…", mScan: "Code-barres", mScanSub: "Scanne le produit", mPhoto: "Photo de l'assiette", mPhotoSub: "L'IA estime les calories", rechercheLib: "Filtrer la bibliothèque…", onlineHint: "Tape le nom d'un produit ou d'une marque pour chercher dans la base mondiale.",
     scanUnsupported: "Le scan n'est pas supporté par ce navigateur — utilise la recherche.",
-    scanDenied: "Accès caméra refusé.", scanSearching: "Recherche du produit…", scanNotFound: "Produit introuvable dans la base.", scanAddManual: "Ajouter ce produit en 10 s",
+    scanDenied: "Accès caméra refusé.", scanPhotoBtn: "📸 Photographier le code-barres", scanReading: "Lecture du code-barres…", scanUnreadable: "Code-barres illisible sur la photo. Réessaie de plus près, bien éclairé et à plat.", scanSearching: "Recherche du produit…", scanNotFound: "Produit introuvable dans la base.", scanAddManual: "Ajouter ce produit en 10 s",
     scanTitle: "Vise le code-barres", scanClose: "Fermer",
     photoTitle: "Vito a repéré ces aliments", photoAddAll: "Tout ajouter", photoAnalyzing: "Vito analyse ta photo…",
     photoNone: "Je n'ai pas reconnu d'aliment sur la photo. Réessaie avec une photo plus nette.",
@@ -200,7 +200,7 @@ const L = {
     offTitle: "Online gefundene Produkte", offLoading: "Suche…", quickTitle: "Schnellzugriff", recentTitle: "Kürzlich",
     addFood: "Lebensmittel hinzufügen", mLib: "Bibliothek", mLibSub: "Häufige Lebensmittel, nach Kategorie", mOnline: "Online-Suche", mOnlineSub: "Migros, Coop, Marken…", mScan: "Barcode", mScanSub: "Produkt scannen", mPhoto: "Foto vom Teller", mPhotoSub: "KI schätzt die Kalorien", rechercheLib: "Bibliothek filtern…", onlineHint: "Gib einen Produkt- oder Markennamen ein, um in der weltweiten Datenbank zu suchen.",
     scanUnsupported: "Scan wird von diesem Browser nicht unterstützt — nutze die Suche.",
-    scanDenied: "Kamerazugriff verweigert.", scanSearching: "Produkt wird gesucht…", scanNotFound: "Produkt nicht in der Datenbank gefunden.", scanAddManual: "Produkt in 10 Sek. hinzufügen",
+    scanDenied: "Kamerazugriff verweigert.", scanPhotoBtn: "📸 Strichcode fotografieren", scanReading: "Strichcode wird gelesen…", scanUnreadable: "Strichcode auf dem Foto nicht lesbar. Versuch es näher, gut beleuchtet und gerade.", scanSearching: "Produkt wird gesucht…", scanNotFound: "Produkt nicht in der Datenbank gefunden.", scanAddManual: "Produkt in 10 Sek. hinzufügen",
     scanTitle: "Barcode anvisieren", scanClose: "Schliessen",
     photoTitle: "Vito hat diese Lebensmittel erkannt", photoAddAll: "Alle hinzufügen", photoAnalyzing: "Vito analysiert dein Foto…",
     photoNone: "Kein Lebensmittel erkannt. Versuch ein schärferes Foto.",
@@ -295,7 +295,7 @@ const L = {
     offTitle: "Products found online", offLoading: "Searching…", quickTitle: "Quick access", recentTitle: "Recent",
     addFood: "Add a food", mLib: "Library", mLibSub: "Common foods, by category", mOnline: "Online search", mOnlineSub: "Migros, Coop, brands…", mScan: "Barcode", mScanSub: "Scan the product", mPhoto: "Photo of your plate", mPhotoSub: "AI estimates the calories", rechercheLib: "Filter the library…", onlineHint: "Type a product or brand name to search the global database.",
     scanUnsupported: "Scanning isn't supported by this browser — use search.",
-    scanDenied: "Camera access denied.", scanSearching: "Looking up product…", scanNotFound: "Product not found in the database.", scanAddManual: "Add this product in 10s",
+    scanDenied: "Camera access denied.", scanPhotoBtn: "📸 Take a photo of the barcode", scanReading: "Reading the barcode…", scanUnreadable: "Couldn't read the barcode in the photo. Try closer, well lit and straight on.", scanSearching: "Looking up product…", scanNotFound: "Product not found in the database.", scanAddManual: "Add this product in 10s",
     scanTitle: "Aim at the barcode", scanClose: "Close",
     photoTitle: "Vito spotted these foods", photoAddAll: "Add all", photoAnalyzing: "Vito is analysing your photo…",
     photoNone: "I didn't recognise any food. Try a sharper photo.",
@@ -1018,6 +1018,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [qlMode, setQlMode] = useState<"recent" | "top" | null>(null); // null = choix automatique
   const [photoMsg, setPhotoMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  const barcodeFileRef = useRef<HTMLInputElement>(null); // scan par photo (app Android, ou caméra en direct indisponible)
   // Comptes + synchro
   const [user, setUser] = useState<User | null>(null);
   const [proDb, setProDb] = useState(false);
@@ -2567,6 +2568,34 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     } catch { setScanMsg(t.scanNotFound); setScanMissCode(code); }
   };
   const stopScan = () => { scanStop.current?.(); scanStop.current = null; setScanning(false); };
+  // Scan par photo : l'app Android (WebView) n'a pas accès à la caméra en direct ; on lit le code sur une photo.
+  const decodeBarcodePhoto = async (file: File) => {
+    setScanMissCode(null);
+    setScanMsg(t.scanReading);
+    try {
+      const url = URL.createObjectURL(file);
+      const img = await new Promise<HTMLImageElement>((ok, ko) => { const im = new Image(); im.onload = () => ok(im); im.onerror = ko; im.src = url; });
+      const tryAt = async (max: number): Promise<string | null> => {
+        const k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+        const c = document.createElement("canvas");
+        c.width = Math.max(1, Math.round(img.naturalWidth * k)); c.height = Math.max(1, Math.round(img.naturalHeight * k));
+        c.getContext("2d")?.drawImage(img, 0, 0, c.width, c.height);
+        const BD = (window as unknown as { BarcodeDetector?: new (o: { formats: string[] }) => { detect: (v: unknown) => Promise<{ rawValue: string }[]> } }).BarcodeDetector;
+        if (BD) {
+          try { const r = await new BD({ formats: ["ean_13", "ean_8", "upc_a", "upc_e", "code_128"] }).detect(c); if (r && r.length) return r[0].rawValue; } catch { /* repli ZXing */ }
+        }
+        try {
+          const { BrowserMultiFormatReader } = await import("@zxing/browser");
+          const res = new BrowserMultiFormatReader().decodeFromCanvas(c);
+          return res ? res.getText() : null;
+        } catch { return null; }
+      };
+      const code = (await tryAt(1600)) || (await tryAt(1000)) || (await tryAt(2400));
+      URL.revokeObjectURL(url);
+      if (code) await lookupBarcode(code);
+      else setScanMsg(t.scanUnreadable);
+    } catch { setScanMsg(t.scanUnreadable); }
+  };
   // Échap ferme la fenêtre ouverte (clavier, lecteurs d'écran), la plus « haute » d'abord.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -3129,9 +3158,14 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
             <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden
               onChange={(e) => { const f = e.target.files?.[0]; if (f) onPhoto(f); e.target.value = ""; }} />
+            <input ref={barcodeFileRef} type="file" accept="image/*" capture="environment" hidden
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) decodeBarcodePhoto(f); e.target.value = ""; }} />
             {(scanMsg || photoMsg) && (
               <div className="cl-scanmsgwrap">
                 <p className="cl-scanmsg" role="status" aria-live="polite">{scanMsg || photoMsg}</p>
+                {(scanMsg === t.scanDenied || scanMsg === t.scanUnreadable) && (
+                  <button className="cl-scanadd" onClick={() => barcodeFileRef.current?.click()}>{t.scanPhotoBtn}</button>
+                )}
                 {scanMissCode && (
                   <button className="cl-scanadd" onClick={() => {
                     setCf({ nom: "", kcal: "", prot: "", gluc: "", lip: "", portion: "", emoji: "🏷️", code: scanMissCode });
@@ -3520,7 +3554,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                 <button className="cl-method" onClick={() => { setQ(""); setAddMode("online"); }}>
                   <span className="cl-method-i">🔍</span><b>{t.mOnline}</b><small>{t.mOnlineSub}</small>
                 </button>
-                <button className="cl-method" onClick={() => { setAddOpen(false); startScan(); }}>
+                <button className="cl-method" onClick={() => { setAddOpen(false); if (playApp) barcodeFileRef.current?.click(); else startScan(); }}>
                   <span className="cl-method-i">📷</span><b>{t.mScan}</b><small>{t.mScanSub}</small>
                 </button>
                 <button className="cl-method pro" onClick={() => { setAddOpen(false); if (proActive) fileRef.current?.click(); else goPro(); }}>

@@ -112,7 +112,7 @@ const L = {
     photoLock: "L'analyse photo est réservée au Pro. Prends ton assiette en photo, Vito estime les calories.",
     estim: "estimé",
     syncBtn: "Synchroniser mes données", synced: "Synchronisé", logout: "Déconnexion",
-    authTitle: "Retrouve tes données sur tous tes appareils", authSub: "Crée un compte gratuit — ton journal, ton poids et ton profil te suivent sur téléphone et ordinateur.",
+    signTitle: (n: number) => `🔒 Garde tes ${n} jours de suivi en sécurité`, signText: "Crée ton compte gratuit en 10 secondes : ton journal est sauvegardé et te suit sur tous tes appareils, même si tu changes de téléphone.", signBtn: "Créer mon compte gratuit", signLater: "Plus tard", authTitle: "Retrouve tes données sur tous tes appareils", authSub: "Crée un compte gratuit — ton journal, ton poids et ton profil te suivent sur téléphone et ordinateur.",
     inviteTitle: "Invite un ami, 1 mois Pro chacun", inviteSub: "Partage ton lien : quand ton ami a utilisé calorio 3 jours, vous recevez chacun 1 mois de Pro offert (coach IA + photo, jusqu'à 6 mois pour toi).",
     copyLink: "Copier", copied2: "Copié ✓", shareInvite: "Partager mon lien",
     inviteCount: (n: number) => (n === 0 ? "Aucun ami parrainé pour l'instant" : `${n} ami${n > 1 ? "s" : ""} parrainé${n > 1 ? "s" : ""} 🎉`),
@@ -208,7 +208,7 @@ const L = {
     photoLock: "Die Foto-Analyse ist Pro. Fotografiere deinen Teller, Vito schätzt die Kalorien.",
     estim: "geschätzt",
     syncBtn: "Daten synchronisieren", synced: "Synchronisiert", logout: "Abmelden",
-    authTitle: "Deine Daten auf allen Geräten", authSub: "Erstelle ein kostenloses Konto — Journal, Gewicht und Profil folgen dir auf Handy und Computer.",
+    signTitle: (n: number) => `🔒 Sichere deine ${n} Tage Tracking`, signText: "Erstelle in 10 Sekunden ein Gratiskonto: Dein Journal wird gesichert und begleitet dich auf allen Geräten, auch bei einem neuen Handy.", signBtn: "Gratiskonto erstellen", signLater: "Später", authTitle: "Deine Daten auf allen Geräten", authSub: "Erstelle ein kostenloses Konto — Journal, Gewicht und Profil folgen dir auf Handy und Computer.",
     inviteTitle: "Lade eine Freundin ein, je 1 Monat Pro gratis", inviteSub: "Teile deinen Link: sobald deine Freundin calorio 3 Tage genutzt hat, erhaltet ihr beide 1 Monat Pro (KI-Coach + Foto, bis zu 6 Monate für dich).",
     copyLink: "Kopieren", copied2: "Kopiert ✓", shareInvite: "Link teilen",
     inviteCount: (n: number) => (n === 0 ? "Noch niemand geworben" : `${n} Freund${n > 1 ? "e" : ""} geworben 🎉`),
@@ -303,7 +303,7 @@ const L = {
     photoLock: "Photo analysis is Pro. Snap your plate, Vito estimates the calories.",
     estim: "est.",
     syncBtn: "Sync my data", synced: "Synced", logout: "Sign out",
-    authTitle: "Your data on every device", authSub: "Create a free account — your log, weight and profile follow you on phone and computer.",
+    signTitle: (n: number) => `🔒 Keep your ${n} days of tracking safe`, signText: "Create your free account in 10 seconds: your log is backed up and follows you on all your devices, even if you change phones.", signBtn: "Create my free account", signLater: "Later", authTitle: "Your data on every device", authSub: "Create a free account — your log, weight and profile follow you on phone and computer.",
     inviteTitle: "Invite a friend, get 1 month Pro each", inviteSub: "Share your link: once your friend has used calorio for 3 days, you each get 1 month of Pro (AI coach + photo, up to 6 months for you).",
     copyLink: "Copy", copied2: "Copied ✓", shareInvite: "Share my link",
     inviteCount: (n: number) => (n === 0 ? "No friends referred yet" : `${n} friend${n > 1 ? "s" : ""} referred 🎉`),
@@ -2508,6 +2508,26 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
 
   // « Les plus utilisés » : l'historique (hors jour affiché) est lu une fois par jour, puis combiné aux lignes du jour.
   const journalHist = useMemo(() => (mounted ? load<Record<string, Line[]>>("calorio.journal", {}) : {}), [mounted, day]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Invitation douce à créer un compte : sans compte, dès 2 jours notés ; au plus 3 fois, espacées de 5 jours.
+  const SIGN_KEY = "calorio.signupNudge";
+  const daysLogged = useMemo(
+    () => Object.entries(journalHist).filter(([d, r]) => d !== day && rowsKcal(r) > 0).length + (total.kcal > 0 ? 1 : 0),
+    [journalHist, day, total.kcal]
+  );
+  const [signNudgeOk, setSignNudgeOk] = useState(false);
+  useEffect(() => {
+    if (!mounted) return;
+    try {
+      const st = load<{ n?: number; at?: number }>(SIGN_KEY, {});
+      setSignNudgeOk((st.n || 0) < 3 && Date.now() - (st.at || 0) > 5 * 86400000);
+    } catch { /* ignore */ }
+  }, [mounted]);
+  const showSignNudge = mounted && !user && signNudgeOk && daysLogged >= 2;
+  const closeSignNudge = (open: boolean) => {
+    setSignNudgeOk(false);
+    try { const st = load<{ n?: number; at?: number }>(SIGN_KEY, {}); save(SIGN_KEY, { n: (st.n || 0) + 1, at: Date.now() }); } catch { /* ignore */ }
+    if (open) { setAuthMsg(""); setAuthOpen(true); }
+  };
   const topUsed = useMemo(() => topFoods<Food>(journalHist, day, lines), [journalHist, day, lines]);
   const qlShown: "recent" | "top" = qlMode ?? (topUsed.length >= 3 ? "top" : "recent");
   const pickQl = (m: "recent" | "top") => { setQlMode(m); save("calorio.qlMode", m); };
@@ -2898,6 +2918,17 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                     <div className="cl-stepstat-prog" aria-hidden><span style={{ width: `${Math.min(100, Math.max(3, (hcPas / 10000) * 100))}%` }} /></div>
                   </div>
                   <div className="cl-stepstat-pct">{Math.min(100, Math.round((hcPas / 10000) * 100))}%</div>
+                </div>
+              )}
+
+              {showSignNudge && (
+                <div className="cl-card cl-signnudge">
+                  <div className="cl-signnudge-h">{t.signTitle(daysLogged)}</div>
+                  <p className="cl-signnudge-p">{t.signText}</p>
+                  <div className="cl-signnudge-b">
+                    <button className="cl-signnudge-go" onClick={() => closeSignNudge(true)}>{t.signBtn}</button>
+                    <button className="cl-signnudge-no" onClick={() => closeSignNudge(false)}>{t.signLater}</button>
+                  </div>
                 </div>
               )}
 
@@ -4350,6 +4381,12 @@ a.cl-login-inst{display:inline-flex;align-items:center;justify-content:center;te
 .cl-legal{margin:12px 2px 0;text-align:center;color:var(--soft);font-size:.78rem;line-height:1.6;font-weight:600}
 .cl-madein{margin-top:8px;font-weight:700}
 /* invitation */
+.cl-signnudge{margin-top:13px;background:linear-gradient(135deg,var(--card),var(--greenbg));border:1.5px solid var(--greenline)}
+.cl-signnudge-h{font-family:var(--disp);font-weight:700;font-size:1.05rem;color:var(--ink);margin-bottom:4px}
+.cl-signnudge-p{margin:0 0 12px;font-size:.88rem;line-height:1.5;color:var(--muted)}
+.cl-signnudge-b{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.cl-signnudge-go{background:var(--btn);color:#fff;border:0;border-radius:12px;padding:11px 16px;font-weight:800;font-size:.9rem;cursor:pointer;font-family:var(--body)}
+.cl-signnudge-no{background:none;border:0;color:var(--muted);font-weight:700;font-size:.85rem;cursor:pointer;font-family:var(--body)}
 .cl-rate{background:linear-gradient(135deg,#fffaf0,#fff3d6);border:1px solid #f4dfa6}
 .cl-rate-h{font-family:var(--disp);font-weight:700;font-size:1.08rem;color:var(--ink);margin-bottom:4px}
 .cl-rate-p{margin:0 0 12px;font-size:.88rem;line-height:1.5;color:var(--muted)}

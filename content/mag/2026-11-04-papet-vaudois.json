@@ -1,0 +1,125 @@
+{
+  "id": "papet-vaudois",
+  "date": "2026-11-04",
+  "cat": "classiques",
+  "emoji": "🥘",
+  "kcal": { "value": "850–1000", "label": { "fr": "kcal par assiette", "de": "kcal pro Teller" } },
+  "related": { "aliments": ["papet_vaudois", "saucisse_choux", "poireau", "pomme_terre"] },
+  "sources": [
+    { "label": "Viande Suisse : recette du papet vaudois (4 personnes, valeurs nutritives par portion)", "url": "https://viandesuisse.ch/print/pdf/node/1097" },
+    { "label": "Société Suisse de Nutrition SSN et Viande Suisse : papet vaudois, « assiette équilibrée » (valeurs par portion)", "url": "https://www.sge-ssn.ch/media/ebgbs41o/f_papet_vaudois_2019_0.pdf" },
+    { "label": "Viande Suisse : saucisses aux choux vaudoises IGP d'environ 250 g (recette)", "url": "https://viandesuisse.ch/print/pdf/node/1189" },
+    { "label": "Association suisse des AOP-IGP : fiche Saucisse aux choux vaudoise IGP", "url": "https://2021.aop-igp.ch/fileadmin/Dokumente/Produkteflyer/Saucisse_aux_choux_vaudoise_IGP_FR.pdf" },
+    { "label": "Fiche technique Saucisson vaudois IGP (valeurs pour 100 g)", "url": "https://cdn.api.groupe-pomona.fr/public/products/0255299/branch/ch/medias/saucisson-vaudois-igp-piece-environ-350g-suter-viandes_0255299_ch_technical.pdf" },
+    { "label": "Base d'aliments calorio : saucisse aux choux (valeurs pour 100 g)", "url": "https://calorio.ch/calories/saucisse-aux-choux-vd" },
+    { "label": "Base d'aliments calorio : poireau (valeurs pour 100 g)", "url": "https://calorio.ch/calories/poireau" },
+    { "label": "Base d'aliments calorio : pomme de terre (valeurs pour 100 g)", "url": "https://calorio.ch/calories/pomme-de-terre" },
+    { "label": "Base d'aliments calorio : crème 35 % (valeurs pour 100 g)", "url": "https://calorio.ch/calories/creme-35" }
+  ],
+  "fr": {
+    "slug": "calories-papet-vaudois",
+    "title": "Papet vaudois : combien de calories dans une assiette ?",
+    "cardTitle": "Un papet vaudois, combien de calories ?",
+    "description": "Avec 150 g de saucisse aux choux, une assiette de papet vaudois apporte environ 930 kcal. Le détail, le poids de la saucisse et une version à 630 kcal.",
+    "intro": "Une assiette de papet vaudois avec 150 g de saucisse aux choux apporte **environ 930 kcal**, et **850 à 1000 kcal** selon la taille de la tranche de saucisse. Les poireaux et les pommes de terre pèsent peu : c'est la saucisse qui fait l'essentiel.",
+    "blocks": [
+      { "type": "h2", "text": "Ce qu'il y a dans l'assiette" },
+      { "type": "p", "text": "Pour 4 personnes, on compte en général 1 kg de poireaux, 800 g de pommes de terre, un oignon, un peu de beurre, de vin blanc et de crème, et environ 600 g de saucisse aux choux vaudoise IGP. Voici le détail d'une assiette :" },
+      { "type": "table", "head": ["Élément", "Quantité", "Calories"], "rows": [
+        ["Saucisse aux choux", "150 g", "450 kcal"],
+        ["Pommes de terre", "200 g", "174 kcal"],
+        ["Poireau", "250 g", "153 kcal"],
+        ["Oignon", "25 g", "10 kcal"],
+        ["Beurre pour étuver", "5 g", "36 kcal"],
+        ["Vin blanc dans la casserole", "0,25 dl", "20 kcal"],
+        ["Crème 35 %", "2 c. à soupe (25 g)", "85 kcal"],
+        ["Total", "environ 680 g", "≈ 930 kcal"]
+      ], "note": "Cette assiette apporte environ 28 g de protéines et 54 g de matières grasses. Viande Suisse arrive à un ordre de grandeur proche : environ 955 kcal par portion pour sa recette avec deux saucissons vaudois." },
+      { "type": "h2", "text": "La saucisse, c'est elle qui compte" },
+      { "type": "p", "text": "La saucisse aux choux compte **environ 300 kcal pour 100 g**. Une saucisse pèse souvent autour de 250 g : une demi-saucisse (125 g) fait donc environ 375 kcal, une grosse tranche de 175 g environ 525 kcal. Avec du **saucisson vaudois**, ça peut monter : la fiche technique d'un producteur indique 410 kcal pour 100 g. Les valeurs varient d'une boucherie à l'autre, alors jette un œil à l'étiquette." },
+      { "type": "table", "head": ["Saucisse dans l'assiette", "Assiette complète"], "rows": [
+        ["125 g (une demi-saucisse)", "≈ 855 kcal"],
+        ["150 g", "≈ 930 kcal"],
+        ["175 g", "≈ 1005 kcal"]
+      ] },
+      { "type": "h2", "text": "La version plus légère" },
+      { "type": "p", "text": "La Société Suisse de Nutrition et Viande Suisse proposent un papet « assiette équilibrée » avec un seul saucisson de 350 g pour 4 personnes, sans crème, à environ 550 kcal par portion selon leur calcul. Sur le même principe, avec les valeurs de calorio :" },
+      { "type": "table", "head": ["Élément", "Quantité", "Calories"], "rows": [
+        ["Saucisse aux choux", "80 g", "240 kcal"],
+        ["Pommes de terre", "200 g", "174 kcal"],
+        ["Poireau", "250 g", "153 kcal"],
+        ["Oignon", "25 g", "10 kcal"],
+        ["Huile pour étuver", "1 c. à café (4 g)", "35 kcal"],
+        ["Vin blanc dans la casserole", "0,25 dl", "20 kcal"],
+        ["Total", "", "≈ 630 kcal"]
+      ], "note": "Toujours une belle assiette bien chaude, avec environ 18 g de protéines et deux fois moins de matières grasses que la version classique." },
+      { "type": "ul", "items": [
+        "**Cuis la saucisse à petit feu** : environ 40 minutes dans une eau frémissante, sans bouillir, pour qu'elle n'éclate pas et garde son jus.",
+        "**Mise sur le poireau** : 250 g par personne, c'est beaucoup de volume pour environ 150 kcal.",
+        "**Un filet de vinaigre au lieu de la crème** : la recette de la SSN termine le papet avec une cuillère à café de vinaigre de vin blanc et du persil. Ça relève le plat et évite environ 85 kcal.",
+        "**Coupe la saucisse en tranches** avant de servir : c'est plus facile de doser sa part."
+      ] },
+      { "type": "tip", "title": "Le bon réflexe", "text": "Le papet, c'est un plat de saison qu'on partage en famille ou au carnotzet. Inutile de s'en priver : sers-toi la tranche de saucisse qui te fait envie et complète avec plus de poireaux. Sur la semaine, une assiette généreuse passe très bien." }
+    ],
+    "faq": [
+      { "q": "Combien de saucisse aux choux prévoir par personne ?", "a": "Compte entre 125 et 175 g par personne pour un repas principal, soit environ une demi-saucisse. Pour 4 personnes, 2 saucisses d'environ 250 g font l'affaire, un peu plus pour les gros appétits." },
+      { "q": "Combien de calories dans le papet sans la saucisse ?", "a": "Environ 480 kcal pour une assiette de poireaux et de pommes de terre avec un peu de beurre, de vin et de crème. Sans la crème, on descend à environ 395 kcal." },
+      { "q": "Saucisse aux choux ou saucisson vaudois, lequel est le plus léger ?", "a": "La saucisse aux choux compte environ 300 kcal pour 100 g, en partie grâce au chou qu'elle contient. Pour le saucisson vaudois, la fiche technique d'un producteur indique 410 kcal pour 100 g. Les recettes varient : l'étiquette fait foi." },
+      { "q": "Comment noter un papet vaudois dans calorio ?", "a": "Cherche « papet vaudois » dans calorio et ajuste la portion à ton assiette. Pour être au plus près, note séparément la « saucisse aux choux » (300 kcal pour 100 g), les pommes de terre et le poireau." }
+    ],
+    "social": "Un papet vaudois, combien de calories ? 🥘\n\nEnviron 930 kcal pour une assiette avec 150 g de saucisse aux choux, poireaux et pommes de terre. Les légumes pèsent peu : c'est la saucisse qui fait l'essentiel, environ 300 kcal pour 100 g.\n\nLe détail, la bonne portion de saucisse et une version à 630 kcal dans le Mag calorio : calorio.ch/mag\n\nPapet vaudois: wie viele Kalorien? Alles im calorio Magazin.\n\n#calorio #papetvaudois #saucisseauxchoux #vaud #suisseromande #nutrition #compteurdecalories"
+  },
+  "de": {
+    "slug": "kalorien-papet-vaudois",
+    "title": "Papet vaudois: wie viele Kalorien hat ein Teller?",
+    "cardTitle": "Papet vaudois: wie viele Kalorien?",
+    "description": "Mit 150 g Saucisse aux choux liefert ein Teller Papet vaudois rund 930 kcal. Die Details, die richtige Wurstportion und eine Variante mit 630 kcal.",
+    "intro": "Ein Teller Papet vaudois mit 150 g Saucisse aux choux liefert **rund 930 kcal**, je nach Wurstportion **850 bis 1000 kcal**. Lauch und Kartoffeln fallen kaum ins Gewicht: Den grössten Teil macht die Wurst aus.",
+    "blocks": [
+      { "type": "h2", "text": "Was auf dem Teller liegt" },
+      { "type": "p", "text": "Für 4 Personen rechnet man meist mit 1 kg Lauch, 800 g Kartoffeln, einer Zwiebel, etwas Butter, Weisswein und Rahm sowie rund 600 g Saucisse aux choux vaudoise IGP, der Waadtländer Kohlwurst. So sieht ein Teller aus:" },
+      { "type": "table", "head": ["Zutat", "Menge", "Kalorien"], "rows": [
+        ["Saucisse aux choux", "150 g", "450 kcal"],
+        ["Kartoffeln", "200 g", "174 kcal"],
+        ["Lauch", "250 g", "153 kcal"],
+        ["Zwiebel", "25 g", "10 kcal"],
+        ["Butter zum Dünsten", "5 g", "36 kcal"],
+        ["Weisswein in der Pfanne", "0,25 dl", "20 kcal"],
+        ["Vollrahm 35 %", "2 EL (25 g)", "85 kcal"],
+        ["Total", "rund 680 g", "≈ 930 kcal"]
+      ], "note": "Dieser Teller liefert rund 28 g Eiweiss und 54 g Fett. Viande Suisse kommt auf eine ähnliche Grössenordnung: rund 955 kcal pro Portion für ihr Rezept mit zwei Waadtländer Saucissons." },
+      { "type": "h2", "text": "Die Wurst macht den Unterschied" },
+      { "type": "p", "text": "Die Saucisse aux choux hat **rund 300 kcal pro 100 g**. Eine Wurst wiegt oft etwa 250 g: Eine halbe Wurst (125 g) zählt also rund 375 kcal, ein grosses Stück von 175 g rund 525 kcal. Mit **Saucisson vaudois** kann es mehr werden: Das Produktblatt eines Herstellers nennt 410 kcal pro 100 g. Die Werte sind von Metzgerei zu Metzgerei verschieden, ein Blick auf die Etikette lohnt sich." },
+      { "type": "table", "head": ["Wurst auf dem Teller", "Ganzer Teller"], "rows": [
+        ["125 g (eine halbe Wurst)", "≈ 855 kcal"],
+        ["150 g", "≈ 930 kcal"],
+        ["175 g", "≈ 1005 kcal"]
+      ] },
+      { "type": "h2", "text": "Die leichtere Variante" },
+      { "type": "p", "text": "Die Schweizerische Gesellschaft für Ernährung und Viande Suisse schlagen einen Papet als «optimalen Teller» vor: ein einziger Saucisson von 350 g für 4 Personen, ohne Rahm, laut ihrer Berechnung rund 550 kcal pro Portion. Nach dem gleichen Prinzip, mit den Werten von calorio:" },
+      { "type": "table", "head": ["Zutat", "Menge", "Kalorien"], "rows": [
+        ["Saucisse aux choux", "80 g", "240 kcal"],
+        ["Kartoffeln", "200 g", "174 kcal"],
+        ["Lauch", "250 g", "153 kcal"],
+        ["Zwiebel", "25 g", "10 kcal"],
+        ["Öl zum Dünsten", "1 TL (4 g)", "35 kcal"],
+        ["Weisswein in der Pfanne", "0,25 dl", "20 kcal"],
+        ["Total", "", "≈ 630 kcal"]
+      ], "note": "Immer noch ein schöner, heisser Teller, mit rund 18 g Eiweiss und halb so viel Fett wie die klassische Version." },
+      { "type": "ul", "items": [
+        "**Die Wurst sanft garen**: rund 40 Minuten im siedenden, nicht kochenden Wasser, damit sie nicht platzt und saftig bleibt.",
+        "**Viel Lauch**: 250 g pro Person geben viel Volumen für rund 150 kcal.",
+        "**Ein Schuss Essig statt Rahm**: Im Rezept der SGE kommen zum Schluss ein Teelöffel Weissweinessig und Petersilie dazu. Das gibt Frische und spart rund 85 kcal.",
+        "**Die Wurst in Scheiben schneiden**, bevor du servierst: So lässt sich die eigene Portion leichter einteilen."
+      ] },
+      { "type": "tip", "title": "Der richtige Reflex", "text": "Der Papet ist ein Saisongericht, das man mit der Familie oder im Carnotzet geniesst. Kein Grund zu verzichten: Nimm das Stück Wurst, auf das du Lust hast, und schöpf dir dafür mehr Lauch. Über die Woche gesehen ist ein grosszügiger Teller kein Problem." }
+    ],
+    "faq": [
+      { "q": "Wie viel Saucisse aux choux pro Person?", "a": "Rechne mit 125 bis 175 g pro Person als Hauptmahlzeit, also etwa einer halben Wurst. Für 4 Personen reichen 2 Würste von je rund 250 g, für grossen Hunger etwas mehr." },
+      { "q": "Wie viele Kalorien hat der Papet ohne Wurst?", "a": "Rund 480 kcal für einen Teller Lauch und Kartoffeln mit etwas Butter, Wein und Rahm. Ohne Rahm sind es rund 395 kcal." },
+      { "q": "Saucisse aux choux oder Saucisson vaudois: was ist leichter?", "a": "Die Saucisse aux choux hat rund 300 kcal pro 100 g, auch dank dem Kohl, der drinsteckt. Für den Saucisson vaudois nennt das Produktblatt eines Herstellers 410 kcal pro 100 g. Die Rezepte sind verschieden: Massgebend ist die Etikette." },
+      { "q": "Wie erfasse ich einen Papet vaudois in calorio?", "a": "Suche in calorio nach «Papet vaudois» und passe die Portion an deinen Teller an. Noch genauer wird es, wenn du die «Kohlwurst» (300 kcal pro 100 g), die Kartoffeln und den Lauch einzeln erfasst." }
+    ],
+    "social": "Papet vaudois: wie viele Kalorien? 🥘\n\nRund 930 kcal für einen Teller mit 150 g Saucisse aux choux, Lauch und Kartoffeln. Das Gemüse fällt kaum ins Gewicht: Den grössten Teil macht die Wurst aus, rund 300 kcal pro 100 g.\n\nDetails, die richtige Wurstportion und eine Variante mit 630 kcal im calorio Magazin: calorio.ch/de/magazin\n\n#calorio #papetvaudois #waadt #schweiz #ernährung #kalorienzähler"
+  }
+}

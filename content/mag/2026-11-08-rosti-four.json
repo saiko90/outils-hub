@@ -23,12 +23,6 @@
     "description": "Un rösti au four avec une seule cuillère à café d'huile, un œuf au plat, une tranche de jambon et une salade : environ 440 kcal. Recette et variantes.",
     "intro": "Un rösti cuit au four avec **une seule cuillère à café d'huile** compte environ 260 kcal pour 250 g de pommes de terre, contre environ 410 kcal pour la même portion à la poêle. Avec un œuf au plat, une tranche de jambon et une salade, tu as **un vrai repas à environ 440 kcal**.",
     "blocks": [
-      { "type": "h2", "text": "Pourquoi le four change tout" },
-      { "type": "p", "text": "Les pommes de terre cuites ne comptent qu'**environ 87 kcal pour 100 g**. Ce qui fait grimper un rösti, c'est surtout le beurre ou l'huile qu'il absorbe dans la poêle : un rösti classique tourne autour de **164 kcal pour 100 g**. Au four, sur du papier cuisson, une cuillère à café d'huile suffit pour qu'il dore." },
-      { "type": "table", "head": ["Rösti de 250 g de pommes de terre", "Matière grasse", "Calories"], "rows": [
-        ["À la poêle, façon classique", "beurre ou huile à volonté", "≈ 410 kcal"],
-        ["Au four", "1 c. à café d'huile (5 g)", "≈ 262 kcal"]
-      ], "note": "Pour la version à la poêle, calcul avec la valeur moyenne d'un rösti (164 kcal pour 100 g) ; le résultat dépend beaucoup de la quantité de beurre." },
       { "type": "h2", "text": "Ton repas complet à 440 kcal" },
       { "type": "p", "text": "Tout se trouve chez Migros ou chez Coop : des pommes de terre à chair ferme, des œufs, du jambon et une salade de saison comme la doucette ou la chicorée." },
       { "type": "table", "head": ["Élément", "Quantité", "Calories"], "rows": [
@@ -47,6 +41,12 @@
         "Fais cuire 25 à 30 minutes, en les retournant à mi-cuisson, jusqu'à ce qu'elles soient bien dorées.",
         "Pendant ce temps, cuis l'œuf au plat dans une poêle antiadhésive sans matière grasse et assaisonne la salade."
       ] },
+      { "type": "h2", "text": "Pourquoi le four change tout" },
+      { "type": "p", "text": "Les pommes de terre cuites ne comptent qu'**environ 87 kcal pour 100 g**. Ce qui fait grimper un rösti, c'est surtout le beurre ou l'huile qu'il absorbe dans la poêle : un rösti classique tourne autour de **164 kcal pour 100 g**. Au four, sur du papier cuisson, une cuillère à café d'huile suffit pour qu'il dore." },
+      { "type": "table", "head": ["Rösti de 250 g de pommes de terre", "Matière grasse", "Calories"], "rows": [
+        ["À la poêle, façon classique", "beurre ou huile à volonté", "≈ 410 kcal"],
+        ["Au four", "1 c. à café d'huile (5 g)", "≈ 262 kcal"]
+      ], "note": "Pour la version à la poêle, calcul avec la valeur moyenne d'un rösti (164 kcal pour 100 g) ; le résultat dépend beaucoup de la quantité de beurre." },
       { "type": "h2", "text": "Trois variantes selon tes envies" },
       { "type": "table", "head": ["Variante", "Ce qui change", "Par repas"], "rows": [
         ["Classique", "Œuf au plat et une tranche de jambon", "≈ 440 kcal"],
@@ -76,12 +76,6 @@
     "description": "Ofen-Rösti mit nur einem Teelöffel Öl, Spiegelei, einer Scheibe Schinken und Salat: rund 440 kcal. Rezept und Varianten.",
     "intro": "Eine Rösti aus dem Ofen mit **nur einem Teelöffel Öl** hat rund 260 kcal für 250 g Kartoffeln, gegenüber rund 410 kcal für die gleiche Portion aus der Pfanne. Mit Spiegelei, einer Scheibe Schinken und Salat hast du **eine richtige Mahlzeit mit rund 440 kcal**.",
     "blocks": [
-      { "type": "h2", "text": "Warum der Ofen den Unterschied macht" },
-      { "type": "p", "text": "Gekochte Kartoffeln haben nur **rund 87 kcal pro 100 g**. Was eine Rösti schwer macht, ist vor allem die Butter oder das Öl, das sie in der Pfanne aufsaugt: Eine klassische Rösti liegt bei rund **164 kcal pro 100 g**. Im Ofen auf Backpapier reicht ein Teelöffel Öl, damit sie schön goldbraun wird." },
-      { "type": "table", "head": ["Rösti aus 250 g Kartoffeln", "Fett", "Kalorien"], "rows": [
-        ["Aus der Pfanne, klassisch", "Butter oder Öl nach Gefühl", "≈ 410 kcal"],
-        ["Aus dem Ofen", "1 TL Öl (5 g)", "≈ 262 kcal"]
-      ], "note": "Für die Pfannen-Rösti mit dem Durchschnittswert einer Rösti gerechnet (164 kcal pro 100 g); das Resultat hängt stark von der Buttermenge ab." },
       { "type": "h2", "text": "Deine ganze Mahlzeit mit 440 kcal" },
       { "type": "p", "text": "Alles gibt es in der Migros oder im Coop: festkochende Kartoffeln, Eier, Schinken und ein Salat der Saison wie Nüsslisalat oder Zuckerhut." },
       { "type": "table", "head": ["Zutat", "Menge", "Kalorien"], "rows": [
@@ -100,6 +94,12 @@
         "25 bis 30 Minuten backen, nach der Hälfte der Zeit wenden, bis sie schön goldbraun sind.",
         "In der Zwischenzeit das Spiegelei in einer beschichteten Pfanne ohne Fett braten und den Salat anmachen."
       ] },
+      { "type": "h2", "text": "Warum der Ofen den Unterschied macht" },
+      { "type": "p", "text": "Gekochte Kartoffeln haben nur **rund 87 kcal pro 100 g**. Was eine Rösti schwer macht, ist vor allem die Butter oder das Öl, das sie in der Pfanne aufsaugt: Eine klassische Rösti liegt bei rund **164 kcal pro 100 g**. Im Ofen auf Backpapier reicht ein Teelöffel Öl, damit sie schön goldbraun wird." },
+      { "type": "table", "head": ["Rösti aus 250 g Kartoffeln", "Fett", "Kalorien"], "rows": [
+        ["Aus der Pfanne, klassisch", "Butter oder Öl nach Gefühl", "≈ 410 kcal"],
+        ["Aus dem Ofen", "1 TL Öl (5 g)", "≈ 262 kcal"]
+      ], "note": "Für die Pfannen-Rösti mit dem Durchschnittswert einer Rösti gerechnet (164 kcal pro 100 g); das Resultat hängt stark von der Buttermenge ab." },
       { "type": "h2", "text": "Drei Varianten nach Lust und Laune" },
       { "type": "table", "head": ["Variante", "Was sich ändert", "Pro Mahlzeit"], "rows": [
         ["Klassisch", "Spiegelei und eine Scheibe Schinken", "≈ 440 kcal"],

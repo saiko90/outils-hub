@@ -544,6 +544,16 @@ export const ALIMENTS: Aliment[] = [
   a("nasi_goreng", "Nasi goreng", "Nasi Goreng", "Nasi goreng", "plats", 170, 6, 24, 6, 350, "🍚"),
   a("gyoza", "Gyoza", "Gyoza", "Gyoza", "plats", 180, 7, 22, 7, 150, "🥟"),
   a("california_roll", "California roll", "California Roll", "California roll", "plats", 150, 5, 28, 3, 200, "🍣"),
+  // Saison de l'Avent (Mag, novembre 2026) : valeurs de la Schweizer Nährwertdatenbank (BLV, naehrwertdaten.ch),
+  // sauf le vin chaud, calculé d'après la recette Fooby (7,5 dl de vin rouge + 50 g de sucre pour 7 dl).
+  // Portion des biscuits = 1 pièce (poids moyen d'après les recettes Fooby : pâte totale / nombre de pièces).
+  a("grittibaenz", "Grittibänz", "Grittibänz", "Grittibänz (bread man)", "feculents", 329, 9.2, 46.9, 11.1, 100, "🍞"),
+  a("vin_chaud", "Vin chaud", "Glühwein", "Mulled wine", "boissons", 110, 0.1, 7.7, 0, 200, "🍷"),
+  a("mailaenderli", "Mailänderli", "Mailänderli", "Mailänderli (butter biscuit)", "snacks", 431, 7.1, 53.2, 20.8, 14, "🍪"),
+  a("brunsli", "Brunsli", "Brunsli", "Brunsli (chocolate almond biscuit)", "snacks", 515, 14.9, 43.3, 29.8, 15, "🍪"),
+  a("zimtsterne", "Étoile à la cannelle", "Zimtstern", "Cinnamon star", "snacks", 505, 14.2, 50.9, 25.9, 13, "⭐"),
+  a("spitzbuebe", "Spitzbub", "Spitzbub", "Jam-filled biscuit (Spitzbub)", "snacks", 499, 5.8, 60.3, 25.6, 24, "🍪"),
+  a("fondue_chinoise_viande", "Viande pour fondue chinoise", "Fleisch für Fondue chinoise", "Fondue chinoise meat", "viandes", 111, 22.8, 0.1, 2.2, 200, "🥩"),
 ];
 
 const BY_ID: Record<string, Aliment> = Object.fromEntries(ALIMENTS.map((x) => [x.id, x]));

@@ -43,7 +43,7 @@ export default function CategoryPageEn({ params }: { params: { slug: string } })
     mainEntity: {
       "@type": "ItemList",
       numberOfItems: tools.length,
-      itemListElement: tools.map((x, i) => ({ "@type": "ListItem", position: i + 1, name: x.name, description: toolTagline(lang, x), url: `https://outils.ch/o/${x.slug}` })),
+      itemListElement: tools.map((x, i) => ({ "@type": "ListItem", position: i + 1, name: x.name, description: toolTagline(lang, x), url: `https://outils.ch/en/o/${x.slug}` })),
     },
   };
   const breadcrumb = {

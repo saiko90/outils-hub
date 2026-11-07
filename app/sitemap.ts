@@ -38,6 +38,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // propres URLs, pas celles d'outils.ch.
   const host = (headers().get("host") || "outils.ch").toLowerCase();
   if (host === "calorio.ch" || host === "www.calorio.ch") {
+    const chAlt = { languages: { "fr-CH": "https://calorio.ch/calories/specialites-suisses", "de-CH": "https://calorio.ch/de/kalorien/schweizer-spezialitaeten" } };
     const vs = ["calorio-vs-myfitnesspal", "calorio-vs-yazio", "calorio-vs-lifesum", "calorio-vs-cronometer"];
     return [
       { url: "https://calorio.ch/", lastModified: CALORIO_UPDATED, changeFrequency: "weekly", priority: 1, alternates: { languages: { fr: "https://calorio.ch/", de: "https://calorio.ch/de", en: "https://calorio.ch/en" } } },
@@ -52,6 +53,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       { url: "https://calorio.ch/mentions-legales", lastModified: CALORIO_CONTENT, changeFrequency: "yearly", priority: 0.3 },
       { url: "https://calorio.ch/partenaires", lastModified: CALORIO_CONTENT, changeFrequency: "monthly", priority: 0.4 },
       { url: "https://calorio.ch/calories", lastModified: CALORIO_CONTENT, changeFrequency: "monthly", priority: 0.7 },
+      { url: "https://calorio.ch/calories/specialites-suisses", lastModified: CALORIO_CONTENT, changeFrequency: "monthly", priority: 0.85, alternates: chAlt },
+      { url: "https://calorio.ch/de/kalorien/schweizer-spezialitaeten", lastModified: CALORIO_CONTENT, changeFrequency: "monthly", priority: 0.85, alternates: chAlt },
       ...ALIMENT_SLUGS.map((x) => ({ url: `https://calorio.ch/calories/${x.slug}`, lastModified: CALORIO_CONTENT, changeFrequency: "monthly" as const, priority: 0.6 })),
       { url: "https://calorio.ch/recettes", lastModified: CALORIO_CONTENT, changeFrequency: "monthly", priority: 0.7 },
       ...RECETTE_SLUGS.map((x) => ({ url: `https://calorio.ch/recettes/${x.slug}`, lastModified: CALORIO_CONTENT, changeFrequency: "monthly" as const, priority: 0.6 })),

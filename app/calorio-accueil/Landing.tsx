@@ -253,6 +253,7 @@ export default function Landing({ lang }: { lang: LLang }) {
           <a href={lang === "de" ? "/de/magazin" : "/mag"}>{c.footer.mag}</a>
           <a href="/recettes">{c.footer.recipes}</a>
           <a href="/calories">{c.footer.foods}</a>
+          <a href={c.footer.swissHref}>{c.footer.swiss}</a>
           <a href={lang === "en" ? "/calorio-vs-myfitnesspal/en" : "/calorio-vs-myfitnesspal"}>{c.footer.compare}</a>
           <a href="/confidentialite-calorio">{c.footer.privacy}</a>
           <a href={lang === "fr" ? "/partenaires" : `/${lang}/${lang === "de" ? "partner" : "partners"}`}>{c.footer.partners}</a>

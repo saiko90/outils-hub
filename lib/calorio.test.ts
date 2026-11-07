@@ -14,6 +14,10 @@ import {
   inText,
   deNom,
   ficheTitle,
+  CH_IDS,
+  CH_RECETTES,
+  ALIMENT_SLUGS,
+  recette,
 } from "./calorio";
 
 describe("calorio — métabolisme (Mifflin-St Jeor)", () => {
@@ -137,5 +141,16 @@ describe("calorio — noms des fiches SEO", () => {
   });
   it("chaque fiche a un titre de 60 caractères au plus", () => {
     for (const al of ALIMENTS) expect(ficheTitle(al).length, al.id).toBeLessThanOrEqual(60);
+  });
+});
+
+describe("calorio — spécialités suisses", () => {
+  it("chaque id de la liste blanche existe, sans doublon", () => {
+    for (const id of CH_IDS) expect(aliment(id), id).toBeDefined();
+    expect(new Set(CH_IDS).size).toBe(CH_IDS.length);
+    for (const id of CH_RECETTES) expect(recette(id), id).toBeDefined();
+  });
+  it("aucune fiche n'occupe l'URL de la page pivot", () => {
+    expect(ALIMENT_SLUGS.map((x) => x.slug)).not.toContain("specialites-suisses");
   });
 });

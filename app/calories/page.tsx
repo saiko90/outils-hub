@@ -33,6 +33,7 @@ export default function Page() {
         <h1 className="ci-h1">Combien de calories dans… ?</h1>
         <p className="ci-intro">Les calories et macronutriments des aliments courants, pour 100 g et par portion. Clique un aliment pour le détail — et suis tes calories gratuitement, sans pub, avec calorio.</p>
         <a className="ci-cta" href="https://calorio.ch/calorio">Ouvrir calorio <span aria-hidden>→</span></a>
+        <a className="ci-ch" href="/calories/specialites-suisses"><b>🇨🇭 Spécialités suisses</b><span>Raclette, fondue, rösti, tresse, Läckerli… toutes les calories sur une page →</span></a>
         <p className="ci-xlink"><a href="/recettes">Voir aussi : recettes équilibrées & leurs calories →</a> · <a href="/mag">Le Mag calorio →</a></p>
 
         {CAT_ORDER.map((cat) => {
@@ -83,6 +84,9 @@ body{background:#f3f7f2 !important}
 .ci-k small{display:block;font-size:.62rem;opacity:.7}
 .ci-disc{margin:26px 0 0;font-size:.78rem;color:#9aa2b4;text-align:center;line-height:1.5}
 .ci-xlink{margin:12px 0 0}
+.ci-ch{display:flex;flex-direction:column;gap:3px;margin:16px 0 0;background:#fff;border:1px solid #cdebd7;border-radius:16px;padding:14px 16px;text-decoration:none;box-shadow:0 6px 20px -14px rgba(20,80,44,.4)}
+.ci-ch b{color:#166a3a;font-size:1.02rem}
+.ci-ch span{color:#4b5563;font-size:.9rem}
 .ci-xlink a{color:#16a34a;text-decoration:none;font-weight:700;font-size:.92rem}
 @media(max-width:560px){.ci-h1{font-size:1.5rem}.ci-grid{grid-template-columns:1fr}}
 `;

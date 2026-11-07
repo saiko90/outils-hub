@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import { ALIMENTS, ALIMENT_SLUGS, alimentBySlug, alimentSlug, seoName, inText, deNom, ficheTitle, type Aliment, type AlimentCat } from "@/lib/calorio";
+import { ALIMENTS, ALIMENT_SLUGS, alimentBySlug, alimentSlug, seoName, inText, deNom, ficheTitle, isChSpecialite, type Aliment, type AlimentCat } from "@/lib/calorio";
 
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -42,6 +42,7 @@ export default function Page({ params }: { params: { slug: string } }) {
     { label: "Lipides", per100: al.lip, perPortion: (al.lip * al.portion) / 100 },
   ];
   const name = seoName(al);
+  const ch = isChSpecialite(al.id);
   const nt = inText(name);
   const faq = [
     { q: `Combien de calories dans 100 g ${deNom(nt)} ?`, a: `100 g ${deNom(nt)} apportent environ ${al.kcal} kcal.` },
@@ -55,7 +56,8 @@ export default function Page({ params }: { params: { slug: string } }) {
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "calorio", item: "https://calorio.ch/" },
       { "@type": "ListItem", position: 2, name: "Calories des aliments", item: "https://calorio.ch/calories" },
-      { "@type": "ListItem", position: 3, name, item: canon },
+      ...(ch ? [{ "@type": "ListItem", position: 3, name: "Spécialités suisses", item: "https://calorio.ch/calories/specialites-suisses" }] : []),
+      { "@type": "ListItem", position: ch ? 4 : 3, name, item: canon },
     ],
   };
 
@@ -69,7 +71,7 @@ export default function Page({ params }: { params: { slug: string } }) {
         <header className="ca-top">
           <a className="ca-brand" href="https://calorio.ch/"><img src="/calorio-icon-192.png" alt="" width={30} height={30} /> calorio</a>
         </header>
-        <nav className="ca-crumb" aria-label="fil d'ariane"><a href="https://calorio.ch/">calorio</a> <span aria-hidden>›</span> <a href="/calories">Calories des aliments</a> <span aria-hidden>›</span> {name}</nav>
+        <nav className="ca-crumb" aria-label="fil d'ariane"><a href="https://calorio.ch/">calorio</a> <span aria-hidden>›</span> <a href="/calories">Calories des aliments</a> <span aria-hidden>›</span> {ch && <><a href="/calories/specialites-suisses">Spécialités suisses</a> <span aria-hidden>›</span> </>}{name}</nav>
 
         <h1 className="ca-h1"><span className="ca-emo" aria-hidden>{al.emoji}</span> {name} : combien de calories ?</h1>
         <p className="ca-intro">{name} apporte <b>{al.kcal} kcal pour 100 g</b>, soit environ <b>{kcalP} kcal</b> pour une portion usuelle de {al.portion} g. Voici le détail des calories et des macronutriments — et de quoi les suivre gratuitement.</p>

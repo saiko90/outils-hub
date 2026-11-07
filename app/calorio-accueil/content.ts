@@ -34,7 +34,7 @@ export type LandingCopy = {
   faq: Faq[];
   finalTitle: string;
   finalText: string;
-  footer: { madeBy: string; madeWhere: string; privacy: string; legal: string; partners: string; recipes: string; foods: string; compare: string; mag: string };
+  footer: { madeBy: string; madeWhere: string; swiss: string; swissHref: string; privacy: string; legal: string; partners: string; recipes: string; foods: string; compare: string; mag: string };
 };
 
 export const COPY: Record<LLang, LandingCopy> = {
@@ -86,7 +86,7 @@ export const COPY: Record<LLang, LandingCopy> = {
     ],
     finalTitle: "Ta première journée prend deux minutes.",
     finalText: "Règle ton profil, note ton prochain repas, et regarde l'anneau se remplir.",
-    footer: { madeBy: "Une application de", madeWhere: ", Valais", privacy: "Confidentialité", legal: "Mentions légales et conditions", partners: "Devenir partenaire", recipes: "Recettes", foods: "Calories des aliments", compare: "Comparatifs", mag: "Le Mag" },
+    footer: { madeBy: "Une application de", madeWhere: ", Valais", swiss: "Spécialités suisses", swissHref: "/calories/specialites-suisses", privacy: "Confidentialité", legal: "Mentions légales et conditions", partners: "Devenir partenaire", recipes: "Recettes", foods: "Calories des aliments", compare: "Comparatifs", mag: "Le Mag" },
   },
   de: {
     htmlTitle: "calorio — Kalorienzähler aus der Schweiz, einfach und werbefrei",
@@ -136,7 +136,7 @@ export const COPY: Record<LLang, LandingCopy> = {
     ],
     finalTitle: "Dein erster Tag dauert zwei Minuten.",
     finalText: "Profil einstellen, nächste Mahlzeit erfassen und zusehen, wie sich der Ring füllt.",
-    footer: { madeBy: "Eine App von", madeWhere: ", Wallis", privacy: "Datenschutz", legal: "Impressum und AGB", partners: "Partner werden", recipes: "Rezepte (FR)", foods: "Kalorien von Lebensmitteln (FR)", compare: "Vergleiche", mag: "Magazin" },
+    footer: { madeBy: "Eine App von", madeWhere: ", Wallis", swiss: "Schweizer Spezialitäten", swissHref: "/de/kalorien/schweizer-spezialitaeten", privacy: "Datenschutz", legal: "Impressum und AGB", partners: "Partner werden", recipes: "Rezepte (FR)", foods: "Kalorien von Lebensmitteln (FR)", compare: "Vergleiche", mag: "Magazin" },
   },
   en: {
     htmlTitle: "calorio — the Swiss calorie counter, simple and ad-free",
@@ -186,6 +186,6 @@ export const COPY: Record<LLang, LandingCopy> = {
     ],
     finalTitle: "Your first day takes two minutes.",
     finalText: "Set your profile, log your next meal, and watch the ring fill up.",
-    footer: { madeBy: "An app by", madeWhere: ", Valais", privacy: "Privacy", legal: "Legal notice and terms", partners: "Become a partner", recipes: "Recipes (FR)", foods: "Food calories (FR)", compare: "Comparisons", mag: "Magazine (FR/DE)" },
+    footer: { madeBy: "An app by", madeWhere: ", Valais", swiss: "Swiss specialties (FR)", swissHref: "/calories/specialites-suisses", privacy: "Privacy", legal: "Legal notice and terms", partners: "Become a partner", recipes: "Recipes (FR)", foods: "Food calories (FR)", compare: "Comparisons", mag: "Magazine (FR/DE)" },
   },
 };

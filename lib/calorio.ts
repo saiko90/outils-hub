@@ -591,6 +591,22 @@ export function alimentSlug(al: Aliment): string {
   return SLUG_BY_ID[al.id] || al.id;
 }
 
+/* --- Spécialités suisses (pages pivots /calories/specialites-suisses et /de/kalorien/schweizer-spezialitaeten) --- */
+export type ChGroup = "plats" | "fromages" | "pains" | "charcuteries" | "boissons";
+/** Liste blanche des spécialités suisses, par groupe (ids de ALIMENTS). */
+export const CH_GROUPS: { id: ChGroup; fr: string; de: string; ids: string[] }[] = [
+  { id: "plats", fr: "Plats", de: "Gerichte", ids: ["fondue", "rosti", "alplermagronen", "geschnetzeltes", "papet_vaudois", "capuns", "pizzoccheri", "malakoff", "birchermuesli"] },
+  { id: "fromages", fr: "Fromages", de: "Käse", ids: ["raclette", "gruyere", "emmental", "vacherin_fribourgeois"] },
+  { id: "pains", fr: "Pains et pâtisseries", de: "Brot und Gebäck", ids: ["tresse", "cuchaule", "grittibaenz", "nusstorte", "meringue_creme", "carac", "cremeschnitte", "laeckerli", "mailaenderli", "brunsli", "zimtsterne", "spitzbuebe"] },
+  { id: "charcuteries", fr: "Charcuteries", de: "Wurst und Fleisch", ids: ["viande_sechee", "cervelas", "saucisse_choux", "longeole"] },
+  { id: "boissons", fr: "Boissons", de: "Getränke", ids: ["rivella", "ovomaltine"] },
+];
+export const CH_IDS: string[] = CH_GROUPS.flatMap((g) => g.ids);
+const CH_SET = new Set(CH_IDS);
+export const isChSpecialite = (id: string): boolean => CH_SET.has(id);
+/** Recettes suisses de la base (section « Spécialités suisses » de RECETTES). */
+export const CH_RECETTES = ["raclette_valais", "fondue_moitie", "rosti_oeuf"];
+
 /* --- Noms affichés dans les pages SEO (sans toucher à nom.fr, dont dépendent les slugs) --- */
 // Suffixe de canton en fin de nom : « Cuchaule (FR) », « Longeole (GE) ». Construit avec new RegExp.
 const CANTON_SUFFIX = new RegExp("\\s*\\([A-Z]{2}\\)$");

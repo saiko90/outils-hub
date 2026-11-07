@@ -96,7 +96,22 @@ export default function Landing({ lang }: { lang: LLang }) {
           { "@type": "Offer", name: "Pro (mensuel)", price: "4.90", priceCurrency: "CHF", category: "subscription" },
           { "@type": "Offer", name: "Pro (annuel)", price: "39.00", priceCurrency: "CHF", category: "subscription" },
         ],
-        publisher: { "@type": "Organization", name: "Swiss Digital Studio", url: "https://www.swissdigitalstudio.ch" },
+        publisher: { "@id": "https://swissdigitalstudio.ch/#org" },
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://calorio.ch/#website",
+        name: "calorio",
+        url: "https://calorio.ch",
+        inLanguage: ["fr-CH", "de-CH", "en"],
+        publisher: { "@id": "https://swissdigitalstudio.ch/#org" },
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://swissdigitalstudio.ch/#org",
+        name: "Swiss Digital Studio",
+        url: "https://swissdigitalstudio.ch/",
+        logo: "https://calorio.ch/calorio-icon-512.png",
       },
       {
         "@type": "FAQPage",
@@ -232,7 +247,7 @@ export default function Landing({ lang }: { lang: LLang }) {
       </main>
 
       <footer className="lp-foot">
-        <p>{c.footer.made}</p>
+        <p>{c.footer.madeBy} <a href="https://swissdigitalstudio.ch/">Swiss Digital Studio</a>{c.footer.madeWhere}</p>
         <nav aria-label="Liens">
           <a href={lang === "de" ? "/de/magazin" : "/mag"}>{c.footer.mag}</a>
           <a href="/recettes">{c.footer.recipes}</a>

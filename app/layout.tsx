@@ -63,41 +63,10 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-const siteLd = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebSite",
-      "@id": "https://outils.ch/#website",
-      name: "outils.ch",
-      url: "https://outils.ch",
-      inLanguage: ["fr", "de", "en"],
-      description: "Des micro-outils en ligne gratuits (convertisseurs, générateurs, calculateurs), 100 % navigateur, sans inscription — avec des outils métier conformes aux normes suisses.",
-      publisher: { "@id": "https://www.swissdigitalstudio.ch/#org" },
-      potentialAction: {
-        "@type": "SearchAction",
-        target: { "@type": "EntryPoint", urlTemplate: "https://outils.ch/?q={search_term_string}" },
-        "query-input": "required name=search_term_string",
-      },
-    },
-    {
-      "@type": "Organization",
-      "@id": "https://www.swissdigitalstudio.ch/#org",
-      name: "Swiss Digital Studio",
-      url: "https://www.swissdigitalstudio.ch",
-      logo: "https://outils.ch/icon-192.png",
-      brand: "outils.ch",
-      areaServed: "CH",
-      slogan: "Des outils suisses, simples, rapides et privés.",
-    },
-  ],
-};
-
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="fr" className={inter.variable}>
       <body>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteLd) }} />
         {children}
         <Hit />
         <Analytics />

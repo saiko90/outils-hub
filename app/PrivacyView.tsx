@@ -80,7 +80,7 @@ export default function PrivacyView({ lang }: { lang: Lang }) {
     "@context": "https://schema.org", "@type": "PrivacyPolicy",
     name: c.kicker + " — outils.ch", url: canon, inLanguage: lang,
     isPartOf: { "@type": "WebSite", name: "outils.ch", url: "https://outils.ch" },
-    publisher: { "@type": "Organization", name: "Swiss Digital Studio", url: "https://www.swissdigitalstudio.ch" },
+    publisher: { "@type": "Organization", "@id": "https://swissdigitalstudio.ch/#org", name: "Swiss Digital Studio", url: "https://swissdigitalstudio.ch/" },
   };
 
   return (

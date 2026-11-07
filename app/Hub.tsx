@@ -342,7 +342,7 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
           <div className="foot-brand">
             <div className="foot-logo"><b>outils</b><span className="tld">.ch</span></div>
             <p>{tr(lang, "footTagline")}</p>
-            <a href="https://www.swissdigitalstudio.ch" target="_blank" rel="noopener noreferrer" className="foot-studio">
+            <a href="https://swissdigitalstudio.ch/" target="_blank" rel="noopener" className="foot-studio">
               {tr(lang, "footBy")} <b>Swiss Digital Studio</b> <span aria-hidden>↗</span>
             </a>
           </div>

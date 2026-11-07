@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { OUTILS_WEBSITE, STUDIO_ORG } from "@/lib/siteLd";
 import Hub from "./Hub";
 import { TOOLS, REAL_CATEGORIES, CAT_SLUG, CAT_EMOJI, toolsByCat, proTools } from "@/lib/catalog";
 import { altLanguages } from "@/lib/i18n";
@@ -8,16 +9,22 @@ export const metadata: Metadata = { alternates: { canonical: "/", languages: alt
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "ItemList",
-  name: "outils.ch — répertoire d'outils en ligne",
-  numberOfItems: TOOLS.length,
-  itemListElement: TOOLS.map((t, i) => ({
-    "@type": "ListItem",
-    position: i + 1,
-    name: t.name,
-    description: t.tagline,
-    url: t.url,
-  })),
+  "@graph": [
+    OUTILS_WEBSITE,
+    STUDIO_ORG,
+    {
+      "@type": "ItemList",
+      name: "outils.ch — répertoire d'outils en ligne",
+      numberOfItems: TOOLS.length,
+      itemListElement: TOOLS.map((t, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: t.name,
+        description: t.tagline,
+        url: t.url,
+      })),
+    },
+  ],
 };
 
 export default function Page() {

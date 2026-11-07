@@ -194,7 +194,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
         <footer className="tp-foot">
           <Link href={home}>outils.ch</Link> · {t(lang, "freeTools")} · {t(lang, "madeCH")}
           <br />
-          <a href="https://www.swissdigitalstudio.ch" target="_blank" rel="noopener noreferrer" className="tp-studio">
+          <a href="https://swissdigitalstudio.ch/" target="_blank" rel="noopener" className="tp-studio">
             {t(lang, "footBy")} Swiss Digital Studio ↗
           </a>
         </footer>

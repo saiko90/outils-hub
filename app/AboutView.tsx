@@ -64,8 +64,8 @@ export default function AboutView({ lang }: { lang: Lang }) {
     "@context": "https://schema.org", "@type": "AboutPage",
     name: c.kicker + " — outils.ch", url: canon, inLanguage: lang,
     mainEntity: {
-      "@type": "Organization",
-      name: "Swiss Digital Studio", url: "https://www.swissdigitalstudio.ch",
+      "@type": "Organization", "@id": "https://swissdigitalstudio.ch/#org",
+      name: "Swiss Digital Studio", url: "https://swissdigitalstudio.ch/",
       brand: { "@type": "Brand", name: "outils.ch" },
       areaServed: "CH",
     },
@@ -93,7 +93,7 @@ export default function AboutView({ lang }: { lang: Lang }) {
           </section>
         ))}
 
-        <a className="about-studio" href="https://www.swissdigitalstudio.ch" target="_blank" rel="noopener noreferrer">
+        <a className="about-studio" href="https://swissdigitalstudio.ch/" target="_blank" rel="noopener">
           {c.studioCta} <span aria-hidden>↗</span>
         </a>
 

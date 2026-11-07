@@ -25,6 +25,7 @@ import {
   tpProBadge, tpOpenVerb, faqTitle, tpTrust, t,
 } from "@/lib/i18n";
 import { toolH1 } from "@/lib/seo";
+import { toolContent } from "@/lib/toolContent";
 
 // Liens contextuels vers les sites frères (URL absolues, hôte canonique uniquement). FR seulement.
 const FURTHER: Record<string, { href: string; label: string }> = {
@@ -54,7 +55,8 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
   const proText = pro ? proContent(lang, tool) : "";
   const swissLinked = pro ? relatedPro(tool.slug) : [];
   const bridge = pro ? undefined : bridgePro(tool.slug);
-  const faq = pro ? faqFor(lang, tool) : faqGeneric(lang, tool);
+  const content = toolContent(lang, tool.slug);
+  const faq = content ? content.faq : pro ? faqFor(lang, tool) : faqGeneric(lang, tool);
   const tagline = toolTagline(lang, tool);
   const h1 = toolH1(lang, tool);
   const canon = `https://outils.ch${p}/o/${tool.slug}`;
@@ -146,8 +148,21 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
         {tool.slug === "sitemapo" && <SitemapoCalc lang={lang} />}
         {(tool.slug === "capimmo" || tool.slug === "ibano") && <FinanceLead slug={tool.slug} lang={lang} />}
 
-        {!declutter && <p className="tp-long">{longDescriptionL(lang, tool)}</p>}
-        {!declutter && proText && <p className="tp-long tp-procontent">{proText}</p>}
+        {content ? (
+          <div className="tp-content">
+            {content.sections.map((sec) => (
+              <section key={sec.h2}>
+                <h2>{sec.h2}</h2>
+                <div dangerouslySetInnerHTML={{ __html: sec.html }} />
+              </section>
+            ))}
+          </div>
+        ) : (
+          <>
+            {!declutter && <p className="tp-long">{longDescriptionL(lang, tool)}</p>}
+            {!declutter && proText && <p className="tp-long tp-procontent">{proText}</p>}
+          </>
+        )}
 
         {swissLinked.length > 0 && (
           <section className="tp-swiss">

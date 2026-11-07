@@ -91,7 +91,7 @@ export default function Page({ params }: { params: { slug: string } }) {
             </tbody>
           </table>
         </div>
-        <p className="ca-note">Valeurs indicatives par 100 g (moyennes). Les valeurs réelles varient selon la marque et la préparation.</p>
+        <p className="ca-note">Valeurs indicatives par 100 g (moyennes). Les valeurs réelles varient selon la marque et la préparation. <a href="/mag/methode">Méthode et sources</a></p>
 
         <div className="ca-final">
           <div className="ca-final-t">Suis {nt} dans ton journal</div>

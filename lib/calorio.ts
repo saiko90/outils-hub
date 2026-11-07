@@ -201,8 +201,11 @@ export const ALIMENTS: Aliment[] = [
   a("salade_cesar", "Salade César", "Caesar-Salat", "Caesar salad", "plats", 180, 9, 6, 13, 250, "🥗"),
   a("lasagne", "Lasagnes", "Lasagne", "Lasagna", "plats", 130, 7, 12, 6, 350, "🍝"),
   a("soupe", "Soupe de légumes", "Gemüsesuppe", "Vegetable soup", "plats", 40, 1.5, 6, 1, 250, "🥣"),
-  a("raclette", "Raclette (fromage)", "Raclettekäse", "Raclette cheese", "plats", 357, 23, 0.5, 29, 60, "🧀"),
-  a("fondue", "Fondue (par pers.)", "Fondue (pro Person)", "Fondue (per person)", "plats", 350, 20, 6, 27, 200, "🫕"),
+  // Raclette : fiche produit Raclette Suisse (340 kcal, 26 g protéines, 28 g lipides pour 100 g), comme l'article du Mag.
+  a("raclette", "Raclette (fromage)", "Raclettekäse", "Raclette cheese", "plats", 340, 26, 0, 28, 60, "🧀"),
+  // Fondue : caquelon prêt (fromage + vin + maïzena), Schweizer Nährwertdatenbank « Fondue moitié-moitié, zubereitet »
+  // (292 kcal/100 g). Portion 290 g = 200 g de fromage avec le vin, soit ≈ 850 kcal sans pain, comme l'article du Mag.
+  a("fondue", "Fondue (par pers.)", "Fondue (pro Person)", "Fondue (per person)", "plats", 292, 16.8, 1, 20.8, 290, "🫕"),
 
   // ── Fruits exotiques & baies ──
   a("mangue", "Mangue", "Mango", "Mango", "fruits", 60, 0.8, 15, 0.4, 150, "🥭"),

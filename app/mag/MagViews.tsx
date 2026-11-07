@@ -4,6 +4,7 @@ import {
   type MagArticle, type MagBlock, type MagLang, type MagCat,
 } from "@/lib/mag";
 import { ALIMENTS, RECETTES, alimentSlug, recetteSlug, recetteNutri } from "@/lib/calorio";
+import { METHODE, METHODE_PATH, METHODE_UPDATED } from "@/lib/magMethode";
 
 // Vues partagées du Mag calorio (index + article), en français et en allemand.
 
@@ -28,6 +29,7 @@ const T = {
     seeAlso: "Voir aussi : calories des aliments et recettes",
     perPortion: "/portion",
     disclaimer: "Valeurs indicatives, calculées pour des portions courantes ; elles varient selon les produits et la préparation. Ces conseils ne remplacent pas l'avis d'un·e professionnel·le de santé.",
+    method: "Méthode et sources",
   },
   de: {
     mag: "Das calorio Magazin",
@@ -49,6 +51,7 @@ const T = {
     seeAlso: "",
     perPortion: "/Portion",
     disclaimer: "Richtwerte, berechnet für übliche Portionen; sie variieren je nach Produkt und Zubereitung. Diese Tipps ersetzen keine Beratung durch eine Fachperson.",
+    method: "Methode und Quellen",
   },
 } as const;
 
@@ -171,7 +174,7 @@ export function MagArticleView({ a, lang }: { a: MagArticle; lang: MagLang }) {
   const articleLd = {
     "@context": "https://schema.org", "@type": "Article", headline: l.title, description: l.description, image: [img],
     datePublished: a.date, dateModified: a.updated || a.date, inLanguage: lang === "de" ? "de-CH" : "fr-CH", mainEntityOfPage: url,
-    author: { "@type": "Organization", name: "calorio", url: "https://calorio.ch/" },
+    author: { "@type": "Organization", name: METHODE[lang].author, url: MAG_ORIGIN + METHODE_PATH[lang] },
     publisher: { "@type": "Organization", name: "calorio", url: "https://calorio.ch/", logo: { "@type": "ImageObject", url: "https://calorio.ch/calorio-icon-512.png" } },
   };
   const crumbLd = {
@@ -245,7 +248,7 @@ export function MagArticleView({ a, lang }: { a: MagArticle; lang: MagLang }) {
           </>
         )}
 
-        <p className="mg-disc">{t.disclaimer}</p>
+        <p className="mg-disc">{t.disclaimer} <a href={METHODE_PATH[lang]}>{t.method}</a></p>
         {a.sources && a.sources.length > 0 && (
           <p className="mg-src">{t.sources} : {a.sources.map((s, i) => <span key={s.url}>{i > 0 && " · "}<a href={s.url} rel="noopener nofollow" target="_blank">{s.label}</a></span>)}</p>
         )}
@@ -257,6 +260,42 @@ export function MagArticleView({ a, lang }: { a: MagArticle; lang: MagLang }) {
           <div className="mg-grid mg-grid-2">{more.map((x) => <Card key={x.id} a={x} lang={lang} />)}</div>
         </>
       )}
+      <p className="mg-back"><a href={base}>{t.back}</a></p>
+    </Shell>
+  );
+}
+
+/** Page « Méthode et sources » (FR /mag/methode, DE /de/magazin/methode). */
+export function MagMethodView({ lang }: { lang: MagLang }) {
+  const t = T[lang];
+  const m = METHODE[lang];
+  const other: MagLang = lang === "fr" ? "de" : "fr";
+  const base = lang === "de" ? "/de/magazin" : "/mag";
+  const url = MAG_ORIGIN + METHODE_PATH[lang];
+  const ld = {
+    "@context": "https://schema.org",
+    "@graph": [
+      { "@type": "WebPage", "@id": url, url, name: m.title, description: m.description, inLanguage: lang === "de" ? "de-CH" : "fr-CH", dateModified: METHODE_UPDATED,
+        publisher: { "@type": "Organization", name: "calorio", url: "https://calorio.ch/" } },
+      { "@type": "BreadcrumbList", itemListElement: [
+        { "@type": "ListItem", position: 1, name: "calorio", item: lang === "de" ? "https://calorio.ch/de" : "https://calorio.ch/" },
+        { "@type": "ListItem", position: 2, name: t.mag, item: MAG_ORIGIN + base },
+        { "@type": "ListItem", position: 3, name: m.h1, item: url },
+      ] },
+    ],
+  };
+  return (
+    <Shell lang={lang} crumb={<><a href={lang === "de" ? "https://calorio.ch/de" : "https://calorio.ch/"}>calorio</a> <span aria-hidden>›</span> <a href={base}>{t.mag}</a> <span aria-hidden>›</span> {m.h1}</>}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <article>
+        <div className="mg-meta">
+          <span className="mg-meta-t">{magDate(METHODE_UPDATED, lang)}</span>
+          <a className="mg-meta-l" href={METHODE_PATH[other]} hrefLang={other === "de" ? "de-CH" : "fr-CH"}>{t.other}</a>
+        </div>
+        <h1 className="mg-h1">{m.h1}</h1>
+        <p className="mg-lead"><Inline text={m.intro} /></p>
+        {m.blocks.map((b, i) => <Block key={i} b={b} />)}
+      </article>
       <p className="mg-back"><a href={base}>{t.back}</a></p>
     </Shell>
   );

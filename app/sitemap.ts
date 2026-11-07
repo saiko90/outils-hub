@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { TOOLS, REAL_CATEGORIES, CAT_SLUG } from "@/lib/catalog";
 import { ALIMENT_SLUGS, RECETTE_SLUGS } from "@/lib/calorio";
 import { magPublished, magUrl } from "@/lib/mag";
+import { METHODE_UPDATED } from "@/lib/magMethode";
 
 // Dates réelles de dernière modification (et non « maintenant » à chaque requête, ce qui n'apprend rien aux moteurs).
 const CALORIO_UPDATED = new Date("2026-09-25");
@@ -13,9 +14,13 @@ function magSitemap(): MetadataRoute.Sitemap {
   const list = magPublished();
   const last = list.length ? new Date(list[0].updated || list[0].date) : CALORIO_CONTENT;
   const idx = { languages: { "fr-CH": "https://calorio.ch/mag", "de-CH": "https://calorio.ch/de/magazin" } };
+  const meth = { languages: { "fr-CH": "https://calorio.ch/mag/methode", "de-CH": "https://calorio.ch/de/magazin/methode" } };
+  const methLm = new Date(METHODE_UPDATED);
   return [
     { url: "https://calorio.ch/mag", lastModified: last, changeFrequency: "weekly", priority: 0.8, alternates: idx },
     { url: "https://calorio.ch/de/magazin", lastModified: last, changeFrequency: "weekly", priority: 0.8, alternates: idx },
+    { url: "https://calorio.ch/mag/methode", lastModified: methLm, changeFrequency: "yearly", priority: 0.4, alternates: meth },
+    { url: "https://calorio.ch/de/magazin/methode", lastModified: methLm, changeFrequency: "yearly", priority: 0.4, alternates: meth },
     ...list.flatMap((a) => {
       const alt = { languages: { "fr-CH": magUrl(a, "fr", true), "de-CH": magUrl(a, "de", true) } };
       const lm = new Date(a.updated || a.date);

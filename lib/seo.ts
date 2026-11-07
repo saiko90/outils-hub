@@ -97,13 +97,28 @@ const DESC_TAIL: Record<Lang, string> = {
   en: "Free, no sign-up, runs in your browser.",
 };
 
-/** Meta description d'une page outil. */
+/** Compléments factuels ajoutés au gabarit, dans l'ordre, tant que la description fait moins de 140 caractères. */
+const DESC_EXTRA: Record<Lang, { ch: string; more: string[] }> = {
+  fr: { ch: " Pensé pour la Suisse.", more: [" Résultat immédiat.", " Fonctionne aussi sur mobile.", " Aucune installation.", " Une boîte à outils suisse : outils.ch.", " Simple et rapide."] },
+  de: { ch: " Für die Schweiz gemacht.", more: [" Resultat sofort.", " Funktioniert auch auf dem Handy.", " Keine Installation nötig.", " Teil der Schweizer Toolbox outils.ch.", " Einfach und schnell."] },
+  en: { ch: " Made for Switzerland.", more: [" Instant results.", " Works on mobile too.", " Nothing to install.", " Part of the Swiss toolbox outils.ch.", " Simple and fast."] },
+};
+const DESC_MIN = 140;
+const DESC_MAX = 160;
+
+/** Meta description d'une page outil : texte SEO s'il existe, sinon tagline + gabarit, complété vers 140-160 caractères. */
 export function toolDescription(lang: Lang, tool: Tool): string {
   const seo = seoFor(lang, tool.slug);
   if (seo) return seo.desc;
   const tag = toolTagline(lang, tool).trim();
   const sep = /[.?!]$/.test(tag) ? " " : ". ";
-  return `${tag}${sep}${DESC_TAIL[lang]}`;
+  let d = `${tag}${sep}${DESC_TAIL[lang]}`;
+  const extra = DESC_EXTRA[lang];
+  for (const x of [...(tool.ch ? [extra.ch] : []), ...extra.more]) {
+    if (d.length >= DESC_MIN) break;
+    if (d.length + x.length <= DESC_MAX) d += x;
+  }
+  return d;
 }
 
 /** H1 d'une page outil : formulation de la requête si elle existe, sinon la tagline. */

@@ -31,6 +31,8 @@ describe("SEO des pages outil", () => {
         expect(title.length).toBeGreaterThan(10);
         const d = toolDescription(lang, t);
         expect(d).not.toMatch(/en un clic|mit einem Klick|in one click/);
+        expect(d.length, `${lang} ${t.slug} description: ${d}`).toBeGreaterThanOrEqual(140);
+        expect(d.length, `${lang} ${t.slug} description: ${d}`).toBeLessThanOrEqual(160);
         expect(toolH1(lang, t).length).toBeGreaterThan(0);
       }
     }

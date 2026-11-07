@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { partnerRedirect } from "./lib/partnerLinks";
+import { canonicalRedirect } from "./lib/hostRedirects";
 
 // Sert le Cockpit admin sur le sous-domaine admin.outils.ch (réécriture vers /admin),
 // tout en le laissant aussi accessible sur outils.ch/admin. Aucun effet sur le site public.
@@ -13,6 +14,11 @@ export function middleware(req: NextRequest) {
   if (host === "www.calorio.ch" && req.nextUrl.searchParams.has("applogin")) {
     return NextResponse.redirect(`https://calorio.ch${pathname}${req.nextUrl.search}`, 307);
   }
+  // Hôte canonique (308) : www.outils.ch et outils-hub.vercel.app → outils.ch ; pages calorio (Mag, fiches,
+  // recettes, comparatifs…) servies sous outils.ch → calorio.ch ; pages indexables de www.calorio.ch → calorio.ch.
+  // Jamais /api, /calorio ni ?applogin (voir lib/hostRedirects.ts).
+  const canonical = canonicalRedirect(host, pathname, req.nextUrl.search);
+  if (canonical) return NextResponse.redirect(canonical, 308);
   // calorio.ch : page d'accueil indexable (FR / DE / EN) ; l'application vit sur /calorio.
   if (onCalorio && (pathname === "/" || pathname === "/de" || pathname === "/en")) {
     const url = req.nextUrl.clone();
@@ -36,10 +42,7 @@ export function middleware(req: NextRequest) {
     const dest = partnerRedirect(pathname);
     if (dest) return NextResponse.redirect(`https://calorio.ch${dest}`, 307);
   }
-  // Le Mag calorio (FR /mag, DE /de/magazin) n'existe que sous calorio.ch (évite le contenu dupliqué sur outils.ch).
-  if (!onCalorio && (host === "outils.ch" || host === "www.outils.ch") && /^\/(?:mag|de\/magazin)(?:\/|$)/.test(pathname)) {
-    return NextResponse.redirect(`https://calorio.ch${pathname}${req.nextUrl.search}`, 308);
-  }
+  // Le Mag calorio (FR /mag, DE /de/magazin) n'existe que sous calorio.ch : règle intégrée à canonicalRedirect (plus haut).
   // La page d'accueil n'existe que sous calorio.ch/ (évite le contenu dupliqué).
   const local = host === "localhost" || host === "127.0.0.1";
   if (!local && pathname.startsWith("/calorio-accueil")) {

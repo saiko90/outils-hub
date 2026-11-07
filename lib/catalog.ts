@@ -9,7 +9,11 @@ export type Tool = {
   from: string;     // couleur d'accent 1
   to: string;       // couleur d'accent 2
   ch?: boolean;     // spécifique Suisse
+  updated?: string; // AAAA-MM-JJ : dernière modification réelle de la page outil (sinon HUB_UPDATED)
 };
+
+/** Dernière modification du gabarit commun des pages outil (titres, contenu, maillage). Date réelle, jamais « maintenant ». */
+export const HUB_UPDATED = "2026-11-07";
 
 export const CATEGORIES = [
   "Tous", "Suisse", "Dev", "Design", "Texte", "Temps", "Finance", "Calcul", "Web", "Santé",

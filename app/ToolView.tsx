@@ -26,6 +26,13 @@ import {
 } from "@/lib/i18n";
 import { toolH1 } from "@/lib/seo";
 import { toolContent } from "@/lib/toolContent";
+import { STUDIO_ORG_ID } from "@/lib/siteLd";
+
+/** Catégorie schema.org de l'application selon la catégorie du catalogue. */
+const APP_CATEGORY: Record<string, string> = {
+  Suisse: "FinanceApplication", Finance: "FinanceApplication", "Santé": "HealthApplication",
+  Dev: "DeveloperApplication", Web: "DeveloperApplication", Design: "DesignApplication",
+};
 
 // Liens contextuels vers les sites frères (URL absolues, hôte canonique uniquement). FR seulement.
 const FURTHER: Record<string, { href: string; label: string }> = {
@@ -61,12 +68,14 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
   const h1 = toolH1(lang, tool);
   const canon = `https://outils.ch${p}/o/${tool.slug}`;
 
+  // Jamais d'aggregateRating : aucune note réelle n'est collectée.
   const jsonLd = {
     "@context": "https://schema.org", "@type": "SoftwareApplication",
-    name: tool.name, description: tagline, url: canon,
-    applicationCategory: "WebApplication", operatingSystem: "Web",
+    name: h1, alternateName: tool.name, description: tagline, url: canon,
+    applicationCategory: APP_CATEGORY[tool.cat] ?? "UtilitiesApplication", operatingSystem: "Web",
     offers: { "@type": "Offer", price: "0", priceCurrency: "CHF" },
-    inLanguage: lang, isAccessibleForFree: true,
+    inLanguage: lang === "fr" ? "fr-CH" : lang === "de" ? "de-CH" : "en", isAccessibleForFree: true,
+    publisher: { "@id": STUDIO_ORG_ID },
   };
   const catSlug = CAT_SLUG[tool.cat];
   const catUrl = `https://outils.ch${p}/c/${catSlug}`;

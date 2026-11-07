@@ -20,13 +20,17 @@ export function magIndexMetadata(lang: MagLang): Metadata {
 
 export function magArticleMetadata(a: MagArticle, lang: MagLang): Metadata {
   const l = a[lang];
+  // seoTitle / seoDescription : formulation de la requête Google (le H1, le cardTitle et le visuel ne changent pas).
+  const title = l.seoTitle ? plain(l.seoTitle) : `${plain(l.title)} | calorio`;
+  const description = plain(l.seoDescription || l.description);
+  const ogTitle = l.seoTitle ? plain(l.seoTitle) : plain(l.title);
   return {
     metadataBase: new URL(MAG_ORIGIN),
-    title: `${plain(l.title)} | calorio`,
-    description: plain(l.description),
+    title,
+    description,
     alternates: { canonical: magUrl(a, lang, true), languages: { "fr-CH": magUrl(a, "fr", true), "de-CH": magUrl(a, "de", true), "x-default": magUrl(a, "fr", true) } },
-    openGraph: { title: plain(l.title), description: plain(l.description), url: magUrl(a, lang, true), type: "article", siteName: "calorio", locale: lang === "fr" ? "fr_CH" : "de_CH", publishedTime: a.date, modifiedTime: a.updated || a.date },
-    twitter: { card: "summary_large_image", title: plain(l.title), description: plain(l.description) },
+    openGraph: { title: ogTitle, description, url: magUrl(a, lang, true), type: "article", siteName: "calorio", locale: lang === "fr" ? "fr_CH" : "de_CH", publishedTime: a.date, modifiedTime: a.updated || a.date },
+    twitter: { card: "summary_large_image", title: ogTitle, description },
     robots: { index: true, follow: true },
     applicationName: "calorio",
     icons: { icon: [{ url: "/calorio-icon-192.png", sizes: "192x192", type: "image/png" }], apple: [{ url: "/calorio-icon-180.png", sizes: "180x180", type: "image/png" }] },

@@ -1,6 +1,7 @@
 {
   "id": "fondue-moitie-moitie",
   "date": "2026-10-22",
+  "updated": "2026-11-07",
   "cat": "classiques",
   "emoji": "🫕",
   "kcal": { "value": "1250–1500", "label": { "fr": "kcal par personne", "de": "kcal pro Person" } },
@@ -15,6 +16,8 @@
     "title": "Fondue moitié-moitié : combien de calories par personne ?",
     "cardTitle": "Une fondue moitié-moitié, combien de calories ?",
     "description": "Avec 200 g de fromage et le pain, une fondue moitié-moitié apporte 1250 à 1500 kcal par personne. Le détail, le poids du pain et une version plus légère.",
+    "seoTitle": "Fondue moitié-moitié : calories par personne, avec pain",
+    "seoDescription": "Avec 200 g de fromage et le pain, une fondue moitié-moitié apporte 1250 à 1500 kcal par personne, environ 850 kcal sans pain. Détail et version légère.",
     "intro": "Une fondue moitié-moitié apporte **environ 1250 à 1500 kcal par personne**, pain compris. Le fromage compte pour plus de la moitié, mais le pain pèse plus qu'on ne le pense.",
     "blocks": [
       { "type": "h2", "text": "Ce qu'il y a dans le caquelon" },
@@ -60,6 +63,8 @@
     "title": "Fondue moitié-moitié: wie viele Kalorien pro Person?",
     "cardTitle": "Fondue moitié-moitié: wie viele Kalorien?",
     "description": "Mit 200 g Käse und Brot liefert ein Fondue moitié-moitié 1250 bis 1500 kcal pro Person. Die Details, das Gewicht des Brotes und eine leichtere Variante.",
+    "seoTitle": "Käsefondue Kalorien mit Brot: 1250–1500 kcal pro Person",
+    "seoDescription": "Fondue moitié-moitié mit 200 g Käse und Brot: 1250 bis 1500 kcal pro Person, ohne Brot rund 850 kcal. Mit Brotmenge, Wein und leichterer Variante.",
     "intro": "Ein Fondue moitié-moitié liefert **etwa 1250 bis 1500 kcal pro Person**, Brot inklusive. Der Käse macht mehr als die Hälfte aus, aber das Brot zählt mehr, als man denkt.",
     "blocks": [
       { "type": "h2", "text": "Was im Caquelon steckt" },

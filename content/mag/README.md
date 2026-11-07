@@ -31,6 +31,12 @@ mise en valeur), `{ "type": "tip", "title"?, "text" }`. Dans les textes, seuls `
 - `related.aliments` : identifiants de `lib/calorio.ts` (fonction `a("id", …)`) ; `related.recettes` : identifiants `rc("id", …)`.
   N'utilise que des identifiants qui existent.
 - `title` ≤ 70 caractères, `description` ≤ 160, `cardTitle` ≤ 48 (titre du visuel).
+- `seoTitle` et `seoDescription` (facultatifs, dans `fr` et `de`) : remplacent le `<title>` et la meta description
+  sans toucher au H1, au `cardTitle` ni au visuel. `seoTitle` ≤ 60 caractères (affiché tel quel, sans « | calorio »),
+  avec la formulation exacte de la recherche et le chiffre de réponse ; `seoDescription` de 140 à 160 caractères, chiffre
+  dans la 1re phrase. Règle : renseigner `seoTitle` dès que la Search Console montre une formulation de requête différente
+  du titre (exemple : « kalorien raclette käse 1 scheibe » pour l'article Raclette-Abend). Ne jamais changer un `slug` publié.
+- `updated` (facultatif, AAAA-MM-JJ) : date de la dernière modification réelle du contenu ou des métadonnées.
 - `kcal` : facultatif ; la valeur principale de l'article (sert au badge et au visuel).
 - `social` : la légende Facebook / Instagram (texte, 2 à 4 courts paragraphes, une ligne dans l'autre langue, 5 à 8 hashtags).
 - **Mentions de marques dans `social`** : quand l'article cite réellement une marque, une interprofession ou un producteur

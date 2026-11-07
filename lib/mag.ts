@@ -18,6 +18,8 @@ export type MagLocale = {
   slug: string;
   title: string; // titre H1 / SEO (≤ 70 caractères)
   description: string; // meta description (≤ 160 caractères)
+  seoTitle?: string; // <title> si la requête Google diffère du H1 (≤ 60 caractères, affiché sans suffixe)
+  seoDescription?: string; // meta description dédiée (140 à 160 caractères, chiffre dans la 1re phrase)
   cardTitle?: string; // titre court pour l'image de partage
   intro: string; // chapô : la réponse directe en 1 à 3 phrases
   blocks: MagBlock[];

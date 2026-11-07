@@ -1,6 +1,7 @@
 {
   "id": "papet-vaudois",
   "date": "2026-11-04",
+  "updated": "2026-11-07",
   "cat": "classiques",
   "emoji": "🥘",
   "kcal": { "value": "850–1000", "label": { "fr": "kcal par assiette", "de": "kcal pro Teller" } },
@@ -19,6 +20,7 @@
   "fr": {
     "slug": "calories-papet-vaudois",
     "title": "Papet vaudois : combien de calories dans une assiette ?",
+    "seoTitle": "Papet vaudois : calories par assiette (environ 930 kcal)",
     "cardTitle": "Un papet vaudois, combien de calories ?",
     "description": "Avec 150 g de saucisse aux choux, une assiette de papet vaudois apporte environ 930 kcal. Le détail, le poids de la saucisse et une version à 630 kcal.",
     "intro": "Une assiette de papet vaudois avec 150 g de saucisse aux choux apporte **environ 930 kcal**, et **850 à 1000 kcal** selon la taille de la tranche de saucisse. Les poireaux et les pommes de terre pèsent peu : c'est la saucisse qui fait l'essentiel.",

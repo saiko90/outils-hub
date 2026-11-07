@@ -1,6 +1,7 @@
 {
   "id": "soupe-courge-legere",
   "date": "2026-10-25",
+  "updated": "2026-11-07",
   "cat": "leger",
   "emoji": "🎃",
   "kcal": { "value": "425", "label": { "fr": "kcal par repas", "de": "kcal pro Mahlzeit" } },
@@ -16,6 +17,7 @@
   "fr": {
     "slug": "soupe-courge-legere-calories",
     "title": "Soupe de courge légère : la recette à moins de 450 kcal",
+    "seoTitle": "Soupe de courge légère : 245 kcal le bol, 425 le repas",
     "cardTitle": "Soupe de courge : un repas à 425 kcal",
     "description": "Un grand bol de soupe de courge maison fait environ 245 kcal. Avec des graines de courge et du pain complet, le repas reste à 425 kcal. Recette et variantes.",
     "intro": "Un grand bol de soupe de courge maison (5 dl) apporte **environ 245 kcal**. Avec une poignée de graines de courge grillées et une tranche de pain complet, tu as **un vrai repas à environ 425 kcal**.",

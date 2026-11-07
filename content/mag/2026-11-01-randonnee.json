@@ -1,6 +1,7 @@
 {
   "id": "randonnee-calories-brulees",
   "date": "2026-11-01",
+  "updated": "2026-11-07",
   "cat": "guides",
   "emoji": "🥾",
   "kcal": {
@@ -43,6 +44,7 @@
   "fr": {
     "slug": "randonnee-calories-brulees",
     "title": "Randonnée : combien de calories brûles-tu vraiment ?",
+    "seoTitle": "Randonnée : calories brûlées par heure (320 à 480 kcal)",
     "cardTitle": "Randonnée : 320 à 480 kcal par heure",
     "description": "Une heure de randonnée à rythme normal brûle 320 à 480 kcal selon ton poids, bien plus en montée. Tableau par poids, exemple d'une journée et pique-nique.",
     "intro": "Une heure de randonnée à rythme normal brûle **environ 320 à 480 kcal** selon ton poids (de 60 à 90 kg). En montée raide, c'est plutôt **530 à 790 kcal par heure** : une belle sortie de 4 heures en montagne peut ainsi dépasser 1700 kcal.",
@@ -218,6 +220,7 @@
   "de": {
     "slug": "wandern-kalorienverbrauch",
     "title": "Wandern: Wie viele Kalorien verbrennst du wirklich?",
+    "seoTitle": "Wandern Kalorienverbrauch: 320 bis 480 kcal pro Stunde",
     "cardTitle": "Wandern: 320 bis 480 kcal pro Stunde",
     "description": "Eine Stunde Wandern im normalen Tempo verbrennt je nach Gewicht rund 320 bis 480 kcal, bergauf deutlich mehr. Tabelle nach Gewicht, Beispieltour und Picknick.",
     "intro": "Eine Stunde Wandern im normalen Tempo verbrennt je nach Gewicht (60 bis 90 kg) **rund 320 bis 480 kcal**. Steil bergauf sind es eher **530 bis 790 kcal pro Stunde**: Eine schöne 4-Stunden-Bergtour kann so über 1700 kcal ausmachen.",

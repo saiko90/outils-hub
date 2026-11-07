@@ -4,7 +4,7 @@ import { METHODE, METHODE_PATH } from "@/lib/magMethode";
 
 export function magIndexMetadata(lang: MagLang): Metadata {
   const fr = `${MAG_ORIGIN}/mag`, de = `${MAG_ORIGIN}/de/magazin`;
-  const title = lang === "fr" ? "Le Mag calorio : calories des plats suisses, recettes et conseils" : "Das calorio Magazin: Kalorien von Schweizer Gerichten, Rezepte und Tipps";
+  const title = lang === "fr" ? "Le Mag calorio : calories des plats suisses et recettes" : "calorio Magazin: Kalorien Schweizer Gerichte und Rezepte";
   const description = lang === "fr"
     ? "Raclette, fondue, rösti : combien de calories ? Recettes légères, plats nourrissants et guides pratiques pour manger équilibré en Suisse."
     : "Raclette, Fondue, Rösti: wie viele Kalorien? Leichte Rezepte, sättigende Gerichte und praktische Ratgeber für eine ausgewogene Ernährung in der Schweiz.";

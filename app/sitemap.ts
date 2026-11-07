@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { headers } from "next/headers";
 import { outilsSitemap } from "@/lib/sitemapOutils";
-import { ALIMENT_SLUGS, RECETTE_SLUGS } from "@/lib/calorio";
+import { ALIMENT_SLUGS, RECETTE_SLUGS, DE_SLUGS, alimentSlug } from "@/lib/calorio";
 import { magPublished, magUrl } from "@/lib/mag";
 import { METHODE_UPDATED } from "@/lib/magMethode";
 
@@ -54,7 +54,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       { url: "https://calorio.ch/calories", lastModified: CALORIO_CONTENT, changeFrequency: "monthly", priority: 0.7 },
       { url: "https://calorio.ch/calories/specialites-suisses", lastModified: CALORIO_CONTENT, changeFrequency: "monthly", priority: 0.85, alternates: chAlt },
       { url: "https://calorio.ch/de/kalorien/schweizer-spezialitaeten", lastModified: CALORIO_CONTENT, changeFrequency: "monthly", priority: 0.85, alternates: chAlt },
-      ...ALIMENT_SLUGS.map((x) => ({ url: `https://calorio.ch/calories/${x.slug}`, lastModified: CALORIO_CONTENT, changeFrequency: "monthly" as const, priority: 0.6 })),
+      ...ALIMENT_SLUGS.map((x) => {
+        const de = DE_SLUGS.find((d) => d.al.id === x.al.id);
+        const alternates = de ? { languages: { "fr-CH": `https://calorio.ch/calories/${x.slug}`, "de-CH": `https://calorio.ch/de/kalorien/${de.slug}` } } : undefined;
+        return { url: `https://calorio.ch/calories/${x.slug}`, lastModified: CALORIO_CONTENT, changeFrequency: "monthly" as const, priority: 0.6, alternates };
+      }),
+      ...DE_SLUGS.map((x) => ({
+        url: `https://calorio.ch/de/kalorien/${x.slug}`, lastModified: CALORIO_CONTENT, changeFrequency: "monthly" as const, priority: 0.65,
+        alternates: { languages: { "fr-CH": `https://calorio.ch/calories/${alimentSlug(x.al)}`, "de-CH": `https://calorio.ch/de/kalorien/${x.slug}` } },
+      })),
       { url: "https://calorio.ch/recettes", lastModified: CALORIO_CONTENT, changeFrequency: "monthly", priority: 0.7 },
       ...RECETTE_SLUGS.map((x) => ({ url: `https://calorio.ch/recettes/${x.slug}`, lastModified: CALORIO_CONTENT, changeFrequency: "monthly" as const, priority: 0.6 })),
       ...magSitemap(),

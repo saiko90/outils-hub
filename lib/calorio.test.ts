@@ -21,6 +21,11 @@ import {
   relatedAliments,
   recettesWithAliment,
   SLICE_IDS,
+  slugifyDe,
+  DE_SLUGS,
+  DE_FICHE_IDS,
+  deBySlug,
+  deSlugById,
 } from "./calorio";
 
 describe("calorio — métabolisme (Mifflin-St Jeor)", () => {
@@ -171,5 +176,26 @@ describe("calorio — maillage des fiches", () => {
   it("recettes contenant un aliment, tranches réservées aux pains et fromages", () => {
     expect(recettesWithAliment("raclette").map((r) => r.id)).toContain("raclette_valais");
     for (const id of SLICE_IDS) expect(aliment(id), id).toBeDefined();
+  });
+});
+
+describe("calorio — fiches allemandes", () => {
+  it("slugifyDe remplace les umlauts", () => {
+    expect(slugifyDe("Zürcher Geschnetzeltes")).toBe("zuercher-geschnetzeltes");
+    expect(slugifyDe("Älplermagronen")).toBe("aelplermagronen");
+    expect(slugifyDe("Läckerli")).toBe("laeckerli");
+  });
+  it("slugs uniques, jamais celui de la page pivot ni de la méthode", () => {
+    const slugs = DE_SLUGS.map((x) => x.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+    expect(slugs).not.toContain("schweizer-spezialitaeten");
+    expect(slugs).not.toContain("methode");
+    expect(slugs.length).toBe(DE_FICHE_IDS.length);
+    expect(slugs.length).toBeLessThanOrEqual(30);
+  });
+  it("pas de fiche DE pour les plats déjà servis par un article allemand", () => {
+    for (const id of ["raclette", "fondue", "papet_vaudois", "rosti", "grittibaenz"]) expect(deSlugById(id), id).toBeUndefined();
+    expect(deBySlug("butterzopf")?.id).toBe("tresse");
+    expect(deSlugById("geschnetzeltes")).toBe("zuercher-geschnetzeltes");
   });
 });

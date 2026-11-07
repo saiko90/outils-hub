@@ -3,7 +3,7 @@ import {
   MAG_CATS, MAG_CAT_ORDER, MAG_ORIGIN, magPublished, magUrl, magDate, readingMinutes, inlineParts, plain,
   type MagArticle, type MagBlock, type MagLang, type MagCat,
 } from "@/lib/mag";
-import { ALIMENTS, RECETTES, alimentSlug, recetteSlug, recetteNutri } from "@/lib/calorio";
+import { ALIMENTS, RECETTES, alimentSlug, recetteSlug, recetteNutri, deSlugById, deName } from "@/lib/calorio";
 import { METHODE, METHODE_PATH, METHODE_UPDATED } from "@/lib/magMethode";
 
 // Vues partagées du Mag calorio (index + article), en français et en allemand.
@@ -43,7 +43,7 @@ const T = {
     faq: "Häufige Fragen",
     sources: "Quellen",
     more: "Weiterlesen",
-    relatedFoods: "Kalorien im Detail (Französisch)",
+    relatedFoods: "Kalorien im Detail",
     relatedRecipes: "Passende Rezepte (Französisch)",
     other: "Version française",
     back: "← Zum Magazin",
@@ -216,9 +216,9 @@ export function MagArticleView({ a, lang }: { a: MagArticle; lang: MagLang }) {
             {foods.length > 0 && (
               <div className="mg-rel">
                 {foods.map((f) => (
-                  <a className="mg-relcard" key={f.id} href={`/calories/${alimentSlug(f)}`}>
+                  <a className="mg-relcard" key={f.id} href={lang === "de" && deSlugById(f.id) ? `/de/kalorien/${deSlugById(f.id)}` : `/calories/${alimentSlug(f)}`}>
                     <span className="mg-relemo" aria-hidden>{f.emoji}</span>
-                    <span className="mg-reln">{f.nom[lang]}</span>
+                    <span className="mg-reln">{lang === "de" ? deName(f) : f.nom.fr}{lang === "de" && !deSlugById(f.id) ? " (FR)" : ""}</span>
                     <span className="mg-relk">{f.kcal} kcal<small>/100 g</small></span>
                   </a>
                 ))}

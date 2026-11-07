@@ -136,7 +136,7 @@ export const COPY: Record<LLang, LandingCopy> = {
     ],
     finalTitle: "Dein erster Tag dauert zwei Minuten.",
     finalText: "Profil einstellen, nächste Mahlzeit erfassen und zusehen, wie sich der Ring füllt.",
-    footer: { madeBy: "Eine App von", madeWhere: ", Wallis", swiss: "Schweizer Spezialitäten", swissHref: "/de/kalorien/schweizer-spezialitaeten", privacy: "Datenschutz", legal: "Impressum und AGB", partners: "Partner werden", recipes: "Rezepte (FR)", foods: "Kalorien von Lebensmitteln (FR)", compare: "Vergleiche", mag: "Magazin" },
+    footer: { madeBy: "Eine App von", madeWhere: ", Wallis", swiss: "Schweizer Spezialitäten", swissHref: "/de/kalorien/schweizer-spezialitaeten", privacy: "Datenschutz", legal: "Impressum und AGB", partners: "Partner werden", recipes: "Rezepte (FR)", foods: "Kalorientabelle Schweizer Spezialitäten", compare: "Vergleiche", mag: "Magazin" },
   },
   en: {
     htmlTitle: "calorio — the Swiss calorie counter, simple and ad-free",

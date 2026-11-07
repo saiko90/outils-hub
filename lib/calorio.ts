@@ -869,3 +869,39 @@ export function relatedAliments(al: Aliment, max = 8): Aliment[] {
     .slice(0, max)
     .map((o) => o.x);
 }
+
+/* --- Fiches allemandes /de/kalorien/<slug> : uniquement les spécialités suisses sans article DE dédié --- */
+/** Slug allemand : ä/ö/ü → ae/oe/ue (comme les slugs du Mag), puis slugify. */
+export function slugifyDe(s: string): string {
+  return slugify(s.replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue").replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue"));
+}
+/** Spécialités déjà servies en allemand par un article du Mag qui se classe : pas de fiche DE (pas de cannibalisation). */
+const DE_EXCLUDED = new Set(["raclette", "fondue", "papet_vaudois", "rosti", "grittibaenz"]);
+export const DE_FICHE_IDS: string[] = CH_IDS.filter((id) => !DE_EXCLUDED.has(id));
+/** Nom allemand affiché (précision quand nom.de est ambigu). */
+const DE_DISPLAY: Record<string, string> = { ovomaltine: "Ovomaltine (Getränk)" };
+export function deName(al: Aliment): string {
+  return DE_DISPLAY[al.id] ?? al.nom.de;
+}
+export const DE_SLUGS: { slug: string; al: Aliment }[] = (() => {
+  const seen = new Set<string>(["schweizer-spezialitaeten", "methode"]);
+  const out: { slug: string; al: Aliment }[] = [];
+  for (const id of DE_FICHE_IDS) {
+    const al = aliment(id);
+    if (!al) continue;
+    let sl = slugifyDe(al.nom.de);
+    if (!sl || seen.has(sl)) sl = `${sl || "lebensmittel"}-${al.id.replace(/_/g, "-")}`;
+    seen.add(sl);
+    out.push({ slug: sl, al });
+  }
+  return out;
+})();
+const DE_BY_SLUG: Record<string, Aliment> = Object.fromEntries(DE_SLUGS.map((x) => [x.slug, x.al]));
+const DE_SLUG_BY_ID: Record<string, string> = Object.fromEntries(DE_SLUGS.map((x) => [x.al.id, x.slug]));
+export function deBySlug(slug: string): Aliment | undefined {
+  return DE_BY_SLUG[slug];
+}
+/** Slug de la fiche allemande, ou undefined si l'aliment n'en a pas. */
+export function deSlugById(id: string): string | undefined {
+  return DE_SLUG_BY_ID[id];
+}

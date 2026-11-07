@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CH_GROUPS, CH_IDS, CH_RECETTES, aliment, alimentSlug, seoName, recette, recetteSlug, recetteNutri, type Aliment } from "@/lib/calorio";
+import { CH_GROUPS, CH_IDS, CH_RECETTES, aliment, alimentSlug, seoName, deName, deSlugById, recette, recetteSlug, recetteNutri, type Aliment } from "@/lib/calorio";
 import { magPublished, magUrl, type MagLang } from "@/lib/mag";
 
 // Pages pivots « Calories des spécialités suisses » (FR) et « Kalorien Schweizer Spezialitäten » (DE).
@@ -24,7 +24,7 @@ const T = {
     title: "Kalorien Schweizer Spezialitäten: Raclette, Fondue, Rösti",
     description: "Wie viele Kalorien haben Schweizer Gerichte? Raclette, Fondue, Älplermagronen, Butterzopf, Capuns, Nusstorte: Werte pro 100 g und pro Portion.",
     h1: "Kalorien Schweizer Spezialitäten",
-    intro: "Raclette, Fondue, Rösti, Zopf oder Läckerli: Hier findest du die Kalorien der Schweizer Spezialitäten, pro 100 g und pro übliche Portion. Ein Klick auf ein Lebensmittel zeigt Eiweiss, Kohlenhydrate und Fett (Detailseiten auf Französisch).",
+    intro: "Raclette, Fondue, Rösti, Zopf oder Läckerli: Hier findest du die Kalorien der Schweizer Spezialitäten, pro 100 g und pro übliche Portion. Ein Klick auf ein Lebensmittel zeigt Eiweiss, Kohlenhydrate und Fett.",
     crumbHome: "calorio", crumbFoods: "",
     head: ["Spezialität", "Pro 100 g", "Pro Portion", "Portion"],
     mag: "Im Magazin", recipes: "Schweizer Rezepte (Französisch)", perPortion: "pro Portion",
@@ -34,7 +34,12 @@ const T = {
 } as const;
 
 const r0 = (n: number) => Math.round(n);
-const nameOf = (al: Aliment, lang: MagLang) => (lang === "de" ? al.nom.de : seoName(al));
+const nameOf = (al: Aliment, lang: MagLang) => (lang === "de" ? deName(al) : seoName(al));
+/** Lien vers la fiche : allemande si elle existe (page DE), sinon la fiche française. */
+const ficheHref = (al: Aliment, lang: MagLang) => {
+  const de = lang === "de" ? deSlugById(al.id) : undefined;
+  return de ? `/de/kalorien/${de}` : `/calories/${alimentSlug(al)}`;
+};
 
 export function specialitesMetadata(lang: MagLang): Metadata {
   const t = T[lang];
@@ -69,7 +74,7 @@ export function SpecialitesView({ lang }: { lang: MagLang }) {
       {
         "@type": "ItemList", name: t.h1, url,
         numberOfItems: groups.reduce((n, g) => n + g.items.length, 0),
-        itemListElement: groups.flatMap((g) => g.items).map((al, i) => ({ "@type": "ListItem", position: i + 1, name: nameOf(al, lang), url: `${ORIGIN}/calories/${alimentSlug(al)}` })),
+        itemListElement: groups.flatMap((g) => g.items).map((al, i) => ({ "@type": "ListItem", position: i + 1, name: nameOf(al, lang), url: ORIGIN + ficheHref(al, lang) })),
       },
       { "@type": "BreadcrumbList", itemListElement: crumbs.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: c.item })) },
     ],
@@ -102,7 +107,7 @@ export function SpecialitesView({ lang }: { lang: MagLang }) {
                 <tbody>
                   {g.items.map((al) => (
                     <tr key={al.id}>
-                      <th scope="row"><a href={`/calories/${alimentSlug(al)}`}><span aria-hidden>{al.emoji} </span>{nameOf(al, lang)}</a></th>
+                      <th scope="row"><a href={ficheHref(al, lang)}><span aria-hidden>{al.emoji} </span>{nameOf(al, lang)}</a></th>
                       <td>{al.kcal} kcal</td>
                       <td>{r0((al.kcal * al.portion) / 100)} kcal</td>
                       <td>{al.portion} g</td>

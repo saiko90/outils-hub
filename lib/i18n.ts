@@ -147,6 +147,19 @@ export const TAGLINE_DE: Record<string, string> = {
   dureo: "Dauer-Umrechner (s ⇄ T/Std/Min)",
   entito: "HTML-Entities (kodieren / dekodieren)",
   teleco: "Schweizer Telefonnummer (E.164)",
+  salaro: "Lohnrechner Schweiz: Brutto in Netto (AHV, ALV, BVG, UVG)",
+  lamalo: "Welche Franchise wählen? Krankenkassen-Rechner (KVG)",
+  rento: "Pensionierung: 2. Säule als Kapital oder Rente?",
+  legato: "Erbrechner Schweiz: Pflichtteile & verfügbare Quote",
+  budgeto: "Budgetrechner Schweiz (Steuern, Versicherungen, Serafe)",
+  resilio: "Kündigungsfrist Mietvertrag berechnen (Schweiz)",
+  alloco: "Familienzulagen nach Kanton (Schweiz)",
+  intero: "Verzugszins 5 % berechnen (Art. 104 OR)",
+  preo: "Kündigungsfrist Arbeitsvertrag berechnen (Schweiz)",
+  ideo: "UID-Nummer prüfen (CHE) – Schweizer Firmennummer",
+  alcoolo: "Promillerechner (Widmark) – Schweizer Grenzwerte",
+  imca: "BMI-Rechner (Body-Mass-Index)",
+  scalc: "Wissenschaftlicher Taschenrechner + Gleichungslöser",
 };
 
 /** Taglines traduites (EN). */
@@ -199,6 +212,19 @@ export const TAGLINE_EN: Record<string, string> = {
   dureo: "Duration converter (s ⇄ d/h/m)",
   entito: "HTML entities (encode / decode)",
   teleco: "Swiss phone number (E.164)",
+  salaro: "Swiss salary calculator: gross to net (AHV, BVG)",
+  lamalo: "Which Swiss health insurance deductible to choose?",
+  rento: "Swiss pension: 2nd pillar as lump sum or annuity?",
+  legato: "Swiss inheritance calculator: reserved shares",
+  budgeto: "Swiss monthly & yearly budget planner",
+  resilio: "Swiss lease termination notice calculator",
+  alloco: "Swiss family allowances by canton",
+  intero: "Swiss late payment interest (5%, Art. 104 CO)",
+  preo: "Swiss employment notice period calculator",
+  ideo: "Check a Swiss UID / company number (CHE)",
+  alcoolo: "Blood alcohol estimate (Widmark) – Swiss limits",
+  imca: "BMI calculator (body mass index)",
+  scalc: "Scientific calculator + equation solver",
 };
 
 export const toolTagline = (lang: Lang, tool: Tool): string => {

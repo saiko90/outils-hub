@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { TOOLS, PRO_SLUGS, REAL_CATEGORIES, CAT_SLUG, bySlug, RELATED_PRO, relatedPro } from "./catalog";
+import { TAGLINE_DE, TAGLINE_EN } from "./i18n";
 
 describe("catalogue outils.ch — intégrité", () => {
   it("contient au moins 40 outils", () => {
@@ -71,5 +72,12 @@ describe("catalogue outils.ch — intégrité", () => {
       }
     }
     expect(relatedPro("facturama").length).toBeGreaterThan(0);
+  });
+
+  it("chaque outil a une tagline traduite en DE et en EN (pas de titre mélangé FR/DE)", () => {
+    for (const t of TOOLS) {
+      expect(TAGLINE_DE[t.slug], `TAGLINE_DE manquante: ${t.slug}`).toBeTruthy();
+      expect(TAGLINE_EN[t.slug], `TAGLINE_EN manquante: ${t.slug}`).toBeTruthy();
+    }
   });
 });

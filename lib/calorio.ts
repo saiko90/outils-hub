@@ -847,3 +847,25 @@ export function recetteSlug(r: Recette): string {
 export function recette(id: string): Recette | undefined {
   return RECETTES.find((r) => r.id === id);
 }
+
+/** Recettes de la base qui contiennent cet aliment. */
+export function recettesWithAliment(id: string): Recette[] {
+  return RECETTES.filter((r) => r.items.some((x) => x.id === id));
+}
+
+/** Pains et fromages qu'on mange en tranches : la fiche affiche la ligne « 1 tranche (25 g) ». */
+export const SLICE_IDS = new Set([
+  "pain_blanc", "pain_complet", "pain_seigle", "pain_mie", "baguette", "brioche", "tresse", "cuchaule", "grittibaenz",
+  "gruyere", "emmental", "vacherin_fribourgeois", "raclette", "cheddar", "chevre", "brie", "camembert", "gorgonzola", "halloumi",
+]);
+export const SLICE_G = 25;
+
+/** Aliments voisins pour une fiche : même catégorie, triés par écart de kcal (spécialités suisses d'abord pour une spécialité). */
+export function relatedAliments(al: Aliment, max = 8): Aliment[] {
+  const ch = isChSpecialite(al.id);
+  return ALIMENTS.filter((x) => x.cat === al.cat && x.id !== al.id)
+    .map((x) => ({ x, k: (ch && isChSpecialite(x.id) ? 0 : 1) * 1e6 + Math.abs(x.kcal - al.kcal) }))
+    .sort((a, b) => a.k - b.k || a.x.id.localeCompare(b.x.id))
+    .slice(0, max)
+    .map((o) => o.x);
+}

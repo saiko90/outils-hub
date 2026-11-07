@@ -18,6 +18,9 @@ import {
   CH_RECETTES,
   ALIMENT_SLUGS,
   recette,
+  relatedAliments,
+  recettesWithAliment,
+  SLICE_IDS,
 } from "./calorio";
 
 describe("calorio — métabolisme (Mifflin-St Jeor)", () => {
@@ -152,5 +155,21 @@ describe("calorio — spécialités suisses", () => {
   });
   it("aucune fiche n'occupe l'URL de la page pivot", () => {
     expect(ALIMENT_SLUGS.map((x) => x.slug)).not.toContain("specialites-suisses");
+  });
+});
+
+describe("calorio — maillage des fiches", () => {
+  it("voisins : même catégorie, sans l'aliment lui-même, 8 au plus, triés par écart de kcal", () => {
+    const g = aliment("gruyere")!;
+    const rel = relatedAliments(g);
+    expect(rel.length).toBeLessThanOrEqual(8);
+    expect(rel.map((x) => x.id)).not.toContain("gruyere");
+    for (const x of rel) expect(x.cat).toBe(g.cat);
+    // spécialité suisse : les autres spécialités de la catégorie passent devant
+    expect(rel.slice(0, 2).map((x) => x.id).sort()).toEqual(["emmental", "vacherin_fribourgeois"]);
+  });
+  it("recettes contenant un aliment, tranches réservées aux pains et fromages", () => {
+    expect(recettesWithAliment("raclette").map((r) => r.id)).toContain("raclette_valais");
+    for (const id of SLICE_IDS) expect(aliment(id), id).toBeDefined();
   });
 });

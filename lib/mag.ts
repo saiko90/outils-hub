@@ -87,6 +87,10 @@ export function isPublished(a: MagArticle, now = new Date()): boolean {
 export function magPublished(now = new Date()): MagArticle[] {
   return MAG_ALL.filter((a) => isPublished(a, now));
 }
+/** Articles publiés qui citent cet aliment (related.aliments), du plus récent au plus ancien, 3 au plus. */
+export function magArticlesForAliment(id: string, now = new Date()): MagArticle[] {
+  return magPublished(now).filter((a) => (a.related?.aliments || []).includes(id)).slice(0, 3);
+}
 export function magBySlug(lang: MagLang, slug: string): MagArticle | undefined {
   return MAG_ALL.find((a) => a[lang].slug === slug);
 }

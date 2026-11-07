@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { COPY, type LLang } from "./content";
 import { calorioFontVars } from "../calorioFonts";
+import { magPublished, magUrl } from "@/lib/mag";
 
 const BASE = "https://calorio.ch";
 const PATH: Record<LLang, string> = { fr: "/", de: "/de", en: "/en" };
@@ -228,6 +229,20 @@ export default function Landing({ lang }: { lang: LLang }) {
           </div>
         </section>
 
+        <section className="lp-sec lp-magsec">
+          <h2 className="lp-h2">{lang === "de" ? "Neu im Magazin" : lang === "en" ? "From the calorio magazine" : "Nouveau dans le Mag"}</h2>
+          {lang === "en" ? (
+            <p className="lp-sub"><a href="/mag">Swiss dishes, calories and recipes, in French and German →</a></p>
+          ) : (
+            <ul className="lp-maglist">
+              {magPublished().slice(0, 3).map((a) => (
+                <li key={a.id}><a href={magUrl(a, lang)}><span aria-hidden>{a.emoji || "📰"}</span> {a[lang].title}</a></li>
+              ))}
+              <li className="lp-magall"><a href={lang === "de" ? "/de/magazin" : "/mag"}>{lang === "de" ? "Alle Artikel →" : "Tous les articles →"}</a></li>
+            </ul>
+          )}
+        </section>
+
         <section className="lp-sec" id="faq">
           <h2 className="lp-h2">{c.faqTitle}</h2>
           <div className="lp-faq">
@@ -310,6 +325,10 @@ body{background:var(--lp-bg) !important;color:var(--lp-ink)}
 .lp-h2{font-size:clamp(1.7rem,3.4vw,2.5rem);letter-spacing:-.8px;line-height:1.1;font-weight:700;max-width:22ch}
 .lp-sub{color:var(--lp-muted);font-size:1.05rem;line-height:1.6;max-width:60ch;margin:12px 0 0}
 .lp-bmi{margin-top:24px;font-size:.98rem}
+.lp-maglist{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:10px;max-width:820px}
+.lp-maglist a{display:block;background:var(--lp-card);border:1px solid var(--lp-line);border-radius:16px;padding:14px 18px;font-weight:800;color:inherit;text-decoration:none}
+.lp-maglist .lp-magall a{background:none;border:0;padding:4px 2px;color:var(--lp-green-ink)}
+.lp-magsec .lp-sub a{font-weight:800;color:var(--lp-green-ink)}
 .lp-bmi a{font-weight:800;color:inherit;text-decoration:underline;text-underline-offset:3px}
 .lp-feats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:30px}
 .lp-feat{background:var(--lp-card);border:1px solid var(--lp-line);border-radius:20px;padding:20px}

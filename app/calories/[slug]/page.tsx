@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import { ALIMENTS, ALIMENT_SLUGS, alimentBySlug, alimentSlug, seoName, inText, deNom, ficheTitle, isChSpecialite, type Aliment, type AlimentCat } from "@/lib/calorio";
+import { ALIMENT_SLUGS, alimentBySlug, alimentSlug, seoName, inText, deNom, ficheTitle, isChSpecialite, relatedAliments, recettesWithAliment, recetteSlug, recetteNutri, SLICE_IDS, SLICE_G, type Aliment, type AlimentCat } from "@/lib/calorio";
+import { magArticlesForAliment, magUrl } from "@/lib/mag";
 
 export const dynamicParams = false;
+export const revalidate = 3600; // le bloc « Dans le Mag calorio » suit les articles publiés
 export function generateStaticParams() {
   return ALIMENT_SLUGS.map((x) => ({ slug: x.slug }));
 }
@@ -35,7 +37,10 @@ export default function Page({ params }: { params: { slug: string } }) {
   const al = alimentBySlug(params.slug);
   if (!al) notFound();
   const kcalP = r0((al.kcal * al.portion) / 100);
-  const related = ALIMENTS.filter((x) => x.cat === al.cat && x.id !== al.id).slice(0, 8);
+  const related = relatedAliments(al);
+  const articles = magArticlesForAliment(al.id);
+  const recettes = recettesWithAliment(al.id).slice(0, 4);
+  const slice = SLICE_IDS.has(al.id) ? r0((al.kcal * SLICE_G) / 100) : null;
   const macros: { label: string; per100: number; perPortion: number }[] = [
     { label: "Protéines", per100: al.prot, perPortion: (al.prot * al.portion) / 100 },
     { label: "Glucides", per100: al.gluc, perPortion: (al.gluc * al.portion) / 100 },
@@ -93,6 +98,9 @@ export default function Page({ params }: { params: { slug: string } }) {
             </tbody>
           </table>
         </div>
+        {slice !== null && (
+          <p className="ca-slice"><b>1 tranche ({SLICE_G} g) : environ {slice} kcal</b> <span>(tranche moyenne de {SLICE_G} g)</span></p>
+        )}
         <p className="ca-note">Valeurs indicatives par 100 g (moyennes). Les valeurs réelles varient selon la marque et la préparation. <a href="/mag/methode">Méthode et sources</a></p>
 
         <div className="ca-final">
@@ -113,6 +121,24 @@ export default function Page({ params }: { params: { slug: string } }) {
                 </a>
               ))}
             </div>
+          </>
+        )}
+
+        {articles.length > 0 && (
+          <>
+            <h2 className="ca-h2">Dans le Mag calorio</h2>
+            <ul className="ca-links">
+              {articles.map((a) => <li key={a.id}><a href={magUrl(a, "fr")}>{a.emoji ? `${a.emoji} ` : ""}{a.fr.title}</a></li>)}
+            </ul>
+          </>
+        )}
+
+        {recettes.length > 0 && (
+          <>
+            <h2 className="ca-h2">Recettes avec cet aliment</h2>
+            <ul className="ca-links">
+              {recettes.map((r) => <li key={r.id}><a href={`/recettes/${recetteSlug(r)}`}>{r.emoji} {r.nom.fr}</a> · {recetteNutri(r).parPortion.kcal} kcal par portion</li>)}
+            </ul>
           </>
         )}
 
@@ -157,6 +183,10 @@ body{background:#f3f7f2 !important}
 .ca-table tbody td{font-weight:700;color:#166a3a;font-variant-numeric:tabular-nums}
 .ca-table tbody tr:last-child th,.ca-table tbody tr:last-child td{border-bottom:0}
 .ca-note{font-size:.78rem;color:#9aa2b4;margin:10px 2px 0;line-height:1.5}
+.ca-slice{margin:12px 2px 0;font-size:.95rem;color:#166a3a}
+.ca-slice span{color:#6b7280;font-size:.85rem}
+.ca-links{margin:0;padding-left:20px;line-height:1.9}
+.ca-links a{color:#166a3a;font-weight:700}
 .ca-final{margin:26px 0 0;text-align:center;background:linear-gradient(135deg,#eafaf0,#fdecf1);border:1px solid #cdebd7;border-radius:20px;padding:26px 22px}
 .ca-final-t{font-size:1.2rem;font-weight:800;color:#1a2030}
 .ca-final p{margin:7px 0 15px;color:#4b5563;line-height:1.5}

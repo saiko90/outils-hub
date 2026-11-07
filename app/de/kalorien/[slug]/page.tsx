@@ -29,7 +29,9 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   const n = deName(al);
   const kcalP = r0((al.kcal * al.portion) / 100);
   const title = `${n} Kalorien: ${al.kcal} kcal pro 100 g`;
-  const description = `${n} hat rund ${al.kcal} kcal pro 100 g, also ${kcalP} kcal pro Portion (${al.portion} g). Eiweiss ${r1(al.prot)} g, Kohlenhydrate ${r1(al.gluc)} g, Fett ${r1(al.lip)} g. Gratis tracken mit calorio.`;
+  const descBase = `${n} hat rund ${al.kcal} kcal pro 100 g, also ${kcalP} kcal pro Portion (${al.portion} g). Eiweiss ${r1(al.prot)} g, Kohlenhydrate ${r1(al.gluc)} g, Fett ${r1(al.lip)} g.`;
+  const descTail = " Gratis tracken mit calorio.";
+  const description = descBase.length + descTail.length <= 160 ? descBase + descTail : descBase;
   return {
     metadataBase: new URL(ORIGIN),
     title,
@@ -112,7 +114,7 @@ export default function Page({ params }: { params: { slug: string } }) {
 
         <div className="ca-final">
           <div className="ca-final-t">{n} im Ernährungstagebuch erfassen</div>
-          <p>Mit zwei Tipps erfasst: calorio rechnet Kalorien und Makros deines Tages aus. Gratis und ohne Werbung.</p>
+          <p>In wenigen Sekunden erfasst: calorio rechnet Kalorien und Makros deines Tages aus. Gratis und ohne Werbung.</p>
           <a className="ca-cta" href="https://calorio.ch/calorio?lang=de">calorio öffnen <span aria-hidden>→</span></a>
         </div>
 

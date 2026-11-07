@@ -28,7 +28,10 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   const canon = `https://calorio.ch/calories/${params.slug}`;
   const kcalP = r0((al.kcal * al.portion) / 100);
   const title = ficheTitle(al);
-  const description = `${seoName(al)} apporte environ ${al.kcal} kcal pour 100 g, soit ${kcalP} kcal par portion de ${al.portion} g. Protéines ${r1(al.prot)} g, glucides ${r1(al.gluc)} g, lipides ${r1(al.lip)} g. Suivi gratuit avec calorio.`;
+  // ≤ 160 caractères : la mention finale saute pour les noms longs (« Viande pour fondue chinoise »…).
+  const descBase = `${seoName(al)} apporte environ ${al.kcal} kcal pour 100 g, soit ${kcalP} kcal par portion de ${al.portion} g. Protéines ${r1(al.prot)} g, glucides ${r1(al.gluc)} g, lipides ${r1(al.lip)} g.`;
+  const descTail = " Suivi gratuit avec calorio.";
+  const description = descBase.length + descTail.length <= 160 ? descBase + descTail : descBase;
   return {
     title,
     description,

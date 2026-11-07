@@ -138,7 +138,7 @@ function Card({ t, q, i, lang, fav, onFav, onOpen }: { t: Tool; q: string; i: nu
         </div>
       </div>
       <div className="tag"><Highlight text={toolTagline(lang, t)} q={q} /></div>
-      <a ref={btn} className="go" href={t.url} target="_blank" rel="noopener noreferrer" onClick={() => { trackOpen(t, "card"); onOpen?.(t.slug); }} style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }}>
+      <a ref={btn} className="go" href={`${langPrefix(lang)}/o/${t.slug}`} onClick={() => { trackOpen(t, "card"); onOpen?.(t.slug); }} style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }}>
         <span className="sheen" />{tr(lang, "use")} <span aria-hidden>→</span>
       </a>
     </motion.div>
@@ -153,7 +153,7 @@ function Palette({ open, onClose, lang }: { open: boolean; onClose: () => void; 
   const res = useMemo(() => filterTools(norm(q.trim()), "Tous").slice(0, 8), [q]);
   useEffect(() => { if (open) { setQ(""); setSel(0); setTimeout(() => inp.current?.focus(), 30); } }, [open]);
   useEffect(() => { setSel(0); }, [q]);
-  const open2 = useCallback((t: Tool) => { trackOpen(t, "palette"); window.open(t.url, "_blank", "noopener"); onClose(); }, [onClose]);
+  const open2 = useCallback((t: Tool) => { trackOpen(t, "palette"); window.location.href = `${langPrefix(lang)}/o/${t.slug}`; onClose(); }, [onClose, lang]);
   function onKey(e: React.KeyboardEvent) {
     if (e.key === "ArrowDown") { e.preventDefault(); setSel((s) => Math.min(s + 1, res.length - 1)); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setSel((s) => Math.max(s - 1, 0)); }
@@ -173,7 +173,7 @@ function Palette({ open, onClose, lang }: { open: boolean; onClose: () => void; 
         <div className="plist">
           {res.length === 0 ? <div className="pempty">{tr(lang, "pEmpty")} « {q} »</div> :
             res.map((t, idx) => (
-              <a key={t.slug} className={"pitem" + (idx === sel ? " sel" : "")} href={t.url} target="_blank" rel="noopener noreferrer"
+              <a key={t.slug} className={"pitem" + (idx === sel ? " sel" : "")} href={`${langPrefix(lang)}/o/${t.slug}`}
                 onMouseEnter={() => setSel(idx)} onClick={() => { trackOpen(t, "palette"); onClose(); }}>
                 <span className="plogo" style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }}>{t.name.slice(0, 2).toUpperCase()}</span>
                 <span className="pmeta"><b>{t.name}</b><small>{toolTagline(lang, t)}</small></span>

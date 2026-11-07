@@ -28,7 +28,7 @@ const jsonLd = {
         position: i + 1,
         name: t.name,
         description: t.tagline,
-        url: t.url,
+        url: `https://outils.ch/o/${t.slug}`,
       })),
     },
   ],

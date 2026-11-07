@@ -9,6 +9,10 @@ import { pathLang, CONTENT_LANGUAGE } from "./lib/pathLang";
 export function middleware(req: NextRequest) {
   const host = (req.headers.get("host") || "").split(":")[0];
   const { pathname } = req.nextUrl;
+  // Anciens sous-domaines d'outils désormais intégrés à outils.ch (sans effet tant que ces domaines ne sont
+  // pas rattachés à ce projet Vercel).
+  const sub = host.match(/^(avso|prorato|pourcento|ibano)\.outils\.ch$/);
+  if (sub) return NextResponse.redirect(`https://outils.ch/o/${sub[1]}${req.nextUrl.search}`, 308);
   const onCalorio = host === "calorio.ch" || host === "www.calorio.ch";
   // En-tête Content-Language (de-CH / en / fr-CH) calculé sur le chemin d'origine, sur les réponses servies
   // (next ou rewrite), jamais sur les redirections. Bing s'en sert ; <html lang> reste statique.

@@ -24,7 +24,7 @@ const jsonLd = {
       "@type": "ItemList",
       name: "outils.ch — Verzeichnis von Online-Tools",
       numberOfItems: TOOLS.length,
-      itemListElement: TOOLS.map((t2, i) => ({ "@type": "ListItem", position: i + 1, name: t2.name, description: toolTagline("de", t2), url: t2.url })),
+      itemListElement: TOOLS.map((t2, i) => ({ "@type": "ListItem", position: i + 1, name: t2.name, description: toolTagline("de", t2), url: `https://outils.ch/de/o/${t2.slug}` })),
     },
   ],
 };

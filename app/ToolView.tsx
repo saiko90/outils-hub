@@ -20,6 +20,10 @@ import ScalcCalc from "./ScalcCalc";
 import AgendoCalc from "./AgendoCalc";
 import SchemoCalc from "./SchemoCalc";
 import SitemapoCalc from "./SitemapoCalc";
+import AvsoCalc from "./AvsoCalc";
+import PourcentoCalc from "./PourcentoCalc";
+import ProratoCalc from "./ProratoCalc";
+import IbanoCalc from "./IbanoCalc";
 import {
   type Lang, langPrefix, catLabel, toolTagline, longDescriptionL, faqFor, faqGeneric, proContent,
   tpProBadge, tpOpenVerb, faqTitle, tpTrust, t,
@@ -48,6 +52,12 @@ const FURTHER: Record<string, { href: string; label: string }> = {
 // dans les métadonnées invisibles (title/description/keywords + JSON-LD ci-dessous).
 // Pour nettoyer un outil, ajoute son slug ici. (Nettoyage des autres outils : à étendre.)
 const DECLUTTER = new Set<string>(["calorio"]);
+
+// Outils dont le calculateur est intégré à la page (le bouton descend vers lui au lieu d'ouvrir un autre site).
+const INLINE = new Set<string>([
+  "rento", "legato", "budgeto", "lamalo", "salaro", "resilio", "alloco", "intero", "preo", "ideo", "alcoolo", "imca",
+  "calorio", "scalc", "agendo", "schemo", "sitemapo", "avso", "pourcento", "prorato", "ibano",
+]);
 
 export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
   const tool = bySlug(slug);
@@ -123,7 +133,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
           </div>
         </header>
 
-        {(tool.slug === "rento" || tool.slug === "legato" || tool.slug === "budgeto" || tool.slug === "lamalo" || tool.slug === "salaro" || tool.slug === "resilio" || tool.slug === "alloco" || tool.slug === "intero" || tool.slug === "preo" || tool.slug === "ideo" || tool.slug === "alcoolo" || tool.slug === "imca" || tool.slug === "calorio" || tool.slug === "scalc" || tool.slug === "agendo" || tool.slug === "schemo" || tool.slug === "sitemapo") ? (
+        {INLINE.has(tool.slug) ? (
           <a className="tp-cta" href={`#${tool.slug}`} style={{ background: `linear-gradient(135deg, ${tool.from}, ${tool.to})` }}>
             {tpOpenVerb[lang]} {tool.name} <span aria-hidden>↓</span>
           </a>
@@ -155,6 +165,10 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
         {tool.slug === "agendo" && <AgendoCalc lang={lang} />}
         {tool.slug === "schemo" && <SchemoCalc lang={lang} />}
         {tool.slug === "sitemapo" && <SitemapoCalc lang={lang} />}
+        {tool.slug === "avso" && <AvsoCalc lang={lang} />}
+        {tool.slug === "pourcento" && <PourcentoCalc lang={lang} />}
+        {tool.slug === "prorato" && <ProratoCalc lang={lang} />}
+        {tool.slug === "ibano" && <IbanoCalc lang={lang} />}
         {(tool.slug === "capimmo" || tool.slug === "ibano") && <FinanceLead slug={tool.slug} lang={lang} />}
 
         {content ? (

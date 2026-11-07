@@ -185,6 +185,7 @@ export default function Landing({ lang }: { lang: LLang }) {
               </article>
             ))}
           </div>
+          <p className="lp-sub lp-bmi">{c.bmi.text} <a href={c.bmi.href}>{c.bmi.link}</a></p>
         </section>
 
         <section className="lp-sec lp-shots-sec" aria-label={c.howTitle}>
@@ -307,6 +308,8 @@ body{background:var(--lp-bg) !important;color:var(--lp-ink)}
 .lp-sec{padding-block:48px}
 .lp-h2{font-size:clamp(1.7rem,3.4vw,2.5rem);letter-spacing:-.8px;line-height:1.1;font-weight:700;max-width:22ch}
 .lp-sub{color:var(--lp-muted);font-size:1.05rem;line-height:1.6;max-width:60ch;margin:12px 0 0}
+.lp-bmi{margin-top:24px;font-size:.98rem}
+.lp-bmi a{font-weight:800;color:inherit;text-decoration:underline;text-underline-offset:3px}
 .lp-feats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:30px}
 .lp-feat{background:var(--lp-card);border:1px solid var(--lp-line);border-radius:20px;padding:20px}
 .lp-feat-ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--lp-bg2);color:var(--lp-green-ink);margin-bottom:14px}

@@ -151,3 +151,26 @@ export function longDescription(t: Tool): string {
   const ch = t.ch ? " Pensé pour la Suisse" : "";
   return `${t.name} est un outil ${t.cat.toLowerCase()} en ligne, gratuit et sans inscription : ${t.tagline.toLowerCase()}.${ch}. Tout se calcule directement dans ton navigateur — aucune donnée n'est envoyée sur un serveur, tes informations restent privées. Rapide, sans publicité, utilisable sur mobile comme sur ordinateur.`;
 }
+
+/**
+ * Grappes thématiques pour le maillage interne des pages outil (« Outils liés ») : on relie ce qui sert
+ * dans la même situation, et non les 4 premiers outils de la catégorie. calorio est exclu (redirigé vers calorio.ch).
+ */
+export const CLUSTERS: Record<string, string[]> = {
+  travail: ["salaro", "preo", "alloco", "avso", "ideo", "teleco"],
+  logement: ["prorato", "resilio", "capimmo", "amortiz", "intero"],
+  argent: ["facturama", "tvaflash", "ibano", "lettro", "intero", "pourcento"],
+  famille: ["rento", "legato", "budgeto", "lamalo", "alloco"],
+  sante: ["imca", "alcoolo"],
+};
+
+/** Outils liés : ceux des grappes de l'outil (5 au plus), complétés par sa catégorie jusqu'à 4. Jamais lui-même. */
+export function relatedFor(slug: string): Tool[] {
+  const out: string[] = [];
+  const add = (s: string) => { if (s !== slug && s !== "calorio" && !out.includes(s) && bySlug(s)) out.push(s); };
+  for (const members of Object.values(CLUSTERS)) if (members.includes(slug)) members.forEach(add);
+  out.splice(5);
+  const self = bySlug(slug);
+  if (self) for (const t of TOOLS) { if (out.length >= 4) break; if (t.cat === self.cat) add(t.slug); }
+  return out.map((s) => bySlug(s)!);
+}

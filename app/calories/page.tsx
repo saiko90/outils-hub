@@ -39,7 +39,7 @@ export default function Page() {
           const items = ALIMENTS.filter((a) => a.cat === cat);
           if (items.length === 0) return null;
           return (
-            <section key={cat}>
+            <section key={cat} id={cat}>
               <h2 className="ci-h2">{CAT_FR[cat]}</h2>
               <div className="ci-grid">
                 {items.map((a) => (

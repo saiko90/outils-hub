@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { TOOLS, bySlug, CAT_EMOJI, CAT_SLUG, isPro, relatedPro, bridgePro } from "@/lib/catalog";
+import { bySlug, CAT_EMOJI, CAT_SLUG, isPro, relatedPro, bridgePro, relatedFor } from "@/lib/catalog";
 import FacturamaPro from "./FacturamaPro";
 import FinanceLead from "./FinanceLead";
 import RentoCalc from "./RentoCalc";
@@ -26,6 +26,15 @@ import {
 } from "@/lib/i18n";
 import { toolH1 } from "@/lib/seo";
 
+// Liens contextuels vers les sites frères (URL absolues, hôte canonique uniquement). FR seulement.
+const FURTHER: Record<string, { href: string; label: string }> = {
+  intero: { href: "https://marmi.ch/guides/frais-de-rappel", label: "Frais de rappel : ce qu'un créancier peut facturer" },
+  lamalo: { href: "https://marmi.ch/guides/changer-de-caisse-maladie", label: "Changer de caisse maladie : délais et lettre" },
+  resilio: { href: "https://marmi.ch/guides/loyer-en-retard", label: "Loyer en retard : délais et conséquences" },
+  imca: { href: "https://calorio.ch/", label: "Combien de calories par jour ? Compteur calorio" },
+  alcoolo: { href: "https://calorio.ch/calories#boissons", label: "Calories des cocktails et de la bière" },
+};
+
 // Outils « épurés » : on masque le fluff de bas de page dont le client n'a pas besoin
 // (nuage de mots-clés, description générique, FAQ générique) tout en gardant le SEO
 // dans les métadonnées invisibles (title/description/keywords + JSON-LD ci-dessous).
@@ -38,7 +47,8 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
   const declutter = DECLUTTER.has(slug);
   const p = langPrefix(lang);
   const home = p || "/";
-  const related = TOOLS.filter((x) => x.cat === tool.cat && x.slug !== tool.slug).slice(0, 4);
+  const related = relatedFor(tool.slug);
+  const further = lang === "fr" ? FURTHER[tool.slug] : undefined;
   const initials = tool.name.slice(0, 2).toUpperCase();
   const pro = isPro(tool.slug);
   const proText = pro ? proContent(lang, tool) : "";
@@ -146,10 +156,17 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
               {swissLinked.map((r) => (
                 <Link key={r.slug} href={`${p}/o/${r.slug}`} className="tp-relcard">
                   <span className="tp-rellogo" style={{ background: `linear-gradient(135deg, ${r.from}, ${r.to})` }}>{r.name.slice(0, 2).toUpperCase()}</span>
-                  <span><b>{r.name}</b><small>{toolTagline(lang, r)}</small></span>
+                  <span><b>{toolH1(lang, r)}</b><small>{r.name}</small></span>
                 </Link>
               ))}
             </div>
+          </section>
+        )}
+
+        {further && (
+          <section className="tp-swiss">
+            <h2>{t(lang, "goDeeper")}</h2>
+            <p className="tp-long"><a href={further.href}>{further.label}</a></p>
           </section>
         )}
 
@@ -159,7 +176,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
             <div className="tp-relgrid">
               <Link href={`${p}/o/${bridge.slug}`} className="tp-relcard">
                 <span className="tp-rellogo" style={{ background: `linear-gradient(135deg, ${bridge.from}, ${bridge.to})` }}>{bridge.name.slice(0, 2).toUpperCase()}</span>
-                <span><b>{bridge.name}</b><small>{toolTagline(lang, bridge)}</small></span>
+                <span><b>{toolH1(lang, bridge)}</b><small>{bridge.name}</small></span>
               </Link>
             </div>
           </section>
@@ -179,12 +196,12 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
 
         {related.length > 0 && (
           <section className="tp-rel">
-            <h2>{t(lang, "sameCat")}</h2>
+            <h2>{t(lang, "relatedTools")}</h2>
             <div className="tp-relgrid">
               {related.map((r) => (
                 <Link key={r.slug} href={`${p}/o/${r.slug}`} className="tp-relcard">
                   <span className="tp-rellogo" style={{ background: `linear-gradient(135deg, ${r.from}, ${r.to})` }}>{r.name.slice(0, 2).toUpperCase()}</span>
-                  <span><b>{r.name}</b><small>{toolTagline(lang, r)}</small></span>
+                  <span><b>{toolH1(lang, r)}</b><small>{r.name}</small></span>
                 </Link>
               ))}
             </div>

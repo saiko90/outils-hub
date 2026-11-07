@@ -31,7 +31,7 @@ export const UI: Record<Lang, Record<string, string>> = {
     catsTitle: "Parcourir par catégorie",
     backAll: "← Tous les outils", sameCat: "Dans la même catégorie",
     otherCats: "Explorer les autres catégories", freeTools: "outils gratuits", madeCH: "🇨🇭 fait en Suisse", footTagline: "Micro-outils gratuits, 100 % navigateur.", footBy: "Réalisé par", footCats: "Catégories", footLangs: "Langues",
-    toGrid: "Tous les outils", favTitle: "Favoris", recentTitle: "Récemment ouverts", pin: "Ajouter aux favoris", unpin: "Retirer des favoris", suggestTitle: "Suggestions", footAbout: "À propos", footPrivacy: "Confidentialité", footLegal: "Mentions légales", footTerms: "Conditions", swissLinked: "Outils suisses complémentaires", goFurther: "Pour aller plus loin — outil métier suisse", catProTitle: "Outils métier pros", catProSub: "Conçus pour les indépendants et PME, selon les règles suisses.",
+    toGrid: "Tous les outils", favTitle: "Favoris", recentTitle: "Récemment ouverts", pin: "Ajouter aux favoris", unpin: "Retirer des favoris", suggestTitle: "Suggestions", footAbout: "À propos", footPrivacy: "Confidentialité", footLegal: "Mentions légales", footTerms: "Conditions", swissLinked: "Outils suisses complémentaires", relatedTools: "Outils liés", goDeeper: "Pour aller plus loin", goFurther: "Pour aller plus loin — outil métier suisse", catProTitle: "Outils métier pros", catProSub: "Conçus pour les indépendants et PME, selon les règles suisses.",
   },
   de: {
     eyebrow: "Schweizer Toolbox — 100 % gratis, 100 % im Browser",
@@ -53,7 +53,7 @@ export const UI: Record<Lang, Record<string, string>> = {
     catsTitle: "Nach Kategorie durchsuchen",
     backAll: "← Alle Tools", sameCat: "In derselben Kategorie",
     otherCats: "Weitere Kategorien entdecken", freeTools: "gratis Tools", madeCH: "🇨🇭 made in Switzerland", footTagline: "Gratis Mikro-Tools, 100 % im Browser.", footBy: "Umgesetzt von", footCats: "Kategorien", footLangs: "Sprachen",
-    toGrid: "Alle Tools", favTitle: "Favoriten", recentTitle: "Zuletzt geöffnet", pin: "Zu Favoriten hinzufügen", unpin: "Aus Favoriten entfernen", suggestTitle: "Vorschläge", footAbout: "Über uns", footPrivacy: "Datenschutz", footLegal: "Impressum", footTerms: "AGB", swissLinked: "Ergänzende Schweizer Tools", goFurther: "Einen Schritt weiter — Schweizer Business-Tool", catProTitle: "Business-Tools für Profis", catProSub: "Für Selbstständige und KMU, nach Schweizer Regeln.",
+    toGrid: "Alle Tools", favTitle: "Favoriten", recentTitle: "Zuletzt geöffnet", pin: "Zu Favoriten hinzufügen", unpin: "Aus Favoriten entfernen", suggestTitle: "Vorschläge", footAbout: "Über uns", footPrivacy: "Datenschutz", footLegal: "Impressum", footTerms: "AGB", swissLinked: "Ergänzende Schweizer Tools", relatedTools: "Verwandte Tools", goDeeper: "Weiterlesen", goFurther: "Einen Schritt weiter — Schweizer Business-Tool", catProTitle: "Business-Tools für Profis", catProSub: "Für Selbstständige und KMU, nach Schweizer Regeln.",
   },
   en: {
     eyebrow: "Swiss toolbox — 100% free, 100% in your browser",
@@ -75,7 +75,7 @@ export const UI: Record<Lang, Record<string, string>> = {
     catsTitle: "Browse by category",
     backAll: "← All tools", sameCat: "In the same category",
     otherCats: "Explore other categories", freeTools: "free tools", madeCH: "🇨🇭 made in Switzerland", footTagline: "Free micro-tools, 100% in your browser.", footBy: "Built by", footCats: "Categories", footLangs: "Languages",
-    toGrid: "All tools", favTitle: "Favourites", recentTitle: "Recently opened", pin: "Add to favourites", unpin: "Remove from favourites", suggestTitle: "Suggestions", footAbout: "About", footPrivacy: "Privacy", footLegal: "Legal notice", footTerms: "Terms", swissLinked: "Related Swiss tools", goFurther: "Go further — Swiss business tool", catProTitle: "Pro business tools", catProSub: "Built for freelancers and SMEs, following Swiss rules.",
+    toGrid: "All tools", favTitle: "Favourites", recentTitle: "Recently opened", pin: "Add to favourites", unpin: "Remove from favourites", suggestTitle: "Suggestions", footAbout: "About", footPrivacy: "Privacy", footLegal: "Legal notice", footTerms: "Terms", swissLinked: "Related Swiss tools", relatedTools: "Related tools", goDeeper: "Further reading", goFurther: "Go further — Swiss business tool", catProTitle: "Pro business tools", catProSub: "Built for freelancers and SMEs, following Swiss rules.",
   },
 };
 

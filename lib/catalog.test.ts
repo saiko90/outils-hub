@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { TOOLS, PRO_SLUGS, REAL_CATEGORIES, CAT_SLUG, bySlug, RELATED_PRO, relatedPro } from "./catalog";
+import { TOOLS, PRO_SLUGS, REAL_CATEGORIES, CAT_SLUG, bySlug, RELATED_PRO, relatedPro, CLUSTERS, relatedFor } from "./catalog";
 import { TAGLINE_DE, TAGLINE_EN } from "./i18n";
 
 describe("catalogue outils.ch — intégrité", () => {
@@ -79,5 +79,19 @@ describe("catalogue outils.ch — intégrité", () => {
       expect(TAGLINE_DE[t.slug], `TAGLINE_DE manquante: ${t.slug}`).toBeTruthy();
       expect(TAGLINE_EN[t.slug], `TAGLINE_EN manquante: ${t.slug}`).toBeTruthy();
     }
+  });
+
+  it("CLUSTERS : chaque slug existe ; relatedFor ne renvoie jamais l'outil lui-même ni calorio", () => {
+    for (const [name, members] of Object.entries(CLUSTERS)) {
+      for (const s of members) expect(bySlug(s), `${name}: ${s}`).toBeDefined();
+    }
+    for (const t of TOOLS) {
+      const rel = relatedFor(t.slug).map((x) => x.slug);
+      expect(rel, t.slug).not.toContain(t.slug);
+      expect(rel, t.slug).not.toContain("calorio");
+      expect(new Set(rel).size, t.slug).toBe(rel.length);
+      expect(rel.length, t.slug).toBeLessThanOrEqual(5);
+    }
+    expect(relatedFor("intero").map((x) => x.slug)).toContain("prorato");
   });
 });

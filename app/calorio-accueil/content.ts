@@ -22,6 +22,7 @@ export type LandingCopy = {
   featTitle: string;
   featLead: string;
   features: Feature[];
+  bmi: { text: string; link: string; href: string };
   proTag: string;
   howTitle: string;
   how: { title: string; text: string }[];
@@ -41,6 +42,7 @@ export const COPY: Record<LLang, LandingCopy> = {
     htmlTitle: "calorio — compteur de calories suisse, simple et sans pub",
     metaDesc: "Compte tes calories et tes macros, scanne tes produits, suis ton poids et demande conseil à Vito, ton coach nutrition IA. Gratuit, sans pub, conçu en Suisse.",
     nav: { features: "Fonctionnalités", pricing: "Prix", faq: "Questions", open: "Ouvrir l'app" },
+    bmi: { text: "Envie de situer ton poids avant de te fixer un objectif ?", link: "Calculer son IMC", href: "https://outils.ch/o/imca" },
     eyebrow: "Compteur de calories · conçu en Valais",
     h1a: "Compte tes calories,",
     h1b: "sans te prendre la tête.",
@@ -90,6 +92,7 @@ export const COPY: Record<LLang, LandingCopy> = {
     htmlTitle: "calorio — Kalorienzähler aus der Schweiz, einfach und werbefrei",
     metaDesc: "Zähle Kalorien und Makros, scanne Produkte, verfolge dein Gewicht und frag Vito, deinen KI-Ernährungscoach. Gratis, ohne Werbung, aus der Schweiz.",
     nav: { features: "Funktionen", pricing: "Preise", faq: "Fragen", open: "App öffnen" },
+    bmi: { text: "Möchtest du wissen, wo dein Gewicht steht, bevor du ein Ziel setzt?", link: "BMI berechnen", href: "https://outils.ch/de/o/imca" },
     eyebrow: "Kalorienzähler · entwickelt im Wallis",
     h1a: "Kalorien zählen,",
     h1b: "ganz ohne Stress.",
@@ -139,6 +142,7 @@ export const COPY: Record<LLang, LandingCopy> = {
     htmlTitle: "calorio — the Swiss calorie counter, simple and ad-free",
     metaDesc: "Count calories and macros, scan products, track your weight and ask Vito, your AI nutrition coach. Free, ad-free, made in Switzerland.",
     nav: { features: "Features", pricing: "Pricing", faq: "FAQ", open: "Open the app" },
+    bmi: { text: "Want to see where your weight stands before setting a goal?", link: "Calculate your BMI", href: "https://outils.ch/en/o/imca" },
     eyebrow: "Calorie counter · made in Valais",
     h1a: "Count your calories,",
     h1b: "without the headache.",

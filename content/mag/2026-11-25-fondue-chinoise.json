@@ -1,0 +1,383 @@
+{
+  "id": "fondue-chinoise",
+  "date": "2026-11-25",
+  "cat": "classiques",
+  "emoji": "🥩",
+  "kcal": {
+    "value": "750–1000",
+    "label": {
+      "fr": "kcal par personne",
+      "de": "kcal pro Person"
+    }
+  },
+  "related": {
+    "aliments": [
+      "fondue_chinoise_viande",
+      "riz",
+      "frites",
+      "mayonnaise",
+      "champignons",
+      "brocoli"
+    ]
+  },
+  "sources": [
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : bœuf, coin (valeurs pour 100 g, cru)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/352519"
+    },
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : bœuf, filet (valeurs pour 100 g, cru)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/352521"
+    },
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : veau, coin (valeurs pour 100 g, cru)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/351153"
+    },
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : blanc de poulet sans peau (valeurs pour 100 g, cru)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/351506"
+    },
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : sauce cocktail à la mayonnaise, maison (valeurs pour 100 g)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/352120"
+    },
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : sauce tartare à la mayonnaise, maison (valeurs pour 100 g)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/352332"
+    },
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : bouillon de viande, préparé (valeurs pour 100 g)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/351798"
+    },
+    {
+      "label": "Meat4you (boucherie suisse) : quantité de viande conseillée pour la fondue chinoise (200 à 250 g par adulte)",
+      "url": "https://meat4you.ch/en/swiss-beef-rump-sliced-chinoise"
+    },
+    {
+      "label": "Base d'aliments calorio : riz cuit (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/riz-cuit"
+    },
+    {
+      "label": "Base d'aliments calorio : frites (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/frites"
+    },
+    {
+      "label": "Base d'aliments calorio : yaourt nature (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/yaourt-nature"
+    },
+    {
+      "label": "Base d'aliments calorio : champignons (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/champignons"
+    },
+    {
+      "label": "Base d'aliments calorio : brocoli (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/brocoli"
+    }
+  ],
+  "fr": {
+    "slug": "calories-fondue-chinoise",
+    "title": "Fondue chinoise : combien de calories par personne ?",
+    "seoTitle": "Fondue chinoise : calories par personne (750 à 1000 kcal)",
+    "cardTitle": "Une fondue chinoise, combien de calories ?",
+    "description": "Avec 200 g de viande, deux sauces et du riz, une fondue chinoise apporte environ 750 kcal par personne, 1000 kcal avec des frites. Détail et version légère.",
+    "intro": "Une fondue chinoise avec 200 g de viande, deux sauces et du riz apporte **environ 750 kcal par personne**, et **environ 1000 kcal** avec des frites. La viande, maigre, pèse peu : ce sont les sauces et l'accompagnement qui font monter le total.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "Le détail d'une assiette"
+      },
+      {
+        "type": "p",
+        "text": "Une boucherie suisse conseille **200 à 250 g de viande par adulte**. Avec un mélange de bœuf, de veau et de poulet maigres coupés fin (environ 111 kcal pour 100 g crus), voici ce que donne une soirée typique :"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Élément",
+          "Quantité",
+          "Calories"
+        ],
+        "rows": [
+          [
+            "Viande maigre (bœuf, veau, poulet)",
+            "200 g",
+            "222 kcal"
+          ],
+          [
+            "Sauce cocktail",
+            "2 c. à soupe (30 g)",
+            "209 kcal"
+          ],
+          [
+            "Sauce tartare",
+            "2 c. à soupe (30 g)",
+            "116 kcal"
+          ],
+          [
+            "Riz cuit",
+            "150 g",
+            "195 kcal"
+          ],
+          [
+            "Bouillon bu en fin de repas",
+            "2 dl",
+            "10 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 750 kcal"
+          ]
+        ],
+        "note": "Avec 150 g de frites à la place du riz, compte environ 270 kcal de plus, soit près de 1025 kcal. Avec 250 g de viande, environ 55 kcal de plus. Un verre de vin blanc (1,5 dl) en ajoute environ 120."
+      },
+      {
+        "type": "p",
+        "text": "Cette assiette apporte une cinquantaine de grammes de protéines, presque toutes venues de la viande. Comme elle cuit dans le bouillon et non dans l'huile, elle reste légère : c'est la grande différence avec la fondue bourguignonne."
+      },
+      {
+        "type": "h2",
+        "text": "Les sauces, le vrai poids de la soirée"
+      },
+      {
+        "type": "p",
+        "text": "Les sauces à base de mayonnaise sont très riches : la sauce cocktail maison compte **environ 700 kcal pour 100 g**, la sauce tartare **environ 385 kcal**. Une cuillère à soupe (15 g) fait donc environ **105 kcal** de sauce cocktail ou **58 kcal** de sauce tartare. À table, on en reprend souvent sans compter."
+      },
+      {
+        "type": "h2",
+        "text": "La version plus légère"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Élément",
+          "Quantité",
+          "Calories"
+        ],
+        "rows": [
+          [
+            "Viande maigre (bœuf, veau, poulet)",
+            "200 g",
+            "222 kcal"
+          ],
+          [
+            "Sauce au yaourt et aux herbes",
+            "60 g",
+            "37 kcal"
+          ],
+          [
+            "Sauce cocktail",
+            "1 c. à soupe (15 g)",
+            "105 kcal"
+          ],
+          [
+            "Riz cuit",
+            "100 g",
+            "130 kcal"
+          ],
+          [
+            "Champignons et brocoli cuits dans le bouillon",
+            "200 g",
+            "56 kcal"
+          ],
+          [
+            "Bouillon bu en fin de repas",
+            "2 dl",
+            "10 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 560 kcal"
+          ]
+        ]
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Une sauce au yaourt** : yaourt nature, ciboulette, persil, un peu de moutarde ou de curry. Environ 10 kcal la cuillère à soupe.",
+          "**Des légumes dans le bouillon** : champignons, brocoli, carottes ou poivrons cuisent en même temps que la viande.",
+          "**Le riz plutôt que les frites** : environ 270 kcal d'écart pour la même portion.",
+          "**Bois le bouillon à la fin** : il est très léger et réchauffe bien."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Le bon réflexe",
+        "text": "La fondue chinoise est l'un des repas de fête les plus légers : de la viande maigre cuite dans un bouillon. Fais-toi plaisir avec la viande et les légumes, et garde un œil sur les sauces, c'est là que tout se joue."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Combien de viande prévoir par personne pour une fondue chinoise ?",
+        "a": "Compte 200 à 250 g de viande par adulte, et 120 à 150 g par enfant, comme le conseille une boucherie suisse. Prévois un peu plus si la soirée est longue."
+      },
+      {
+        "q": "Combien de calories dans 200 g de viande de fondue chinoise ?",
+        "a": "Environ 220 kcal pour un mélange maigre de bœuf, de veau et de poulet (environ 111 kcal pour 100 g crus selon la table suisse de composition des aliments)."
+      },
+      {
+        "q": "Qu'est-ce qui fait le plus grossir dans une fondue chinoise ?",
+        "a": "Les sauces à base de mayonnaise et les frites. Deux cuillères à soupe de sauce cocktail apportent environ 210 kcal, presque autant que 200 g de viande."
+      },
+      {
+        "q": "Comment noter une fondue chinoise dans calorio ?",
+        "a": "Cherche « viande pour fondue chinoise » dans calorio (200 g par défaut), puis ajoute le riz ou les frites et les sauces (« mayonnaise » pour une sauce cocktail ou tartare, en adaptant la quantité)."
+      }
+    ],
+    "social": "Une fondue chinoise, c'est combien de calories ? 🥩\n\nEnviron 750 kcal par personne avec 200 g de viande, deux sauces et du riz, et près de 1000 kcal avec des frites. La viande, cuite dans le bouillon, reste légère : ce sont les sauces qui font le total.\n\nLe détail et une version à 560 kcal sont dans le Mag calorio : calorio.ch/mag\n\nFondue chinoise: wie viele Kalorien? Alles im calorio Magazin.\n\n#calorio #fonduechinoise #noel #suisse #suisseromande #repasdefete #compteurdecalories"
+  },
+  "de": {
+    "slug": "kalorien-fondue-chinoise",
+    "title": "Fondue chinoise: wie viele Kalorien pro Person?",
+    "seoTitle": "Fondue chinoise Kalorien: 750 bis 1000 kcal pro Person",
+    "cardTitle": "Fondue chinoise: wie viele Kalorien?",
+    "description": "Mit 200 g Fleisch, zwei Saucen und Reis liefert ein Fondue chinoise rund 750 kcal pro Person, mit Pommes frites rund 1000 kcal. Details und leichte Variante.",
+    "intro": "Ein Fondue chinoise mit 200 g Fleisch, zwei Saucen und Reis liefert **rund 750 kcal pro Person**, mit Pommes frites **rund 1000 kcal**. Das magere Fleisch zählt wenig: Die Saucen und die Beilage treiben die Summe in die Höhe.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "Ein Teller im Detail"
+      },
+      {
+        "type": "p",
+        "text": "Eine Schweizer Metzgerei empfiehlt **200 bis 250 g Fleisch pro erwachsene Person**. Mit einer Mischung aus magerem Rind-, Kalb- und Pouletfleisch, fein geschnitten (rund 111 kcal pro 100 g roh), sieht ein typischer Abend so aus:"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Zutat",
+          "Menge",
+          "Kalorien"
+        ],
+        "rows": [
+          [
+            "Mageres Fleisch (Rind, Kalb, Poulet)",
+            "200 g",
+            "222 kcal"
+          ],
+          [
+            "Cocktailsauce",
+            "2 EL (30 g)",
+            "209 kcal"
+          ],
+          [
+            "Tartarsauce",
+            "2 EL (30 g)",
+            "116 kcal"
+          ],
+          [
+            "Reis, gekocht",
+            "150 g",
+            "195 kcal"
+          ],
+          [
+            "Bouillon zum Schluss",
+            "2 dl",
+            "10 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 750 kcal"
+          ]
+        ],
+        "note": "Mit 150 g Pommes frites statt Reis kommen rund 270 kcal dazu, also fast 1025 kcal. Mit 250 g Fleisch rund 55 kcal mehr. Ein Glas Weisswein (1,5 dl) zählt etwa 120 kcal."
+      },
+      {
+        "type": "p",
+        "text": "Dieser Teller liefert rund 50 g Eiweiss, fast alles aus dem Fleisch. Weil es in Bouillon und nicht in Öl gart, bleibt es leicht: Das ist der grosse Unterschied zum Fondue bourguignonne."
+      },
+      {
+        "type": "h2",
+        "text": "Die Saucen zählen am meisten"
+      },
+      {
+        "type": "p",
+        "text": "Saucen auf Mayonnaise-Basis sind sehr gehaltvoll: Hausgemachte Cocktailsauce hat **rund 700 kcal pro 100 g**, Tartarsauce **rund 385 kcal**. Ein Esslöffel (15 g) sind also rund **105 kcal** Cocktailsauce oder **58 kcal** Tartarsauce. Am Tisch nimmt man oft nach, ohne zu zählen."
+      },
+      {
+        "type": "h2",
+        "text": "Die leichtere Variante"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Zutat",
+          "Menge",
+          "Kalorien"
+        ],
+        "rows": [
+          [
+            "Mageres Fleisch (Rind, Kalb, Poulet)",
+            "200 g",
+            "222 kcal"
+          ],
+          [
+            "Joghurt-Kräuter-Sauce",
+            "60 g",
+            "37 kcal"
+          ],
+          [
+            "Cocktailsauce",
+            "1 EL (15 g)",
+            "105 kcal"
+          ],
+          [
+            "Reis, gekocht",
+            "100 g",
+            "130 kcal"
+          ],
+          [
+            "Champignons und Broccoli aus der Bouillon",
+            "200 g",
+            "56 kcal"
+          ],
+          [
+            "Bouillon zum Schluss",
+            "2 dl",
+            "10 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 560 kcal"
+          ]
+        ]
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Eine Joghurtsauce**: Naturjoghurt, Schnittlauch, Petersilie, etwas Senf oder Curry. Rund 10 kcal pro Esslöffel.",
+          "**Gemüse in die Bouillon**: Champignons, Broccoli, Rüebli oder Peperoni garen gleichzeitig mit dem Fleisch.",
+          "**Reis statt Pommes frites**: rund 270 kcal Unterschied bei gleicher Portion.",
+          "**Die Bouillon zum Schluss trinken**: Sie ist sehr leicht und wärmt schön."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Der richtige Reflex",
+        "text": "Das Fondue chinoise ist eines der leichtesten Festessen: mageres Fleisch, in Bouillon gegart. Geniess Fleisch und Gemüse und behalte die Saucen im Blick, dort entscheidet sich alles."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Wie viel Fleisch pro Person für ein Fondue chinoise?",
+        "a": "Rechne mit 200 bis 250 g Fleisch pro erwachsene Person und 120 bis 150 g pro Kind, wie eine Schweizer Metzgerei empfiehlt. Bei einem langen Abend etwas mehr."
+      },
+      {
+        "q": "Wie viele Kalorien haben 200 g Fondue-chinoise-Fleisch?",
+        "a": "Rund 220 kcal für eine magere Mischung aus Rind, Kalb und Poulet (etwa 111 kcal pro 100 g roh laut Schweizer Nährwertdatenbank)."
+      },
+      {
+        "q": "Was macht beim Fondue chinoise am meisten Kalorien?",
+        "a": "Die Saucen auf Mayonnaise-Basis und die Pommes frites. Zwei Esslöffel Cocktailsauce liefern rund 210 kcal, fast so viel wie 200 g Fleisch."
+      },
+      {
+        "q": "Wie erfasse ich ein Fondue chinoise in calorio?",
+        "a": "Suche in calorio nach «Fleisch für Fondue chinoise» (200 g als Vorschlag), dann Reis oder Pommes frites und die Saucen hinzufügen («Mayonnaise» für Cocktail- oder Tartarsauce, Menge anpassen)."
+      }
+    ],
+    "social": "Fondue chinoise: wie viele Kalorien? 🥩\n\nRund 750 kcal pro Person mit 200 g Fleisch, zwei Saucen und Reis, fast 1000 kcal mit Pommes frites. Das Fleisch gart in der Bouillon und bleibt leicht: Die Saucen machen den Unterschied.\n\nDetails und eine Variante mit 560 kcal im calorio Magazin: calorio.ch/de/magazin\n\n#calorio #fonduechinoise #weihnachten #schweiz #festessen #ernährung #kalorienzähler"
+  }
+}

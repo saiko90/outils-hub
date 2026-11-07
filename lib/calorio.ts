@@ -532,7 +532,7 @@ export const ALIMENTS: Aliment[] = [
   a("longeole", "Longeole (GE)", "Longeole", "Longeole", "viandes", 290, 15, 1, 25, 120, "🌭"),
   a("malakoff", "Malakoff (VD)", "Malakoff", "Malakoff", "snacks", 320, 14, 10, 25, 80, "🧀"),
   a("cuchaule", "Cuchaule (FR)", "Cuchaule", "Cuchaule", "feculents", 300, 8, 52, 7, 80, "🍞"),
-  a("tresse", "Tresse au beurre", "Butterzopf", "Butter braid", "feculents", 360, 9, 50, 14, 80, "🍞"),
+  a("tresse", "Tresse au beurre", "Butterzopf", "Butter braid", "feculents", 325, 9, 45.7, 11.4, 80, "🍞"), // BLV (naehrwertdaten.ch), Butterzopf
   a("nusstorte", "Tourte aux noix (GR)", "Nusstorte", "Nut tart", "snacks", 450, 7, 55, 23, 90, "🥧"),
   a("meringue_creme", "Meringue double crème", "Meringue mit Doppelrahm", "Meringue & cream", "snacks", 400, 3, 45, 24, 100, "🍥"),
   a("carac", "Carac", "Carac", "Carac", "snacks", 380, 4, 50, 18, 60, "🧁"),

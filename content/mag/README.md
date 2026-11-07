@@ -66,3 +66,22 @@ mise en valeur), `{ "type": "tip", "title"?, "text" }`. Dans les textes, seuls `
 
 Le visuel de publication est généré automatiquement : `https://calorio.ch/mag/<slug-fr>/image?lang=fr&format=post`
 (ou `lang=de`), au format 1080×1350.
+
+## Calendrier saisonnier imposé
+
+Ces sujets ont un pic de recherche à date fixe : l'article doit être en ligne **une à trois semaines avant**
+(le domaine est exploré lentement). Vérifie avec `ls content/mag` qu'aucune date ni aucun sujet n'est déjà pris.
+
+| Date | Sujet | Fichier |
+| --- | --- | --- |
+| 2026-11-15 | Grittibänz : combien de calories dans un bonhomme ? / Grittibänz Kalorien | `2026-11-15-grittibaenz.json` (fait) |
+| 2026-11-22 | Vin chaud : combien de calories dans un verre ? / Glühwein Kalorien | `2026-11-22-vin-chaud.json` (fait) |
+| 2026-11-25 | Fondue chinoise : combien de calories par personne ? | `2026-11-25-fondue-chinoise.json` (fait) |
+| 2026-11-29 | Biscuits de Noël suisses : Mailänderli, Brunsli, étoiles à la cannelle, Spitzbuben | `2026-11-29-biscuits-noel.json` (fait) |
+| 2026-12-06 | Raclette : combien de tranches par personne ? | à écrire (sans cannibaliser l'article raclette du 15.10 : angle quantités et nombre de tranches) |
+| 2027-01-10 | Soupe d'orge des Grisons / Bündner Gerstensuppe | à écrire |
+| 2027-01-17 | Ski : calories brûlées par journée / Skifahren Kalorienverbrauch | à écrire |
+
+Source à privilégier pour les valeurs pour 100 g : la **Schweizer Nährwertdatenbank** (OSAV/BLV, naehrwertdaten.ch).
+Lien direct vers un aliment : `https://naehrwertdaten.ch/de/search/#/food/<id>` (l'id se lit dans l'adresse après une
+recherche sur le site).

@@ -1,0 +1,409 @@
+{
+  "id": "grittibaenz",
+  "date": "2026-11-15",
+  "cat": "classiques",
+  "emoji": "🍞",
+  "kcal": {
+    "value": "330",
+    "label": {
+      "fr": "kcal pour 100 g",
+      "de": "kcal pro 100 g"
+    }
+  },
+  "related": {
+    "aliments": [
+      "grittibaenz",
+      "tresse",
+      "beurre",
+      "confiture",
+      "chocolat_chaud",
+      "mandarine"
+    ]
+  },
+  "sources": [
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : Grittibänz (valeurs pour 100 g)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/351454"
+    },
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : tresse au beurre / Butterzopf (valeurs pour 100 g)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/351439"
+    },
+    {
+      "label": "Base d'aliments calorio : beurre (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/beurre"
+    },
+    {
+      "label": "Base d'aliments calorio : confiture (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/confiture"
+    },
+    {
+      "label": "Base d'aliments calorio : chocolat chaud (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/chocolat-chaud"
+    },
+    {
+      "label": "Base d'aliments calorio : mandarine (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/mandarine"
+    },
+    {
+      "label": "Base d'aliments calorio : fromage blanc maigre (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/fromage-blanc-maigre"
+    },
+    {
+      "label": "Base d'aliments calorio : café au lait (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/cafe-au-lait"
+    }
+  ],
+  "fr": {
+    "slug": "calories-grittibaenz",
+    "title": "Grittibänz : combien de calories dans un bonhomme ?",
+    "seoTitle": "Grittibänz : calories par taille (100 g = 330 kcal)",
+    "cardTitle": "Un Grittibänz, combien de calories ?",
+    "description": "Un Grittibänz de 100 g apporte environ 330 kcal, un de 250 g environ 820 kcal. Le détail par taille, le petit-déjeuner du 6 décembre et une version légère.",
+    "seoDescription": "Un Grittibänz apporte environ 330 kcal pour 100 g : 820 kcal pour un bonhomme de 250 g, 1650 kcal pour un grand de 500 g. Détail et petit-déjeuner léger.",
+    "intro": "Un Grittibänz de 100 g apporte **environ 330 kcal**, un bonhomme de 250 g **environ 820 kcal** et un grand de 500 g **environ 1650 kcal**, à partager. Sa pâte au beurre est presque la même que celle de la tresse du dimanche.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "Les calories selon la taille du bonhomme"
+      },
+      {
+        "type": "p",
+        "text": "La table suisse de composition des aliments compte **329 kcal pour 100 g** de Grittibänz, avec environ 9 g de protéines, 47 g de glucides et 11 g de lipides. Le reste n'est qu'une question de taille :"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Grittibänz",
+          "Poids",
+          "Calories"
+        ],
+        "rows": [
+          [
+            "Une tranche",
+            "50 g",
+            "≈ 165 kcal"
+          ],
+          [
+            "Petit bonhomme",
+            "100 g",
+            "≈ 330 kcal"
+          ],
+          [
+            "Bonhomme moyen",
+            "250 g",
+            "≈ 820 kcal"
+          ],
+          [
+            "Grand bonhomme à partager",
+            "500 g",
+            "≈ 1650 kcal"
+          ]
+        ],
+        "note": "Les yeux en raisins secs et le sucre perlé ajoutent quelques kcal seulement. Un Grittibänz du commerce peut varier un peu : l'étiquette donne la valeur exacte."
+      },
+      {
+        "type": "h2",
+        "text": "Le petit-déjeuner de la Saint-Nicolas"
+      },
+      {
+        "type": "p",
+        "text": "Le 6 décembre, le Grittibänz se mange souvent au petit-déjeuner, avec du beurre, de la confiture et un chocolat chaud. Voici ce que donne un bol bien garni :"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Élément",
+          "Quantité",
+          "Calories"
+        ],
+        "rows": [
+          [
+            "Grittibänz",
+            "100 g",
+            "330 kcal"
+          ],
+          [
+            "Beurre",
+            "10 g",
+            "72 kcal"
+          ],
+          [
+            "Confiture",
+            "20 g",
+            "50 kcal"
+          ],
+          [
+            "Chocolat chaud",
+            "2 dl",
+            "154 kcal"
+          ],
+          [
+            "Mandarine",
+            "100 g",
+            "53 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 660 kcal"
+          ]
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "La version plus légère"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Élément",
+          "Quantité",
+          "Calories"
+        ],
+        "rows": [
+          [
+            "Grittibänz",
+            "50 g (la moitié d'un petit)",
+            "165 kcal"
+          ],
+          [
+            "Séré maigre",
+            "50 g",
+            "34 kcal"
+          ],
+          [
+            "Confiture",
+            "10 g",
+            "25 kcal"
+          ],
+          [
+            "Café au lait",
+            "2 dl",
+            "84 kcal"
+          ],
+          [
+            "Mandarine",
+            "100 g",
+            "53 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 360 kcal"
+          ]
+        ],
+        "note": "Le séré maigre remplace le beurre : il ajoute environ 6 g de protéines et cale plus longtemps."
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Partage le grand bonhomme** : un Grittibänz de 500 g se coupe facilement en quatre ou cinq parts.",
+          "**Une tranche plutôt qu'un bonhomme entier** au goûter : 50 g suffisent avec un fruit.",
+          "**Garde le beurre ou la confiture**, pas forcément les deux : tu économises 50 à 70 kcal.",
+          "**Le lendemain**, le Grittibänz un peu sec fait un excellent pain perdu."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Le bon réflexe",
+        "text": "Le Grittibänz, c'est une fois par an et c'est un moment de fête, surtout avec les enfants. Profites-en sans calculer au gramme près : une part raisonnable et un fruit, et la journée reste équilibrée."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Combien de calories dans un Grittibänz ?",
+        "a": "Environ 330 kcal pour 100 g selon la table suisse de composition des aliments. Un bonhomme de 250 g apporte donc environ 820 kcal, un grand de 500 g environ 1650 kcal."
+      },
+      {
+        "q": "Le Grittibänz est-il plus calorique que la tresse ?",
+        "a": "Presque pas : 329 kcal pour 100 g pour le Grittibänz, 325 kcal pour la tresse au beurre. C'est la même famille de pâte levée au beurre et au lait."
+      },
+      {
+        "q": "Combien de calories dans une tranche de Grittibänz ?",
+        "a": "Une tranche de 50 g apporte environ 165 kcal, sans le beurre ni la confiture."
+      },
+      {
+        "q": "Comment noter un Grittibänz dans calorio ?",
+        "a": "Cherche « Grittibänz » dans calorio et indique le poids (100 g par défaut, ou la part que tu as mangée). Ajoute ensuite le beurre, la confiture et la boisson."
+      }
+    ],
+    "social": "Un Grittibänz, c'est combien de calories ? 🍞\n\nEnviron 330 kcal pour un petit bonhomme de 100 g, 820 kcal pour un de 250 g. Le grand de 500 g, lui, se partage : environ 1650 kcal en tout.\n\nLe petit-déjeuner de la Saint-Nicolas et une version légère à 360 kcal sont dans le Mag calorio : calorio.ch/mag\n\nGrittibänz: wie viele Kalorien? Alles im calorio Magazin.\n\n#calorio #grittibaenz #saintnicolas #samichlaus #suisse #suisseromande #compteurdecalories"
+  },
+  "de": {
+    "slug": "grittibaenz-kalorien",
+    "title": "Grittibänz Kalorien: so viel hat ein Grittibänz",
+    "seoTitle": "Grittibänz Kalorien: 330 kcal pro 100 g, je nach Grösse",
+    "cardTitle": "Grittibänz: wie viele Kalorien?",
+    "description": "Ein Grittibänz von 100 g hat rund 330 kcal, einer von 250 g rund 820 kcal. Die Kalorien nach Grösse, das Samichlaus-Zmorge und eine leichtere Variante.",
+    "seoDescription": "Ein Grittibänz hat rund 330 kcal pro 100 g: 820 kcal für einen Grittibänz von 250 g, 1650 kcal für einen grossen von 500 g. Mit Zmorge und leichter Variante.",
+    "intro": "Ein Grittibänz von 100 g hat **rund 330 kcal**, einer von 250 g **rund 820 kcal** und ein grosser von 500 g **rund 1650 kcal**, zum Teilen. Der Butterteig ist fast derselbe wie beim Sonntagszopf.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "Die Kalorien nach Grösse"
+      },
+      {
+        "type": "p",
+        "text": "Die Schweizer Nährwertdatenbank rechnet mit **329 kcal pro 100 g** Grittibänz, mit rund 9 g Eiweiss, 47 g Kohlenhydraten und 11 g Fett. Der Rest ist eine Frage der Grösse:"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Grittibänz",
+          "Gewicht",
+          "Kalorien"
+        ],
+        "rows": [
+          [
+            "Eine Scheibe",
+            "50 g",
+            "≈ 165 kcal"
+          ],
+          [
+            "Kleiner Grittibänz",
+            "100 g",
+            "≈ 330 kcal"
+          ],
+          [
+            "Mittlerer Grittibänz",
+            "250 g",
+            "≈ 820 kcal"
+          ],
+          [
+            "Grosser Grittibänz zum Teilen",
+            "500 g",
+            "≈ 1650 kcal"
+          ]
+        ],
+        "note": "Rosinenaugen und Hagelzucker bringen nur ein paar kcal dazu. Ein gekaufter Grittibänz kann etwas abweichen: Die Etikette zeigt den genauen Wert."
+      },
+      {
+        "type": "h2",
+        "text": "Das Samichlaus-Zmorge"
+      },
+      {
+        "type": "p",
+        "text": "Am 6. Dezember kommt der Grittibänz oft zum Zmorge auf den Tisch, mit Butter, Konfi und einer heissen Schokolade. So sieht ein gut gefüllter Teller aus:"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Zutat",
+          "Menge",
+          "Kalorien"
+        ],
+        "rows": [
+          [
+            "Grittibänz",
+            "100 g",
+            "330 kcal"
+          ],
+          [
+            "Butter",
+            "10 g",
+            "72 kcal"
+          ],
+          [
+            "Konfitüre",
+            "20 g",
+            "50 kcal"
+          ],
+          [
+            "Heisse Schokolade",
+            "2 dl",
+            "154 kcal"
+          ],
+          [
+            "Mandarine",
+            "100 g",
+            "53 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 660 kcal"
+          ]
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Die leichtere Variante"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Zutat",
+          "Menge",
+          "Kalorien"
+        ],
+        "rows": [
+          [
+            "Grittibänz",
+            "50 g (ein halber kleiner)",
+            "165 kcal"
+          ],
+          [
+            "Magerquark",
+            "50 g",
+            "34 kcal"
+          ],
+          [
+            "Konfitüre",
+            "10 g",
+            "25 kcal"
+          ],
+          [
+            "Milchkaffee",
+            "2 dl",
+            "84 kcal"
+          ],
+          [
+            "Mandarine",
+            "100 g",
+            "53 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 360 kcal"
+          ]
+        ],
+        "note": "Magerquark statt Butter bringt rund 6 g Eiweiss und macht länger satt."
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Den grossen Grittibänz teilen**: Einer von 500 g lässt sich gut in vier oder fünf Stücke schneiden.",
+          "**Zum Zvieri eine Scheibe** statt eines ganzen Grittibänz: 50 g reichen mit einer Frucht.",
+          "**Butter oder Konfi**, nicht unbedingt beides: Das spart 50 bis 70 kcal.",
+          "**Am nächsten Tag** wird ein etwas trockener Grittibänz zu feinen Fotzelschnitten."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Der richtige Reflex",
+        "text": "Den Grittibänz gibt es einmal im Jahr, und er gehört zum Fest, gerade mit Kindern. Geniess ihn, ohne aufs Gramm zu rechnen: ein vernünftiges Stück und eine Frucht, und der Tag bleibt ausgewogen."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Wie viele Kalorien hat ein Grittibänz?",
+        "a": "Rund 330 kcal pro 100 g laut Schweizer Nährwertdatenbank. Ein Grittibänz von 250 g hat also rund 820 kcal, ein grosser von 500 g rund 1650 kcal."
+      },
+      {
+        "q": "Hat ein Grittibänz mehr Kalorien als ein Zopf?",
+        "a": "Kaum: 329 kcal pro 100 g beim Grittibänz, 325 kcal beim Butterzopf. Beides ist ein Hefeteig mit Butter und Milch."
+      },
+      {
+        "q": "Wie viele Kalorien hat eine Scheibe Grittibänz?",
+        "a": "Eine Scheibe von 50 g hat rund 165 kcal, ohne Butter und Konfitüre."
+      },
+      {
+        "q": "Wie erfasse ich einen Grittibänz in calorio?",
+        "a": "Suche in calorio nach «Grittibänz» und gib das Gewicht ein (100 g als Vorschlag, oder dein Stück). Danach Butter, Konfitüre und Getränk hinzufügen."
+      }
+    ],
+    "social": "Grittibänz: wie viele Kalorien? 🍞\n\nRund 330 kcal für einen kleinen Grittibänz von 100 g, 820 kcal für einen von 250 g. Der grosse von 500 g wird geteilt: rund 1650 kcal insgesamt.\n\nDas Samichlaus-Zmorge und eine leichte Variante mit 360 kcal im calorio Magazin: calorio.ch/de/magazin\n\n#calorio #grittibänz #samichlaus #schweiz #zmorge #ernährung #kalorienzähler"
+  }
+}

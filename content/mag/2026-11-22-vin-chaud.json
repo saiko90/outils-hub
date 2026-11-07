@@ -1,0 +1,337 @@
+{
+  "id": "vin-chaud",
+  "date": "2026-11-22",
+  "cat": "guides",
+  "emoji": "🍷",
+  "kcal": {
+    "value": "220",
+    "label": {
+      "fr": "kcal par verre de 2 dl",
+      "de": "kcal pro Becher (2 dl)"
+    }
+  },
+  "related": {
+    "aliments": [
+      "vin_chaud",
+      "vin_rouge",
+      "vin_blanc",
+      "jus_pomme"
+    ]
+  },
+  "sources": [
+    {
+      "label": "Fooby (Coop) : recette du vin chaud (7,5 dl de vin rouge et 50 g de sucre de canne pour 7 dl)",
+      "url": "https://fooby.ch/en/recipes/amp.id-14124.html"
+    },
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : vin rouge 13,5 % vol. (valeurs pour 100 g)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/351023"
+    },
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : vin rouge 12 % vol. (valeurs pour 100 g)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/351927"
+    },
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : vin blanc 12,5 % vol. (valeurs pour 100 g)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/351867"
+    },
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : rhum (valeurs pour 100 g)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/351598"
+    },
+    {
+      "label": "Base d'aliments calorio : jus de pomme (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/jus-de-pomme"
+    }
+  ],
+  "fr": {
+    "slug": "calories-vin-chaud",
+    "title": "Vin chaud : combien de calories dans un verre ?",
+    "seoTitle": "Vin chaud : calories par verre (2 dl = 220 kcal)",
+    "cardTitle": "Un vin chaud, combien de calories ?",
+    "description": "Un verre de vin chaud de 2 dl apporte environ 220 kcal, soit 110 kcal par décilitre. Le calcul de la recette, les tailles de tasse et les versions plus légères.",
+    "intro": "Un verre de vin chaud de 2 dl apporte **environ 220 kcal**, soit à peu près **110 kcal par décilitre**. Le vin en fournit près des trois quarts, le sucre le reste. Selon la tasse, compte 165 à 275 kcal.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "Ce qu'il y a dans la casserole"
+      },
+      {
+        "type": "p",
+        "text": "La recette de Fooby prévoit **7,5 dl de vin rouge corsé et 50 g de sucre de canne**, avec une orange, de la cannelle, des clous de girofle, de l'anis étoilé et de la cardamome. On obtient environ 7 dl de vin chaud :"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Élément",
+          "Quantité",
+          "Calories"
+        ],
+        "rows": [
+          [
+            "Vin rouge corsé (13,5 % vol.)",
+            "7,5 dl",
+            "566 kcal"
+          ],
+          [
+            "Sucre de canne",
+            "50 g",
+            "200 kcal"
+          ],
+          [
+            "Orange et épices",
+            "",
+            "≈ 10 kcal"
+          ],
+          [
+            "Total pour 7 dl",
+            "",
+            "≈ 775 kcal"
+          ]
+        ],
+        "note": "Soit environ 110 kcal par décilitre. Une partie de l'alcool s'évapore pendant la chauffe, mais on ne peut pas compter dessus : ce calcul part du vin entier, c'est une estimation plutôt haute."
+      },
+      {
+        "type": "h2",
+        "text": "Selon la taille de la tasse"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Tasse",
+          "Calories"
+        ],
+        "rows": [
+          [
+            "1 dl",
+            "≈ 110 kcal"
+          ],
+          [
+            "1,5 dl",
+            "≈ 165 kcal"
+          ],
+          [
+            "2 dl",
+            "≈ 220 kcal"
+          ],
+          [
+            "2,5 dl",
+            "≈ 275 kcal"
+          ]
+        ],
+        "note": "Un vin chaud tout prêt peut contenir plus ou moins de sucre : l'étiquette donne la valeur exacte."
+      },
+      {
+        "type": "h2",
+        "text": "Les variantes, du plus riche au plus léger"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Pour 2 dl",
+          "Calories"
+        ],
+        "rows": [
+          [
+            "Avec 2 cl de rhum en plus",
+            "≈ 265 kcal"
+          ],
+          [
+            "Vin chaud rouge classique",
+            "≈ 220 kcal"
+          ],
+          [
+            "Vin chaud blanc (même recette, vin blanc)",
+            "≈ 215 kcal"
+          ],
+          [
+            "Avec moitié moins de sucre (25 g pour 7 dl)",
+            "≈ 195 kcal"
+          ],
+          [
+            "Punch sans alcool (moitié jus de pomme, moitié thé aux fruits)",
+            "≈ 50 kcal"
+          ]
+        ]
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Moins de sucre, plus d'épices** : l'orange, la cannelle et l'anis donnent déjà beaucoup de goût. Avec 25 g de sucre au lieu de 50, tu économises environ 25 kcal par verre.",
+          "**Une petite tasse** : 1,5 dl au lieu de 2,5 dl, c'est 110 kcal de moins.",
+          "**Alterne avec un punch sans alcool** ou un thé chaud : environ 50 kcal la tasse, et c'est aussi bon pour la tête le lendemain.",
+          "**Mange quelque chose** : l'alcool sur un estomac vide ouvre l'appétit, et on finit souvent par grignoter davantage."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Le bon réflexe",
+        "text": "Un vin chaud au marché de Noël entre amis, c'est un vrai plaisir de saison. Compte-le comme un petit en-cas et profite du moment. Et si tu conduis, choisis le punch sans alcool."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Combien de calories dans un verre de vin chaud ?",
+        "a": "Environ 220 kcal pour 2 dl, soit 110 kcal par décilitre, pour une recette avec 7,5 dl de vin rouge et 50 g de sucre."
+      },
+      {
+        "q": "Le vin chaud est-il plus calorique que le vin rouge ?",
+        "a": "Oui, à cause du sucre : environ 110 kcal par décilitre contre 70 à 76 kcal pour un vin rouge de 12 à 13,5 % vol. selon la table suisse de composition des aliments."
+      },
+      {
+        "q": "L'alcool s'évapore-t-il quand on chauffe le vin ?",
+        "a": "En partie seulement, surtout si on ne le fait pas bouillir. Nos chiffres comptent tout le vin : c'est une estimation plutôt haute."
+      },
+      {
+        "q": "Comment noter un vin chaud dans calorio ?",
+        "a": "Cherche « vin chaud » dans calorio et indique la taille de ta tasse (2 dl par défaut). Pour un punch sans alcool, note plutôt le jus de pomme avec la moitié de la quantité."
+      }
+    ],
+    "social": "Un vin chaud, c'est combien de calories ? 🍷\n\nEnviron 220 kcal pour un verre de 2 dl. Le vin en apporte près des trois quarts, le sucre le reste. Avec un shot de rhum, on passe à environ 265 kcal.\n\nLes tailles de tasse et les versions plus légères sont dans le Mag calorio : calorio.ch/mag\n\nGlühwein: wie viele Kalorien? Alles im calorio Magazin.\n\n#calorio #vinchaud #marchedenoel #suisse #suisseromande #hiver #compteurdecalories"
+  },
+  "de": {
+    "slug": "gluehwein-kalorien",
+    "title": "Glühwein Kalorien: so viel hat ein Becher",
+    "seoTitle": "Glühwein Kalorien: 220 kcal pro Becher (2 dl)",
+    "cardTitle": "Glühwein: wie viele Kalorien?",
+    "description": "Ein Becher Glühwein von 2 dl hat rund 220 kcal, also 110 kcal pro Deziliter. Die Rechnung zum Rezept, die Bechergrössen und leichtere Varianten.",
+    "intro": "Ein Becher Glühwein von 2 dl hat **rund 220 kcal**, also etwa **110 kcal pro Deziliter**. Der Wein liefert fast drei Viertel davon, der Zucker den Rest. Je nach Becher sind es 165 bis 275 kcal.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "Was in der Pfanne steckt"
+      },
+      {
+        "type": "p",
+        "text": "Das Rezept von Fooby sieht **7,5 dl kräftigen Rotwein und 50 g Rohzucker** vor, dazu eine Orange, Zimt, Nelken, Sternanis und Kardamom. Das ergibt rund 7 dl Glühwein:"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Zutat",
+          "Menge",
+          "Kalorien"
+        ],
+        "rows": [
+          [
+            "Kräftiger Rotwein (13,5 % vol.)",
+            "7,5 dl",
+            "566 kcal"
+          ],
+          [
+            "Rohzucker",
+            "50 g",
+            "200 kcal"
+          ],
+          [
+            "Orange und Gewürze",
+            "",
+            "≈ 10 kcal"
+          ],
+          [
+            "Total für 7 dl",
+            "",
+            "≈ 775 kcal"
+          ]
+        ],
+        "note": "Das sind rund 110 kcal pro Deziliter. Beim Erwärmen verdampft ein Teil des Alkohols, darauf kann man aber nicht zählen: Die Rechnung geht vom ganzen Wein aus, ist also eher hoch geschätzt."
+      },
+      {
+        "type": "h2",
+        "text": "Je nach Bechergrösse"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Becher",
+          "Kalorien"
+        ],
+        "rows": [
+          [
+            "1 dl",
+            "≈ 110 kcal"
+          ],
+          [
+            "1,5 dl",
+            "≈ 165 kcal"
+          ],
+          [
+            "2 dl",
+            "≈ 220 kcal"
+          ],
+          [
+            "2,5 dl",
+            "≈ 275 kcal"
+          ]
+        ],
+        "note": "Fertiger Glühwein kann mehr oder weniger Zucker enthalten: Die Etikette zeigt den genauen Wert."
+      },
+      {
+        "type": "h2",
+        "text": "Die Varianten, von gehaltvoll bis leicht"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Für 2 dl",
+          "Kalorien"
+        ],
+        "rows": [
+          [
+            "Mit 2 cl Rum dazu",
+            "≈ 265 kcal"
+          ],
+          [
+            "Klassischer roter Glühwein",
+            "≈ 220 kcal"
+          ],
+          [
+            "Weisser Glühwein (gleiches Rezept mit Weisswein)",
+            "≈ 215 kcal"
+          ],
+          [
+            "Mit halb so viel Zucker (25 g für 7 dl)",
+            "≈ 195 kcal"
+          ],
+          [
+            "Alkoholfreier Punsch (halb Apfelsaft, halb Früchtetee)",
+            "≈ 50 kcal"
+          ]
+        ]
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Weniger Zucker, mehr Gewürze**: Orange, Zimt und Sternanis bringen schon viel Geschmack. Mit 25 statt 50 g Zucker sparst du rund 25 kcal pro Becher.",
+          "**Ein kleinerer Becher**: 1,5 statt 2,5 dl sind 110 kcal weniger.",
+          "**Abwechseln mit alkoholfreiem Punsch** oder heissem Tee: rund 50 kcal pro Becher, und der Kopf dankt es dir am nächsten Tag.",
+          "**Etwas dazu essen**: Alkohol auf leeren Magen macht Appetit, und man nascht danach oft mehr."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Der richtige Reflex",
+        "text": "Ein Glühwein am Weihnachtsmarkt mit Freunden gehört zur Saison. Zähl ihn wie einen kleinen Snack und geniess den Moment. Und wer fährt, nimmt den alkoholfreien Punsch."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Wie viele Kalorien hat ein Becher Glühwein?",
+        "a": "Rund 220 kcal für 2 dl, also 110 kcal pro Deziliter, bei einem Rezept mit 7,5 dl Rotwein und 50 g Zucker."
+      },
+      {
+        "q": "Hat Glühwein mehr Kalorien als Rotwein?",
+        "a": "Ja, wegen des Zuckers: rund 110 kcal pro Deziliter gegenüber 70 bis 76 kcal bei einem Rotwein mit 12 bis 13,5 % vol. laut Schweizer Nährwertdatenbank."
+      },
+      {
+        "q": "Verdampft der Alkohol beim Erwärmen?",
+        "a": "Nur teilweise, vor allem wenn der Glühwein nicht kocht. Unsere Werte zählen den ganzen Wein: Sie sind eher hoch geschätzt."
+      },
+      {
+        "q": "Wie erfasse ich einen Glühwein in calorio?",
+        "a": "Suche in calorio nach «Glühwein» und gib die Bechergrösse ein (2 dl als Vorschlag). Für alkoholfreien Punsch erfasst du besser Apfelsaft mit der halben Menge."
+      }
+    ],
+    "social": "Glühwein: wie viele Kalorien? 🍷\n\nRund 220 kcal für einen Becher von 2 dl. Der Wein liefert fast drei Viertel, der Zucker den Rest. Mit einem Schuss Rum sind es rund 265 kcal.\n\nBechergrössen und leichtere Varianten im calorio Magazin: calorio.ch/de/magazin\n\n#calorio #glühwein #weihnachtsmarkt #schweiz #winter #ernährung #kalorienzähler"
+  }
+}

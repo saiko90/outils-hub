@@ -1,0 +1,415 @@
+{
+  "id": "biscuits-noel-suisses",
+  "date": "2026-11-29",
+  "cat": "classiques",
+  "emoji": "🍪",
+  "kcal": {
+    "value": "60–120",
+    "label": {
+      "fr": "kcal par biscuit",
+      "de": "kcal pro Guetzli"
+    }
+  },
+  "related": {
+    "aliments": [
+      "mailaenderli",
+      "zimtsterne",
+      "brunsli",
+      "spitzbuebe",
+      "clementine",
+      "the"
+    ]
+  },
+  "sources": [
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : Mailänderli maison (valeurs pour 100 g)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/351445"
+    },
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : étoile à la cannelle / Zimtstern maison (valeurs pour 100 g)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/352393"
+    },
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : Brunsli maison (valeurs pour 100 g)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/352313"
+    },
+    {
+      "label": "Schweizer Nährwertdatenbank (OSAV/BLV) : Spitzbub, sablé à la confiture (valeurs pour 100 g)",
+      "url": "https://naehrwertdaten.ch/de/search/#/food/351355"
+    },
+    {
+      "label": "Fooby (Coop) : recette des Mailänderli (80 pièces, 62 kcal par pièce)",
+      "url": "https://fooby.ch/en/recipes/14185/mailaenderli"
+    },
+    {
+      "label": "Fooby (Coop) : recette des étoiles à la cannelle (50 pièces, 62 kcal par pièce)",
+      "url": "https://fooby.ch/en/recipes/12488/cinnamon-stars"
+    },
+    {
+      "label": "Fooby (Coop) : recette des Brunsli (20 pièces, 158 kcal par pièce)",
+      "url": "https://fooby.ch/en/recipes/14183/brunsli-biscuits"
+    },
+    {
+      "label": "Fooby (Coop) : recette des Spitzbuben (36 pièces)",
+      "url": "https://fooby.ch/de/rezepte/amp.id-22441.html"
+    },
+    {
+      "label": "Base d'aliments calorio : clémentine (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/clementine"
+    }
+  ],
+  "fr": {
+    "slug": "calories-biscuits-noel-suisses",
+    "title": "Biscuits de Noël suisses : calories des Mailänderli, Brunsli",
+    "seoTitle": "Biscuits de Noël : calories des Mailänderli et Brunsli",
+    "cardTitle": "Biscuits de Noël : combien de calories ?",
+    "description": "Un Mailänderli apporte environ 60 kcal, une étoile à la cannelle 65, un Spitzbub 120. Les calories par pièce et pour 100 g des biscuits de Noël suisses.",
+    "seoDescription": "Un Mailänderli apporte environ 60 kcal, une étoile à la cannelle 65, un Brunsli 75 à 155 et un Spitzbub 120. Calories par pièce et pour 100 g, et astuces.",
+    "intro": "Un Mailänderli apporte **environ 60 kcal**, une étoile à la cannelle **environ 65 kcal**, un Brunsli **75 à 155 kcal** selon sa taille et un Spitzbub **environ 120 kcal**. Tous tournent autour de 430 à 515 kcal pour 100 g : c'est la taille de la pièce qui fait la différence.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "Les calories biscuit par biscuit"
+      },
+      {
+        "type": "p",
+        "text": "Les valeurs pour 100 g viennent de la table suisse de composition des aliments. Le poids d'une pièce est calculé d'après les recettes de Fooby (la pâte divisée par le nombre de biscuits) :"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Biscuit",
+          "1 pièce",
+          "Pour 100 g",
+          "Calories par pièce"
+        ],
+        "rows": [
+          [
+            "Mailänderli",
+            "14 g",
+            "431 kcal",
+            "≈ 60 kcal"
+          ],
+          [
+            "Étoile à la cannelle (Zimtstern)",
+            "13 g",
+            "505 kcal",
+            "≈ 65 kcal"
+          ],
+          [
+            "Brunsli, petit",
+            "15 g",
+            "515 kcal",
+            "≈ 75 kcal"
+          ],
+          [
+            "Brunsli, gros",
+            "30 g",
+            "515 kcal",
+            "≈ 155 kcal"
+          ],
+          [
+            "Spitzbub (sablé à la confiture)",
+            "24 g",
+            "499 kcal",
+            "≈ 120 kcal"
+          ]
+        ],
+        "note": "Fooby indique lui-même 62 kcal par Mailänderli, 62 kcal par étoile à la cannelle et 158 kcal par Brunsli pour ses recettes. Des biscuits plus petits ou plus grands changent tout : 10 g de pâte en plus, c'est environ 45 à 50 kcal de plus."
+      },
+      {
+        "type": "p",
+        "text": "Le Mailänderli est le plus léger pour 100 g (beurre, sucre, farine et œufs). Les étoiles à la cannelle et les Brunsli sont faits surtout d'amandes moulues et de sucre : ils sont plus riches, mais aussi plus riches en protéines (environ 14 à 15 g pour 100 g)."
+      },
+      {
+        "type": "h2",
+        "text": "Une assiette de biscuits, ça fait combien ?"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Élément",
+          "Quantité",
+          "Calories"
+        ],
+        "rows": [
+          [
+            "Mailänderli",
+            "2 pièces",
+            "120 kcal"
+          ],
+          [
+            "Étoiles à la cannelle",
+            "2 pièces",
+            "130 kcal"
+          ],
+          [
+            "Brunsli, petit",
+            "1 pièce",
+            "75 kcal"
+          ],
+          [
+            "Spitzbub",
+            "1 pièce",
+            "120 kcal"
+          ],
+          [
+            "Total",
+            "6 biscuits",
+            "≈ 445 kcal"
+          ]
+        ],
+        "note": "C'est à peu près l'équivalent d'un repas léger. Sur un mois de décembre, ces assiettes s'additionnent vite."
+      },
+      {
+        "type": "h2",
+        "text": "La pause plus légère"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Élément",
+          "Quantité",
+          "Calories"
+        ],
+        "rows": [
+          [
+            "Mailänderli",
+            "2 pièces",
+            "120 kcal"
+          ],
+          [
+            "Étoile à la cannelle",
+            "1 pièce",
+            "65 kcal"
+          ],
+          [
+            "Clémentine",
+            "80 g",
+            "38 kcal"
+          ],
+          [
+            "Thé ou café noir",
+            "2 dl",
+            "≈ 2 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 225 kcal"
+          ]
+        ]
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Fais des biscuits plus petits** : un Mailänderli de 10 g au lieu de 14 g, c'est environ 17 kcal de moins par pièce, et l'assiette paraît tout aussi pleine.",
+          "**Sers-toi une assiette** au lieu de piocher dans la boîte : on sait ce qu'on a mangé.",
+          "**Garde les Spitzbuben pour les grandes occasions** : avec la confiture, ce sont les plus lourds.",
+          "**Accompagne d'un fruit** : une clémentine ou une mandarine, c'est la saison."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Le bon réflexe",
+        "text": "Les biscuits de Noël, on les prépare en famille et on les offre : c'est une tradition, pas un écart. Choisis tes préférés, savoure-les lentement, et laisse les autres pour le lendemain."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Combien de calories dans un Mailänderli ?",
+        "a": "Environ 60 kcal pour un Mailänderli de 14 g (431 kcal pour 100 g selon la table suisse de composition des aliments). Fooby indique 62 kcal par pièce pour sa recette."
+      },
+      {
+        "q": "Quel biscuit de Noël est le moins calorique ?",
+        "a": "Par pièce, le Mailänderli et l'étoile à la cannelle (environ 60 à 65 kcal). Pour 100 g, c'est le Mailänderli (431 kcal) ; les Brunsli et les étoiles à la cannelle dépassent 500 kcal."
+      },
+      {
+        "q": "Combien de calories dans un Spitzbub ?",
+        "a": "Environ 120 kcal pour un Spitzbub de 24 g, confiture comprise (499 kcal pour 100 g)."
+      },
+      {
+        "q": "Comment noter des biscuits de Noël dans calorio ?",
+        "a": "Cherche « Mailänderli », « Brunsli », « étoile à la cannelle » ou « Spitzbub » dans calorio : la portion proposée correspond à une pièce. Indique le nombre de biscuits, ou le poids si tu les as pesés."
+      }
+    ],
+    "social": "Biscuits de Noël : combien de calories ? 🍪\n\nUn Mailänderli, environ 60 kcal. Une étoile à la cannelle, 65. Un Brunsli, 75 à 155 selon sa taille. Un Spitzbub, environ 120. Une assiette de six biscuits, c'est vite 445 kcal.\n\nLe tableau complet et une pause plus légère sont dans le Mag calorio : calorio.ch/mag\n\nWeihnachtsguetzli: wie viele Kalorien? Alles im calorio Magazin.\n\n#calorio #biscuitsdenoel #mailanderli #brunsli #suisse #suisseromande #compteurdecalories"
+  },
+  "de": {
+    "slug": "weihnachtsguetzli-kalorien",
+    "title": "Weihnachtsguetzli Kalorien: Mailänderli, Brunsli, Zimtsterne",
+    "seoTitle": "Weihnachtsguetzli Kalorien: Mailänderli, Brunsli & Co.",
+    "cardTitle": "Weihnachtsguetzli: wie viele Kalorien?",
+    "description": "Ein Mailänderli hat rund 60 kcal, ein Zimtstern 65, ein Spitzbub 120. Die Kalorien pro Stück und pro 100 g der Schweizer Weihnachtsguetzli im Überblick.",
+    "seoDescription": "Ein Mailänderli hat rund 60 kcal, ein Zimtstern 65, ein Brunsli 75 bis 155 und ein Spitzbub 120. Kalorien pro Stück und pro 100 g, mit Tipps für den Advent.",
+    "intro": "Ein Mailänderli hat **rund 60 kcal**, ein Zimtstern **rund 65 kcal**, ein Brunsli **75 bis 155 kcal** je nach Grösse und ein Spitzbub **rund 120 kcal**. Alle liegen bei 430 bis 515 kcal pro 100 g: Den Unterschied macht die Grösse.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "Die Kalorien Guetzli für Guetzli"
+      },
+      {
+        "type": "p",
+        "text": "Die Werte pro 100 g stammen aus der Schweizer Nährwertdatenbank. Das Gewicht pro Stück ist aus den Rezepten von Fooby berechnet (Teig geteilt durch die Anzahl Guetzli):"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Guetzli",
+          "1 Stück",
+          "Pro 100 g",
+          "Kalorien pro Stück"
+        ],
+        "rows": [
+          [
+            "Mailänderli",
+            "14 g",
+            "431 kcal",
+            "≈ 60 kcal"
+          ],
+          [
+            "Zimtstern",
+            "13 g",
+            "505 kcal",
+            "≈ 65 kcal"
+          ],
+          [
+            "Brunsli, klein",
+            "15 g",
+            "515 kcal",
+            "≈ 75 kcal"
+          ],
+          [
+            "Brunsli, gross",
+            "30 g",
+            "515 kcal",
+            "≈ 155 kcal"
+          ],
+          [
+            "Spitzbub",
+            "24 g",
+            "499 kcal",
+            "≈ 120 kcal"
+          ]
+        ],
+        "note": "Fooby selbst nennt 62 kcal pro Mailänderli, 62 kcal pro Zimtstern und 158 kcal pro Brunsli für seine Rezepte. Kleinere oder grössere Guetzli ändern alles: 10 g mehr Teig sind rund 45 bis 50 kcal mehr."
+      },
+      {
+        "type": "p",
+        "text": "Das Mailänderli ist pro 100 g am leichtesten (Butter, Zucker, Mehl und Eier). Zimtsterne und Brunsli bestehen vor allem aus gemahlenen Mandeln und Zucker: Sie sind gehaltvoller, haben aber auch mehr Eiweiss (rund 14 bis 15 g pro 100 g)."
+      },
+      {
+        "type": "h2",
+        "text": "Ein Teller Guetzli, wie viel ist das?"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Zutat",
+          "Menge",
+          "Kalorien"
+        ],
+        "rows": [
+          [
+            "Mailänderli",
+            "2 Stück",
+            "120 kcal"
+          ],
+          [
+            "Zimtsterne",
+            "2 Stück",
+            "130 kcal"
+          ],
+          [
+            "Brunsli, klein",
+            "1 Stück",
+            "75 kcal"
+          ],
+          [
+            "Spitzbub",
+            "1 Stück",
+            "120 kcal"
+          ],
+          [
+            "Total",
+            "6 Guetzli",
+            "≈ 445 kcal"
+          ]
+        ],
+        "note": "Das entspricht ungefähr einer leichten Mahlzeit. Im Dezember summieren sich solche Teller schnell."
+      },
+      {
+        "type": "h2",
+        "text": "Die leichtere Pause"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Zutat",
+          "Menge",
+          "Kalorien"
+        ],
+        "rows": [
+          [
+            "Mailänderli",
+            "2 Stück",
+            "120 kcal"
+          ],
+          [
+            "Zimtstern",
+            "1 Stück",
+            "65 kcal"
+          ],
+          [
+            "Clementine",
+            "80 g",
+            "38 kcal"
+          ],
+          [
+            "Tee oder schwarzer Kaffee",
+            "2 dl",
+            "≈ 2 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 225 kcal"
+          ]
+        ]
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Kleinere Guetzli ausstechen**: Ein Mailänderli von 10 statt 14 g hat rund 17 kcal weniger, und der Teller wirkt genauso voll.",
+          "**Einen Teller schöpfen** statt aus der Büchse zu naschen: So weiss man, was man gegessen hat.",
+          "**Spitzbuben für besondere Momente**: Mit der Konfitüre sind sie die gehaltvollsten.",
+          "**Eine Frucht dazu**: Clementinen und Mandarinen haben jetzt Saison."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Der richtige Reflex",
+        "text": "Weihnachtsguetzli backt man mit der Familie und verschenkt sie: Das ist Tradition, kein Ausrutscher. Wähl deine Lieblinge, geniess sie langsam und lass die anderen für morgen."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Wie viele Kalorien hat ein Mailänderli?",
+        "a": "Rund 60 kcal für ein Mailänderli von 14 g (431 kcal pro 100 g laut Schweizer Nährwertdatenbank). Fooby nennt 62 kcal pro Stück für sein Rezept."
+      },
+      {
+        "q": "Welches Weihnachtsguetzli hat am wenigsten Kalorien?",
+        "a": "Pro Stück das Mailänderli und der Zimtstern (rund 60 bis 65 kcal). Pro 100 g das Mailänderli (431 kcal); Brunsli und Zimtsterne liegen über 500 kcal."
+      },
+      {
+        "q": "Wie viele Kalorien hat ein Spitzbub?",
+        "a": "Rund 120 kcal für einen Spitzbub von 24 g, mit Konfitüre (499 kcal pro 100 g)."
+      },
+      {
+        "q": "Wie erfasse ich Weihnachtsguetzli in calorio?",
+        "a": "Suche in calorio nach «Mailänderli», «Brunsli», «Zimtstern» oder «Spitzbub»: Die vorgeschlagene Portion entspricht einem Stück. Gib die Anzahl Guetzli ein, oder das Gewicht, wenn du sie gewogen hast."
+      }
+    ],
+    "social": "Weihnachtsguetzli: wie viele Kalorien? 🍪\n\nEin Mailänderli rund 60 kcal. Ein Zimtstern 65. Ein Brunsli 75 bis 155, je nach Grösse. Ein Spitzbub rund 120. Ein Teller mit sechs Guetzli sind schnell 445 kcal.\n\nDie ganze Tabelle und eine leichtere Pause im calorio Magazin: calorio.ch/de/magazin\n\n#calorio #weihnachtsguetzli #mailänderli #zimtsterne #brunsli #schweiz #kalorienzähler"
+  }
+}

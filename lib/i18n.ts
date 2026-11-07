@@ -13,6 +13,7 @@ export const htmlLang = (lang: Lang): string => lang;
 export const UI: Record<Lang, Record<string, string>> = {
   fr: {
     eyebrow: "Boîte à outils suisse — 100 % gratuit, 100 % navigateur",
+    heroH1: "Outils et calculateurs gratuits pour la Suisse", topTitle: "Les plus utilisés",
     leadA: "micro-outils rapides pour les développeurs, les créatifs et les Suisses pressés.",
     leadB: "Aucune inscription, aucune donnée envoyée.",
     stTools: "outils", stCats: "catégories", stFree: "gratuit", stBrowser: "navigateur",
@@ -34,6 +35,7 @@ export const UI: Record<Lang, Record<string, string>> = {
   },
   de: {
     eyebrow: "Schweizer Toolbox — 100 % gratis, 100 % im Browser",
+    heroH1: "Gratis Online-Rechner für die Schweiz", topTitle: "Meistgenutzt",
     leadA: "Schnelle Mini-Tools für Entwickler, Kreative und Schweizer in Eile.",
     leadB: "Keine Anmeldung, keine Daten gesendet.",
     stTools: "Tools", stCats: "Kategorien", stFree: "gratis", stBrowser: "Browser",
@@ -55,6 +57,7 @@ export const UI: Record<Lang, Record<string, string>> = {
   },
   en: {
     eyebrow: "Swiss toolbox — 100% free, 100% in your browser",
+    heroH1: "Free online calculators for Switzerland", topTitle: "Most used",
     leadA: "Fast mini-tools for developers, creatives and busy Swiss.",
     leadB: "No sign-up, no data sent.",
     stTools: "tools", stCats: "categories", stFree: "free", stBrowser: "browser",

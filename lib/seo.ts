@@ -120,3 +120,47 @@ export const CAT_SEO: Partial<Record<Lang, Record<string, { title: string; desc:
     },
   },
 };
+
+/** « plus de 60 » / « über 60 » / « over 60 », ou le nombre exact s'il est rond (jamais d'arrondi trompeur). */
+export function toolsCountPhrase(lang: Lang, n: number): string {
+  if (n % 10 === 0) return String(n);
+  const r = Math.floor(n / 10) * 10;
+  return lang === "fr" ? `plus de ${r}` : lang === "de" ? `über ${r}` : `over ${r}`;
+}
+
+/** Titre et description des accueils d'outils.ch, positionnés sur « calculateurs suisses gratuits ». */
+export function homeSeo(lang: Lang, n: number): { title: string; desc: string } {
+  const c = toolsCountPhrase(lang, n);
+  if (lang === "de") return {
+    title: "Gratis Rechner für die Schweiz: AHV, MWST, Lohn, Miete",
+    desc: `AHV-Nummer prüfen, Nettolohn, Mietzins pro rata, MWST oder Verzugszins berechnen: ${c} kostenlose Online-Rechner für die Schweiz, ohne Anmeldung.`,
+  };
+  if (lang === "en") return {
+    title: "Free Swiss calculators: AHV, VAT, salary, rent",
+    desc: `Check an AHV number, work out a net salary, pro-rata rent, VAT or late payment interest: ${c} free online calculators for Switzerland, no sign-up.`,
+  };
+  return {
+    title: "Calculateurs suisses gratuits : AVS, TVA, salaire, loyer",
+    desc: `Vérifier un numéro AVS, calculer un salaire net, un loyer au prorata, la TVA ou des intérêts moratoires : ${c} outils gratuits pour la Suisse.`,
+  };
+}
+
+/** Outils mis en avant sous le H1 des accueils (« Les plus utilisés »). */
+export const TOP_TOOLS = ["avso", "prorato", "salaro", "intero", "preo", "resilio", "pourcento", "ibano"];
+
+/** Ancres courtes pour les liens internes, quand l'outil n'a pas de H1 écrit à la main. */
+const ANCHOR: Record<string, Partial<Record<Lang, string>>> = {
+  salaro: { fr: "Calculer son salaire net", de: "Nettolohn berechnen", en: "Net salary calculator" },
+  preo: { fr: "Délai de congé (contrat de travail)", de: "Kündigungsfrist Arbeitsvertrag", en: "Employment notice period" },
+  resilio: { fr: "Délai de résiliation du bail", de: "Kündigungsfrist Mietvertrag", en: "Lease termination notice" },
+  avso: { en: "Check a Swiss AHV number" },
+  prorato: { en: "Pro-rata rent calculator" },
+  intero: { en: "Late payment interest (5%)" },
+  pourcento: { en: "Percentage calculator" },
+  ibano: { de: "IBAN prüfen", en: "Check an IBAN" },
+};
+
+/** Texte d'ancre d'un lien interne vers un outil : ancre courte, sinon H1, sinon tagline. */
+export function toolAnchor(lang: Lang, tool: Tool): string {
+  return ANCHOR[tool.slug]?.[lang] ?? toolH1(lang, tool);
+}

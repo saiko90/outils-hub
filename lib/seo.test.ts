@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { TOOLS } from "./catalog";
 import { LANGS } from "./i18n";
-import { SEO, CAT_SEO, toolTitle, toolDescription, toolH1, cutAtWord } from "./seo";
+import { SEO, CAT_SEO, toolTitle, toolDescription, toolH1, cutAtWord, homeSeo, toolsCountPhrase, TOP_TOOLS } from "./seo";
+import { bySlug } from "./catalog";
 
 describe("SEO des pages outil", () => {
   it("les textes écrits à la main respectent les longueurs (titre ≤ 60, description 140-160)", () => {
@@ -38,5 +39,17 @@ describe("SEO des pages outil", () => {
   it("cutAtWord coupe au mot près", () => {
     expect(cutAtWord("Calculatrice scientifique + solveur d'équations + formulaire", 40)).toBe("Calculatrice scientifique + solveur");
     expect(cutAtWord("court", 60)).toBe("court");
+  });
+
+  it("accueils : titre ≤ 60, description 140-160, nombre d'outils jamais gonflé", () => {
+    for (const lang of LANGS) {
+      const h = homeSeo(lang, TOOLS.length);
+      expect(h.title.length, lang).toBeLessThanOrEqual(60);
+      expect(h.desc.length, lang).toBeGreaterThanOrEqual(140);
+      expect(h.desc.length, lang).toBeLessThanOrEqual(160);
+    }
+    expect(toolsCountPhrase("fr", 61)).toBe("plus de 60");
+    expect(toolsCountPhrase("fr", 60)).toBe("60");
+    for (const s of TOP_TOOLS) expect(bySlug(s), s).toBeDefined();
   });
 });

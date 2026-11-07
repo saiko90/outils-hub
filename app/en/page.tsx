@@ -4,18 +4,15 @@ import { OUTILS_WEBSITE, STUDIO_ORG } from "@/lib/siteLd";
 import Hub from "../Hub";
 import { TOOLS, REAL_CATEGORIES, CAT_SLUG, CAT_EMOJI, toolsByCat, proTools } from "@/lib/catalog";
 import { t, catLabel, toolTagline, altLanguages } from "@/lib/i18n";
+import { homeSeo } from "@/lib/seo";
 
+const home = homeSeo("en", TOOLS.length);
 export const metadata: Metadata = {
-  title: "outils.ch — free online tools (dev, design, Swiss)",
-  description:
-    "The directory of free online tools: converters, generators and calculators for developers, creatives and Switzerland. Instant search, 100% in your browser, no sign-up.",
+  title: home.title,
+  description: home.desc,
   keywords: ["online tools", "free tools", "converter", "generator", "calculator", "switzerland", "outils.ch"],
   alternates: { canonical: "/en", languages: altLanguages("/") },
-  openGraph: {
-    title: "outils.ch — the free Swiss toolbox",
-    description: "Fast mini-tools. Instant search, 100% in your browser, no data sent.",
-    type: "website", locale: "en", siteName: "outils.ch", url: "https://outils.ch/en",
-  },
+  openGraph: { title: home.title, description: home.desc, type: "website", locale: "en", siteName: "outils.ch", url: "https://outils.ch/en" },
 };
 
 const jsonLd = {

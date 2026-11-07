@@ -4,8 +4,15 @@ import { OUTILS_WEBSITE, STUDIO_ORG } from "@/lib/siteLd";
 import Hub from "./Hub";
 import { TOOLS, REAL_CATEGORIES, CAT_SLUG, CAT_EMOJI, toolsByCat, proTools } from "@/lib/catalog";
 import { altLanguages } from "@/lib/i18n";
+import { homeSeo } from "@/lib/seo";
 
-export const metadata: Metadata = { alternates: { canonical: "/", languages: altLanguages("/") } };
+const home = homeSeo("fr", TOOLS.length);
+export const metadata: Metadata = {
+  title: home.title,
+  description: home.desc,
+  alternates: { canonical: "/", languages: altLanguages("/") },
+  openGraph: { title: home.title, description: home.desc, type: "website", locale: "fr_CH", siteName: "outils.ch", url: "https://outils.ch" },
+};
 
 const jsonLd = {
   "@context": "https://schema.org",

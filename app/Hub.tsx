@@ -7,6 +7,7 @@ import { track } from "@vercel/analytics";
 import { TOOLS, CATEGORIES, CAT_EMOJI, CAT_SLUG, bySlug, isPro, type Tool } from "@/lib/catalog";
 import { type Lang, t as tr, catLabel, toolTagline, langPrefix } from "@/lib/i18n";
 import { norm, filterTools, suggestedTools } from "@/lib/search";
+import { toolAnchor, TOP_TOOLS } from "@/lib/seo";
 
 /** Événement de conversion : quel outil est réellement ouvert (identifie les outils « héros »). */
 function trackOpen(t: Tool, from: string) {
@@ -272,9 +273,10 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
           <motion.div className="eyebrow" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <span className="dot" /> {tr(lang, "eyebrow")}
           </motion.div>
-          <motion.h1 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.05 }}>
+          <motion.div className="hero-brand" aria-hidden initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.05 }}>
             <span className="g">outils</span><span className="tld">.ch</span>
-          </motion.h1>
+          </motion.div>
+          <h1 className="hero-h1">{tr(lang, "heroH1")}</h1>
           <motion.p className="lead" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.14 }}>
             {TOOLS.length} {tr(lang, "leadA")} {tr(lang, "leadB")}
           </motion.p>
@@ -284,6 +286,14 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
             <div className="stat"><div className="n">0.-</div><div className="l">{tr(lang, "stFree")}</div></div>
             <div className="stat"><div className="n">100%</div><div className="l">{tr(lang, "stBrowser")}</div></div>
           </motion.div>
+          <nav className="hero-top" aria-label={tr(lang, "topTitle")}>
+            <h2>{tr(lang, "topTitle")}</h2>
+            <ul>
+              {TOP_TOOLS.map((slug) => bySlug(slug)).filter((x): x is Tool => !!x).map((x) => (
+                <li key={x.slug}><Link href={`${langPrefix(lang)}/o/${x.slug}`}>{toolAnchor(lang, x)}</Link></li>
+              ))}
+            </ul>
+          </nav>
         </motion.header>
 
         <div className="searchwrap">

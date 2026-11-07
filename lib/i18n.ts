@@ -91,11 +91,11 @@ export const CAT_LABEL: Record<Lang, Record<string, string>> = {
   fr: {},
   de: {
     Tous: "Alle", Suisse: "Schweiz", Dev: "Dev", Design: "Design", Texte: "Text", Temps: "Zeit",
-    Finance: "Finanzen", Calcul: "Rechnen", Données: "Daten", Web: "Web", Santé: "Gesundheit",
+    Finance: "Finanzen", Calcul: "Rechnen", Web: "Web", Santé: "Gesundheit",
   },
   en: {
     Tous: "All", Suisse: "Switzerland", Dev: "Dev", Design: "Design", Texte: "Text", Temps: "Time",
-    Finance: "Finance", Calcul: "Calc", Données: "Data", Web: "Web", Santé: "Health",
+    Finance: "Finance", Calcul: "Calc", Web: "Web", Santé: "Health",
   },
 };
 export const catLabel = (lang: Lang, cat: string): string => CAT_LABEL[lang]?.[cat] ?? cat;
@@ -135,7 +135,6 @@ export const TAGLINE_DE: Record<string, string> = {
   uuido: "UUID-Generator (v4)",
   diffo: "Text-Vergleich (Diff, LCS)",
   prorato: "Miete pro rata (Schweiz, 30-Tage-Methode)",
-  imco: "BMI-Rechner + WHO-Kategorien",
   epocho: "Unix-Timestamp ⇄ Datum (ISO/UTC)",
   gradiento: "CSS-Verlauf-Generator",
   cssmino: "Schonender CSS-Minifier",
@@ -200,7 +199,6 @@ export const TAGLINE_EN: Record<string, string> = {
   uuido: "UUID generator (v4)",
   diffo: "Text compare (diff, LCS)",
   prorato: "Pro-rata rent (Switzerland, 30-day method)",
-  imco: "BMI calculator + WHO categories",
   epocho: "Unix timestamp ⇄ date (ISO/UTC)",
   gradiento: "CSS gradient generator",
   cssmino: "Careful CSS minifier",

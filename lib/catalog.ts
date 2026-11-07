@@ -12,7 +12,7 @@ export type Tool = {
 };
 
 export const CATEGORIES = [
-  "Tous", "Suisse", "Dev", "Design", "Texte", "Temps", "Finance", "Calcul", "Données", "Web", "Santé",
+  "Tous", "Suisse", "Dev", "Design", "Texte", "Temps", "Finance", "Calcul", "Web", "Santé",
 ] as const;
 
 export const TOOLS: Tool[] = [
@@ -35,8 +35,8 @@ export const TOOLS: Tool[] = [
   { slug: "schemo", name: "schemo", tagline: "Validateur JSON-LD (Schema.org)", url: "https://outils.ch/o/schemo", cat: "Web", tags: ["json-ld", "jsonld", "schema.org", "données structurées", "structured data", "seo", "rich results", "rich snippets", "google", "microdata", "balisage", "référencement"], from: "#8b5cf6", to: "#0ea5e9" },
   { slug: "sitemapo", name: "sitemapo", tagline: "Générateur de sitemap.xml + robots.txt", url: "https://outils.ch/o/sitemapo", cat: "Web", tags: ["sitemap", "sitemap.xml", "robots.txt", "seo", "référencement", "google", "indexation", "crawl", "urls", "plan du site"], from: "#0ea5e9", to: "#22c55e" },
   { slug: "tvaflash", name: "tvaflash", tagline: "Décompte TVA suisse (8.1 / 2.6 / 3.8 %)", url: "https://tva-suisse.vercel.app", cat: "Suisse", tags: ["tva", "impôt", "décompte", "ht", "ttc", "comptabilité"], from: "#14b8a6", to: "#0ea5e9", ch: true },
-  { slug: "csvzen", name: "csvzen", tagline: "Nettoyeur & dédoublonneur de CSV", url: "https://csvzen.outils.ch", cat: "Données", tags: ["csv", "doublons", "nettoyer", "tableur", "data"], from: "#10b981", to: "#22d3ee" },
-  { slug: "dataflip", name: "dataflip", tagline: "Convertisseur JSON ⇄ CSV ⇄ Excel", url: "https://dataflip.outils.ch", cat: "Données", tags: ["json", "csv", "excel", "convertir", "data"], from: "#6366f1", to: "#a855f7" },
+  { slug: "csvzen", name: "csvzen", tagline: "Nettoyeur & dédoublonneur de CSV", url: "https://csvzen.outils.ch", cat: "Dev", tags: ["csv", "doublons", "nettoyer", "tableur", "data"], from: "#10b981", to: "#22d3ee" },
+  { slug: "dataflip", name: "dataflip", tagline: "Convertisseur JSON ⇄ CSV ⇄ Excel", url: "https://dataflip.outils.ch", cat: "Dev", tags: ["json", "csv", "excel", "convertir", "data"], from: "#6366f1", to: "#a855f7" },
   { slug: "amortiz", name: "amortiz", tagline: "Tableau d'amortissement de prêt", url: "https://amortiz.outils.ch", cat: "Finance", tags: ["prêt", "crédit", "amortissement", "intérêts", "mensualité"], from: "#f59e0b", to: "#10b981" },
   { slug: "datafaux", name: "datafaux", tagline: "Générateur de données de test factices", url: "https://datafaux.vercel.app", cat: "Dev", tags: ["données", "test", "faux", "mock", "fixtures", "seed"], from: "#22d3ee", to: "#e879f9" },
   { slug: "datecalc", name: "datecalc", tagline: "Calculateur de dates & délais", url: "https://datecalc-three.vercel.app", cat: "Temps", tags: ["date", "délai", "jours", "calcul", "échéance"], from: "#14b8a6", to: "#3b82f6" },
@@ -62,7 +62,6 @@ export const TOOLS: Tool[] = [
   { slug: "uuido", name: "uuido", tagline: "Générateur d'UUID (v4)", url: "https://uuido.vercel.app", cat: "Dev", tags: ["uuid", "guid", "identifiant", "v4", "aléatoire"], from: "#8b5cf6", to: "#6366f1" },
   { slug: "diffo", name: "diffo", tagline: "Comparateur de texte (diff LCS)", url: "https://diffo.vercel.app", cat: "Texte", tags: ["diff", "comparer", "texte", "différence", "lcs"], from: "#22d3ee", to: "#3b82f6" },
   { slug: "prorato", name: "prorato", tagline: "Loyer au prorata (Suisse, méthode 30es)", url: "https://prorato.vercel.app", cat: "Suisse", tags: ["loyer", "prorata", "bail", "régie", "30es"], from: "#10b981", to: "#34d399", ch: true },
-  { slug: "imco", name: "imco", tagline: "Calculateur d'IMC + catégories OMS", url: "https://imco.vercel.app", cat: "Santé", tags: ["imc", "bmi", "poids", "taille", "oms", "santé"], from: "#38bdf8", to: "#2dd4bf" },
   { slug: "epocho", name: "epocho", tagline: "Timestamp Unix ⇄ date (ISO/UTC)", url: "https://epocho.vercel.app", cat: "Temps", tags: ["timestamp", "unix", "epoch", "date", "iso"], from: "#a78bfa", to: "#22d3ee" },
   { slug: "gradiento", name: "gradiento", tagline: "Générateur de dégradé CSS", url: "https://gradiento-omega.vercel.app", cat: "Design", tags: ["dégradé", "gradient", "css", "couleur", "linear"], from: "#f472b6", to: "#fbbf24" },
   { slug: "cssmino", name: "cssmino", tagline: "Minifieur CSS prudent", url: "https://cssmino.vercel.app", cat: "Dev", tags: ["css", "minify", "minifier", "compresser", "front"], from: "#4ade80", to: "#14b8a6" },
@@ -81,7 +80,7 @@ export const TOOLS: Tool[] = [
 
 export const CAT_EMOJI: Record<string, string> = {
   Suisse: "🇨🇭", Dev: "⚙️", Design: "🎨", Texte: "✍️", Temps: "⏱️",
-  Finance: "💰", Calcul: "🔢", Données: "📊", Web: "🌐", Santé: "❤️", Tous: "✨",
+  Finance: "💰", Calcul: "🔢", Web: "🌐", Santé: "❤️", Tous: "✨",
 };
 
 export const bySlug = (slug: string): Tool | undefined => TOOLS.find((t) => t.slug === slug);
@@ -92,7 +91,7 @@ export const REAL_CATEGORIES = CATEGORIES.filter((c) => c !== "Tous") as string[
 /** Slug URL ASCII pour chaque catégorie (/c/<slug>). */
 export const CAT_SLUG: Record<string, string> = {
   Suisse: "suisse", Dev: "dev", Design: "design", Texte: "texte", Temps: "temps",
-  Finance: "finance", Calcul: "calcul", Données: "donnees", Web: "web", Santé: "sante",
+  Finance: "finance", Calcul: "calcul", Web: "web", Santé: "sante",
 };
 
 /** Reverse : slug URL -> nom de catégorie. */

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-const POPULAR_CATS = ["Suisse", "Dev", "Données"];
+const POPULAR_CATS = ["Suisse", "Dev", "Finance"];
 const FEATURED = ["facturama", "tvaflash", "paletto", "jsono"];
 
 export default function NotFound() {

@@ -358,7 +358,7 @@ export default function Hub({ lang = "fr" }: { lang?: Lang }) {
           </div>
           <nav className="foot-col" aria-label={tr(lang, "footCats")}>
             <h3>{tr(lang, "footCats")}</h3>
-            {["Suisse", "Dev", "Données", "Finance"].filter((c) => CAT_SLUG[c]).map((c) => (
+            {["Suisse", "Dev", "Finance", "Santé"].filter((c) => CAT_SLUG[c]).map((c) => (
               <Link key={c} href={`${langPrefix(lang)}/c/${CAT_SLUG[c]}`}>{CAT_EMOJI[c]} {catLabel(lang, c)}</Link>
             ))}
           </nav>

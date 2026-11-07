@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { partnerRedirect } from "./lib/partnerLinks";
 import { canonicalRedirect } from "./lib/hostRedirects";
+import { pathLang, CONTENT_LANGUAGE } from "./lib/pathLang";
 
 // Sert le Cockpit admin sur le sous-domaine admin.outils.ch (réécriture vers /admin),
 // tout en le laissant aussi accessible sur outils.ch/admin. Aucun effet sur le site public.
@@ -9,6 +10,13 @@ export function middleware(req: NextRequest) {
   const host = (req.headers.get("host") || "").split(":")[0];
   const { pathname } = req.nextUrl;
   const onCalorio = host === "calorio.ch" || host === "www.calorio.ch";
+  // En-tête Content-Language (de-CH / en / fr-CH) calculé sur le chemin d'origine, sur les réponses servies
+  // (next ou rewrite), jamais sur les redirections. Bing s'en sert ; <html lang> reste statique.
+  const contentLang = onCalorio || host === "outils.ch" ? CONTENT_LANGUAGE[pathLang(pathname)] : null;
+  const serve = (res: NextResponse) => {
+    if (contentLang) res.headers.set("Content-Language", contentLang);
+    return res;
+  };
   // Connexion de l'app Android : l'app ouvre www.calorio.ch (hôte différent → le système l'ouvre dans le
   // navigateur et non dans l'app) ; on renvoie vers calorio.ch, où vit la session du navigateur.
   if (host === "www.calorio.ch" && req.nextUrl.searchParams.has("applogin")) {
@@ -23,19 +31,19 @@ export function middleware(req: NextRequest) {
   if (onCalorio && (pathname === "/" || pathname === "/de" || pathname === "/en")) {
     const url = req.nextUrl.clone();
     url.pathname = pathname === "/" ? "/calorio-accueil" : `/calorio-accueil${pathname}`;
-    return NextResponse.rewrite(url);
+    return serve(NextResponse.rewrite(url));
   }
   // calorio.ch : mentions légales et conditions propres à calorio (exigences TWINT : nom, adresse, contact, prix CHF).
   if (onCalorio && /^\/(?:(?:de|en)\/)?(?:mentions-legales|impressum|legal-notice|conditions|agb|terms)\/?$/.test(pathname)) {
     const url = req.nextUrl.clone();
     url.pathname = "/mentions-legales-calorio";
-    return NextResponse.rewrite(url);
+    return serve(NextResponse.rewrite(url));
   }
   // calorio.ch : programme partenaires (créateurs, coachs).
   if (onCalorio && /^\/(?:(?:de|en)\/)?(?:partenaires|partner|partners)\/?$/.test(pathname)) {
     const url = req.nextUrl.clone();
     url.pathname = "/partenaires-calorio";
-    return NextResponse.rewrite(url);
+    return serve(NextResponse.rewrite(url));
   }
   // calorio.ch : liens partenaires courts (calorio.ch/anne, calorio.ch/ANNE20) → accueil avec le code promo.
   if (onCalorio) {
@@ -59,9 +67,9 @@ export function middleware(req: NextRequest) {
   if (host.startsWith("admin.") && !pathname.startsWith("/admin")) {
     const url = req.nextUrl.clone();
     url.pathname = "/admin" + (pathname === "/" ? "" : pathname);
-    return NextResponse.rewrite(url);
+    return serve(NextResponse.rewrite(url));
   }
-  return NextResponse.next();
+  return serve(NextResponse.next());
 }
 
 export const config = {

@@ -45,7 +45,7 @@ export default function IdeoCalc({ lang }: { lang: Lang }) {
 
   return (
     <section className="id" id="ideo">
-      <style>{ID_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: ID_CSS }} />
       <label className="id-field">
         <span>{t.label}</span>
         <input type="text" value={val} onChange={(e) => setVal(e.target.value)} placeholder={t.placeholder}

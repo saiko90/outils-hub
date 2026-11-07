@@ -57,7 +57,7 @@ export default function SalaroCalc({ lang }: { lang: Lang }) {
 
   return (
     <section className="sl" id="salaro">
-      <style>{SL_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: SL_CSS }} />
       <div className="sl-grid">
         <div className="sl-params">
           <h3 className="sl-h">{t.params}</h3>

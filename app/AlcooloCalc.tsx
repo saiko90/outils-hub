@@ -78,7 +78,7 @@ export default function AlcooloCalc({ lang }: { lang: Lang }) {
 
   return (
     <section className="ao" id="alcoolo">
-      <style>{AO_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: AO_CSS }} />
       <div className="ao-grid">
         <div className="ao-params">
           <div className="ao-field">

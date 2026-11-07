@@ -50,7 +50,7 @@ export default function InteroCalc({ lang }: { lang: Lang }) {
 
   return (
     <section className="in" id="intero">
-      <style>{IN_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: IN_CSS }} />
       <div className="in-grid">
         <div className="in-params">
           <label className="in-field"><span>{t.montant}</span>

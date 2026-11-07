@@ -152,7 +152,7 @@ export default function RentoCalc({ lang }: { lang: Lang }) {
 
   return (
     <section className="rc" id="rento">
-      <style>{RC_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: RC_CSS }} />
 
       <div className="rc-verdict" style={{ borderColor: vColor }}>
         <div className="rc-vtag" style={{ background: vColor }}>{t.verdictTitre}</div>

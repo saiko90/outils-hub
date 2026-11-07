@@ -71,7 +71,7 @@ export default function LegatoCalc({ lang }: { lang: Lang }) {
 
   return (
     <section className="lg" id="legato">
-      <style>{LG_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: LG_CSS }} />
       <div className="lg-grid">
         <div className="lg-params">
           <h3 className="lg-h">{t.params}</h3>

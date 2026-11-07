@@ -40,7 +40,7 @@ export default function ImcaCalc({ lang }: { lang: Lang }) {
 
   return (
     <section className="ic" id="imca">
-      <style>{IC_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: IC_CSS }} />
       <div className="ic-grid">
         <div className="ic-params">
           <label className="ic-field">

@@ -51,7 +51,7 @@ export default function PreoCalc({ lang }: { lang: Lang }) {
 
   return (
     <section className="pr" id="preo">
-      <style>{PR_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: PR_CSS }} />
       <div className="pr-grid">
         <div className="pr-params">
           <label className="pr-field">

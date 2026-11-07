@@ -95,7 +95,7 @@ export default function ScalcCalc({ lang }: { lang: Lang }) {
 
   return (
     <section className="sc" id="scalc">
-      <style>{SC_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: SC_CSS }} />
       <div className="sc-layout">
         <div className="sc-main">
           <div className="sc-tabs">

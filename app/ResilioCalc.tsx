@@ -66,7 +66,7 @@ export default function ResilioCalc({ lang }: { lang: Lang }) {
 
   return (
     <section className="rs" id="resilio">
-      <style>{RS_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: RS_CSS }} />
       <div className="rs-grid">
         <div className="rs-params">
           <label className="rs-field">

@@ -41,7 +41,7 @@ export default function AllocoCalc({ lang }: { lang: Lang }) {
 
   return (
     <section className="al" id="alloco">
-      <style>{AL_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: AL_CSS }} />
       <div className="al-grid">
         <div className="al-params">
           <label className="al-field">

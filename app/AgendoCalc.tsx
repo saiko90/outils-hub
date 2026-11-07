@@ -115,7 +115,7 @@ export default function AgendoCalc({ lang }: { lang: Lang }) {
 
   return (
     <section className="ag" id="agendo">
-      <style>{AG_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: AG_CSS }} />
       <div className="ag-grid">
         <div className="ag-form">
           <label className="ag-field">

@@ -59,7 +59,7 @@ export default function LamaloCalc({ lang }: { lang: Lang }) {
 
   return (
     <section className="lm" id="lamalo">
-      <style>{LM_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: LM_CSS }} />
       <p className="lm-intro">{t.intro}</p>
 
       <div className="lm-grid">

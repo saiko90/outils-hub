@@ -83,7 +83,7 @@ export default function BudgetoCalc({ lang }: { lang: Lang }) {
 
   return (
     <section className="bg" id="budgeto">
-      <style>{BG_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: BG_CSS }} />
       <div className="bg-grid">
         <div className="bg-inputs">
           {CATS.map(({ cat }) => (

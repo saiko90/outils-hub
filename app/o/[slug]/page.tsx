@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { TOOLS, bySlug } from "@/lib/catalog";
-import { toolTagline, altLanguages } from "@/lib/i18n";
+import { altLanguages } from "@/lib/i18n";
+import { toolTitle, toolDescription } from "@/lib/seo";
 import ToolView from "../../ToolView";
 
 const lang = "fr" as const;
@@ -12,9 +13,8 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const tool = bySlug(params.slug);
   if (!tool) return { title: "Outil introuvable — outils.ch" };
-  const tag = toolTagline(lang, tool);
-  const title = `${tool.name} — ${tag} | outils.ch`;
-  const description = `${tag}. Outil ${tool.cat.toLowerCase()} gratuit, sans inscription, 100 % dans ton navigateur. ${tool.ch ? "Pensé pour la Suisse. " : ""}Ouvre ${tool.name} en un clic sur outils.ch.`;
+  const title = toolTitle(lang, tool);
+  const description = toolDescription(lang, tool);
   return {
     title, description,
     keywords: [tool.name, ...tool.tags, "outil en ligne", "gratuit", tool.cat.toLowerCase()],

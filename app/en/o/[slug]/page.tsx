@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { TOOLS, bySlug } from "@/lib/catalog";
-import { toolTagline, catLabel, altLanguages } from "@/lib/i18n";
+import { catLabel, altLanguages } from "@/lib/i18n";
+import { toolTitle, toolDescription } from "@/lib/seo";
 import ToolView from "../../../ToolView";
 
 const lang = "en" as const;
@@ -12,9 +13,8 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const tool = bySlug(params.slug);
   if (!tool) return { title: "Tool not found — outils.ch" };
-  const tag = toolTagline(lang, tool);
-  const title = `${tool.name} — ${tag} | outils.ch`;
-  const description = `${tag}. Free ${catLabel(lang, tool.cat).toLowerCase()} tool, no sign-up, 100% in your browser. ${tool.ch ? "Built for Switzerland. " : ""}Open ${tool.name} in one click on outils.ch.`;
+  const title = toolTitle(lang, tool);
+  const description = toolDescription(lang, tool);
   return {
     title, description,
     keywords: [tool.name, ...tool.tags, "online tool", "free", catLabel(lang, tool.cat).toLowerCase()],

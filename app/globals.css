@@ -152,7 +152,8 @@ main:focus { outline: none; }
 .tp-logo { width: 76px; height: 76px; border-radius: 20px; display: grid; place-items: center; font-weight: 850; font-size: 27px; color: #06060c; flex-shrink: 0; box-shadow: 0 16px 40px -16px rgba(0,0,0,0.7); }
 .tp-cat { font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 7px; }
 .tp-cat .ch { color: #ef4444; }
-.tp-h1 { font-size: clamp(34px, 7vw, 54px); font-weight: 860; letter-spacing: -0.03em; margin: 6px 0 4px; }
+.tp-brand { font-size: clamp(15px, 2.4vw, 18px); font-weight: 800; letter-spacing: -0.01em; color: var(--muted); margin: 6px 0 0; }
+.tp-h1 { font-size: clamp(28px, 5.2vw, 44px); font-weight: 860; letter-spacing: -0.03em; line-height: 1.12; margin: 4px 0 6px; }
 .tp-tag { color: var(--muted); font-size: clamp(16px, 2.6vw, 20px); margin: 0; }
 .tp-cta { display: inline-flex; align-items: center; gap: 10px; color: #06060c; font-weight: 800; font-size: 17px; border-radius: 14px; padding: 16px 26px; text-decoration: none; box-shadow: 0 16px 36px -14px rgba(99,102,241,0.6); transition: transform 0.15s ease; }
 .tp-cta:hover { transform: translateY(-3px); }

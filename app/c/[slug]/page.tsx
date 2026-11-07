@@ -5,6 +5,7 @@ import {
   REAL_CATEGORIES, CAT_SLUG, catBySlug, toolsByCat, categoryIntro, CAT_EMOJI,
 } from "@/lib/catalog";
 import { altLanguages } from "@/lib/i18n";
+import { CAT_SEO } from "@/lib/seo";
 import CatProHighlight from "../../CatProHighlight";
 
 export function generateStaticParams() {
@@ -15,8 +16,9 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   const cat = catBySlug(params.slug);
   if (!cat) return { title: "Catégorie introuvable — outils.ch" };
   const n = toolsByCat(cat).length;
-  const title = `Outils ${cat} — ${n} outils en ligne gratuits | outils.ch`;
-  const description = categoryIntro(cat);
+  const custom = CAT_SEO.fr?.[params.slug];
+  const title = custom?.title ?? `Outils ${cat} — ${n} outils en ligne gratuits | outils.ch`;
+  const description = custom?.desc ?? categoryIntro(cat);
   return {
     title,
     description,

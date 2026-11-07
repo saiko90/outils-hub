@@ -24,6 +24,7 @@ import {
   type Lang, langPrefix, catLabel, toolTagline, longDescriptionL, faqFor, faqGeneric, proContent,
   tpProBadge, tpOpenVerb, faqTitle, tpTrust, t,
 } from "@/lib/i18n";
+import { toolH1 } from "@/lib/seo";
 
 // Outils « épurés » : on masque le fluff de bas de page dont le client n'a pas besoin
 // (nuage de mots-clés, description générique, FAQ générique) tout en gardant le SEO
@@ -45,6 +46,7 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
   const bridge = pro ? undefined : bridgePro(tool.slug);
   const faq = pro ? faqFor(lang, tool) : faqGeneric(lang, tool);
   const tagline = toolTagline(lang, tool);
+  const h1 = toolH1(lang, tool);
   const canon = `https://outils.ch${p}/o/${tool.slug}`;
 
   const jsonLd = {
@@ -94,8 +96,9 @@ export default function ToolView({ slug, lang }: { slug: string; lang: Lang }) {
           <div className="tp-logo" style={{ background: `linear-gradient(135deg, ${tool.from}, ${tool.to})` }}>{initials}</div>
           <div>
             <div className="tp-cat">{tool.ch && <span className="ch">🇨🇭</span>}{CAT_EMOJI[tool.cat]} {catLabel(lang, tool.cat)}{pro && <span className="tp-pro">{tpProBadge[lang]}</span>}</div>
-            <h1 className="tp-h1">{tool.name}</h1>
-            <p className="tp-tag">{tagline}</p>
+            <p className="tp-brand">{tool.name}</p>
+            <h1 className="tp-h1">{h1}</h1>
+            {h1 !== tagline && <p className="tp-tag">{tagline}</p>}
           </div>
         </header>
 

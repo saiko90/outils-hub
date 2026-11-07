@@ -35,8 +35,8 @@ export default function Page() {
         <div className="pro-inner">
           <div className="pro-head">
             <span className="pro-eyebrow">🇨🇭 Pour les indépendants &amp; PME suisses</span>
-            <h2>Les outils métier, conformes et prêts pour votre comptabilité</h2>
-            <p>TVA, QR-facture, IBAN, AVS, loyers au prorata… Des outils précis, aux normes suisses, que ni un tableur ni une IA ne remplacent. Édités par Swiss Digital Studio.</p>
+            <h2>Outils suisses pour indépendants et PME</h2>
+            <p>TVA, QR-facture, IBAN, AVS, loyers au prorata… Des outils précis, selon les règles suisses, que ni un tableur ni une IA ne remplacent. Édités par Swiss Digital Studio.</p>
           </div>
 
           <div className="pro-grid">

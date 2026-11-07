@@ -24,13 +24,13 @@ export const UI: Record<Lang, Record<string, string>> = {
     palettePh: "Aller à un outil…", pNav: "naviguer", pOpen: "ouvrir", pClose: "fermer", pEmpty: "Aucun outil pour",
     footMade: "🇨🇭 Fait en Suisse — Swiss Digital Studio", footRight: "aucune donnée envoyée",
     proEyebrow: "🇨🇭 Pour les indépendants & PME suisses",
-    proTitle: "Les outils métier, conformes et prêts pour votre comptabilité",
-    proIntro: "TVA, QR-facture, IBAN, AVS, loyers au prorata… Des outils précis, aux normes suisses, que ni un tableur ni une IA ne remplacent. Édités par Swiss Digital Studio.",
+    proTitle: "Outils suisses pour indépendants et PME",
+    proIntro: "TVA, QR-facture, IBAN, AVS, loyers au prorata… Des outils précis, selon les règles suisses, que ni un tableur ni une IA ne remplacent. Édités par Swiss Digital Studio.",
     proFlag: "Produit phare", proDiscover: "Découvrir",
     catsTitle: "Parcourir par catégorie",
     backAll: "← Tous les outils", sameCat: "Dans la même catégorie",
     otherCats: "Explorer les autres catégories", freeTools: "outils gratuits", madeCH: "🇨🇭 fait en Suisse", footTagline: "Micro-outils gratuits, 100 % navigateur.", footBy: "Réalisé par", footCats: "Catégories", footLangs: "Langues",
-    toGrid: "Tous les outils", favTitle: "Favoris", recentTitle: "Récemment ouverts", pin: "Ajouter aux favoris", unpin: "Retirer des favoris", suggestTitle: "Suggestions", footAbout: "À propos", footPrivacy: "Confidentialité", footLegal: "Mentions légales", footTerms: "Conditions", swissLinked: "Outils suisses complémentaires", goFurther: "Pour aller plus loin — outil métier suisse", catProTitle: "Outils métier pros", catProSub: "Conçus pour les indépendants et PME : conformes aux normes suisses, résultat prêt pour ta comptabilité.",
+    toGrid: "Tous les outils", favTitle: "Favoris", recentTitle: "Récemment ouverts", pin: "Ajouter aux favoris", unpin: "Retirer des favoris", suggestTitle: "Suggestions", footAbout: "À propos", footPrivacy: "Confidentialité", footLegal: "Mentions légales", footTerms: "Conditions", swissLinked: "Outils suisses complémentaires", goFurther: "Pour aller plus loin — outil métier suisse", catProTitle: "Outils métier pros", catProSub: "Conçus pour les indépendants et PME, selon les règles suisses.",
   },
   de: {
     eyebrow: "Schweizer Toolbox — 100 % gratis, 100 % im Browser",
@@ -45,13 +45,13 @@ export const UI: Record<Lang, Record<string, string>> = {
     palettePh: "Zu einem Tool springen…", pNav: "navigieren", pOpen: "öffnen", pClose: "schliessen", pEmpty: "Kein Tool für",
     footMade: "🇨🇭 Made in Switzerland — Swiss Digital Studio", footRight: "keine Daten gesendet",
     proEyebrow: "🇨🇭 Für Schweizer Selbstständige & KMU",
-    proTitle: "Die Business-Tools — normkonform und bereit für Ihre Buchhaltung",
-    proIntro: "MWST, QR-Rechnung, IBAN, AHV, Miete pro rata … Präzise Tools nach Schweizer Norm, die weder Tabelle noch KI ersetzen. Herausgegeben von Swiss Digital Studio.",
+    proTitle: "Schweizer Tools für Selbstständige und KMU",
+    proIntro: "MWST, QR-Rechnung, IBAN, AHV, Miete pro rata … Präzise Tools nach Schweizer Regeln, die weder Tabelle noch KI ersetzen. Herausgegeben von Swiss Digital Studio.",
     proFlag: "Vorzeigeprodukt", proDiscover: "Entdecken",
     catsTitle: "Nach Kategorie durchsuchen",
     backAll: "← Alle Tools", sameCat: "In derselben Kategorie",
     otherCats: "Weitere Kategorien entdecken", freeTools: "gratis Tools", madeCH: "🇨🇭 made in Switzerland", footTagline: "Gratis Mikro-Tools, 100 % im Browser.", footBy: "Umgesetzt von", footCats: "Kategorien", footLangs: "Sprachen",
-    toGrid: "Alle Tools", favTitle: "Favoriten", recentTitle: "Zuletzt geöffnet", pin: "Zu Favoriten hinzufügen", unpin: "Aus Favoriten entfernen", suggestTitle: "Vorschläge", footAbout: "Über uns", footPrivacy: "Datenschutz", footLegal: "Impressum", footTerms: "AGB", swissLinked: "Ergänzende Schweizer Tools", goFurther: "Einen Schritt weiter — Schweizer Business-Tool", catProTitle: "Business-Tools für Profis", catProSub: "Für Selbstständige und KMU: normkonform, Ergebnis bereit für die Buchhaltung.",
+    toGrid: "Alle Tools", favTitle: "Favoriten", recentTitle: "Zuletzt geöffnet", pin: "Zu Favoriten hinzufügen", unpin: "Aus Favoriten entfernen", suggestTitle: "Vorschläge", footAbout: "Über uns", footPrivacy: "Datenschutz", footLegal: "Impressum", footTerms: "AGB", swissLinked: "Ergänzende Schweizer Tools", goFurther: "Einen Schritt weiter — Schweizer Business-Tool", catProTitle: "Business-Tools für Profis", catProSub: "Für Selbstständige und KMU, nach Schweizer Regeln.",
   },
   en: {
     eyebrow: "Swiss toolbox — 100% free, 100% in your browser",
@@ -66,13 +66,13 @@ export const UI: Record<Lang, Record<string, string>> = {
     palettePh: "Jump to a tool…", pNav: "navigate", pOpen: "open", pClose: "close", pEmpty: "No tool for",
     footMade: "🇨🇭 Made in Switzerland — Swiss Digital Studio", footRight: "no data sent",
     proEyebrow: "🇨🇭 For Swiss freelancers & SMEs",
-    proTitle: "The business tools — compliant and ready for your accounting",
-    proIntro: "VAT, QR-bill, IBAN, AHV, pro-rata rent… Precise tools built to Swiss standards that neither a spreadsheet nor an AI can replace. Made by Swiss Digital Studio.",
+    proTitle: "Swiss tools for freelancers and SMEs",
+    proIntro: "VAT, QR-bill, IBAN, AHV, pro-rata rent… Precise tools following Swiss rules that neither a spreadsheet nor an AI can replace. Made by Swiss Digital Studio.",
     proFlag: "Flagship", proDiscover: "Discover",
     catsTitle: "Browse by category",
     backAll: "← All tools", sameCat: "In the same category",
     otherCats: "Explore other categories", freeTools: "free tools", madeCH: "🇨🇭 made in Switzerland", footTagline: "Free micro-tools, 100% in your browser.", footBy: "Built by", footCats: "Categories", footLangs: "Languages",
-    toGrid: "All tools", favTitle: "Favourites", recentTitle: "Recently opened", pin: "Add to favourites", unpin: "Remove from favourites", suggestTitle: "Suggestions", footAbout: "About", footPrivacy: "Privacy", footLegal: "Legal notice", footTerms: "Terms", swissLinked: "Related Swiss tools", goFurther: "Go further — Swiss business tool", catProTitle: "Pro business tools", catProSub: "Built for freelancers and SMEs: Swiss-compliant, result ready for your accounting.",
+    toGrid: "All tools", favTitle: "Favourites", recentTitle: "Recently opened", pin: "Add to favourites", unpin: "Remove from favourites", suggestTitle: "Suggestions", footAbout: "About", footPrivacy: "Privacy", footLegal: "Legal notice", footTerms: "Terms", swissLinked: "Related Swiss tools", goFurther: "Go further — Swiss business tool", catProTitle: "Pro business tools", catProSub: "Built for freelancers and SMEs, following Swiss rules.",
   },
 };
 
@@ -238,25 +238,24 @@ export const tpProBadge: Record<Lang, string> = { fr: "Pro · Suisse", de: "Pro 
 export const tpOpenVerb: Record<Lang, string> = { fr: "Ouvrir", de: "Öffnen", en: "Open" };
 export const faqTitle: Record<Lang, string> = { fr: "Questions fréquentes", de: "Häufige Fragen", en: "FAQ" };
 export const tpTrust: Record<Lang, string> = {
-  fr: "Outil métier aux normes suisses — résultat prêt pour votre comptabilité. 100 % dans votre navigateur, aucune donnée envoyée.",
-  de: "Business-Tool nach Schweizer Norm — Ergebnis bereit für Ihre Buchhaltung. 100 % im Browser, keine Daten gesendet.",
-  en: "Business tool built to Swiss standards — result ready for your accounting. 100% in your browser, no data sent.",
+  fr: "Outil aux règles suisses. Calcul 100 % dans votre navigateur, aucune donnée envoyée.",
+  de: "Nach Schweizer Regeln. Berechnung 100 % im Browser, keine Daten gesendet.",
+  en: "Built on Swiss rules. Runs 100% in your browser, no data sent.",
 };
 
 /** Description longue traduite pour la page SEO. */
 export function longDescriptionL(lang: Lang, tool: Tool): string {
-  const kw = tool.tags.slice(0, 6).join(", ");
   const tag = toolTagline(lang, tool).toLowerCase();
   if (lang === "de") {
     const ch = tool.ch ? " Für die Schweiz konzipiert." : "";
-    return `${tool.name} ist ein Online-${catLabel("de", tool.cat)}-Tool, gratis und ohne Anmeldung: ${tag}.${ch} Alles wird direkt in deinem Browser berechnet — keine Daten werden an einen Server gesendet, deine Informationen bleiben privat. Schnell, werbefrei, auf Handy und Computer nutzbar. Stichwörter: ${kw}.`;
+    return `${tool.name} ist ein Online-${catLabel("de", tool.cat)}-Tool, gratis und ohne Anmeldung: ${tag}.${ch} Alles wird direkt in deinem Browser berechnet — keine Daten werden an einen Server gesendet, deine Informationen bleiben privat. Schnell, werbefrei, auf Handy und Computer nutzbar.`;
   }
   if (lang === "en") {
     const ch = tool.ch ? " Built for Switzerland." : "";
-    return `${tool.name} is a free, no-sign-up online ${catLabel("en", tool.cat).toLowerCase()} tool: ${tag}.${ch} Everything is computed right in your browser — no data is sent to a server, your information stays private. Fast, ad-free, works on mobile and desktop. Keywords: ${kw}.`;
+    return `${tool.name} is a free, no-sign-up online ${catLabel("en", tool.cat).toLowerCase()} tool: ${tag}.${ch} Everything is computed right in your browser — no data is sent to a server, your information stays private. Fast, ad-free, works on mobile and desktop.`;
   }
   const ch = tool.ch ? " Pensé pour la Suisse." : "";
-  return `${tool.name} est un outil ${tool.cat.toLowerCase()} en ligne, gratuit et sans inscription : ${tag}.${ch} Tout se calcule directement dans ton navigateur — aucune donnée n'est envoyée sur un serveur, tes informations restent privées. Rapide, sans publicité, utilisable sur mobile comme sur ordinateur. Mots-clés : ${kw}.`;
+  return `${tool.name} est un outil ${tool.cat.toLowerCase()} en ligne, gratuit et sans inscription : ${tag}.${ch} Tout se calcule directement dans ton navigateur — aucune donnée n'est envoyée sur un serveur, tes informations restent privées. Rapide, sans publicité, utilisable sur mobile comme sur ordinateur.`;
 }
 
 /** Contenu SEO enrichi pour les outils pro (cas d'usage suisses concrets). */
@@ -358,22 +357,18 @@ export function proContent(lang: Lang, tool: Tool): string {
 
 /** FAQ (pour les outils pro) traduite. */
 export function faqFor(lang: Lang, tool: Tool): { q: string; a: string }[] {
-  const tag = toolTagline(lang, tool).toLowerCase();
   const n = tool.name;
   if (lang === "de") return [
-    { q: `Ist ${n} normkonform (Schweiz)?`, a: `Ja. ${n} wendet die geltenden Schweizer Regeln an (${tag}), um ein Ergebnis zu liefern, das direkt in Ihrer Buchhaltung und für Ihre Behördengänge nutzbar ist.` },
     { q: `Werden meine Daten an einen Server gesendet?`, a: `Nein. Alles wird in Ihrem Browser berechnet — keine Daten (Betrag, IBAN, Nummer) werden übertragen oder gespeichert. Ideal für sensible Informationen.` },
-    { q: `Ist ${n} gratis?`, a: `Ja, ${n} ist gratis und ohne Anmeldung. Pro-Funktionen für Schweizer Selbstständige und KMU kommen bald auf outils.ch.` },
+    { q: `Ist ${n} gratis?`, a: `Ja, ${n} ist gratis und ohne Anmeldung.` },
   ];
   if (lang === "en") return [
-    { q: `Is ${n} compliant with Swiss standards?`, a: `Yes. ${n} applies the current Swiss rules (${tag}) to produce a result you can use directly in your accounting and paperwork.` },
     { q: `Is my data sent to a server?`, a: `No. Everything is computed in your browser — no data (amount, IBAN, number) is transmitted or stored. Ideal for sensitive information.` },
-    { q: `Is ${n} free?`, a: `Yes, ${n} is free and requires no sign-up. Pro features for Swiss freelancers and SMEs are coming to outils.ch.` },
+    { q: `Is ${n} free?`, a: `Yes, ${n} is free and requires no sign-up.` },
   ];
   return [
-    { q: `${n} est-il conforme aux normes suisses ?`, a: `Oui. ${n} applique les règles suisses en vigueur (${tag}) pour produire un résultat directement utilisable dans votre comptabilité et vos démarches.` },
     { q: `Mes données sont-elles envoyées sur un serveur ?`, a: `Non. Tout est calculé dans votre navigateur — aucune donnée (montant, IBAN, numéro) n'est transmise ni stockée. Idéal pour des informations sensibles.` },
-    { q: `${n} est-il gratuit ?`, a: `Oui, ${n} est gratuit et sans inscription. Des fonctions Pro pour les indépendants et PME suisses arrivent sur outils.ch.` },
+    { q: `${n} est-il gratuit ?`, a: `Oui, ${n} est gratuit et sans inscription.` },
   ];
 }
 

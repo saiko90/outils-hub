@@ -148,7 +148,6 @@ export function categoryIntro(cat: string): string {
 
 /** Description longue générée (unique par outil) pour la page SEO dédiée. */
 export function longDescription(t: Tool): string {
-  const kw = t.tags.slice(0, 6).join(", ");
   const ch = t.ch ? " Pensé pour la Suisse" : "";
-  return `${t.name} est un outil ${t.cat.toLowerCase()} en ligne, gratuit et sans inscription : ${t.tagline.toLowerCase()}.${ch}. Tout se calcule directement dans ton navigateur — aucune donnée n'est envoyée sur un serveur, tes informations restent privées. Rapide, sans publicité, utilisable sur mobile comme sur ordinateur. Mots-clés : ${kw}.`;
+  return `${t.name} est un outil ${t.cat.toLowerCase()} en ligne, gratuit et sans inscription : ${t.tagline.toLowerCase()}.${ch}. Tout se calcule directement dans ton navigateur — aucune donnée n'est envoyée sur un serveur, tes informations restent privées. Rapide, sans publicité, utilisable sur mobile comme sur ordinateur.`;
 }

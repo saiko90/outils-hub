@@ -588,6 +588,35 @@ export function alimentSlug(al: Aliment): string {
   return SLUG_BY_ID[al.id] || al.id;
 }
 
+/* --- Noms affichés dans les pages SEO (sans toucher à nom.fr, dont dépendent les slugs) --- */
+// Suffixe de canton en fin de nom : « Cuchaule (FR) », « Longeole (GE) ». Construit avec new RegExp.
+const CANTON_SUFFIX = new RegExp("\\s*\\([A-Z]{2}\\)$");
+/** Nom sans suffixe de canton : « Cuchaule (FR) » → « Cuchaule ». Les autres parenthèses restent. */
+export function seoName(al: Aliment): string {
+  return al.nom.fr.replace(CANTON_SUFFIX, "");
+}
+/**
+ * Nom à placer au milieu d'une phrase : la 1re lettre passe en minuscule seulement si la 2e est minuscule
+ * et qu'aucune autre majuscule ne suit (« Gruyère » → « gruyère », mais « Big Mac » et « McNuggets » restent).
+ */
+export function inText(s: string): string {
+  if (s.length < 2) return s;
+  const second = s[1];
+  if (second.toLowerCase() !== second || second.toUpperCase() === second) return s;
+  if (/\p{Lu}/u.test(s.slice(1))) return s;
+  return s[0].toLowerCase() + s.slice(1);
+}
+/** <title> d'une fiche /calories (≤ 60 caractères) : la question, puis des variantes plus courtes pour les noms longs. */
+export function ficheTitle(al: Aliment): string {
+  const n = seoName(al);
+  const opts = [`${n} : combien de calories ? ${al.kcal} kcal/100 g`, `${n} : calories, ${al.kcal} kcal pour 100 g`, `${n} : ${al.kcal} kcal/100 g`];
+  return opts.find((t) => t.length <= 60) ?? opts[opts.length - 1];
+}
+/** « de » ou « d' » devant un nom (élision devant voyelle ou h muet). */
+export function deNom(s: string): string {
+  return /^[aeiouyàâäéèêëîïôöùûüœh]/i.test(s) ? `d'${s}` : `de ${s}`;
+}
+
 export type Total = { kcal: number; prot: number; gluc: number; lip: number };
 
 /** Valeurs nutritionnelles par 100 g — commun à la base interne et aux sources externes. */

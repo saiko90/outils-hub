@@ -6,7 +6,7 @@ import { magPublished, magUrl } from "@/lib/mag";
 
 // Dates réelles de dernière modification (et non « maintenant » à chaque requête, ce qui n'apprend rien aux moteurs).
 const CALORIO_UPDATED = new Date("2026-09-25");
-const CALORIO_CONTENT = new Date("2026-09-25");
+const CALORIO_CONTENT = new Date("2026-11-07"); // gabarit des fiches /calories (HUB-08)
 
 // Le Mag calorio : index FR / DE et articles publiés (avec leurs équivalents dans l'autre langue).
 function magSitemap(): MetadataRoute.Sitemap {

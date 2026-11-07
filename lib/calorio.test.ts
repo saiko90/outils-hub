@@ -9,6 +9,11 @@ import {
   tendancePoids,
   aliment,
   ALIMENTS,
+  alimentBySlug,
+  seoName,
+  inText,
+  deNom,
+  ficheTitle,
 } from "./calorio";
 
 describe("calorio — métabolisme (Mifflin-St Jeor)", () => {
@@ -107,5 +112,30 @@ describe("plancher calorique de sécurité", () => {
     const b = computeBesoins({ sexe: "homme", age: 30, poids: 80, taille: 180, activite: "modere", objectif: "perte" });
     expect(b.cible).toBe(2759 - 300);
     expect(b.plancher).toBe(false);
+  });
+});
+
+describe("calorio — noms des fiches SEO", () => {
+  it("seoName retire seulement un suffixe de canton", () => {
+    expect(seoName(aliment("cuchaule")!)).toBe("Cuchaule");
+    expect(seoName(aliment("longeole")!)).toBe("Longeole");
+    expect(seoName(aliment("raclette")!)).toBe("Raclette (fromage)");
+    expect(seoName(aliment("mcnuggets")!)).toBe("McNuggets (6 pièces)");
+  });
+  it("inText ne casse pas les noms propres", () => {
+    expect(inText("Big Mac")).toBe("Big Mac");
+    expect(inText("McNuggets (6 pièces)")).toBe("McNuggets (6 pièces)");
+    expect(inText("Gruyère")).toBe("gruyère");
+    expect(inText("Raclette (fromage)")).toBe("raclette (fromage)");
+    expect(deNom("émincé zurichois")).toBe("d'émincé zurichois");
+    expect(deNom("gruyère")).toBe("de gruyère");
+  });
+  it("non-régression : les slugs déjà indexés se résolvent toujours", () => {
+    for (const s of ["cuchaule-fr", "vacherin-fribourgeois", "raclette-fromage", "pates-cuites", "mojito"]) {
+      expect(alimentBySlug(s), s).toBeDefined();
+    }
+  });
+  it("chaque fiche a un titre de 60 caractères au plus", () => {
+    for (const al of ALIMENTS) expect(ficheTitle(al).length, al.id).toBeLessThanOrEqual(60);
   });
 });

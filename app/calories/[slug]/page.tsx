@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import { ALIMENTS, ALIMENT_SLUGS, alimentBySlug, alimentSlug, type Aliment, type AlimentCat } from "@/lib/calorio";
+import { ALIMENTS, ALIMENT_SLUGS, alimentBySlug, alimentSlug, seoName, inText, deNom, ficheTitle, type Aliment, type AlimentCat } from "@/lib/calorio";
 
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -19,11 +19,13 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   if (!al) return {};
   const canon = `https://calorio.ch/calories/${params.slug}`;
   const kcalP = r0((al.kcal * al.portion) / 100);
+  const title = ficheTitle(al);
+  const description = `${seoName(al)} apporte environ ${al.kcal} kcal pour 100 g, soit ${kcalP} kcal par portion de ${al.portion} g. Protéines ${r1(al.prot)} g, glucides ${r1(al.gluc)} g, lipides ${r1(al.lip)} g. Suivi gratuit avec calorio.`;
   return {
-    title: `Combien de calories dans ${al.nom.fr} ? ${al.kcal} kcal/100 g`,
-    description: `${al.nom.fr} : ${al.kcal} kcal pour 100 g (≈ ${kcalP} kcal par portion de ${al.portion} g). Protéines ${r1(al.prot)} g, glucides ${r1(al.gluc)} g, lipides ${r1(al.lip)} g. Suis tes calories gratuitement avec calorio.`,
+    title,
+    description,
     alternates: { canonical: canon },
-    openGraph: { title: `${al.nom.fr} — ${al.kcal} kcal/100 g`, description: `Calories et macros de ${al.nom.fr}, et comment les suivre gratuitement avec calorio.`, url: canon, type: "article", siteName: "calorio" },
+    openGraph: { title, description, url: canon, type: "article", siteName: "calorio" },
   };
 }
 
@@ -39,26 +41,38 @@ export default function Page({ params }: { params: { slug: string } }) {
     { label: "Glucides", per100: al.gluc, perPortion: (al.gluc * al.portion) / 100 },
     { label: "Lipides", per100: al.lip, perPortion: (al.lip * al.portion) / 100 },
   ];
+  const name = seoName(al);
+  const nt = inText(name);
   const faq = [
-    { q: `Combien de calories dans 100 g de ${al.nom.fr.toLowerCase()} ?`, a: `100 g de ${al.nom.fr.toLowerCase()} apportent environ ${al.kcal} kcal.` },
-    { q: `Combien de calories pour une portion de ${al.nom.fr.toLowerCase()} ?`, a: `Une portion usuelle de ${al.portion} g représente environ ${kcalP} kcal.` },
-    { q: `Quels sont les macros de ${al.nom.fr.toLowerCase()} ?`, a: `Pour 100 g : ${r1(al.prot)} g de protéines, ${r1(al.gluc)} g de glucides et ${r1(al.lip)} g de lipides.` },
+    { q: `Combien de calories dans 100 g ${deNom(nt)} ?`, a: `100 g ${deNom(nt)} apportent environ ${al.kcal} kcal.` },
+    { q: `Combien de calories pour une portion ${deNom(nt)} ?`, a: `Une portion usuelle de ${al.portion} g représente environ ${kcalP} kcal.` },
+    { q: `Quels sont les macros ${deNom(nt)} ?`, a: `Pour 100 g : ${r1(al.prot)} g de protéines, ${r1(al.gluc)} g de glucides et ${r1(al.lip)} g de lipides.` },
   ];
   const faqLd = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) };
+  const canon = `https://calorio.ch/calories/${params.slug}`;
+  const breadcrumbLd = {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "calorio", item: "https://calorio.ch/" },
+      { "@type": "ListItem", position: 2, name: "Calories des aliments", item: "https://calorio.ch/calories" },
+      { "@type": "ListItem", position: 3, name, item: canon },
+    ],
+  };
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <style dangerouslySetInnerHTML={{ __html: CAL_CSS }} />
       <div className="ca-bg" aria-hidden />
       <main className="ca">
         <header className="ca-top">
           <a className="ca-brand" href="https://calorio.ch/"><img src="/calorio-icon-192.png" alt="" width={30} height={30} /> calorio</a>
         </header>
-        <nav className="ca-crumb" aria-label="fil d'ariane"><a href="https://calorio.ch/">calorio</a> <span aria-hidden>›</span> <a href="/calories">Calories des aliments</a> <span aria-hidden>›</span> {al.nom.fr}</nav>
+        <nav className="ca-crumb" aria-label="fil d'ariane"><a href="https://calorio.ch/">calorio</a> <span aria-hidden>›</span> <a href="/calories">Calories des aliments</a> <span aria-hidden>›</span> {name}</nav>
 
-        <h1 className="ca-h1"><span className="ca-emo" aria-hidden>{al.emoji}</span> Combien de calories dans {al.nom.fr.toLowerCase()} ?</h1>
-        <p className="ca-intro">{al.nom.fr} apporte <b>{al.kcal} kcal pour 100 g</b>, soit environ <b>{kcalP} kcal</b> pour une portion usuelle de {al.portion} g. Voici le détail des calories et des macronutriments — et de quoi les suivre gratuitement.</p>
+        <h1 className="ca-h1"><span className="ca-emo" aria-hidden>{al.emoji}</span> {name} : combien de calories ?</h1>
+        <p className="ca-intro">{name} apporte <b>{al.kcal} kcal pour 100 g</b>, soit environ <b>{kcalP} kcal</b> pour une portion usuelle de {al.portion} g. Voici le détail des calories et des macronutriments — et de quoi les suivre gratuitement.</p>
 
         <div className="ca-kpis">
           <div className="ca-kpi"><div className="ca-kv">{al.kcal}</div><div className="ca-kl">kcal / 100 g</div></div>
@@ -80,7 +94,7 @@ export default function Page({ params }: { params: { slug: string } }) {
         <p className="ca-note">Valeurs indicatives par 100 g (moyennes). Les valeurs réelles varient selon la marque et la préparation.</p>
 
         <div className="ca-final">
-          <div className="ca-final-t">Suis {al.nom.fr.toLowerCase()} dans ton journal</div>
+          <div className="ca-final-t">Suis {nt} dans ton journal</div>
           <p>Ajoute cet aliment en deux tapes, calorio calcule tes calories et tes macros du jour. Gratuit, sans pub.</p>
           <a className="ca-cta" href="https://calorio.ch/calorio">Ouvrir calorio <span aria-hidden>→</span></a>
         </div>

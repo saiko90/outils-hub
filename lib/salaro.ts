@@ -1,10 +1,10 @@
 // salaro — cœur de calcul : salaire BRUT → NET suisse (déductions salarié 2026).
-// AVS/AI/APG, assurance chômage (AC + solidarité), LAA (accident non prof.), LPP, impôt à la source.
+// AVS/AI/APG, assurance chômage (AC), LAA (accident non prof.), LPP, impôt à la source.
 // Estimation : la LPP dépend du plan et de l'âge, la LAA de la branche, l'impôt source du canton.
 
 export const AVS_RATE = 5.3;       // % — AVS/AI/APG part salarié, sans plafond
 export const AC_RATE = 1.1;        // % — assurance chômage jusqu'au plafond
-export const AC_SOLIDARITE = 0.5;  // % — cotisation de solidarité au-delà du plafond
+// La cotisation de solidarité AC (0.5 % au-delà du plafond) n'est plus prélevée depuis le 1er janvier 2023.
 export const AC_PLAFOND = 148200;  // CHF/an — plafond du salaire assuré AC/LAA 2026
 
 export type SalaroInputs = {
@@ -27,11 +27,9 @@ export type SalaroResult = {
 
 const r2 = (v: number) => Math.round(v * 100) / 100;
 
-/** Cotisation AC : taux plein jusqu'au plafond, puis solidarité au-delà. */
+/** Cotisation AC : 1.1 % jusqu'au plafond, rien au-delà (plus de cotisation de solidarité depuis 2023). */
 export function cotisationAC(brut: number): number {
-  const base = Math.min(brut, AC_PLAFOND) * (AC_RATE / 100);
-  const solidarite = Math.max(0, brut - AC_PLAFOND) * (AC_SOLIDARITE / 100);
-  return base + solidarite;
+  return Math.min(Math.max(0, brut), AC_PLAFOND) * (AC_RATE / 100);
 }
 
 export function computeSalaro(inp: SalaroInputs): SalaroResult {

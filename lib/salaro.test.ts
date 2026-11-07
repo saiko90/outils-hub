@@ -4,16 +4,16 @@ import { cotisationAC, computeSalaro, AC_PLAFOND, type SalaroInputs } from "./sa
 const base: SalaroInputs = { brutAnnuel: 100000, tauxLAA: 1.3, tauxLPP: 0, tauxSource: 0 };
 const find = (r: ReturnType<typeof computeSalaro>, k: string) => r.deductions.find((d) => d.key === k);
 
-describe("salaro — cotisation AC (plafond + solidarité)", () => {
+describe("salaro — cotisation AC (plafond, sans solidarité depuis 2023)", () => {
   it("sous le plafond : 1.1 %", () => {
     expect(cotisationAC(100000)).toBe(1100);
   });
   it("au plafond exact : 1.1 % de 148200", () => {
     expect(cotisationAC(AC_PLAFOND)).toBeCloseTo(1630.2, 2);
   });
-  it("au-dessus du plafond : 1.1 % jusqu'au plafond + 0.5 % au-delà", () => {
-    // 200000 → 148200×1.1% + 51800×0.5% = 1630.2 + 259 = 1889.2
-    expect(cotisationAC(200000)).toBeCloseTo(1889.2, 2);
+  it("au-dessus du plafond : 1.1 % jusqu'au plafond, rien au-delà", () => {
+    // 200000 → 148200×1.1% = 1630.2 (la cotisation de solidarité n'est plus prélevée depuis 2023)
+    expect(cotisationAC(200000)).toBeCloseTo(1630.2, 2);
   });
 });
 

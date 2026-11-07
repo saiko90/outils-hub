@@ -12,7 +12,7 @@ const L = {
     net: "Salaire net", parAn: "/an", moisSuffix: "/mois", deductions: "Détail des déductions",
     totalDed: "Total des déductions", tauxGlobal: "Taux de déduction global",
     dLabels: { avs: "AVS / AI / APG", ac: "Assurance chômage (AC)", laa: "Assurance accident (LAA)", lpp: "2e pilier (LPP)", source: "Impôt à la source" },
-    disclaimer: "Estimation des déductions sociales salarié (taux fédéraux 2026 : AVS 5.3 %, AC 1.1 % jusqu'à 148'200 CHF puis 0.5 %). La LPP, la LAA et l'impôt à la source dépendent de ton employeur, de ta caisse de pension et de ton canton — ajuste-les. Ne comprend pas l'impôt ordinaire sur le revenu.",
+    disclaimer: "Estimation des déductions sociales salarié (taux fédéraux 2026 : AVS 5.3 %, AC 1.1 % jusqu'à 148'200 CHF, rien au-delà). La LPP, la LAA et l'impôt à la source dépendent de ton employeur, de ta caisse de pension et de ton canton — ajuste-les. Ne comprend pas l'impôt ordinaire sur le revenu.",
   },
   de: {
     params: "Dein Lohn", brut: "Bruttojahreslohn", parMois: "d. h.", tauxLAA: "Unfallversicherung (NBU)",
@@ -21,7 +21,7 @@ const L = {
     net: "Nettolohn", parAn: "/Jahr", moisSuffix: "/Monat", deductions: "Abzüge im Detail",
     totalDed: "Total Abzüge", tauxGlobal: "Gesamter Abzugssatz",
     dLabels: { avs: "AHV / IV / EO", ac: "Arbeitslosenvers. (ALV)", laa: "Unfallversicherung (NBU)", lpp: "2. Säule (BVG)", source: "Quellensteuer" },
-    disclaimer: "Schätzung der Sozialabzüge (Bundessätze 2026: AHV 5.3 %, ALV 1.1 % bis 148'200 CHF, dann 0.5 %). BVG, NBU und Quellensteuer hängen von Arbeitgeber, Pensionskasse und Kanton ab. Ohne ordentliche Einkommenssteuer.",
+    disclaimer: "Schätzung der Sozialabzüge (Bundessätze 2026: AHV 5.3 %, ALV 1.1 % bis 148'200 CHF, darüber nichts). BVG, NBU und Quellensteuer hängen von Arbeitgeber, Pensionskasse und Kanton ab. Ohne ordentliche Einkommenssteuer.",
   },
   en: {
     params: "Your salary", brut: "Gross annual salary", parMois: "i.e.", tauxLAA: "Accident insurance (LAA)",
@@ -30,7 +30,7 @@ const L = {
     net: "Net salary", parAn: "/yr", moisSuffix: "/mo", deductions: "Deductions breakdown",
     totalDed: "Total deductions", tauxGlobal: "Overall deduction rate",
     dLabels: { avs: "OASI / DI / EO", ac: "Unemployment (AC)", laa: "Accident insurance (LAA)", lpp: "2nd pillar (LPP)", source: "Withholding tax" },
-    disclaimer: "Estimate of employee social deductions (2026 federal rates: OASI 5.3%, unemployment 1.1% up to CHF 148,200 then 0.5%). LPP, LAA and withholding tax depend on your employer, pension fund and canton. Excludes ordinary income tax.",
+    disclaimer: "Estimate of employee social deductions (2026 federal rates: OASI 5.3%, unemployment 1.1% up to CHF 148,200, nothing above). LPP, LAA and withholding tax depend on your employer, pension fund and canton. Excludes ordinary income tax.",
   },
 } as const;
 

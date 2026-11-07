@@ -4,7 +4,7 @@ import { ALIMENTS, alimentSlug, type AlimentCat } from "@/lib/calorio";
 const CANON = "https://calorio.ch/calories";
 
 export const metadata: Metadata = {
-  title: "Calories des aliments : combien de calories dans… ? | calorio",
+  title: "Calories des aliments : combien de calories ? | calorio",
   description:
     "Calories et macros des aliments courants (pain, poulet, banane, pizza, chocolat…) pour 100 g et par portion. Suis tes calories gratuitement, sans pub, avec calorio.",
   alternates: { canonical: CANON },

@@ -89,7 +89,7 @@ export const COPY: Record<LLang, LandingCopy> = {
     footer: { madeBy: "Une application de", madeWhere: ", Valais", swiss: "Spécialités suisses", swissHref: "/calories/specialites-suisses", privacy: "Confidentialité", legal: "Mentions légales et conditions", partners: "Devenir partenaire", recipes: "Recettes", foods: "Calories des aliments", compare: "Comparatifs", mag: "Le Mag" },
   },
   de: {
-    htmlTitle: "calorio — Kalorienzähler aus der Schweiz, einfach und werbefrei",
+    htmlTitle: "calorio — Schweizer Kalorienzähler, einfach und werbefrei",
     metaDesc: "Zähle Kalorien und Makros, scanne Produkte, verfolge dein Gewicht und frag Vito, deinen KI-Ernährungscoach. Gratis, ohne Werbung, aus der Schweiz.",
     nav: { features: "Funktionen", pricing: "Preise", faq: "Fragen", open: "App öffnen" },
     bmi: { text: "Möchtest du wissen, wo dein Gewicht steht, bevor du ein Ziel setzt?", link: "BMI berechnen", href: "https://outils.ch/de/o/imca" },

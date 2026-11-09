@@ -1,0 +1,417 @@
+{
+  "id": "chili-con-carne",
+  "date": "2026-11-11",
+  "cat": "sportif",
+  "emoji": "🌶️",
+  "kcal": {
+    "value": "800",
+    "label": {
+      "fr": "kcal par assiette, avec riz",
+      "de": "kcal pro Teller, mit Reis"
+    }
+  },
+  "related": {
+    "aliments": [
+      "chili",
+      "boeuf_hache",
+      "haricots_rouges",
+      "riz",
+      "lentilles"
+    ],
+    "recettes": [
+      "chili_con_carne"
+    ]
+  },
+  "sources": [
+    {
+      "label": "Base d'aliments calorio : bœuf haché (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/b-uf-hache"
+    },
+    {
+      "label": "Base d'aliments calorio : haricots rouges (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/haricots-rouges"
+    },
+    {
+      "label": "Base d'aliments calorio : sauce tomate (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/sauce-tomate"
+    },
+    {
+      "label": "Base d'aliments calorio : maïs (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/mais"
+    },
+    {
+      "label": "Base d'aliments calorio : oignon (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/oignon"
+    },
+    {
+      "label": "Base d'aliments calorio : poivron (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/poivron"
+    },
+    {
+      "label": "Base d'aliments calorio : huile d'olive (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/huile-d-olive"
+    },
+    {
+      "label": "Base d'aliments calorio : riz cuit (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/riz-cuit"
+    },
+    {
+      "label": "Base d'aliments calorio : lentilles cuites (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/lentilles-cuites"
+    },
+    {
+      "label": "Base d'aliments calorio : cheddar (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/cheddar"
+    },
+    {
+      "label": "Base d'aliments calorio : yaourt grec (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/yaourt-grec"
+    },
+    {
+      "label": "International Society of Sports Nutrition : position sur les protéines et l'exercice (Jäger et al., 2017)",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5477153"
+    }
+  ],
+  "fr": {
+    "slug": "chili-con-carne-calories-proteines",
+    "title": "Chili con carne : calories et protéines par portion",
+    "seoTitle": "Chili con carne : 800 kcal et 52 g de protéines avec riz",
+    "cardTitle": "Chili con carne : 52 g de protéines",
+    "description": "Une portion de chili con carne maison avec 150 g de riz : environ 800 kcal et 52 g de protéines. Recette pour 4, calcul détaillé et variantes sport.",
+    "intro": "Une portion de chili con carne maison (un quart d'une recette avec 500 g de bœuf haché) apporte **environ 610 kcal et 48 g de protéines**. Avec 150 g de riz, compte **environ 800 kcal et 52 g de protéines** : un vrai repas de sportif, qui se prépare en une fois pour plusieurs jours.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "Pourquoi le chili plaît tant aux sportifs"
+      },
+      {
+        "type": "p",
+        "text": "Le chili réunit deux sources de protéines : le **bœuf haché (environ 26 g de protéines pour 100 g)** et les **haricots rouges (environ 9 g pour 100 g)**, qui apportent aussi des glucides pour recharger après l'effort. La Société internationale de nutrition du sport (ISSN) cite des apports de **20 à 40 g de protéines par repas** pour construire du muscle : une portion de chili est déjà au-dessus, même sans le riz."
+      },
+      {
+        "type": "h2",
+        "text": "Le détail d'une portion (recette pour 4)"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Ingrédient",
+          "Quantité par portion",
+          "Calories",
+          "Protéines"
+        ],
+        "rows": [
+          [
+            "Bœuf haché",
+            "125 g",
+            "313 kcal",
+            "32,5 g"
+          ],
+          [
+            "Haricots rouges égouttés",
+            "120 g",
+            "152 kcal",
+            "10,4 g"
+          ],
+          [
+            "Tomates concassées ou passata",
+            "200 g",
+            "64 kcal",
+            "3,2 g"
+          ],
+          [
+            "Maïs égoutté",
+            "35 g",
+            "30 kcal",
+            "1,1 g"
+          ],
+          [
+            "Oignon et poivron",
+            "75 g",
+            "27 kcal",
+            "0,8 g"
+          ],
+          [
+            "Huile d'olive",
+            "2,5 g",
+            "22 kcal",
+            "0 g"
+          ],
+          [
+            "Riz cuit",
+            "150 g",
+            "195 kcal",
+            "4 g"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 800 kcal",
+            "≈ 52 g"
+          ]
+        ],
+        "note": "Sans le riz : environ 610 kcal et 48 g de protéines. Les épices (cumin, paprika, piment, ail) ne comptent pratiquement pas. Les valeurs du bœuf haché varient selon sa teneur en graisse."
+      },
+      {
+        "type": "ol",
+        "items": [
+          "Coupe 2 oignons et 1 poivron en dés et fais-les revenir 5 minutes dans 1 cuillère à soupe d'huile (10 g).",
+          "Ajoute 500 g de bœuf haché et fais-le dorer en l'émiettant. Assaisonne avec 1 gousse d'ail, 2 cuillères à café de cumin, 1 cuillère à soupe de paprika, du piment selon ton goût, du sel et du poivre.",
+          "Verse 800 g de tomates concassées ou de passata, couvre et laisse mijoter 20 minutes.",
+          "Ajoute 2 boîtes de haricots rouges rincés et égouttés (environ 480 g) et 140 g de maïs égoutté, puis laisse encore cuire 10 minutes.",
+          "Sers avec le riz. Les portions restantes se gardent 2 à 3 jours au frigo dans des boîtes fermées, ou se congèlent."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Cinq variantes selon ton objectif"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Variante",
+          "Ce qui change",
+          "Calories",
+          "Protéines"
+        ],
+        "rows": [
+          [
+            "Classique",
+            "La recette ci-dessus, avec 150 g de riz",
+            "≈ 800 kcal",
+            "≈ 52 g"
+          ],
+          [
+            "Sans riz",
+            "Le chili seul",
+            "≈ 610 kcal",
+            "≈ 48 g"
+          ],
+          [
+            "Moitié lentilles",
+            "250 g de bœuf et 300 g de lentilles cuites pour 4, avec riz",
+            "≈ 735 kcal",
+            "≈ 43 g"
+          ],
+          [
+            "Végé",
+            "500 g de lentilles cuites pour 4 à la place du bœuf, avec riz",
+            "≈ 635 kcal",
+            "≈ 31 g"
+          ],
+          [
+            "Prise de muscle",
+            "250 g de riz et 30 g de cheddar râpé par assiette",
+            "≈ 1055 kcal",
+            "≈ 62 g"
+          ]
+        ],
+        "note": "Deux cuillères à soupe de yaourt grec (40 g) à la place de la crème acidulée ajoutent environ 40 kcal et 3,5 g de protéines."
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Cuisine double** : le chili est encore meilleur le lendemain, et tu as ton repas d'après l'entraînement prêt en 3 minutes.",
+          "**Haricots en boîte** : rince-les bien, ils perdent une partie du sel du jus. On les trouve au rayon conserves de Migros et Coop.",
+          "**Plus de légumes** : courgette, carotte ou poivron supplémentaire ajoutent du volume pour très peu de calories.",
+          "**Le riz à la balance** : 150 g de riz cuit, c'est environ 50 g de riz cru. La portion du riz fait varier le total plus que tout le reste."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Le bon réflexe",
+        "text": "Il n'y a pas de « bonne » ou de « mauvaise » portion : adapte le riz à ta faim et à ta journée. Après une grosse séance, la version prise de muscle a toute sa place ; un soir de repos, le chili avec une salade suffit souvent."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Combien de calories dans une assiette de chili con carne ?",
+        "a": "Environ 610 kcal pour une portion de chili (un quart d'une recette avec 500 g de bœuf haché), et environ 800 kcal avec 150 g de riz cuit."
+      },
+      {
+        "q": "Combien de protéines dans un chili con carne ?",
+        "a": "Environ 48 g par portion sans riz : environ 32 g viennent du bœuf haché et 10 g des haricots rouges. Le riz en ajoute environ 4 g."
+      },
+      {
+        "q": "Le chili con carne est-il bon pour la prise de muscle ?",
+        "a": "Oui, c'est un repas complet : beaucoup de protéines, des glucides avec le riz et les haricots, et des légumes. Avec 250 g de riz et un peu de cheddar, on arrive à environ 1055 kcal et 62 g de protéines."
+      },
+      {
+        "q": "Comment noter un chili con carne dans calorio ?",
+        "a": "Cherche « Chili con carne » dans calorio : pour une portion de cette recette, compte environ 450 à 500 g, puis ajoute « Riz cuit » (150 g). La recette « Chili con carne » s'ajoute aussi en un tap, ajuste simplement la portion à ton assiette."
+      }
+    ],
+    "social": "Chili con carne : 52 g de protéines 🌶️💪\n\nUne portion de chili maison avec 150 g de riz, c'est environ 800 kcal et 52 g de protéines. Sans le riz, compte environ 610 kcal. Tu le cuisines une fois et ton repas d'après l'entraînement est prêt pour plusieurs jours.\n\nLa recette pour 4, le calcul détaillé et cinq variantes (végé, moitié lentilles, prise de muscle…) sont dans le Mag calorio : calorio.ch/mag\n\nChili con Carne: 52 g Protein pro Portion. Rezept im calorio Magazin.\n\n#calorio #chiliconcarne #proteines #sport #musculation #mealprep #suisseromande #compteurdecalories"
+  },
+  "de": {
+    "slug": "chili-con-carne-kalorien-protein",
+    "title": "Chili con Carne: Kalorien und Protein pro Portion",
+    "seoTitle": "Chili con Carne Kalorien: 800 kcal und 52 g Protein mit Reis",
+    "cardTitle": "Chili con Carne: 52 g Protein",
+    "description": "Eine Portion hausgemachtes Chili con Carne mit 150 g Reis: rund 800 kcal und 52 g Eiweiss. Rezept für 4, Berechnung und Varianten für Sportler.",
+    "intro": "Eine Portion hausgemachtes Chili con Carne (ein Viertel eines Rezepts mit 500 g Rindshackfleisch) liefert **rund 610 kcal und 48 g Eiweiss**. Mit 150 g Reis sind es **rund 800 kcal und 52 g Eiweiss**: ein richtiges Sportler-Znacht, das man einmal kocht und an mehreren Tagen isst.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "Warum Sportler Chili so mögen"
+      },
+      {
+        "type": "p",
+        "text": "Im Chili stecken zwei Eiweissquellen: **Rindshackfleisch (rund 26 g Eiweiss pro 100 g)** und **Kidneybohnen (rund 9 g pro 100 g)**, die zusätzlich Kohlenhydrate zum Auftanken nach dem Training liefern. Die International Society of Sports Nutrition (ISSN) nennt für den Muskelaufbau **20 bis 40 g Eiweiss pro Mahlzeit**: Eine Portion Chili liegt schon darüber, sogar ohne Reis."
+      },
+      {
+        "type": "h2",
+        "text": "Eine Portion im Detail (Rezept für 4)"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Zutat",
+          "Menge pro Portion",
+          "Kalorien",
+          "Eiweiss"
+        ],
+        "rows": [
+          [
+            "Rindshackfleisch",
+            "125 g",
+            "313 kcal",
+            "32,5 g"
+          ],
+          [
+            "Kidneybohnen, abgetropft",
+            "120 g",
+            "152 kcal",
+            "10,4 g"
+          ],
+          [
+            "Gehackte Tomaten oder Passata",
+            "200 g",
+            "64 kcal",
+            "3,2 g"
+          ],
+          [
+            "Mais, abgetropft",
+            "35 g",
+            "30 kcal",
+            "1,1 g"
+          ],
+          [
+            "Zwiebel und Peperoni",
+            "75 g",
+            "27 kcal",
+            "0,8 g"
+          ],
+          [
+            "Olivenöl",
+            "2,5 g",
+            "22 kcal",
+            "0 g"
+          ],
+          [
+            "Reis, gekocht",
+            "150 g",
+            "195 kcal",
+            "4 g"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 800 kcal",
+            "≈ 52 g"
+          ]
+        ],
+        "note": "Ohne Reis: rund 610 kcal und 48 g Eiweiss. Gewürze (Kreuzkümmel, Paprika, Chili, Knoblauch) fallen kaum ins Gewicht. Die Werte des Hackfleischs hängen vom Fettanteil ab."
+      },
+      {
+        "type": "ol",
+        "items": [
+          "2 Zwiebeln und 1 Peperoni würfeln und in 1 Esslöffel Öl (10 g) 5 Minuten andünsten.",
+          "500 g Rindshackfleisch dazugeben und krümelig anbraten. Mit 1 Knoblauchzehe, 2 Teelöffeln Kreuzkümmel, 1 Esslöffel Paprika, Chili nach Geschmack, Salz und Pfeffer würzen.",
+          "800 g gehackte Tomaten oder Passata dazugiessen, zudecken und 20 Minuten köcheln lassen.",
+          "2 Dosen Kidneybohnen (abgespült und abgetropft, rund 480 g) und 140 g abgetropften Mais beigeben und weitere 10 Minuten kochen.",
+          "Mit Reis servieren. Die restlichen Portionen halten in geschlossenen Dosen 2 bis 3 Tage im Kühlschrank oder lassen sich tiefkühlen."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Fünf Varianten je nach Ziel"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Variante",
+          "Was sich ändert",
+          "Kalorien",
+          "Eiweiss"
+        ],
+        "rows": [
+          [
+            "Klassisch",
+            "Das Rezept oben, mit 150 g Reis",
+            "≈ 800 kcal",
+            "≈ 52 g"
+          ],
+          [
+            "Ohne Reis",
+            "Nur das Chili",
+            "≈ 610 kcal",
+            "≈ 48 g"
+          ],
+          [
+            "Halb Linsen",
+            "250 g Hackfleisch und 300 g gekochte Linsen für 4, mit Reis",
+            "≈ 735 kcal",
+            "≈ 43 g"
+          ],
+          [
+            "Vegi",
+            "500 g gekochte Linsen für 4 statt Hackfleisch, mit Reis",
+            "≈ 635 kcal",
+            "≈ 31 g"
+          ],
+          [
+            "Muskelaufbau",
+            "250 g Reis und 30 g geriebener Cheddar pro Teller",
+            "≈ 1055 kcal",
+            "≈ 62 g"
+          ]
+        ],
+        "note": "Zwei Esslöffel griechischer Joghurt (40 g) statt Sauerrahm bringen rund 40 kcal und 3,5 g Eiweiss dazu."
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Gleich doppelt kochen**: Chili schmeckt am nächsten Tag noch besser, und dein Essen nach dem Training ist in 3 Minuten bereit.",
+          "**Bohnen aus der Dose**: gut abspülen, so geht ein Teil des Salzes aus der Flüssigkeit weg. Du findest sie bei Migros und Coop im Konservenregal.",
+          "**Mehr Gemüse**: Zucchetti, Rüebli oder eine zusätzliche Peperoni geben Volumen für sehr wenige Kalorien.",
+          "**Reis abwägen**: 150 g gekochter Reis sind etwa 50 g roher Reis. Die Reismenge verändert das Total stärker als alles andere."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Der richtige Reflex",
+        "text": "Es gibt keine «richtige» oder «falsche» Portion: Passe den Reis deinem Hunger und deinem Tag an. Nach einem harten Training hat die Muskelaufbau-Variante ihren Platz, an einem Ruhetag reicht das Chili mit Salat oft schon."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Wie viele Kalorien hat ein Teller Chili con Carne?",
+        "a": "Rund 610 kcal für eine Portion Chili (ein Viertel eines Rezepts mit 500 g Rindshackfleisch), mit 150 g gekochtem Reis rund 800 kcal."
+      },
+      {
+        "q": "Wie viel Eiweiss steckt in Chili con Carne?",
+        "a": "Rund 48 g pro Portion ohne Reis: etwa 32 g stammen vom Hackfleisch und 10 g von den Kidneybohnen. Der Reis bringt rund 4 g dazu."
+      },
+      {
+        "q": "Ist Chili con Carne gut für den Muskelaufbau?",
+        "a": "Ja, es ist eine vollständige Mahlzeit: viel Eiweiss, Kohlenhydrate aus Reis und Bohnen und dazu Gemüse. Mit 250 g Reis und etwas Cheddar kommst du auf rund 1055 kcal und 62 g Eiweiss."
+      },
+      {
+        "q": "Wie erfasse ich Chili con Carne in calorio?",
+        "a": "Suche in calorio nach «Chili con Carne»: Für eine Portion dieses Rezepts rechnest du mit 450 bis 500 g, dann fügst du «Reis (gekocht)» (150 g) hinzu. Das Rezept «Chili con Carne» lässt sich auch mit einem Tipp hinzufügen, passe einfach die Portion deinem Teller an."
+      }
+    ],
+    "social": "Chili con Carne: 52 g Protein 🌶️💪\n\nEine Portion hausgemachtes Chili mit 150 g Reis: rund 800 kcal und 52 g Eiweiss. Ohne Reis sind es rund 610 kcal. Einmal kochen, und dein Essen nach dem Training ist für mehrere Tage bereit.\n\nRezept für 4, Berechnung und fünf Varianten (Vegi, halb Linsen, Muskelaufbau…) im calorio Magazin: calorio.ch/de/magazin\n\n#calorio #chiliconcarne #protein #sport #krafttraining #mealprep #schweiz #kalorienzähler"
+  }
+}

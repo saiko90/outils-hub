@@ -416,7 +416,7 @@ const LX = {
     importOk: "✓ Données importées, rechargement…", importErr: "Fichier invalide. Choisis un export calorio.",
     waterTitle: "Hydratation", waterGoalTxt: (n: number, g: number) => `${n} / ${g} verres`, waterL: (l: string) => `≈ ${l} L`,
     fastTitle: "Jeûne intermittent", fastStartBtn: "Démarrer le jeûne", fastEndBtn: "Terminer", fastElapsed: "écoulé", fastRemaining: "restant", fastPick: "Choisis ta fenêtre", fastingLabel: "Jeûne en cours", fastDone: "Objectif atteint 🎉",
-    myMeals: "Mes repas", saveMeal: "💾 Enregistrer", saveMealDone: "Repas enregistré ✓", repeatYesterday: "↻ Répéter hier", quickLog: "⚡ Vite fait", qlRecent: "🕘 Récents", qlTop: "🔁 Les + utilisés", topTitle: "Les plus utilisés", topDays: (n: number) => `${n} jours`, photoSave: "💾 Enregistrer", photoSaveName: "Nom du repas", photoSaveOk: "Enregistrer", photoSaved: "Enregistré dans ⭐ Mes repas ✓", photoMealName: "Repas photo", noYesterday: "Rien de noté hier.", emptyMeals: "Enregistre un repas depuis ta journée pour le rajouter ici en un tap.", del: "Supprimer",
+    myMeals: "Mes repas", saveMeal: "💾 Enregistrer", saveMealDone: "Repas enregistré ✓", repeatYesterday: "↻ Répéter hier", quickLog: "⚡ Vite fait", qlRecent: "🕘 Récents", qlTop: "🔁 Les + utilisés", topTitle: "Les plus utilisés", topDays: (n: number) => `${n} jours`, libNone: "Rien trouvé. Essaie un autre mot, ou scanne le code-barres du produit.", photoSave: "💾 Enregistrer", photoSaveName: "Nom du repas", photoSaveOk: "Enregistrer", photoSaved: "Enregistré dans ⭐ Mes repas ✓", photoMealName: "Repas photo", noYesterday: "Rien de noté hier.", emptyMeals: "Enregistre un repas depuis ta journée pour le rajouter ici en un tap.", del: "Supprimer",
     vitoIdea: "🥕 Vito, une idée de repas ?",
     vitoMealPrompt: (kcal: string, p: string, g: string, l: string) => `Il me reste ${kcal} kcal aujourd'hui (dont environ ${p} g de protéines, ${g} g de glucides, ${l} g de lipides). Propose-moi 3 idées de repas simples et équilibrés qui rentrent dans ce budget.`,
     createFood: "Créer un aliment", createSub: "Ton propre aliment", myFoods: "Mes aliments",
@@ -504,7 +504,7 @@ const LX = {
     importOk: "✓ Daten importiert, wird neu geladen…", importErr: "Ungültige Datei. Wähle einen calorio-Export.",
     waterTitle: "Hydration", waterGoalTxt: (n: number, g: number) => `${n} / ${g} Gläser`, waterL: (l: string) => `≈ ${l} L`,
     fastTitle: "Intervallfasten", fastStartBtn: "Fasten starten", fastEndBtn: "Beenden", fastElapsed: "vergangen", fastRemaining: "übrig", fastPick: "Wähle dein Fenster", fastingLabel: "Fasten läuft", fastDone: "Ziel erreicht 🎉",
-    myMeals: "Meine Mahlzeiten", saveMeal: "💾 Speichern", saveMealDone: "Mahlzeit gespeichert ✓", repeatYesterday: "↻ Gestern wiederholen", quickLog: "⚡ Schnell", qlRecent: "🕘 Kürzlich", qlTop: "🔁 Am häufigsten", topTitle: "Am häufigsten", topDays: (n: number) => `${n} Tage`, photoSave: "💾 Speichern", photoSaveName: "Name der Mahlzeit", photoSaveOk: "Speichern", photoSaved: "In ⭐ Meine Mahlzeiten gespeichert ✓", photoMealName: "Foto-Mahlzeit", noYesterday: "Gestern nichts notiert.", emptyMeals: "Speichere eine Mahlzeit aus deinem Tag, um sie hier mit einem Tipp hinzuzufügen.", del: "Löschen",
+    myMeals: "Meine Mahlzeiten", saveMeal: "💾 Speichern", saveMealDone: "Mahlzeit gespeichert ✓", repeatYesterday: "↻ Gestern wiederholen", quickLog: "⚡ Schnell", qlRecent: "🕘 Kürzlich", qlTop: "🔁 Am häufigsten", topTitle: "Am häufigsten", topDays: (n: number) => `${n} Tage`, libNone: "Nichts gefunden. Versuch ein anderes Wort oder scanne den Barcode des Produkts.", photoSave: "💾 Speichern", photoSaveName: "Name der Mahlzeit", photoSaveOk: "Speichern", photoSaved: "In ⭐ Meine Mahlzeiten gespeichert ✓", photoMealName: "Foto-Mahlzeit", noYesterday: "Gestern nichts notiert.", emptyMeals: "Speichere eine Mahlzeit aus deinem Tag, um sie hier mit einem Tipp hinzuzufügen.", del: "Löschen",
     vitoIdea: "🥕 Vito, eine Idee?",
     vitoMealPrompt: (kcal: string, p: string, g: string, l: string) => `Mir bleiben heute ${kcal} kcal (davon etwa ${p} g Proteine, ${g} g Kohlenhydrate, ${l} g Fette). Schlag mir 3 einfache, ausgewogene Mahlzeiten vor, die in dieses Budget passen.`,
     createFood: "Lebensmittel erstellen", createSub: "Dein eigenes", myFoods: "Meine Lebensmittel",
@@ -592,7 +592,7 @@ const LX = {
     importOk: "✓ Data imported, reloading…", importErr: "Invalid file. Pick a calorio export.",
     waterTitle: "Hydration", waterGoalTxt: (n: number, g: number) => `${n} / ${g} glasses`, waterL: (l: string) => `≈ ${l} L`,
     fastTitle: "Intermittent fasting", fastStartBtn: "Start fasting", fastEndBtn: "End", fastElapsed: "elapsed", fastRemaining: "left", fastPick: "Pick your window", fastingLabel: "Fasting", fastDone: "Goal reached 🎉",
-    myMeals: "My meals", saveMeal: "💾 Save", saveMealDone: "Meal saved ✓", repeatYesterday: "↻ Repeat yesterday", quickLog: "⚡ Quick add", qlRecent: "🕘 Recent", qlTop: "🔁 Most used", topTitle: "Most used", topDays: (n: number) => `${n} days`, photoSave: "💾 Save", photoSaveName: "Meal name", photoSaveOk: "Save", photoSaved: "Saved to ⭐ My meals ✓", photoMealName: "Photo meal", noYesterday: "Nothing logged yesterday.", emptyMeals: "Save a meal from your day to add it here in one tap.", del: "Delete",
+    myMeals: "My meals", saveMeal: "💾 Save", saveMealDone: "Meal saved ✓", repeatYesterday: "↻ Repeat yesterday", quickLog: "⚡ Quick add", qlRecent: "🕘 Recent", qlTop: "🔁 Most used", topTitle: "Most used", topDays: (n: number) => `${n} days`, libNone: "Nothing found. Try another word, or scan the product barcode.", photoSave: "💾 Save", photoSaveName: "Meal name", photoSaveOk: "Save", photoSaved: "Saved to ⭐ My meals ✓", photoMealName: "Photo meal", noYesterday: "Nothing logged yesterday.", emptyMeals: "Save a meal from your day to add it here in one tap.", del: "Delete",
     vitoIdea: "🥕 Vito, a meal idea?",
     vitoMealPrompt: (kcal: string, p: string, g: string, l: string) => `I have ${kcal} kcal left today (about ${p} g protein, ${g} g carbs, ${l} g fat). Suggest 3 simple, balanced meal ideas that fit this budget.`,
     createFood: "Create a food", createSub: "Your own food", myFoods: "My foods",
@@ -693,6 +693,15 @@ function rowsKcal(rows: unknown): number {
 const nf = (lang: Lang, d = 0) =>
   new Intl.NumberFormat(lang === "de" ? "de-CH" : lang === "en" ? "en-CH" : "fr-CH", { maximumFractionDigits: d });
 const noAccent = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+// Recherche dans la bibliothèque : mots de 2 lettres et plus, sans accents, sans « s » ou « x » final.
+const libNorm = (s: string) => noAccent(s).replace(/œ/g, "oe").replace(/æ/g, "ae").replace(/ß/g, "ss");
+const libStem = (w: string) => (w.length > 3 ? w.replace(/[sx]$/, "") : w);
+const libWords = (q: string) =>
+  q.trim().length < 2 ? [] : libNorm(q).split(/[^a-z0-9]+/).filter((w) => w.length >= 2).map(libStem);
+const libMatch = (nom: string, words: string[]) => {
+  const n = libNorm(nom);
+  return words.every((w) => n.includes(w));
+};
 
 // Un aliment « à plat », quelle que soit sa source (base interne, Open Food Facts, photo).
 type Food = { id: string; nom: string; kcal: number; prot: number; gluc: number; lip: number; portion: number; emoji: string; brand?: string; code?: string };
@@ -2441,8 +2450,8 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   };
   const deleteCustomFood = (id: string) => setCustomFoods((prev) => prev.filter((c) => c.id !== id));
   const customMatches = useMemo(() => {
-    const query = noAccent(q.trim());
-    return customFoods.filter((c) => !query || noAccent(c.nom).includes(query));
+    const words = libWords(q);
+    return customFoods.filter((c) => !words.length || libMatch(c.nom, words));
   }, [customFoods, q]);
 
   // Moyenne des 7 derniers jours renseignés (kcal).
@@ -2497,13 +2506,18 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, tab]);
 
+  // Bibliothèque : avec une recherche (2 lettres et plus), on cherche dans TOUTES les catégories,
+  // mot par mot et sans tenir compte du pluriel (« pomme de terre » trouve « Pommes de terre »).
   const resultats = useMemo(() => {
-    const query = noAccent(q.trim());
-    return ALIMENTS.filter((al) => {
-      if (catFilter !== "tous" && al.cat !== catFilter) return false;
-      if (query && !noAccent(al.nom[lang]).includes(query)) return false;
-      return true;
+    const words = libWords(q);
+    const list = ALIMENTS.filter((al) => {
+      if (!words.length) return catFilter === "tous" || al.cat === catFilter;
+      return libMatch(al.nom[lang], words);
     });
+    if (!words.length) return list;
+    // Les noms qui commencent par le mot cherché d'abord (« oeuf » : Œuf avant Bœuf haché).
+    const debut = (al: (typeof ALIMENTS)[number]) => (libNorm(al.nom[lang]).startsWith(words[0]) ? 0 : 1);
+    return [...list].sort((a, b) => debut(a) - debut(b));
   }, [q, catFilter, lang]);
 
   // « Les plus utilisés » : l'historique (hors jour affiché) est lu une fois par jour, puis combiné aux lignes du jour.
@@ -3719,11 +3733,16 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                     </div>
                   </>
                 )}
-                <div className="cl-secth">⭐ {t.quickTitle}</div>
-                <div className="cl-chips">
-                  <button className={catFilter === "tous" ? "on" : ""} onClick={() => setCatFilter("tous")}>{t.tousAliments}</button>
-                  {CATS.map((c) => (<button key={c} className={catFilter === c ? "on" : ""} onClick={() => setCatFilter(c)}>{t.cats[c]}</button>))}
-                </div>
+                {q.trim().length < 2 && (
+                  <>
+                    <div className="cl-secth">⭐ {t.quickTitle}</div>
+                    <div className="cl-chips">
+                      <button className={catFilter === "tous" ? "on" : ""} onClick={() => setCatFilter("tous")}>{t.tousAliments}</button>
+                      {CATS.map((c) => (<button key={c} className={catFilter === c ? "on" : ""} onClick={() => setCatFilter(c)}>{t.cats[c]}</button>))}
+                    </div>
+                  </>
+                )}
+                {q.trim().length >= 2 && resultats.length > 0 && <div className="cl-secth">📚 {t.mLib}</div>}
                 <div className="cl-foods">
                   {resultats.map((al) => (
                     <button key={al.id} className="cl-food2" onClick={() => { addFood(toFood(al, lang), addMeal ?? undefined); setAddOpen(false); }}>
@@ -3731,6 +3750,22 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                     </button>
                   ))}
                 </div>
+                {/* Avec une recherche, les produits de la base en ligne (Migros, Coop, marques) suivent la bibliothèque. */}
+                {q.trim().length >= 2 && (
+                  <>
+                    <div className="cl-secth">🌍 {t.offTitle}{offLoading && <span className="cl-offload"> · {t.offLoading}</span>}</div>
+                    <div className="cl-foods">
+                      {offResults.map((f) => (
+                        <button key={f.id} className="cl-food2" onClick={() => { addFood(f, addMeal ?? undefined); markUsed("search"); setAddOpen(false); }}>
+                          <span className="cl-fem">{f.emoji}</span><span className="cl-f2n">{f.nom}{f.brand ? <small> · {f.brand}</small> : null}</span><span className="cl-f2k">{f.kcal} kcal<small>/100 g</small></span>
+                        </button>
+                      ))}
+                    </div>
+                    {!offLoading && offResults.length === 0 && resultats.length === 0 && customMatches.length === 0 && (
+                      <p className="cl-histempty">{x.libNone}</p>
+                    )}
+                  </>
+                )}
               </div>
             )}
 

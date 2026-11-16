@@ -693,7 +693,7 @@ function rowsKcal(rows: unknown): number {
 const nf = (lang: Lang, d = 0) =>
   new Intl.NumberFormat(lang === "de" ? "de-CH" : lang === "en" ? "en-CH" : "fr-CH", { maximumFractionDigits: d });
 // Dernière version de l'app Android publiée sur Google Play (à mettre à jour après chaque validation par Google).
-const APP_LATEST: [number, number, number] = [1, 2, 3];
+const APP_LATEST: [number, number, number] = [1, 2, 4];
 const appVersionOlder = (a: number[], b: number[]) => {
   for (let i = 0; i < 3; i++) if ((a[i] || 0) !== (b[i] || 0)) return (a[i] || 0) < (b[i] || 0);
   return false;

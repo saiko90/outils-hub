@@ -1,0 +1,547 @@
+{
+  "id": "alplermagronen-legers",
+  "date": "2026-11-18",
+  "cat": "leger",
+  "emoji": "🧀",
+  "kcal": {
+    "value": "440",
+    "label": {
+      "fr": "kcal par assiette (version légère)",
+      "de": "kcal pro Teller (leichte Version)"
+    }
+  },
+  "related": {
+    "aliments": [
+      "alplermagronen",
+      "pates",
+      "pomme_terre",
+      "gruyere",
+      "oignon",
+      "lait_demi"
+    ]
+  },
+  "sources": [
+    {
+      "label": "Base d'aliments calorio : Älplermagronen (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/alplermagronen"
+    },
+    {
+      "label": "USDA FoodData Central : pâtes sèches (valeurs pour 100 g, crues)",
+      "url": "https://fdc.nal.usda.gov/food-details/169736/nutrients"
+    },
+    {
+      "label": "Base d'aliments calorio : pomme de terre (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/pomme-de-terre"
+    },
+    {
+      "label": "Base d'aliments calorio : crème 35 % (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/creme-35"
+    },
+    {
+      "label": "Base d'aliments calorio : lait entier (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/lait-entier"
+    },
+    {
+      "label": "Base d'aliments calorio : lait demi-écrémé (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/lait-1-2-ecreme"
+    },
+    {
+      "label": "Base d'aliments calorio : Gruyère (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/gruyere"
+    },
+    {
+      "label": "Fiche technique Gruyère AOP (valeurs pour 100 g, pour comparaison)",
+      "url": "https://cdn.api.groupe-pomona.fr/public/products/0254226/branch/ch/medias/gruyere-aop-doux-6-mois-piece-unitaire-1-5kg-intercheese_0254226_ch_technical.pdf"
+    },
+    {
+      "label": "Base d'aliments calorio : oignon (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/oignon"
+    },
+    {
+      "label": "Base d'aliments calorio : beurre (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/beurre"
+    },
+    {
+      "label": "Base d'aliments calorio : bacon / lardons (valeurs pour 100 g)",
+      "url": "https://calorio.ch/calories/bacon"
+    },
+    {
+      "label": "USDA FoodData Central : compote de pommes sans sucre ajouté (valeurs pour 100 g)",
+      "url": "https://fdc.nal.usda.gov/food-details/167772/nutrients"
+    },
+    {
+      "label": "Knorr Gemüsebouillon : valeurs nutritives pour 100 ml de bouillon préparé (fiche produit)",
+      "url": "https://www.rewe.de/shop/p/knorr-gemuesebouillon-vegan-ergibt-7-5l/9011281"
+    }
+  ],
+  "fr": {
+    "slug": "alplermagronen-calories-version-legere",
+    "title": "Älplermagronen : calories et version légère à 440 kcal",
+    "seoTitle": "Älplermagronen calories : 820 kcal, ou 440 en version légère",
+    "cardTitle": "Älplermagronen : 820 ou 440 kcal",
+    "description": "Une assiette classique d'Älplermagronen avec sa compote apporte environ 820 kcal. Notre version one-pot au lait et au bouillon descend à 440 kcal.",
+    "intro": "Une assiette classique d'Älplermagronen (pâtes, pommes de terre, crème, fromage, oignons rôtis et compote de pommes) apporte **environ 820 kcal**. Notre version one-pot, cuite dans le bouillon et le lait, garde le côté crémeux pour **environ 440 kcal par assiette**.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "D'où viennent les calories de la recette classique"
+      },
+      {
+        "type": "p",
+        "text": "Les « macaronis des armaillis » sont un plat de chalet : des pâtes et des pommes de terre cuites ensemble, nappées de crème et de fromage râpé, avec des oignons dorés au beurre. Les pâtes forment la base (environ 370 kcal pour 100 g de pâtes sèches), mais ce sont surtout **la crème, le fromage et le beurre** qui font grimper le total : à eux trois, près de la moitié des calories de l'assiette."
+      },
+      {
+        "type": "table",
+        "head": [
+          "Ingrédient",
+          "Pour 4 personnes",
+          "Calories (4 pers.)",
+          "Par personne"
+        ],
+        "rows": [
+          [
+            "Magronen ou cornettes (pâtes sèches)",
+            "300 g",
+            "1113 kcal",
+            "278 kcal"
+          ],
+          [
+            "Pommes de terre fermes",
+            "400 g",
+            "348 kcal",
+            "87 kcal"
+          ],
+          [
+            "Crème entière 35 %",
+            "2 dl",
+            "680 kcal",
+            "170 kcal"
+          ],
+          [
+            "Lait entier",
+            "1 dl",
+            "64 kcal",
+            "16 kcal"
+          ],
+          [
+            "Gruyère ou fromage d'alpage râpé",
+            "150 g",
+            "620 kcal",
+            "155 kcal"
+          ],
+          [
+            "Oignons",
+            "2 (200 g)",
+            "80 kcal",
+            "20 kcal"
+          ],
+          [
+            "Beurre (pour les oignons)",
+            "30 g",
+            "215 kcal",
+            "54 kcal"
+          ],
+          [
+            "Compote de pommes sans sucre ajouté",
+            "400 g",
+            "168 kcal",
+            "42 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 3290 kcal",
+            "≈ 820 kcal"
+          ]
+        ],
+        "note": "Avec environ 26 g de protéines par personne. Le sel, le poivre et la muscade ne comptent pratiquement pas. Une compote sucrée ou maison avec du sucre ajoute davantage."
+      },
+      {
+        "type": "h2",
+        "text": "La version légère one-pot (environ 440 kcal)"
+      },
+      {
+        "type": "p",
+        "text": "L'astuce : cuire les pâtes et les pommes de terre directement dans un mélange de bouillon et de lait demi-écrémé. L'amidon des pâtes épaissit la sauce, comme pour un risotto : **plus besoin de crème**. Avec un peu moins de pâtes, plus de pommes de terre et un fromage au goût prononcé, on garde tout le caractère du plat. Tout se trouve chez Migros ou Coop : cornettes ou Magronen, Gruyère râpé, compote de pommes sans sucre ajouté."
+      },
+      {
+        "type": "table",
+        "head": [
+          "Ingrédient",
+          "Pour 4 personnes",
+          "Calories (4 pers.)",
+          "Par personne"
+        ],
+        "rows": [
+          [
+            "Magronen ou cornettes (pâtes sèches)",
+            "160 g",
+            "594 kcal",
+            "148 kcal"
+          ],
+          [
+            "Pommes de terre fermes en dés",
+            "600 g",
+            "522 kcal",
+            "131 kcal"
+          ],
+          [
+            "Bouillon de légumes",
+            "4 dl",
+            "24 kcal",
+            "6 kcal"
+          ],
+          [
+            "Lait demi-écrémé",
+            "3,2 dl",
+            "150 kcal",
+            "38 kcal"
+          ],
+          [
+            "Gruyère salé râpé",
+            "60 g",
+            "248 kcal",
+            "62 kcal"
+          ],
+          [
+            "Oignons",
+            "2 gros (240 g)",
+            "96 kcal",
+            "24 kcal"
+          ],
+          [
+            "Compote de pommes sans sucre ajouté",
+            "320 g",
+            "134 kcal",
+            "34 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 1770 kcal",
+            "≈ 440 kcal"
+          ]
+        ],
+        "note": "Environ 16 g de protéines par personne. Les valeurs des pâtes sont données crues (avant cuisson)."
+      },
+      {
+        "type": "ol",
+        "items": [
+          "Émince les oignons finement et fais-les dorer 10 à 15 minutes dans une poêle antiadhésive, sans matière grasse, en ajoutant 1 ou 2 cuillères à soupe d'eau dès qu'ils accrochent.",
+          "Épluche les pommes de terre et coupe-les en dés d'environ 1 cm.",
+          "Dans une grande casserole, porte à ébullition le bouillon et le lait. Ajoute les pommes de terre et les pâtes, avec du poivre et une pincée de muscade.",
+          "Laisse cuire à petit feu 12 à 15 minutes en remuant souvent, jusqu'à ce que les pâtes soient tendres et la sauce crémeuse. Ajoute un peu de bouillon si ça devient trop épais.",
+          "Hors du feu, incorpore le Gruyère râpé. Sers avec les oignons dorés par-dessus et la compote de pommes à côté."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Les variantes en un coup d'œil"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Variante",
+          "Ce qui change",
+          "Calories par personne"
+        ],
+        "rows": [
+          [
+            "Classique",
+            "Crème, beurre et 150 g de fromage pour 4",
+            "≈ 820 kcal"
+          ],
+          [
+            "Classique avec lardons",
+            "20 g de lardons par personne en plus",
+            "≈ 930 kcal"
+          ],
+          [
+            "Grande assiette de cabane",
+            "Environ 500 g d'Älplermagronen et 150 g de compote",
+            "≈ 960 kcal"
+          ],
+          [
+            "Légère one-pot",
+            "Bouillon et lait à la place de la crème, oignons sans beurre",
+            "≈ 440 kcal"
+          ],
+          [
+            "Légère sans compote",
+            "La version one-pot, servie avec une salade",
+            "≈ 410 kcal"
+          ]
+        ],
+        "note": "Pour la grande assiette de cabane, calcul avec la valeur de la base calorio : 180 kcal pour 100 g d'Älplermagronen."
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Un fromage qui a du caractère** : un Gruyère salé ou un fromage d'alpage bien affiné donne beaucoup de goût, même en petite quantité. Râpe-le finement, il se répartit mieux.",
+          "**Remue souvent** : c'est ce qui libère l'amidon des pâtes et rend la sauce onctueuse sans crème.",
+          "**Garde la compote** : elle n'apporte qu'environ 40 kcal pour 100 g sans sucre ajouté, et son acidité équilibre parfaitement le fromage.",
+          "**Ajoute des légumes** : quelques poignées de poireau ou d'épinards cuits avec les pâtes donnent du volume à l'assiette pour très peu de calories."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Le bon réflexe",
+        "text": "Les Älplermagronen classiques sont un plat de fête ou de cabane : savoure-les sans te prendre la tête. La version one-pot est là pour les soirs de semaine, quand tu as envie de ce goût-là sans un plat aussi riche."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Combien de calories dans une portion d'Älplermagronen ?",
+        "a": "Environ 820 kcal pour une assiette classique avec sa compote (environ 780 kcal sans la compote). La base calorio compte environ 180 kcal pour 100 g : une assiette de 400 à 450 g fait donc 720 à 810 kcal, avant la compote."
+      },
+      {
+        "q": "Peut-on faire des Älplermagronen sans crème ?",
+        "a": "Oui : cuits dans un mélange de bouillon et de lait, les pâtes et les pommes de terre libèrent leur amidon et la sauce devient crémeuse toute seule. C'est notre version légère à environ 440 kcal."
+      },
+      {
+        "q": "Combien de calories dans la compote de pommes ?",
+        "a": "Environ 42 kcal pour 100 g de compote sans sucre ajouté. Une compote sucrée ou maison avec du sucre en contient davantage : regarde l'étiquette."
+      },
+      {
+        "q": "Comment noter des Älplermagronen dans calorio ?",
+        "a": "Pour la version classique, cherche « Älplermagronen » et ajuste le poids de ton assiette. Pour la version légère, note plutôt les ingrédients : « Pomme de terre » (150 g), « Pâtes cuites » (pèse ta portion une fois cuite), « Lait 1/2 écrémé » (80 g), « Gruyère » (15 g) et « Oignon » (60 g)."
+      }
+    ],
+    "social": "Älplermagronen : 820 kcal… ou 440 en version légère 🧀🥔\n\nPâtes, pommes de terre, crème, fromage, oignons rôtis et compote de pommes : une assiette classique d'Älplermagronen apporte environ 820 kcal. Un vrai plat de chalet, parfait quand il fait froid.\n\nNotre version one-pot, cuite dans le bouillon et le lait, garde le goût et le côté crémeux pour environ 440 kcal. Recette, calcul détaillé et variantes dans le Mag calorio : calorio.ch/mag\n\nÄlplermagronen: rund 820 kcal, leicht nur 440. Rezept im calorio Magazin.\n\n#calorio #alplermagronen #älplermagronen #recettelegere #cuisinesuisse #suisseromande #compteurdecalories"
+  },
+  "de": {
+    "slug": "aelplermagronen-kalorien-leicht",
+    "title": "Älplermagronen Kalorien: 820 kcal pro Teller, leicht nur 440",
+    "seoTitle": "Älplermagronen Kalorien: 820 kcal, leicht nur 440 kcal",
+    "cardTitle": "Älplermagronen: 820 oder 440 kcal",
+    "description": "Ein klassischer Teller Älplermagronen mit Apfelmus hat rund 820 kcal. Unsere Eintopf-Version mit Bouillon und Milch kommt auf 440 kcal.",
+    "intro": "Ein klassischer Teller Älplermagronen (Magronen, Kartoffeln, Rahm, Käse, Röstzwiebeln und Apfelmus) hat **rund 820 kcal**. Unsere Eintopf-Version, in Bouillon und Milch gekocht, bleibt schön cremig und kommt auf **rund 440 kcal pro Teller**.",
+    "blocks": [
+      {
+        "type": "h2",
+        "text": "Woher die Kalorien im klassischen Rezept kommen"
+      },
+      {
+        "type": "p",
+        "text": "Älplermagronen sind echtes Hüttenessen: Magronen und Kartoffeln zusammen gekocht, mit Rahm und geriebenem Käse, dazu goldbraune Zwiebeln aus der Butter. Die Teigwaren bilden die Basis (rund 370 kcal pro 100 g ungekocht), aber vor allem **Rahm, Käse und Butter** treiben die Summe in die Höhe: Zusammen machen sie fast die Hälfte der Kalorien auf dem Teller aus."
+      },
+      {
+        "type": "table",
+        "head": [
+          "Zutat",
+          "Für 4 Personen",
+          "Kalorien (4 Pers.)",
+          "Pro Person"
+        ],
+        "rows": [
+          [
+            "Magronen oder Hörnli (ungekocht)",
+            "300 g",
+            "1113 kcal",
+            "278 kcal"
+          ],
+          [
+            "Festkochende Kartoffeln",
+            "400 g",
+            "348 kcal",
+            "87 kcal"
+          ],
+          [
+            "Vollrahm 35 %",
+            "2 dl",
+            "680 kcal",
+            "170 kcal"
+          ],
+          [
+            "Vollmilch",
+            "1 dl",
+            "64 kcal",
+            "16 kcal"
+          ],
+          [
+            "Gruyère oder Alpkäse, gerieben",
+            "150 g",
+            "620 kcal",
+            "155 kcal"
+          ],
+          [
+            "Zwiebeln",
+            "2 (200 g)",
+            "80 kcal",
+            "20 kcal"
+          ],
+          [
+            "Butter (für die Zwiebeln)",
+            "30 g",
+            "215 kcal",
+            "54 kcal"
+          ],
+          [
+            "Apfelmus ohne Zuckerzusatz",
+            "400 g",
+            "168 kcal",
+            "42 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 3290 kcal",
+            "≈ 820 kcal"
+          ]
+        ],
+        "note": "Dazu rund 26 g Eiweiss pro Person. Salz, Pfeffer und Muskat fallen praktisch nicht ins Gewicht. Gezuckertes oder selbst gemachtes Apfelmus mit Zucker liefert mehr."
+      },
+      {
+        "type": "h2",
+        "text": "Die leichte Eintopf-Version (rund 440 kcal)"
+      },
+      {
+        "type": "p",
+        "text": "Der Trick: Magronen und Kartoffeln direkt in einer Mischung aus Bouillon und teilentrahmter Milch kochen. Die Stärke der Teigwaren bindet die Sauce wie bei einem Risotto, **Rahm braucht es keinen**. Mit etwas weniger Teigwaren, mehr Kartoffeln und einem würzigen Käse bleibt der typische Geschmack erhalten. Alles gibt es bei Migros oder Coop: Hörnli oder Magronen, geriebener Gruyère, Apfelmus ohne Zuckerzusatz."
+      },
+      {
+        "type": "table",
+        "head": [
+          "Zutat",
+          "Für 4 Personen",
+          "Kalorien (4 Pers.)",
+          "Pro Person"
+        ],
+        "rows": [
+          [
+            "Magronen oder Hörnli (ungekocht)",
+            "160 g",
+            "594 kcal",
+            "148 kcal"
+          ],
+          [
+            "Festkochende Kartoffeln, gewürfelt",
+            "600 g",
+            "522 kcal",
+            "131 kcal"
+          ],
+          [
+            "Gemüsebouillon",
+            "4 dl",
+            "24 kcal",
+            "6 kcal"
+          ],
+          [
+            "Milch teilentrahmt",
+            "3,2 dl",
+            "150 kcal",
+            "38 kcal"
+          ],
+          [
+            "Gruyère rezent, gerieben",
+            "60 g",
+            "248 kcal",
+            "62 kcal"
+          ],
+          [
+            "Zwiebeln",
+            "2 grosse (240 g)",
+            "96 kcal",
+            "24 kcal"
+          ],
+          [
+            "Apfelmus ohne Zuckerzusatz",
+            "320 g",
+            "134 kcal",
+            "34 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 1770 kcal",
+            "≈ 440 kcal"
+          ]
+        ],
+        "note": "Rund 16 g Eiweiss pro Person. Die Werte der Teigwaren gelten ungekocht."
+      },
+      {
+        "type": "ol",
+        "items": [
+          "Zwiebeln in feine Ringe schneiden und in einer beschichteten Pfanne ohne Fett 10 bis 15 Minuten goldbraun rösten. Sobald sie ansetzen, 1 bis 2 EL Wasser dazugeben.",
+          "Kartoffeln schälen und in etwa 1 cm grosse Würfel schneiden.",
+          "Bouillon und Milch in einer grossen Pfanne aufkochen. Kartoffeln und Magronen dazugeben, mit Pfeffer und einer Prise Muskat würzen.",
+          "Bei kleiner Hitze 12 bis 15 Minuten köcheln lassen und dabei oft rühren, bis die Teigwaren weich sind und die Sauce cremig ist. Wird es zu dick, etwas Bouillon nachgiessen.",
+          "Pfanne vom Herd nehmen und den geriebenen Gruyère unterrühren. Mit den Röstzwiebeln obendrauf und dem Apfelmus daneben servieren."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Die Varianten auf einen Blick"
+      },
+      {
+        "type": "table",
+        "head": [
+          "Variante",
+          "Was ändert",
+          "Kalorien pro Person"
+        ],
+        "rows": [
+          [
+            "Klassisch",
+            "Rahm, Butter und 150 g Käse für 4",
+            "≈ 820 kcal"
+          ],
+          [
+            "Klassisch mit Speck",
+            "Zusätzlich 20 g Speckwürfeli pro Person",
+            "≈ 930 kcal"
+          ],
+          [
+            "Grosser Hüttenteller",
+            "Rund 500 g Älplermagronen und 150 g Apfelmus",
+            "≈ 960 kcal"
+          ],
+          [
+            "Leichter Eintopf",
+            "Bouillon und Milch statt Rahm, Zwiebeln ohne Butter",
+            "≈ 440 kcal"
+          ],
+          [
+            "Leicht ohne Apfelmus",
+            "Die Eintopf-Version, mit Salat serviert",
+            "≈ 410 kcal"
+          ]
+        ],
+        "note": "Für den grossen Hüttenteller mit dem Wert aus der calorio-Datenbank berechnet: 180 kcal pro 100 g Älplermagronen."
+      },
+      {
+        "type": "ul",
+        "items": [
+          "**Käse mit Charakter**: Ein rezenter Gruyère oder ein gut gereifter Alpkäse bringt viel Geschmack, auch in kleiner Menge. Fein gerieben verteilt er sich besser.",
+          "**Oft rühren**: So löst sich die Stärke aus den Teigwaren, und die Sauce wird ohne Rahm schön sämig.",
+          "**Apfelmus gehört dazu**: Ohne Zuckerzusatz hat es nur rund 40 kcal pro 100 g, und die Säure passt perfekt zum Käse.",
+          "**Mehr Gemüse**: Ein paar Handvoll Lauch oder Spinat, mit den Magronen mitgekocht, machen den Teller grösser, für sehr wenige Kalorien."
+        ]
+      },
+      {
+        "type": "tip",
+        "title": "Der richtige Reflex",
+        "text": "Klassische Älplermagronen sind ein Fest- oder Hüttenessen: Geniess sie ohne schlechtes Gewissen. Die Eintopf-Version ist für den Alltag gedacht, wenn du Lust auf diesen Geschmack hast, aber etwas Leichteres willst."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Wie viele Kalorien hat eine Portion Älplermagronen?",
+        "a": "Rund 820 kcal für einen klassischen Teller mit Apfelmus (rund 780 kcal ohne Apfelmus). Die calorio-Datenbank rechnet mit rund 180 kcal pro 100 g: Ein Teller mit 400 bis 450 g hat also 720 bis 810 kcal, ohne Apfelmus."
+      },
+      {
+        "q": "Kann man Älplermagronen ohne Rahm machen?",
+        "a": "Ja: In Bouillon und Milch gekocht geben Teigwaren und Kartoffeln ihre Stärke ab, und die Sauce wird von selbst cremig. Das ist unsere leichte Version mit rund 440 kcal."
+      },
+      {
+        "q": "Wie viele Kalorien hat Apfelmus?",
+        "a": "Rund 42 kcal pro 100 g Apfelmus ohne Zuckerzusatz. Gezuckertes oder selbst gemachtes Apfelmus mit Zucker hat mehr: Ein Blick auf die Etikette lohnt sich."
+      },
+      {
+        "q": "Wie erfasse ich Älplermagronen in calorio?",
+        "a": "Für die klassische Version suchst du «Älplermagronen» und passt das Gewicht deines Tellers an. Für die leichte Version erfasst du besser die Zutaten: «Kartoffel» (150 g), «Teigwaren (gekocht)» (gekochte Portion wägen), «Milch teilentrahmt» (80 g), «Gruyère» (15 g) und «Zwiebel» (60 g)."
+      }
+    ],
+    "social": "Älplermagronen: 820 kcal… oder 440 in der leichten Version 🧀🥔\n\nMagronen, Kartoffeln, Rahm, Käse, Röstzwiebeln und Apfelmus: Ein klassischer Teller Älplermagronen hat rund 820 kcal. Echtes Hüttenessen, genau richtig, wenn es draussen kalt ist.\n\nUnsere Eintopf-Version, in Bouillon und Milch gekocht, bleibt schön cremig und kommt auf rund 440 kcal. Rezept, Berechnung und Varianten im calorio Magazin: calorio.ch/de/magazin\n\nÄlplermagronen : environ 820 kcal, 440 en version légère. Recette dans le Mag calorio.\n\n#calorio #älplermagronen #alplermagronen #leichtkochen #schweizerküche #schweiz #kalorienzähler"
+  }
+}

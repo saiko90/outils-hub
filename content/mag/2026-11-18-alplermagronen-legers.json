@@ -84,80 +84,6 @@
     "blocks": [
       {
         "type": "h2",
-        "text": "D'où viennent les calories de la recette classique"
-      },
-      {
-        "type": "p",
-        "text": "Les « macaronis des armaillis » sont un plat de chalet : des pâtes et des pommes de terre cuites ensemble, nappées de crème et de fromage râpé, avec des oignons dorés au beurre. Les pâtes forment la base (environ 370 kcal pour 100 g de pâtes sèches), mais ce sont surtout **la crème, le fromage et le beurre** qui font grimper le total : à eux trois, près de la moitié des calories de l'assiette."
-      },
-      {
-        "type": "table",
-        "head": [
-          "Ingrédient",
-          "Pour 4 personnes",
-          "Calories (4 pers.)",
-          "Par personne"
-        ],
-        "rows": [
-          [
-            "Magronen ou cornettes (pâtes sèches)",
-            "300 g",
-            "1113 kcal",
-            "278 kcal"
-          ],
-          [
-            "Pommes de terre fermes",
-            "400 g",
-            "348 kcal",
-            "87 kcal"
-          ],
-          [
-            "Crème entière 35 %",
-            "2 dl",
-            "680 kcal",
-            "170 kcal"
-          ],
-          [
-            "Lait entier",
-            "1 dl",
-            "64 kcal",
-            "16 kcal"
-          ],
-          [
-            "Gruyère ou fromage d'alpage râpé",
-            "150 g",
-            "620 kcal",
-            "155 kcal"
-          ],
-          [
-            "Oignons",
-            "2 (200 g)",
-            "80 kcal",
-            "20 kcal"
-          ],
-          [
-            "Beurre (pour les oignons)",
-            "30 g",
-            "215 kcal",
-            "54 kcal"
-          ],
-          [
-            "Compote de pommes sans sucre ajouté",
-            "400 g",
-            "168 kcal",
-            "42 kcal"
-          ],
-          [
-            "Total",
-            "",
-            "≈ 3290 kcal",
-            "≈ 820 kcal"
-          ]
-        ],
-        "note": "Avec environ 26 g de protéines par personne. Le sel, le poivre et la muscade ne comptent pratiquement pas. Une compote sucrée ou maison avec du sucre ajoute davantage."
-      },
-      {
-        "type": "h2",
         "text": "La version légère one-pot (environ 440 kcal)"
       },
       {
@@ -168,61 +94,52 @@
         "type": "table",
         "head": [
           "Ingrédient",
-          "Pour 4 personnes",
-          "Calories (4 pers.)",
-          "Par personne"
+          "Par personne",
+          "Calories"
         ],
         "rows": [
           [
             "Magronen ou cornettes (pâtes sèches)",
-            "160 g",
-            "594 kcal",
+            "40 g",
             "148 kcal"
           ],
           [
             "Pommes de terre fermes en dés",
-            "600 g",
-            "522 kcal",
+            "150 g",
             "131 kcal"
           ],
           [
-            "Bouillon de légumes",
-            "4 dl",
-            "24 kcal",
-            "6 kcal"
-          ],
-          [
             "Lait demi-écrémé",
-            "3,2 dl",
-            "150 kcal",
+            "0,8 dl",
             "38 kcal"
           ],
           [
             "Gruyère salé râpé",
-            "60 g",
-            "248 kcal",
+            "15 g",
             "62 kcal"
           ],
           [
             "Oignons",
-            "2 gros (240 g)",
-            "96 kcal",
+            "60 g",
             "24 kcal"
           ],
           [
+            "Bouillon de légumes",
+            "1 dl",
+            "6 kcal"
+          ],
+          [
             "Compote de pommes sans sucre ajouté",
-            "320 g",
-            "134 kcal",
+            "80 g",
             "34 kcal"
           ],
           [
             "Total",
             "",
-            "≈ 1770 kcal",
             "≈ 440 kcal"
           ]
         ],
-        "note": "Environ 16 g de protéines par personne. Les valeurs des pâtes sont données crues (avant cuisson)."
+        "note": "Environ 16 g de protéines par personne. Pour 4 personnes : 160 g de pâtes, 600 g de pommes de terre, 4 dl de bouillon, 3,2 dl de lait, 60 g de Gruyère, 2 gros oignons et 320 g de compote (≈ 1770 kcal). Les valeurs des pâtes sont données crues."
       },
       {
         "type": "ol",
@@ -233,6 +150,70 @@
           "Laisse cuire à petit feu 12 à 15 minutes en remuant souvent, jusqu'à ce que les pâtes soient tendres et la sauce crémeuse. Ajoute un peu de bouillon si ça devient trop épais.",
           "Hors du feu, incorpore le Gruyère râpé. Sers avec les oignons dorés par-dessus et la compote de pommes à côté."
         ]
+      },
+      {
+        "type": "h2",
+        "text": "La recette classique, pour comparer (environ 820 kcal)"
+      },
+      {
+        "type": "p",
+        "text": "Les « macaronis des armaillis » sont un plat de chalet : des pâtes et des pommes de terre cuites ensemble, nappées de crème et de fromage râpé, avec des oignons dorés au beurre. Les pâtes forment la base (environ 370 kcal pour 100 g de pâtes sèches), mais ce sont surtout **la crème, le fromage et le beurre** qui font grimper le total : à eux trois, près de la moitié des calories de l'assiette."
+      },
+      {
+        "type": "table",
+        "head": [
+          "Ingrédient",
+          "Par personne",
+          "Calories"
+        ],
+        "rows": [
+          [
+            "Magronen ou cornettes (pâtes sèches)",
+            "75 g",
+            "278 kcal"
+          ],
+          [
+            "Pommes de terre fermes",
+            "100 g",
+            "87 kcal"
+          ],
+          [
+            "Crème entière 35 %",
+            "0,5 dl",
+            "170 kcal"
+          ],
+          [
+            "Lait entier",
+            "0,25 dl",
+            "16 kcal"
+          ],
+          [
+            "Gruyère ou fromage d'alpage râpé",
+            "37 g",
+            "155 kcal"
+          ],
+          [
+            "Oignons",
+            "50 g",
+            "20 kcal"
+          ],
+          [
+            "Beurre (pour les oignons)",
+            "7,5 g",
+            "54 kcal"
+          ],
+          [
+            "Compote de pommes sans sucre ajouté",
+            "100 g",
+            "42 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 820 kcal"
+          ]
+        ],
+        "note": "Environ 26 g de protéines par personne. Pour 4 personnes : 300 g de pâtes, 400 g de pommes de terre, 2 dl de crème, 1 dl de lait, 150 g de fromage, 2 oignons, 30 g de beurre et 400 g de compote (≈ 3290 kcal). Une compote sucrée ajoute davantage."
       },
       {
         "type": "h2",
@@ -319,80 +300,6 @@
     "blocks": [
       {
         "type": "h2",
-        "text": "Woher die Kalorien im klassischen Rezept kommen"
-      },
-      {
-        "type": "p",
-        "text": "Älplermagronen sind echtes Hüttenessen: Magronen und Kartoffeln zusammen gekocht, mit Rahm und geriebenem Käse, dazu goldbraune Zwiebeln aus der Butter. Die Teigwaren bilden die Basis (rund 370 kcal pro 100 g ungekocht), aber vor allem **Rahm, Käse und Butter** treiben die Summe in die Höhe: Zusammen machen sie fast die Hälfte der Kalorien auf dem Teller aus."
-      },
-      {
-        "type": "table",
-        "head": [
-          "Zutat",
-          "Für 4 Personen",
-          "Kalorien (4 Pers.)",
-          "Pro Person"
-        ],
-        "rows": [
-          [
-            "Magronen oder Hörnli (ungekocht)",
-            "300 g",
-            "1113 kcal",
-            "278 kcal"
-          ],
-          [
-            "Festkochende Kartoffeln",
-            "400 g",
-            "348 kcal",
-            "87 kcal"
-          ],
-          [
-            "Vollrahm 35 %",
-            "2 dl",
-            "680 kcal",
-            "170 kcal"
-          ],
-          [
-            "Vollmilch",
-            "1 dl",
-            "64 kcal",
-            "16 kcal"
-          ],
-          [
-            "Gruyère oder Alpkäse, gerieben",
-            "150 g",
-            "620 kcal",
-            "155 kcal"
-          ],
-          [
-            "Zwiebeln",
-            "2 (200 g)",
-            "80 kcal",
-            "20 kcal"
-          ],
-          [
-            "Butter (für die Zwiebeln)",
-            "30 g",
-            "215 kcal",
-            "54 kcal"
-          ],
-          [
-            "Apfelmus ohne Zuckerzusatz",
-            "400 g",
-            "168 kcal",
-            "42 kcal"
-          ],
-          [
-            "Total",
-            "",
-            "≈ 3290 kcal",
-            "≈ 820 kcal"
-          ]
-        ],
-        "note": "Dazu rund 26 g Eiweiss pro Person. Salz, Pfeffer und Muskat fallen praktisch nicht ins Gewicht. Gezuckertes oder selbst gemachtes Apfelmus mit Zucker liefert mehr."
-      },
-      {
-        "type": "h2",
         "text": "Die leichte Eintopf-Version (rund 440 kcal)"
       },
       {
@@ -403,61 +310,52 @@
         "type": "table",
         "head": [
           "Zutat",
-          "Für 4 Personen",
-          "Kalorien (4 Pers.)",
-          "Pro Person"
+          "Pro Person",
+          "Kalorien"
         ],
         "rows": [
           [
             "Magronen oder Hörnli (ungekocht)",
-            "160 g",
-            "594 kcal",
+            "40 g",
             "148 kcal"
           ],
           [
             "Festkochende Kartoffeln, gewürfelt",
-            "600 g",
-            "522 kcal",
+            "150 g",
             "131 kcal"
           ],
           [
-            "Gemüsebouillon",
-            "4 dl",
-            "24 kcal",
-            "6 kcal"
-          ],
-          [
             "Milch teilentrahmt",
-            "3,2 dl",
-            "150 kcal",
+            "0,8 dl",
             "38 kcal"
           ],
           [
             "Gruyère rezent, gerieben",
-            "60 g",
-            "248 kcal",
+            "15 g",
             "62 kcal"
           ],
           [
             "Zwiebeln",
-            "2 grosse (240 g)",
-            "96 kcal",
+            "60 g",
             "24 kcal"
           ],
           [
+            "Gemüsebouillon",
+            "1 dl",
+            "6 kcal"
+          ],
+          [
             "Apfelmus ohne Zuckerzusatz",
-            "320 g",
-            "134 kcal",
+            "80 g",
             "34 kcal"
           ],
           [
             "Total",
             "",
-            "≈ 1770 kcal",
             "≈ 440 kcal"
           ]
         ],
-        "note": "Rund 16 g Eiweiss pro Person. Die Werte der Teigwaren gelten ungekocht."
+        "note": "Rund 16 g Eiweiss pro Person. Für 4 Personen: 160 g Magronen, 600 g Kartoffeln, 4 dl Bouillon, 3,2 dl Milch, 60 g Gruyère, 2 grosse Zwiebeln und 320 g Apfelmus (≈ 1770 kcal). Die Werte der Teigwaren gelten ungekocht."
       },
       {
         "type": "ol",
@@ -468,6 +366,70 @@
           "Bei kleiner Hitze 12 bis 15 Minuten köcheln lassen und dabei oft rühren, bis die Teigwaren weich sind und die Sauce cremig ist. Wird es zu dick, etwas Bouillon nachgiessen.",
           "Pfanne vom Herd nehmen und den geriebenen Gruyère unterrühren. Mit den Röstzwiebeln obendrauf und dem Apfelmus daneben servieren."
         ]
+      },
+      {
+        "type": "h2",
+        "text": "Das klassische Rezept zum Vergleich (rund 820 kcal)"
+      },
+      {
+        "type": "p",
+        "text": "Älplermagronen sind echtes Hüttenessen: Magronen und Kartoffeln zusammen gekocht, mit Rahm und geriebenem Käse, dazu goldbraune Zwiebeln aus der Butter. Die Teigwaren bilden die Basis (rund 370 kcal pro 100 g ungekocht), aber vor allem **Rahm, Käse und Butter** treiben die Summe in die Höhe: Zusammen machen sie fast die Hälfte der Kalorien auf dem Teller aus."
+      },
+      {
+        "type": "table",
+        "head": [
+          "Zutat",
+          "Pro Person",
+          "Kalorien"
+        ],
+        "rows": [
+          [
+            "Magronen oder Hörnli (ungekocht)",
+            "75 g",
+            "278 kcal"
+          ],
+          [
+            "Festkochende Kartoffeln",
+            "100 g",
+            "87 kcal"
+          ],
+          [
+            "Vollrahm 35 %",
+            "0,5 dl",
+            "170 kcal"
+          ],
+          [
+            "Vollmilch",
+            "0,25 dl",
+            "16 kcal"
+          ],
+          [
+            "Gruyère oder Alpkäse, gerieben",
+            "37 g",
+            "155 kcal"
+          ],
+          [
+            "Zwiebeln",
+            "50 g",
+            "20 kcal"
+          ],
+          [
+            "Butter (für die Zwiebeln)",
+            "7,5 g",
+            "54 kcal"
+          ],
+          [
+            "Apfelmus ohne Zuckerzusatz",
+            "100 g",
+            "42 kcal"
+          ],
+          [
+            "Total",
+            "",
+            "≈ 820 kcal"
+          ]
+        ],
+        "note": "Rund 26 g Eiweiss pro Person. Für 4 Personen: 300 g Magronen, 400 g Kartoffeln, 2 dl Rahm, 1 dl Milch, 150 g Käse, 2 Zwiebeln, 30 g Butter und 400 g Apfelmus (≈ 3290 kcal). Gezuckertes Apfelmus liefert mehr."
       },
       {
         "type": "h2",

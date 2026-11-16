@@ -1041,6 +1041,10 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   const [proOpen, setProOpen] = useState(false);
   // App Android (Google Play) : pas d'achat hors Google Play Billing dans l'app (règles Play) → on n'y propose pas Stripe.
   const [playApp, setPlayApp] = useState(false);
+  // App Android 1.2.3 et plus (« calorio-app/x.y.z » dans le user-agent) : la caméra est autorisée,
+  // le scan filme en direct. Versions plus anciennes : scan par photo.
+  const [appCamera, setAppCamera] = useState(false);
+  useEffect(() => { try { setAppCamera(/calorio-app\/\d/.test(navigator.userAgent)); } catch { /* ignore */ } }, []);
   useEffect(() => {
     try { const C = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor; if (C?.isNativePlatform?.()) setPlayApp(true); } catch { /* ignore */ }
   }, []);
@@ -3599,7 +3603,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
                 <button className="cl-method" onClick={() => { setQ(""); setAddMode("online"); }}>
                   <span className="cl-method-i">🔍</span><b>{t.mOnline}</b><small>{t.mOnlineSub}</small>
                 </button>
-                <button className="cl-method" onClick={() => { setAddOpen(false); if (playApp) barcodeFileRef.current?.click(); else startScan(); }}>
+                <button className="cl-method" onClick={() => { setAddOpen(false); if (playApp && !appCamera) barcodeFileRef.current?.click(); else startScan(); }}>
                   <span className="cl-method-i">📷</span><b>{t.mScan}</b><small>{t.mScanSub}</small>
                 </button>
                 <button className="cl-method pro" onClick={() => { setAddOpen(false); if (proActive) fileRef.current?.click(); else goPro(); }}>

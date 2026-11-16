@@ -380,7 +380,7 @@ const LX = {
     myNeeds: "Mes besoins", reglages: "Réglages", passPro: "Passer Pro", proSubShort: "Coach IA + analyse photo",
     themeLabel: "Thème", themeLight: "☀️ Clair", themeDark: "🌙 Sombre", themeAuto: "Auto",
     madeIn: "Fait en Suisse 🇨🇭 · Swiss Digital Studio",
-    playBanner: "calorio en app Android", playBannerSub: "Ouverture en un tap et rappels, gratuite.", playBannerSync: "Connecte-toi d'abord ici pour garder tes données.", playBannerAlt: "Disponible sur Google Play", loginB: "Connecte-toi", loginS: "Synchronise tes données, gratuit", loginBtn: "Se connecter",
+    updTitle: "Nouvelle version de calorio", updSub: "Scan et photo directement dans l'app.", updBtn: "Mettre à jour", playBanner: "calorio en app Android", playBannerSub: "Ouverture en un tap et rappels, gratuite.", playBannerSync: "Connecte-toi d'abord ici pour garder tes données.", playBannerAlt: "Disponible sur Google Play", loginB: "Connecte-toi", loginS: "Synchronise tes données, gratuit", loginBtn: "Se connecter",
     syncedB: "Données synchronisées", vitoDispo: "Ton coach nutrition, dispo 24/7",
     goalWeight: "Poids objectif", toGoal: (v: string) => `plus que ${v} kg`, goalReached: "Objectif atteint 🎉",
     vitoHi: ["Bonjour 👋", "Coucou, c'est parti !", "Salut, prêt·e ?", "Hey, content de te voir 🥕"],
@@ -468,7 +468,7 @@ const LX = {
     myNeeds: "Mein Bedarf", reglages: "Einstellungen", passPro: "Pro werden", proSubShort: "KI-Coach + Foto-Analyse",
     themeLabel: "Thema", themeLight: "☀️ Hell", themeDark: "🌙 Dunkel", themeAuto: "Auto",
     madeIn: "Gemacht in der Schweiz 🇨🇭 · Swiss Digital Studio",
-    playBanner: "calorio als Android-App", playBannerSub: "Mit einem Tipp offen, mit Erinnerungen, gratis.", playBannerSync: "Melde dich zuerst hier an, um deine Daten zu behalten.", playBannerAlt: "Jetzt bei Google Play", loginB: "Melde dich an", loginS: "Synchronisiere deine Daten, gratis", loginBtn: "Anmelden",
+    updTitle: "Neue calorio-Version", updSub: "Scan und Foto direkt in der App.", updBtn: "Aktualisieren", playBanner: "calorio als Android-App", playBannerSub: "Mit einem Tipp offen, mit Erinnerungen, gratis.", playBannerSync: "Melde dich zuerst hier an, um deine Daten zu behalten.", playBannerAlt: "Jetzt bei Google Play", loginB: "Melde dich an", loginS: "Synchronisiere deine Daten, gratis", loginBtn: "Anmelden",
     syncedB: "Daten synchronisiert", vitoDispo: "Dein Ernährungscoach, 24/7 da",
     goalWeight: "Zielgewicht", toGoal: (v: string) => `noch ${v} kg`, goalReached: "Ziel erreicht 🎉",
     vitoHi: ["Hallo 👋", "Hoi, los geht's!", "Bereit?", "Schön, dich zu sehen 🥕"],
@@ -556,7 +556,7 @@ const LX = {
     myNeeds: "My needs", reglages: "Settings", passPro: "Go Pro", proSubShort: "AI coach + photo analysis",
     themeLabel: "Theme", themeLight: "☀️ Light", themeDark: "🌙 Dark", themeAuto: "Auto",
     madeIn: "Made in Switzerland 🇨🇭 · Swiss Digital Studio",
-    playBanner: "calorio as an Android app", playBannerSub: "Opens in one tap, with reminders, free.", playBannerSync: "Sign in here first to keep your data.", playBannerAlt: "Get it on Google Play", loginB: "Sign in", loginS: "Sync your data, free", loginBtn: "Sign in",
+    updTitle: "New calorio version", updSub: "Scan and photo right inside the app.", updBtn: "Update", playBanner: "calorio as an Android app", playBannerSub: "Opens in one tap, with reminders, free.", playBannerSync: "Sign in here first to keep your data.", playBannerAlt: "Get it on Google Play", loginB: "Sign in", loginS: "Sync your data, free", loginBtn: "Sign in",
     syncedB: "Data synced", vitoDispo: "Your nutrition coach, 24/7",
     goalWeight: "Target weight", toGoal: (v: string) => `${v} kg to go`, goalReached: "Goal reached 🎉",
     vitoHi: ["Hi 👋", "Hey, let's go!", "Ready?", "Good to see you 🥕"],
@@ -692,6 +692,12 @@ function rowsKcal(rows: unknown): number {
 }
 const nf = (lang: Lang, d = 0) =>
   new Intl.NumberFormat(lang === "de" ? "de-CH" : lang === "en" ? "en-CH" : "fr-CH", { maximumFractionDigits: d });
+// Dernière version de l'app Android publiée sur Google Play (à mettre à jour après chaque validation par Google).
+const APP_LATEST: [number, number, number] = [1, 2, 3];
+const appVersionOlder = (a: number[], b: number[]) => {
+  for (let i = 0; i < 3; i++) if ((a[i] || 0) !== (b[i] || 0)) return (a[i] || 0) < (b[i] || 0);
+  return false;
+};
 const noAccent = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 // Recherche dans la bibliothèque : mots de 2 lettres et plus, sans accents, sans « s » ou « x » final.
 const libNorm = (s: string) => noAccent(s).replace(/œ/g, "oe").replace(/æ/g, "ae").replace(/ß/g, "ss");
@@ -1045,6 +1051,24 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
   // le scan filme en direct. Versions plus anciennes : scan par photo.
   const [appCamera, setAppCamera] = useState(false);
   useEffect(() => { try { setAppCamera(/calorio-app\/\d/.test(navigator.userAgent)); } catch { /* ignore */ } }, []);
+  // Alerte « nouvelle version » dans l'app Android : la version installée vient du user-agent
+  // (« calorio-app/x.y.z », absent avant la 1.2.3). Si elle est plus ancienne que APP_LATEST
+  // (la dernière version publiée sur Google Play), on propose la mise à jour. Masquable 3 jours.
+  const UPD_KEY = "calorio.updBanner";
+  const [updOff, setUpdOff] = useState(true);
+  useEffect(() => {
+    try {
+      const C = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+      if (!C?.isNativePlatform?.()) return;
+      const m = navigator.userAgent.match(/calorio-app\/(\d+)\.(\d+)\.(\d+)/);
+      const mine = m ? [Number(m[1]), Number(m[2]), Number(m[3])] : [1, 2, 2];
+      if (!appVersionOlder(mine, APP_LATEST)) return;
+      const at = Number(localStorage.getItem(UPD_KEY) || 0);
+      setUpdOff(at > 0 && Date.now() - at < 3 * 24 * 3600 * 1000);
+    } catch { /* ignore */ }
+  }, []);
+  const hideUpd = () => { setUpdOff(true); try { localStorage.setItem(UPD_KEY, String(Date.now())); } catch { /* ignore */ } };
+  const openUpd = () => { hideUpd(); try { window.open("https://play.google.com/store/apps/details?id=ch.calorio.twa", "_blank", "noopener"); } catch { /* ignore */ } };
   useEffect(() => {
     try { const C = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor; if (C?.isNativePlatform?.()) setPlayApp(true); } catch { /* ignore */ }
   }, []);
@@ -2838,6 +2862,18 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
       </div>
 
       {checkoutMsg && checkoutMsg !== "…" && !proOpen && <p className="cl-toast">{checkoutMsg}</p>}
+
+      {playApp && !updOff && (
+        <div className="cl-playban">
+          <img className="cl-playban-ic" src="/calorio-icon-192.png" alt="" width={40} height={40} />
+          <div className="cl-playban-tx">
+            <b>{x.updTitle}</b>
+            <span>{x.updSub}</span>
+          </div>
+          <button className="cl-scanadd" style={{ flex: "none", margin: 0 }} onClick={openUpd}>{x.updBtn}</button>
+          <button className="cl-playban-x" onClick={hideUpd} aria-label={t.close}>×</button>
+        </div>
+      )}
 
       {androidWeb && !playBannerOff && !(samsungHint && !saDismissed) && (
         <div className="cl-playban">

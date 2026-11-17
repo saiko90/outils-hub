@@ -37,6 +37,14 @@ export function middleware(req: NextRequest, event?: NextFetchEvent) {
     url.pathname = pathname === "/" ? "/calorio-accueil" : `/calorio-accueil${pathname}`;
     return serve(NextResponse.rewrite(url));
   }
+  // calorio.ch/admin : tableau de bord privé de calorio (séparé du Cockpit outils.ch).
+  if (onCalorio && /^\/admin\/?$/.test(pathname)) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/calorio-admin";
+    const res = NextResponse.rewrite(url);
+    res.headers.set("X-Robots-Tag", "noindex, nofollow");
+    return res;
+  }
   // calorio.ch : mentions légales et conditions propres à calorio (exigences TWINT : nom, adresse, contact, prix CHF).
   if (onCalorio && /^\/(?:(?:de|en)\/)?(?:mentions-legales|impressum|legal-notice|conditions|agb|terms)\/?$/.test(pathname)) {
     const url = req.nextUrl.clone();

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import type { NextFetchEvent, NextRequest } from "next/server";
 import { partnerRedirect } from "./lib/partnerLinks";
 import { canonicalRedirect } from "./lib/hostRedirects";
 import { pathLang, CONTENT_LANGUAGE } from "./lib/pathLang";
 
 // Sert le Cockpit admin sur le sous-domaine admin.outils.ch (réécriture vers /admin),
 // tout en le laissant aussi accessible sur outils.ch/admin. Aucun effet sur le site public.
-export function middleware(req: NextRequest) {
+export function middleware(req: NextRequest, event?: NextFetchEvent) {
   const host = (req.headers.get("host") || "").split(":")[0];
   const { pathname } = req.nextUrl;
   // Anciens sous-domaines d'outils désormais intégrés à outils.ch (sans effet tant que ces domaines ne sont
@@ -52,7 +52,25 @@ export function middleware(req: NextRequest) {
   // calorio.ch : liens partenaires courts (calorio.ch/anne, calorio.ch/ANNE20) → accueil avec le code promo.
   if (onCalorio) {
     const dest = partnerRedirect(pathname);
-    if (dest) return NextResponse.redirect(`https://calorio.ch${dest}`, 307);
+    if (dest) {
+      // Compte le clic sur le lien partenaire (la page de redirection n'est pas vue par les statistiques du navigateur) :
+      // enregistré comme page « /p/<lien> » dans les statistiques internes (pays inclus, aucune donnée personnelle).
+      const ua = req.headers.get("user-agent") || "";
+      if (event && !/bot|crawl|spider|preview|facebookexternalhit|headless|curl|wget|python/i.test(ua)) {
+        const slug = pathname.replace(/^\/+|\/+$/g, "").toLowerCase().slice(0, 40);
+        const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (key) {
+          event.waitUntil(
+            fetch("https://srcvnqfgtazupuzwznrr.supabase.co/rest/v1/rpc/track_view", {
+              method: "POST",
+              headers: { "content-type": "application/json", apikey: key, authorization: `Bearer ${key}` },
+              body: JSON.stringify({ p_path: `/p/${slug}`, p_country: (req.headers.get("x-vercel-ip-country") || "XX").slice(0, 2), p_ref: (req.headers.get("referer") || "").replace(/^https?:\/\//, "").split("/")[0].toLowerCase().slice(0, 100), p_host: "calorio.ch" }),
+            }).catch(() => {}),
+          );
+        }
+      }
+      return NextResponse.redirect(`https://calorio.ch${dest}`, 307);
+    }
   }
   // Le Mag calorio (FR /mag, DE /de/magazin) n'existe que sous calorio.ch : règle intégrée à canonicalRedirect (plus haut).
   // La page d'accueil n'existe que sous calorio.ch/ (évite le contenu dupliqué).

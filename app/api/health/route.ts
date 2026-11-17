@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { SB_URL, svcHeaders, svcKey } from "@/lib/serverAuth";
 import { calorioPrices } from "@/lib/stripeServer";
-import { modelList } from "@/lib/coachPrompt";
+import { modelList, sseTextDelta } from "@/lib/coachPrompt";
 import { accessToken, playConfigured } from "@/lib/googlePlay";
 
 // Santé de calorio — GET /api/health
@@ -11,7 +11,7 @@ import { accessToken, playConfigured } from "@/lib/googlePlay";
 // Les contrôles payants ou lents (Vito, Google Play) sont gardés en cache 60 min dans public.calorio_health.
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 type Check = { ok: boolean; detail: string; ms?: number; cached?: boolean };
 const CACHE_MIN = 60;
@@ -95,23 +95,48 @@ async function checkVito(): Promise<Check> {
   let c: Check;
   if (!key) c = { ok: false, detail: "clé Gemini absente" };
   else {
-    // Comme le vrai coach : on essaie le modèle principal, puis le modèle de secours.
+    // Exactement comme le vrai coach : réponse en flux (streaming), modèle principal puis secours.
+    // On attend le premier morceau de texte : c'est ce que voit l'utilisateur quand Vito commence à écrire.
     const fails: string[] = [];
     c = { ok: false, detail: "" };
     for (const model of modelList()) {
+      const ctrl = new AbortController();
+      const to = setTimeout(() => ctrl.abort(), 13000);
+      const t0 = Date.now();
       try {
-        const [r, ms] = await timed(() => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse`, {
           method: "POST",
           headers: { "content-type": "application/json", "x-goog-api-key": key },
-          body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "Réponds seulement : OK" }] }], generationConfig: { maxOutputTokens: 256, temperature: 0 } }),
-          signal: AbortSignal.timeout(12000),
-        }));
-        const j = (await r.json().catch(() => ({}))) as { candidates?: { content?: { parts?: { text?: string }[] } }[]; error?: { message?: string } };
-        const txt = j.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || "";
-        if (r.ok && txt.trim()) { c = { ok: true, detail: `${model} répond en ${ms} ms${fails.length ? ` (principal en échec : ${fails.join(" ; ")})` : ""}`, ms }; break; }
-        fails.push(`${model} HTTP ${r.status} ${j.error?.message?.slice(0, 80) || "réponse vide"}`);
+          body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "Dis bonjour en un mot." }] }], generationConfig: { maxOutputTokens: 512, temperature: 0 } }),
+          signal: ctrl.signal,
+        });
+        if (!r.ok || !r.body) {
+          const j = (await r.json().catch(() => ({}))) as { error?: { message?: string } };
+          fails.push(`${model} HTTP ${r.status} ${j.error?.message?.slice(0, 80) || ""}`.trim());
+          continue;
+        }
+        const reader = r.body.getReader();
+        const dec = new TextDecoder();
+        let buf = "", got = "";
+        while (!got) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += dec.decode(value, { stream: true });
+          let nl: number;
+          while ((nl = buf.indexOf("\n")) >= 0) {
+            const line = buf.slice(0, nl).replace(/\r$/, "");
+            buf = buf.slice(nl + 1);
+            if (line.startsWith("data:")) got += sseTextDelta(line.slice(5).trim());
+          }
+        }
+        reader.cancel().catch(() => {});
+        const ms = Date.now() - t0;
+        if (got.trim()) { c = { ok: true, detail: `${model} répond en ${ms} ms${fails.length ? ` (principal en échec : ${fails.join(" ; ")})` : ""}`, ms }; break; }
+        fails.push(`${model} réponse vide`);
       } catch (e) {
-        fails.push(`${model} ${short(e).slice(0, 60)}`);
+        fails.push(`${model} ${Date.now() - t0 >= 12500 ? "pas de réponse en 13 s" : short(e).slice(0, 60)}`);
+      } finally {
+        clearTimeout(to);
       }
     }
     if (!c.ok) c = { ok: false, detail: `Vito ne répond plus : ${fails.join(" ; ")}` };

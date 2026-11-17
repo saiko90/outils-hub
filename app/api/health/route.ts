@@ -95,20 +95,26 @@ async function checkVito(): Promise<Check> {
   let c: Check;
   if (!key) c = { ok: false, detail: "clé Gemini absente" };
   else {
-    const model = modelList()[0];
-    try {
-      const [r, ms] = await timed(() => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-goog-api-key": key },
-        body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "Réponds seulement : OK" }] }], generationConfig: { maxOutputTokens: 20, temperature: 0 } }),
-        signal: AbortSignal.timeout(20000),
-      }));
-      const j = (await r.json().catch(() => ({}))) as { candidates?: { content?: { parts?: { text?: string }[] } }[]; error?: { message?: string } };
-      const txt = j.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || "";
-      c = r.ok && txt.trim() ? { ok: true, detail: `${model} répond en ${ms} ms`, ms } : { ok: false, detail: `${model} : HTTP ${r.status} ${j.error?.message?.slice(0, 120) || "réponse vide"}`, ms };
-    } catch (e) {
-      c = { ok: false, detail: `Gemini injoignable : ${short(e)}` };
+    // Comme le vrai coach : on essaie le modèle principal, puis le modèle de secours.
+    const fails: string[] = [];
+    c = { ok: false, detail: "" };
+    for (const model of modelList()) {
+      try {
+        const [r, ms] = await timed(() => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-goog-api-key": key },
+          body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "Réponds seulement : OK" }] }], generationConfig: { maxOutputTokens: 256, temperature: 0 } }),
+          signal: AbortSignal.timeout(12000),
+        }));
+        const j = (await r.json().catch(() => ({}))) as { candidates?: { content?: { parts?: { text?: string }[] } }[]; error?: { message?: string } };
+        const txt = j.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || "";
+        if (r.ok && txt.trim()) { c = { ok: true, detail: `${model} répond en ${ms} ms${fails.length ? ` (principal en échec : ${fails.join(" ; ")})` : ""}`, ms }; break; }
+        fails.push(`${model} HTTP ${r.status} ${j.error?.message?.slice(0, 80) || "réponse vide"}`);
+      } catch (e) {
+        fails.push(`${model} ${short(e).slice(0, 60)}`);
+      }
     }
+    if (!c.ok) c = { ok: false, detail: `Vito ne répond plus : ${fails.join(" ; ")}` };
   }
   await writeCache("vito", c);
   return c;

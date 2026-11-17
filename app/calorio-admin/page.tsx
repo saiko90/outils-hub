@@ -82,7 +82,7 @@ function Kpi({ label, value, sub, delta }: { label: string; value: string; sub?:
 }
 
 const SECTIONS = [
-  ["apercu", "Aperçu"], ["trafic", "Trafic"], ["users", "Utilisateurs"], ["argent", "Argent"], ["partenaires", "Partenaires"], ["reseaux", "Réseaux"],
+  ["apercu", "Aperçu"], ["sante", "Santé"], ["trafic", "Trafic"], ["users", "Utilisateurs"], ["argent", "Argent"], ["partenaires", "Partenaires"], ["reseaux", "Réseaux"],
 ] as const;
 
 export default function CalorioAdmin() {
@@ -95,6 +95,7 @@ export default function CalorioAdmin() {
   const [busy, setBusy] = useState(false);
   const [range, setRange] = useState(30);
   const [internal, setInternal] = useState(false);
+  const [health, setHealth] = useState<J | null>(null);
 
   useEffect(() => {
     const sb = supabase();
@@ -121,6 +122,10 @@ export default function CalorioAdmin() {
     setBusy(false);
   }, [session, internal]);
   useEffect(() => { if (phase === "admin") load(); }, [phase, load]);
+  const loadHealth = useCallback(async () => {
+    try { const r = await fetch("/api/health", { cache: "no-store" }); setHealth((await r.json()) as J); } catch { setHealth({ ok: false, checks: {} }); }
+  }, []);
+  useEffect(() => { if (phase === "admin") loadHealth(); }, [phase, loadHealth]);
 
   const sendLink = async (e: React.FormEvent) => {
     e.preventDefault(); setErr("");
@@ -209,6 +214,21 @@ export default function CalorioAdmin() {
               <Kpi label="Revenu mensuel (MRR)" value={chf(num(st.mrr))} sub={`encaissé 30 j : ${chf(num(obj(st.revenue).d30))}`} />
             </div>
             {generated && <p className="ca-muted ca-small">Mis à jour {generated.toLocaleString("fr-CH", { dateStyle: "short", timeStyle: "short" })} · comptes internes {internal ? "inclus" : `exclus (${num(d.internal_accounts)})`}</p>}
+          </section>
+
+          <section id="sante" className="ca-sec">
+            <div className="ca-sec-h"><h2>Santé des services</h2>
+              <button className="ca-btn ca-btn-sm" onClick={loadHealth}>↻ Vérifier</button></div>
+            {!health ? <p className="ca-muted">Vérification…</p> : (
+              <div className="ca-health">
+                {Object.entries(obj(health.checks)).map(([k, v]) => { const c = obj(v); return (
+                  <div key={k} className={`ca-hc ${c.ok ? "ok" : "ko"}`}>
+                    <span className="ca-dot" aria-hidden />
+                    <div><b>{SVC[k] || k}</b><small>{String(c.detail || "")}{c.cached ? " · vérifié il y a moins d'1 h" : ""}</small></div>
+                  </div>); })}
+              </div>
+            )}
+            <p className="ca-small ca-muted">Surveillé toutes les 10 minutes. En cas de panne confirmée, une alerte part par e-mail (puis un e-mail « réparé » au retour à la normale).</p>
           </section>
 
           <section id="trafic" className="ca-sec">
@@ -324,6 +344,7 @@ export default function CalorioAdmin() {
   );
 }
 
+const SVC: Record<string, string> = { site: "Site et app", base: "Base de données (Supabase)", vito: "Vito (Gemini)", aliments: "Scan et recherche (Open Food Facts)", stripe: "Paiements web (Stripe)", play: "Abonnements Google Play" };
 const FEAT: Record<string, string> = { scan: "Scan code-barres", coach: "Vito (coach)", photo: "Photo de l'assiette", search: "Recherche en ligne", water: "Eau", sport: "Sport", weight: "Poids", fasting: "Jeûne", saved_meals: "Repas enregistrés", custom_foods: "Aliments créés", duo: "Mode duo", push: "Notifications" };
 const OBJ: Record<string, string> = { perte: "Perdre du poids", perte_rapide: "Perdre vite", maintien: "Maintenir", prise: "Prendre du poids" };
 const PIPE: Record<string, string> = { partenaire: "Partenaire", repondu: "A répondu", envoye: "Contacté", brouillon: "Brouillon", refus: "Refus", ignore: "Ignoré" };
@@ -392,6 +413,11 @@ const CSS = `
 .ca-pill.active,.ca-pill.partenaire{background:#d7f3e1;color:#14663a}.ca-pill.trialing,.ca-pill.repondu{background:#fff0c9;color:#7a5508}.ca-pill.canceled,.ca-pill.past_due,.ca-pill.refus{background:#fde0e6;color:#9e2440}
 .ca-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:.88rem}
 .ca-list small{display:block;color:var(--ca-soft);font-weight:700}.ca-list a{color:inherit}
+.ca-health{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.ca-hc{display:flex;gap:10px;align-items:flex-start;background:var(--ca-card);border:1px solid var(--ca-line);border-radius:14px;padding:12px}
+.ca-hc b{display:block;font-size:.9rem}.ca-hc small{display:block;color:var(--ca-soft);font-weight:700;font-size:.76rem;margin-top:2px;word-break:break-word}
+.ca-dot{flex:none;width:12px;height:12px;border-radius:50%;margin-top:4px;background:var(--ca-green);box-shadow:0 0 0 4px rgba(31,157,85,.15)}
+.ca-hc.ko{border-color:var(--ca-red)}.ca-hc.ko .ca-dot{background:var(--ca-red);box-shadow:0 0 0 4px rgba(233,72,103,.18)}
 .ca-muted{color:var(--ca-soft)}.ca-small{font-size:.78rem;margin:8px 0 0}.ca-empty{color:var(--ca-soft);margin:0}
 .ca-err{color:var(--ca-red);font-weight:800}.ca-ok{color:var(--ca-green);font-weight:800;margin:0}
 .ca-login{max-width:380px;margin:12vh auto 0;background:var(--ca-card);border:1px solid var(--ca-line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:12px}

@@ -52,7 +52,7 @@ const b64url = (b: Buffer | string) => (typeof b === "string" ? Buffer.from(b, "
 
 let cached: { token: string; exp: number } | null = null;
 
-async function accessToken(): Promise<string> {
+export async function accessToken(): Promise<string> {
   if (cached && cached.exp > Date.now() + 60_000) return cached.token;
   const sa = serviceAccount();
   if (!sa) throw new Error("play_not_configured");

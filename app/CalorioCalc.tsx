@@ -380,7 +380,7 @@ const LX = {
     myNeeds: "Mes besoins", reglages: "Réglages", passPro: "Passer Pro", proSubShort: "Coach IA + analyse photo",
     themeLabel: "Thème", themeLight: "☀️ Clair", themeDark: "🌙 Sombre", themeAuto: "Auto",
     madeIn: "Fait en Suisse 🇨🇭 · Swiss Digital Studio",
-    updTitle: "Nouvelle version de calorio", updSub: "Scan et photo directement dans l'app.", updBtn: "Mettre à jour", playBanner: "calorio en app Android", playBannerSub: "Ouverture en un tap et rappels, gratuite.", playBannerSync: "Connecte-toi d'abord ici pour garder tes données.", playBannerAlt: "Disponible sur Google Play", loginB: "Connecte-toi", loginS: "Synchronise tes données, gratuit", loginBtn: "Se connecter",
+    updTitle: "Nouvelle version de calorio", updSub: "Scan et photo directement dans l'app.", updBtn: "Mettre à jour", playBanner: "calorio en app Android", playBannerSub: "Ouverture en un tap et rappels, gratuite.", playBannerSync: "Connecte-toi d'abord ici pour garder tes données.", playBannerAlt: "Disponible sur Google Play", playBannerPromo: (c: string) => `Ton code ${c} : prends Pro ici sur calorio.ch pour garder tes −20 %.`, loginB: "Connecte-toi", loginS: "Synchronise tes données, gratuit", loginBtn: "Se connecter",
     syncedB: "Données synchronisées", vitoDispo: "Ton coach nutrition, dispo 24/7",
     goalWeight: "Poids objectif", toGoal: (v: string) => `plus que ${v} kg`, goalReached: "Objectif atteint 🎉",
     vitoHi: ["Bonjour 👋", "Coucou, c'est parti !", "Salut, prêt·e ?", "Hey, content de te voir 🥕"],
@@ -468,7 +468,7 @@ const LX = {
     myNeeds: "Mein Bedarf", reglages: "Einstellungen", passPro: "Pro werden", proSubShort: "KI-Coach + Foto-Analyse",
     themeLabel: "Thema", themeLight: "☀️ Hell", themeDark: "🌙 Dunkel", themeAuto: "Auto",
     madeIn: "Gemacht in der Schweiz 🇨🇭 · Swiss Digital Studio",
-    updTitle: "Neue calorio-Version", updSub: "Scan und Foto direkt in der App.", updBtn: "Aktualisieren", playBanner: "calorio als Android-App", playBannerSub: "Mit einem Tipp offen, mit Erinnerungen, gratis.", playBannerSync: "Melde dich zuerst hier an, um deine Daten zu behalten.", playBannerAlt: "Jetzt bei Google Play", loginB: "Melde dich an", loginS: "Synchronisiere deine Daten, gratis", loginBtn: "Anmelden",
+    updTitle: "Neue calorio-Version", updSub: "Scan und Foto direkt in der App.", updBtn: "Aktualisieren", playBanner: "calorio als Android-App", playBannerSub: "Mit einem Tipp offen, mit Erinnerungen, gratis.", playBannerSync: "Melde dich zuerst hier an, um deine Daten zu behalten.", playBannerAlt: "Jetzt bei Google Play", playBannerPromo: (c: string) => `Dein Code ${c}: Pro hier auf calorio.ch abschliessen, um −20 % zu behalten.`, loginB: "Melde dich an", loginS: "Synchronisiere deine Daten, gratis", loginBtn: "Anmelden",
     syncedB: "Daten synchronisiert", vitoDispo: "Dein Ernährungscoach, 24/7 da",
     goalWeight: "Zielgewicht", toGoal: (v: string) => `noch ${v} kg`, goalReached: "Ziel erreicht 🎉",
     vitoHi: ["Hallo 👋", "Hoi, los geht's!", "Bereit?", "Schön, dich zu sehen 🥕"],
@@ -556,7 +556,7 @@ const LX = {
     myNeeds: "My needs", reglages: "Settings", passPro: "Go Pro", proSubShort: "AI coach + photo analysis",
     themeLabel: "Theme", themeLight: "☀️ Light", themeDark: "🌙 Dark", themeAuto: "Auto",
     madeIn: "Made in Switzerland 🇨🇭 · Swiss Digital Studio",
-    updTitle: "New calorio version", updSub: "Scan and photo right inside the app.", updBtn: "Update", playBanner: "calorio as an Android app", playBannerSub: "Opens in one tap, with reminders, free.", playBannerSync: "Sign in here first to keep your data.", playBannerAlt: "Get it on Google Play", loginB: "Sign in", loginS: "Sync your data, free", loginBtn: "Sign in",
+    updTitle: "New calorio version", updSub: "Scan and photo right inside the app.", updBtn: "Update", playBanner: "calorio as an Android app", playBannerSub: "Opens in one tap, with reminders, free.", playBannerSync: "Sign in here first to keep your data.", playBannerAlt: "Get it on Google Play", playBannerPromo: (c: string) => `Your code ${c}: get Pro here on calorio.ch to keep your 20% off.`, loginB: "Sign in", loginS: "Sync your data, free", loginBtn: "Sign in",
     syncedB: "Data synced", vitoDispo: "Your nutrition coach, 24/7",
     goalWeight: "Target weight", toGoal: (v: string) => `${v} kg to go`, goalReached: "Goal reached 🎉",
     vitoHi: ["Hi 👋", "Hey, let's go!", "Ready?", "Good to see you 🥕"],
@@ -1086,7 +1086,14 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
     } catch { /* ignore */ }
   }, []);
   const hidePlayBanner = () => { setPlayBannerOff(true); try { localStorage.setItem(PLAY_BANNER_KEY, String(Date.now())); } catch { /* ignore */ } };
-  const playStoreUrl = (medium: string) => `https://play.google.com/store/apps/details?id=ch.calorio.twa&hl=${lang}&referrer=${encodeURIComponent(`utm_source=calorio.ch&utm_medium=${medium}`)}`;
+  // Visiteur venu par un lien partenaire (code mémorisé) : la source transmise au Play Store est le partenaire,
+  // pour compter ses installations dans la Play Console (Acquisition des utilisateurs par source UTM).
+  const playStoreUrl = (medium: string) => {
+    const ref = promoCode
+      ? `utm_source=partenaire&utm_medium=${promoCode.toLowerCase()}&utm_campaign=${medium}`
+      : `utm_source=calorio.ch&utm_medium=${medium}`;
+    return `https://play.google.com/store/apps/details?id=ch.calorio.twa&hl=${lang}&referrer=${encodeURIComponent(ref)}`;
+  };
   // Google Play Billing (plugin natif @capgo/native-purchases, présent à partir de l'app 1.2.0).
   const [playSub, setPlaySub] = useState(false); // abonnement Pro actif acheté via Google Play
   const [playPlans, setPlayPlans] = useState<{ monthly?: PlayOffer; yearly?: PlayOffer }>({});
@@ -2880,7 +2887,7 @@ export default function CalorioCalc({ lang: propLang }: { lang: Lang }) {
           <img className="cl-playban-ic" src="/calorio-icon-192.png" alt="" width={40} height={40} />
           <div className="cl-playban-tx">
             <b>{x.playBanner}</b>
-            <span>{user ? x.playBannerSub : x.playBannerSync}</span>
+            <span>{promoCode ? x.playBannerPromo(promoCode) : user ? x.playBannerSub : x.playBannerSync}</span>
           </div>
           <a className="cl-playban-go" href={playStoreUrl("webapp_banner")} target="_blank" rel="noopener" onClick={hidePlayBanner}>
             <img src={`/badges/google-play-${lang === "de" ? "de" : lang === "en" ? "en" : "fr"}.png`} alt={x.playBannerAlt} width={129} height={50} />

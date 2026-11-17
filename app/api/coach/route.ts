@@ -63,7 +63,8 @@ export async function POST(req: Request) {
   let lastDetail = "";
   let calls = 0;
   for (const model of MODELS) {
-    for (let attempt = 0; attempt < MAX_CALLS && calls < MAX_CALLS; attempt++) {
+    // 2 essais max par modèle, pour laisser leur chance aux modèles de secours quand le principal est saturé.
+    for (let attempt = 0; attempt < 2 && calls < MAX_CALLS; attempt++) {
       calls++;
       const r = await callOnce(model);
       if (!r) { lastStatus = 504; await sleep(300); continue; }

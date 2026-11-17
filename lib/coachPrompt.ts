@@ -140,5 +140,8 @@ export function sseTextDelta(jsonStr: string): string {
 export function modelList(): string[] {
   const MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
   const FALLBACK = process.env.GEMINI_MODEL_FALLBACK || "gemini-flash-latest";
-  return Array.from(new Set([MODEL, ...(FALLBACK && FALLBACK !== MODEL ? [FALLBACK] : [])]));
+  // Troisième recours : le modèle « lite », sur une autre file d'attente chez Google — utile quand les
+  // modèles flash sont saturés (HTTP 503 « high demand »). Un nom inconnu répond 404 tout de suite et est sauté.
+  const FALLBACK2 = process.env.GEMINI_MODEL_FALLBACK2 || "gemini-flash-lite-latest";
+  return Array.from(new Set([MODEL, FALLBACK, FALLBACK2].filter(Boolean)));
 }

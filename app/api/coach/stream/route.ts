@@ -1,4 +1,4 @@
-import { persona, contextBlock, trimMessages, geminiPayload, modelList, coachLang, sanitizeCtx, sseTextDelta, type CoachMsg, type CoachApiCtx } from "@/lib/coachPrompt";
+import { persona, contextBlock, trimMessages, geminiPayload, modelList, modelFailed, modelOk, coachLang, sanitizeCtx, sseTextDelta, type CoachMsg, type CoachApiCtx } from "@/lib/coachPrompt";
 import { coachGuard } from "@/lib/coachRate";
 
 // Relais « Coach nutrition » en STREAMING (réponse en direct, mot par mot).
@@ -46,9 +46,10 @@ export async function POST(req: Request) {
         signal: ctrl.signal,
       });
       clearTimeout(to);
-      if (r.ok && r.body) { upstream = r; break; }
+      if (r.ok && r.body) { upstream = r; modelOk(model); break; }
+      modelFailed(model);
       // non-ok → on essaie le modèle suivant (le client repliera si tout échoue)
-    } catch { clearTimeout(to); }
+    } catch { clearTimeout(to); modelFailed(model); }
   }
   if (!upstream || !upstream.body) { await gate.refund(); return new Response("upstream_unavailable", { status: 503 }); }
 

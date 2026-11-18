@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { SB_URL, svcHeaders, svcKey } from "@/lib/serverAuth";
 import { calorioPrices } from "@/lib/stripeServer";
-import { modelList, sseTextDelta } from "@/lib/coachPrompt";
+import { configuredModels, sseTextDelta } from "@/lib/coachPrompt";
 import { accessToken, playConfigured } from "@/lib/googlePlay";
 
 // Santé de calorio — GET /api/health
@@ -11,7 +11,7 @@ import { accessToken, playConfigured } from "@/lib/googlePlay";
 // Les contrôles payants ou lents (Vito, Google Play) sont gardés en cache 60 min dans public.calorio_health.
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 30;
 
 type Check = { ok: boolean; detail: string; ms?: number; cached?: boolean; degraded?: boolean };
 const CACHE_MIN = 60;
@@ -95,11 +95,9 @@ async function checkVito(): Promise<Check> {
   let c: Check;
   if (!key) c = { ok: false, detail: "clé Gemini absente" };
   else {
-    // Exactement comme le vrai coach : réponse en flux (streaming), modèle principal puis secours.
-    // On attend le premier morceau de texte : c'est ce que voit l'utilisateur quand Vito commence à écrire.
-    const fails: string[] = [];
-    c = { ok: false, detail: "" };
-    for (const model of modelList()) {
+    // Comme le vrai coach : réponse en flux (streaming), on attend le premier morceau de texte.
+    // Les modèles sont testés EN PARALLÈLE (13 s max en tout) ; le résultat suit l'ordre principal → secours.
+    const probe = async (model: string): Promise<{ ok: boolean; ms: number; err: string }> => {
       const ctrl = new AbortController();
       const to = setTimeout(() => ctrl.abort(), 13000);
       const t0 = Date.now();
@@ -112,8 +110,7 @@ async function checkVito(): Promise<Check> {
         });
         if (!r.ok || !r.body) {
           const j = (await r.json().catch(() => ({}))) as { error?: { message?: string } };
-          fails.push(`${model} HTTP ${r.status} ${j.error?.message?.slice(0, 80) || ""}`.trim());
-          continue;
+          return { ok: false, ms: Date.now() - t0, err: `HTTP ${r.status} ${j.error?.message?.slice(0, 80) || ""}`.trim() };
         }
         const reader = r.body.getReader();
         const dec = new TextDecoder();
@@ -130,14 +127,20 @@ async function checkVito(): Promise<Check> {
           }
         }
         reader.cancel().catch(() => {});
-        const ms = Date.now() - t0;
-        if (got.trim()) { c = { ok: true, degraded: fails.length > 0, detail: `${model} répond en ${ms} ms${fails.length ? ` (principal en échec : ${fails.join(" ; ")})` : ""}`, ms }; break; }
-        fails.push(`${model} réponse vide`);
+        return got.trim() ? { ok: true, ms: Date.now() - t0, err: "" } : { ok: false, ms: Date.now() - t0, err: "réponse vide" };
       } catch (e) {
-        fails.push(`${model} ${Date.now() - t0 >= 12500 ? "pas de réponse en 13 s" : short(e).slice(0, 60)}`);
+        return { ok: false, ms: Date.now() - t0, err: Date.now() - t0 >= 12500 ? "pas de réponse en 13 s" : short(e).slice(0, 60) };
       } finally {
         clearTimeout(to);
       }
+    };
+    const models = configuredModels();
+    const res = await Promise.all(models.map(probe));
+    const fails: string[] = [];
+    c = { ok: false, detail: "" };
+    for (let i = 0; i < models.length; i++) {
+      if (res[i].ok) { c = { ok: true, degraded: fails.length > 0, detail: `${models[i]} répond en ${res[i].ms} ms${fails.length ? ` (principal en échec : ${fails.join(" ; ")})` : ""}`, ms: res[i].ms }; break; }
+      fails.push(`${models[i]} ${res[i].err}`);
     }
     if (!c.ok) c = { ok: false, detail: `Vito ne répond plus : ${fails.join(" ; ")}` };
   }

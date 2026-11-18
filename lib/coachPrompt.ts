@@ -137,11 +137,24 @@ export function sseTextDelta(jsonStr: string): string {
   }
 }
 
-export function modelList(): string[] {
+/** Modèles Gemini dans l'ordre configuré : principal, secours, puis « lite » (autre file d'attente chez Google,
+ *  utile quand les modèles flash sont saturés — HTTP 503 « high demand »). Un nom inconnu répond 404 et est sauté. */
+export function configuredModels(): string[] {
   const MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
   const FALLBACK = process.env.GEMINI_MODEL_FALLBACK || "gemini-flash-latest";
-  // Troisième recours : le modèle « lite », sur une autre file d'attente chez Google — utile quand les
-  // modèles flash sont saturés (HTTP 503 « high demand »). Un nom inconnu répond 404 tout de suite et est sauté.
   const FALLBACK2 = process.env.GEMINI_MODEL_FALLBACK2 || "gemini-flash-lite-latest";
   return Array.from(new Set([MODEL, FALLBACK, FALLBACK2].filter(Boolean)));
+}
+
+// Disjoncteur : un modèle qui vient d'échouer passe en fin de liste pendant 5 min, pour que l'utilisateur
+// n'attende pas 12 s à chaque message qu'un modèle saturé finisse par lâcher. (Mémoire de l'instance serveur.)
+const downUntil = new Map<string, number>();
+export function modelFailed(model: string) { downUntil.set(model, Date.now() + 5 * 60_000); }
+export function modelOk(model: string) { downUntil.delete(model); }
+
+export function modelList(): string[] {
+  const all = configuredModels();
+  const now = Date.now();
+  const down = (m: string) => (downUntil.get(m) ?? 0) > now;
+  return [...all.filter((m) => !down(m)), ...all.filter(down)];
 }

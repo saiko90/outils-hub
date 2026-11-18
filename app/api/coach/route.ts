@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { persona, contextBlock, trimMessages, geminiPayload, modelList, coachLang, sanitizeCtx, type CoachMsg, type CoachApiCtx } from "@/lib/coachPrompt";
+import { persona, contextBlock, trimMessages, geminiPayload, modelList, modelFailed, modelOk, coachLang, sanitizeCtx, type CoachMsg, type CoachApiCtx } from "@/lib/coachPrompt";
 import { coachGuard } from "@/lib/coachRate";
 
 // Relais serveur « Coach nutrition » (Pro), NON-streaming et robuste — sert aussi de
@@ -67,8 +67,9 @@ export async function POST(req: Request) {
     for (let attempt = 0; attempt < 2 && calls < MAX_CALLS; attempt++) {
       calls++;
       const r = await callOnce(model);
-      if (!r) { lastStatus = 504; await sleep(300); continue; }
+      if (!r) { lastStatus = 504; modelFailed(model); break; }
       if (r.ok) {
+        modelOk(model);
         const data = (await r.json().catch(() => ({}))) as {
           candidates?: { content?: { parts?: { text?: string }[] } }[];
           promptFeedback?: { blockReason?: string };
@@ -84,6 +85,7 @@ export async function POST(req: Request) {
       lastStatus = r.status;
       lastDetail = (await r.text().catch(() => "")).slice(0, 300);
       if (r.status === 404) break;
+      if (r.status === 503) { modelFailed(model); break; }
       const retryable = r.status === 503 || r.status === 429 || r.status === 500 || r.status === 502;
       if (!retryable) {
         await gate.refund();

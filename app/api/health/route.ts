@@ -13,7 +13,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-type Check = { ok: boolean; detail: string; ms?: number; cached?: boolean };
+type Check = { ok: boolean; detail: string; ms?: number; cached?: boolean; degraded?: boolean };
 const CACHE_MIN = 60;
 
 async function timed<T>(fn: () => Promise<T>): Promise<[T, number]> {
@@ -29,7 +29,7 @@ async function readCache(svc: string): Promise<Check | null> {
     const rows = (await r.json()) as { ok: boolean; detail: string; ms: number; checked_at: string }[];
     const row = rows?.[0];
     // Un échec est revérifié dès le passage suivant ; un succès reste valable CACHE_MIN minutes.
-    if (row && row.ok && Date.now() - Date.parse(row.checked_at) < CACHE_MIN * 60_000) return { ok: true, detail: row.detail, ms: row.ms, cached: true };
+    if (row && row.ok && !/en échec/.test(row.detail) && Date.now() - Date.parse(row.checked_at) < CACHE_MIN * 60_000) return { ok: true, detail: row.detail, ms: row.ms, cached: true };
   } catch { /* pas de cache */ }
   return null;
 }
@@ -131,7 +131,7 @@ async function checkVito(): Promise<Check> {
         }
         reader.cancel().catch(() => {});
         const ms = Date.now() - t0;
-        if (got.trim()) { c = { ok: true, detail: `${model} répond en ${ms} ms${fails.length ? ` (principal en échec : ${fails.join(" ; ")})` : ""}`, ms }; break; }
+        if (got.trim()) { c = { ok: true, degraded: fails.length > 0, detail: `${model} répond en ${ms} ms${fails.length ? ` (principal en échec : ${fails.join(" ; ")})` : ""}`, ms }; break; }
         fails.push(`${model} réponse vide`);
       } catch (e) {
         fails.push(`${model} ${Date.now() - t0 >= 12500 ? "pas de réponse en 13 s" : short(e).slice(0, 60)}`);

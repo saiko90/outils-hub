@@ -222,9 +222,9 @@ export default function CalorioAdmin() {
             {!health ? <p className="ca-muted">Vérification…</p> : (
               <div className="ca-health">
                 {Object.entries(obj(health.checks)).map(([k, v]) => { const c = obj(v); return (
-                  <div key={k} className={`ca-hc ${c.ok ? "ok" : "ko"}`}>
+                  <div key={k} className={`ca-hc ${!c.ok ? "ko" : c.degraded ? "warn" : "ok"}`}>
                     <span className="ca-dot" aria-hidden />
-                    <div><b>{SVC[k] || k}</b><small>{String(c.detail || "")}{c.cached ? " · vérifié il y a moins d'1 h" : ""}</small></div>
+                    <div><b>{SVC[k] || k}{c.ok && c.degraded ? " · sur le secours" : ""}</b><small>{String(c.detail || "")}{c.cached ? " · vérifié il y a moins d'1 h" : ""}</small></div>
                   </div>); })}
               </div>
             )}
@@ -417,7 +417,7 @@ const CSS = `
 .ca-hc{display:flex;gap:10px;align-items:flex-start;background:var(--ca-card);border:1px solid var(--ca-line);border-radius:14px;padding:12px}
 .ca-hc b{display:block;font-size:.9rem}.ca-hc small{display:block;color:var(--ca-soft);font-weight:700;font-size:.76rem;margin-top:2px;word-break:break-word}
 .ca-dot{flex:none;width:12px;height:12px;border-radius:50%;margin-top:4px;background:var(--ca-green);box-shadow:0 0 0 4px rgba(31,157,85,.15)}
-.ca-hc.ko{border-color:var(--ca-red)}.ca-hc.ko .ca-dot{background:var(--ca-red);box-shadow:0 0 0 4px rgba(233,72,103,.18)}
+.ca-hc.warn{border-color:var(--ca-amber)}.ca-hc.warn .ca-dot{background:var(--ca-amber);box-shadow:0 0 0 4px rgba(227,162,59,.2)}.ca-hc.ko{border-color:var(--ca-red)}.ca-hc.ko .ca-dot{background:var(--ca-red);box-shadow:0 0 0 4px rgba(233,72,103,.18)}
 .ca-muted{color:var(--ca-soft)}.ca-small{font-size:.78rem;margin:8px 0 0}.ca-empty{color:var(--ca-soft);margin:0}
 .ca-err{color:var(--ca-red);font-weight:800}.ca-ok{color:var(--ca-green);font-weight:800;margin:0}
 .ca-login{max-width:380px;margin:12vh auto 0;background:var(--ca-card);border:1px solid var(--ca-line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:12px}

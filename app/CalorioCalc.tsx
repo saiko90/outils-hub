@@ -4214,6 +4214,10 @@ const CSS = `
   background:radial-gradient(115% 65% at 88% 106%,#2a1a26 0%,transparent 52%),radial-gradient(90% 55% at 6% -6%,#0f2a1c 0%,transparent 55%),linear-gradient(180deg,#0e1712 0%,#101a15 52%,#131017 100%);
 }}
 .cl[data-theme="dark"] input:not([type=range]),.cl[data-theme="dark"] select,.cl[data-theme="dark"] textarea,.cl[data-theme="auto"] input:not([type=range]),.cl[data-theme="auto"] select,.cl[data-theme="auto"] textarea{background:var(--input)}
+/* Texte saisi lisible en mode sombre (ex. champ de Vito : texte foncé sur fond foncé). */
+.cl[data-theme="dark"] input:not([type=range]),.cl[data-theme="dark"] textarea{color:var(--ink)}
+.cl[data-theme="dark"] input::placeholder,.cl[data-theme="dark"] textarea::placeholder{color:var(--soft)}
+@media(prefers-color-scheme:dark){.cl[data-theme="auto"] input:not([type=range]),.cl[data-theme="auto"] textarea{color:var(--ink)}.cl[data-theme="auto"] input::placeholder,.cl[data-theme="auto"] textarea::placeholder{color:var(--soft)}}
 /* ambiance : lumière qui dérive */
 .cl-amb{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
 .cl-amb::before,.cl-amb::after{content:"";position:absolute;width:460px;height:460px;border-radius:50%;filter:blur(66px);opacity:.7;will-change:transform}

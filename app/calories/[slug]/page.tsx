@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
+import { ACTIVITIES, energySplit, minutesFor, profile } from "@/lib/foodInsights";
 import { ALIMENT_SLUGS, alimentBySlug, alimentSlug, seoName, inText, deNom, ficheTitle, isChSpecialite, relatedAliments, recettesWithAliment, recetteSlug, recetteNutri, SLICE_IDS, SLICE_G, deSlugById, type Aliment, type AlimentCat } from "@/lib/calorio";
 import { magArticlesForAliment, magUrl } from "@/lib/mag";
 import { CAL_CSS } from "../ficheCss";
@@ -58,10 +59,13 @@ export default function Page({ params }: { params: { slug: string } }) {
   const name = seoName(al);
   const ch = isChSpecialite(al.id);
   const nt = inText(name);
+  const split = energySplit(al.prot, al.gluc, al.lip);
+  const burn = ACTIVITIES.map((a) => ({ ...a, min: minutesFor(kcalP, a.met) }));
   const faq = [
     { q: `Combien de calories dans 100 g ${deNom(nt)} ?`, a: `100 g ${deNom(nt)} apportent environ ${al.kcal} kcal.` },
     { q: `Combien de calories pour une portion ${deNom(nt)} ?`, a: `Une portion usuelle de ${al.portion} g représente environ ${kcalP} kcal.` },
     { q: `Quels sont les macros ${deNom(nt)} ?`, a: `Pour 100 g : ${r1(al.prot)} g de protéines, ${r1(al.gluc)} g de glucides et ${r1(al.lip)} g de lipides.` },
+    ...(kcalP > 0 ? [{ q: `Combien de temps de marche pour brûler une portion ${deNom(nt)} ?`, a: `Pour une personne de 70 kg, une portion de ${al.portion} g (${kcalP} kcal) correspond à environ ${burn[0].min} minutes de marche à 5 km/h, ou ${burn[2].min} minutes de course à 10 km/h.` }] : []),
   ];
   const faqLd = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) };
   const canon = `https://calorio.ch/calories/${params.slug}`;
@@ -112,6 +116,23 @@ export default function Page({ params }: { params: { slug: string } }) {
           <p className="ca-slice"><b>1 tranche ({SLICE_G} g) : environ {slice} kcal</b> <span>(tranche moyenne de {SLICE_G} g)</span></p>
         )}
         <p className="ca-note">Valeurs indicatives par 100 g (moyennes). Les valeurs réelles varient selon la marque et la préparation. <a href="/mag/methode">Méthode et sources</a></p>
+
+        {split && (
+          <>
+            <h2 className="ca-h2">D'où viennent les calories ?</h2>
+            <p>Dans {nt}, <b>{split.p} %</b> de l'énergie vient des protéines, <b>{split.g} %</b> des glucides et <b>{split.l} %</b> des lipides : c'est un aliment {profile(split, "fr")}.</p>
+          </>
+        )}
+        {kcalP > 0 && (
+          <>
+            <h2 className="ca-h2">Une portion, c'est combien d'activité ?</h2>
+            <p>Pour dépenser les {kcalP} kcal d'une portion de {al.portion} g, une personne de 70 kg a besoin d'environ :</p>
+            <ul className="ca-links">
+              {burn.map((b) => <li key={b.id}><b>{b.min} min</b> {b.fr}</li>)}
+            </ul>
+            <p className="ca-note">Estimation selon le Compendium of Physical Activities 2024. La dépense réelle dépend du poids, du rythme et du terrain.</p>
+          </>
+        )}
 
         <div className="ca-final">
           <div className="ca-final-t">Suis {nt} dans ton journal</div>

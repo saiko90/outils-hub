@@ -1,3 +1,4 @@
+import { ACTIVITIES, energySplit, minutesFor, profile } from "@/lib/foodInsights";
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { DE_SLUGS, deBySlug, deSlugById, deName, alimentSlug, relatedAliments, SLICE_IDS, SLICE_G, type Aliment } from "@/lib/calorio";
@@ -58,10 +59,13 @@ export default function Page({ params }: { params: { slug: string } }) {
     { label: "Kohlenhydrate", per100: al.gluc, perPortion: (al.gluc * al.portion) / 100 },
     { label: "Fett", per100: al.lip, perPortion: (al.lip * al.portion) / 100 },
   ];
+  const split = energySplit(al.prot, al.gluc, al.lip);
+  const burn = ACTIVITIES.map((a) => ({ ...a, min: minutesFor(kcalP, a.met) }));
   const faq = [
     { q: `Wie viele Kalorien haben 100 g ${n}?`, a: `100 g ${n} liefern rund ${al.kcal} kcal.` },
     { q: `Wie viele Kalorien hat eine Portion ${n}?`, a: `Eine übliche Portion von ${al.portion} g hat rund ${kcalP} kcal.` },
     { q: `Wie viel Eiweiss, Kohlenhydrate und Fett hat ${n}?`, a: `Pro 100 g: ${r1(al.prot)} g Eiweiss, ${r1(al.gluc)} g Kohlenhydrate und ${r1(al.lip)} g Fett.` },
+    ...(kcalP > 0 ? [{ q: `Wie lange muss ich gehen, um eine Portion ${n} zu verbrennen?`, a: `Bei 70 kg Körpergewicht entspricht eine Portion von ${al.portion} g (${kcalP} kcal) rund ${burn[0].min} Minuten Gehen mit 5 km/h oder ${burn[2].min} Minuten Joggen mit 10 km/h.` }] : []),
     { q: `Wie erfasse ich ${n} in calorio?`, a: `Suche in calorio nach «${al.nom.de}» und gib das Gewicht ein (${al.portion} g als Vorschlag). calorio rechnet Kalorien und Makros für deinen Tag aus.` },
   ];
   const faqLd = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) };
@@ -111,6 +115,23 @@ export default function Page({ params }: { params: { slug: string } }) {
           <p className="ca-slice"><b>1 Scheibe ({SLICE_G} g): rund {slice} kcal</b> <span>(durchschnittliche Scheibe von {SLICE_G} g)</span></p>
         )}
         <p className="ca-note">Richtwerte pro 100 g (Durchschnitt). Die effektiven Werte variieren je nach Marke, Rezept und Zubereitung. <a href="/de/magazin/methode">Methode und Quellen</a></p>
+
+        {split && (
+          <>
+            <h2 className="ca-h2">Woher kommen die Kalorien?</h2>
+            <p>Bei {n} stammen <b>{split.p} %</b> der Energie aus Eiweiss, <b>{split.g} %</b> aus Kohlenhydraten und <b>{split.l} %</b> aus Fett: {profile(split, "de")}.</p>
+          </>
+        )}
+        {kcalP > 0 && (
+          <>
+            <h2 className="ca-h2">Eine Portion in Bewegung umgerechnet</h2>
+            <p>Um die {kcalP} kcal einer Portion von {al.portion} g zu verbrauchen, braucht eine Person mit 70 kg ungefähr:</p>
+            <ul className="ca-links">
+              {burn.map((b) => <li key={b.id}><b>{b.min} Min.</b> {b.de}</li>)}
+            </ul>
+            <p className="ca-note">Schätzung nach dem Compendium of Physical Activities 2024. Der effektive Verbrauch hängt von Gewicht, Tempo und Gelände ab.</p>
+          </>
+        )}
 
         <div className="ca-final">
           <div className="ca-final-t">{n} im Ernährungstagebuch erfassen</div>

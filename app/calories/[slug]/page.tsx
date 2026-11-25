@@ -120,7 +120,7 @@ export default function Page({ params }: { params: { slug: string } }) {
         {split && (
           <>
             <h2 className="ca-h2">D'où viennent les calories ?</h2>
-            <p>Dans {nt}, <b>{split.p} %</b> de l'énergie vient des protéines, <b>{split.g} %</b> des glucides et <b>{split.l} %</b> des lipides : c'est un aliment {profile(split, "fr")}.</p>
+            <p>Dans 100 g {deNom(nt)}, <b>{split.p} %</b> de l'énergie vient des protéines, <b>{split.g} %</b> des glucides et <b>{split.l} %</b> des lipides : c'est un aliment {profile(split, "fr")}.</p>
           </>
         )}
         {kcalP > 0 && (

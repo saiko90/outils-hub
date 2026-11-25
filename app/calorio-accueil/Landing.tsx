@@ -73,6 +73,14 @@ function Check() {
   );
 }
 
+/** Comptes officiels de calorio (données structurées « sameAs » + liens du pied de page). */
+const SAME_AS = [
+  "https://www.instagram.com/calorio_app/",
+  "https://www.facebook.com/1424853167373960",
+  "https://www.youtube.com/@Calorio_app",
+  "https://play.google.com/store/apps/details?id=ch.calorio.twa",
+];
+
 export default function Landing({ lang }: { lang: LLang }) {
   const c = COPY[lang];
   const app = `/calorio${lang === "fr" ? "" : `?lang=${lang}`}`;
@@ -85,8 +93,13 @@ export default function Landing({ lang }: { lang: LLang }) {
     "@graph": [
       {
         "@type": "SoftwareApplication",
+        "@id": "https://calorio.ch/#app",
         name: "calorio",
+        alternateName: ["calorio.ch", "calorio Suisse", "calorio – compteur de calories suisse", "calorio Kalorienzähler Schweiz"],
         url: `${BASE}/`,
+        sameAs: SAME_AS,
+        downloadUrl: "https://play.google.com/store/apps/details?id=ch.calorio.twa",
+        author: { "@id": "https://calorio.ch/#brand" },
         description: c.metaDesc,
         applicationCategory: "HealthApplication",
         operatingSystem: "Web, Android",
@@ -108,11 +121,25 @@ export default function Landing({ lang }: { lang: LLang }) {
         publisher: { "@id": "https://swissdigitalstudio.ch/#org" },
       },
       {
+        // La marque calorio et ses comptes officiels : aide Google à distinguer calorio.ch des autres « Calorio ».
+        "@type": "Brand",
+        "@id": "https://calorio.ch/#brand",
+        name: "calorio",
+        alternateName: "calorio.ch",
+        url: "https://calorio.ch/",
+        logo: "https://calorio.ch/calorio-icon-512.png",
+        slogan: c.metaDesc,
+        sameAs: SAME_AS,
+      },
+      {
         "@type": "Organization",
         "@id": "https://swissdigitalstudio.ch/#org",
         name: "Swiss Digital Studio",
         url: "https://swissdigitalstudio.ch/",
         logo: "https://calorio.ch/calorio-icon-512.png",
+        brand: { "@id": "https://calorio.ch/#brand" },
+        founder: { "@type": "Person", name: "Michaël Kaeser" },
+        address: { "@type": "PostalAddress", addressLocality: "Aven", addressRegion: "VS", addressCountry: "CH" },
       },
       {
         "@type": "FAQPage",
@@ -274,6 +301,12 @@ export default function Landing({ lang }: { lang: LLang }) {
           <a href={lang === "fr" ? "/partenaires" : `/${lang}/${lang === "de" ? "partner" : "partners"}`}>{c.footer.partners}</a>
           <a href="/mentions-legales">{c.footer.legal}</a>
         </nav>
+        <nav aria-label="calorio sur les réseaux" className="lp-social">
+          <a href="https://www.instagram.com/calorio_app/" rel="me noopener" target="_blank">Instagram</a>
+          <a href="https://www.facebook.com/1424853167373960" rel="me noopener" target="_blank">Facebook</a>
+          <a href="https://www.youtube.com/@Calorio_app" rel="me noopener" target="_blank">YouTube</a>
+          <a href="https://play.google.com/store/apps/details?id=ch.calorio.twa" rel="noopener" target="_blank">Google Play</a>
+        </nav>
       </footer>
       <script dangerouslySetInnerHTML={{ __html: refScript }} />
     </div>
@@ -372,6 +405,7 @@ body{background:var(--lp-bg) !important;color:var(--lp-ink)}
 .lp-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-block:28px 40px;color:var(--lp-muted);font-size:.9rem;border-top:1px solid var(--lp-line)}
 .lp-foot p{margin:0}
 .lp-foot nav{display:flex;gap:16px;flex-wrap:wrap}
+.lp-social{width:100%}
 .lp-foot a{text-decoration:none;font-weight:700}
 @media (max-width:980px){.lp-feats{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:820px){
